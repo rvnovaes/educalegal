@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block body_block %}
   <div class="container">
-      <h1>Entrar:</h1>
+      <h1>Entrar</h1>
         <form method="post" action="{% url 'authentication:user_login' %}">
         {% csrf_token %}
         {{ user_form|crispy }}
