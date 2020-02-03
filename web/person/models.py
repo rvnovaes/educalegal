@@ -1,10 +1,9 @@
 from enum import Enum
-
 from django.conf import settings
 from django.db import models
-from django.utils.translation import gettext, gettext_lazy as _
 
 
+# Podem ser melhoradas)
 INVALIDO = 1
 PHONE = 2
 EMAIL = 3
@@ -16,10 +15,8 @@ LINKEDIN = 8
 INSTAGRAM = 9
 SNAPCHAT = 10
 CONTACT_MECHANISM_TYPE = ((INVALIDO, 'INVÁLIDO'), (PHONE, 'TELEFONE'),
-                          (EMAIL, 'E-MAIL'), (SKYPE, 'SKYPE'), (WHATSAPP,
-                                                                'WHATSAPP'),
-                          (FACEBOOK, 'FACEBOOK'), (SITE, 'SITE'), (LINKEDIN,
-                                                                   'LINKEDIN'),
+                          (EMAIL, 'E-MAIL'), (SKYPE, 'SKYPE'), (WHATSAPP, 'WHATSAPP'),
+                          (FACEBOOK, 'FACEBOOK'), (SITE, 'SITE'), (LINKEDIN, 'LINKEDIN'),
                           (INSTAGRAM, 'INSTAGRAM'), (SNAPCHAT, 'SNAPCHAT'))
 
 
@@ -38,6 +35,7 @@ class LegalType(Enum):
     def format(value):
         """
         Mostra os tipos de pessoa de forma correta, com acento
+
         :param value: Valor selecionado sendo F ou J
         :type value: str
         :return: Retorna o valor a ser mostrado na tela para o usuario final
@@ -47,50 +45,111 @@ class LegalType(Enum):
         return label.get(value)
 
 
-class ContactMechanismType(models.Model):
-    type_contact_mechanism_type = models.IntegerField(
-        choices=CONTACT_MECHANISM_TYPE,
-        verbose_name='Tipo',
-        default=PHONE,
-        null=False)
-    name = models.CharField(max_length=255, null=False, unique=True)
-
-    def is_email(self):
-        return self.type_contact_mechanism_type == EMAIL
+class Audit(models.Model):
+    create_date = models.DateTimeField('Criado em', auto_now_add=True)
+    create_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='%(class)s_create_user',
+        verbose_name='Criado por')
+    alter_date = models.DateTimeField(
+        'Atualizado em', auto_now=True, blank=True, null=True)
+    alter_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name='%(class)s_alter_user',
+        verbose_name='Alterado por')
+    is_active = models.BooleanField(
+        null=False, default=True, verbose_name='Ativo')
 
     class Meta:
-        db_table = 'contact_mechanism_type'
+        abstract = True
+
+    def activate(self):
+        self.is_active = True
+        self.save()
+
+    def deactivate(self):
+        self.is_active = False
+        self.save()
+
+
+class AddressType(Audit):
+    name = models.CharField(max_length=255, null=False, unique=True)
 
     def __str__(self):
         return self.name
 
 
-class AbstractPerson(models.Model):
+class Country(Audit):
+    name = models.CharField(max_length=255, null=False, unique=True)
+
+    class Meta:
+        verbose_name = 'País'
+        verbose_name_plural = 'Países'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class State(Audit):
+    name = models.CharField(max_length=255, null=False, unique=True)
+    initials = models.CharField(max_length=10, null=False, unique=True)
+    country = models.ForeignKey(
+        Country, on_delete=models.PROTECT, blank=False, null=False)
+
+    class Meta:
+        verbose_name = 'Estado'
+        verbose_name_plural = 'Estados'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class City(Audit):
+    name = models.CharField(max_length=255, null=False)
+    state = models.ForeignKey(
+        State, on_delete=models.PROTECT, blank=False, null=False)
+
+    class Meta:
+        verbose_name = 'Cidade'
+        verbose_name_plural = 'Cidades'
+        unique_together = ('name', 'state')
+
+    def __str__(self):
+        return '{} - {}'.format(self.name, self.state.initials)
+
+
+class Person(Audit):
     legal_name = models.CharField(
-        max_length=255, blank=False, verbose_name=_('Razão social/Nome completo'))
+        max_length=255, blank=False, verbose_name='Razão social/Nome completo')
     name = models.CharField(
         max_length=255,
         null=True,
         blank=True,
-        verbose_name=_('Nome Fantasia/Apelido'))
+        verbose_name='Nome Fantasia/Apelido')
     legal_type = models.CharField(
         null=False,
         verbose_name='Tipo',
         max_length=1,
         choices=((x.value, x.format(x.value)) for x in LegalType),
         default=LegalType.JURIDICA)
-    tax_id = models.CharField(
+    cpf_cnpj = models.CharField(
         max_length=255,
         blank=True,
         null=True,
         unique=True,
-        verbose_name=_('CPF/CNPJ'))
+        verbose_name='CPF/CNPJ')
     auth_user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name=_('Usuário do sistema'))
+        verbose_name='Usuário do sistema')
 
     @property
     def cpf(self):
@@ -141,106 +200,90 @@ class AbstractPerson(models.Model):
     def get_address(self):
         return self.address_set.exclude(id=1)
 
-    @property
-    def is_admin(self):
-        return True if self.auth_user.groups.filter(name__startswith=self.ADMINISTRATOR_GROUP).first() \
-            else False
-
-    @property
-    def is_correspondent(self):
-        return True if self.auth_user.groups.filter(name__startswith=self.CORRESPONDENT_GROUP).first() \
-            else False
-
-    @property
-    def is_requester(self):
-        return True if self.auth_user.groups.filter(name__startswith=self.REQUESTER_GROUP).first() \
-            else False
-
-    @property
-    def is_service(self):
-        return True if self.auth_user.groups.filter(name__startswith=self.SERVICE_GROUP).first() \
-            else False
-
-    @property
-    def is_supervisor(self):
-        return True if self.auth_user.groups.filter(name__startswith=self.SUPERVISOR_GROUP).first() \
-            else False
-
-    @property
-    def is_company_representative(self):
-        return True if self.auth_user.groups.filter(name__startswith=self.COMPANY_REPRESENTATIVE).first() \
-            else False
-
-    class Meta:
-        abstract = True
-
     def __str__(self):
         return self.legal_name or ''
 
 
-class Company(models.Model):
+class Company(Person):
     logo = models.ImageField(verbose_name='Logo', null=True, blank=True)
-    name = models.CharField(verbose_name='Empresa', max_length=255)
+    units = models.ManyToManyField('self', blank=True, symmetrical=False)
 
     class Meta:
         verbose_name = 'Empresa'
         verbose_name_plural = 'Empresas'
 
     def __str__(self):
-        return self.name
-
-class Person(AbstractPerson):
-
-    cpf_cnpj = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        unique=False,
-        verbose_name='CPF/CNPJ')
-    create_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='%(class)s_create_user',
-        verbose_name='Criado por')
-    alter_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        related_name='%(class)s_alter_user',
-        verbose_name='Alterado por')
-
-    company = models.ForeignKey(
-        Company,
-        verbose_name='Compartilhar com empresa',
-        null=True,
-        blank=True)
-
-    refunds_correspondent_service = models.BooleanField(
-        null=False, default=False, verbose_name='Cliente reembolsa valor gasto com serviço de correspondência')
-
-    class Meta:
-        db_table = 'person'
-        ordering = ['legal_name', 'name']
-        verbose_name = 'Pessoa'
-        verbose_name_plural = 'Pessoas'
-
-    def simple_serialize(self):
-        """Simple JSON representation of instance"""
-        return {
-            "id": self.id,
-            "legal_name": self.legal_name,
-            "name": self.name
-        }
+        return self.legal_name
 
 
-class ContactMechanism(models.Model):
-    contact_mechanism_type = models.ForeignKey(
-        ContactMechanismType,
+class Address(Audit):
+
+    street = models.CharField(max_length=255, verbose_name='Logradouro')
+    street_number = models.CharField(max_length=255, verbose_name='Número')
+    unit = models.CharField(
+        max_length=255, blank=True, verbose_name='Complemento')
+    city_region = models.CharField(max_length=255, verbose_name='Bairro')
+    zip_code = models.CharField(max_length=255, verbose_name='CEP')
+    address_type = models.ForeignKey(
+        AddressType,
         on_delete=models.PROTECT,
         blank=False,
         null=False,
-        verbose_name="Tipo")
+        verbose_name='Tipo')
+
+    city = models.ForeignKey(
+        City,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+        verbose_name='Cidade')
+    state = models.ForeignKey(
+        State,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+        verbose_name='Estado')
+    country = models.ForeignKey(
+        Country,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+        verbose_name='País')
+    person = models.ForeignKey(
+        Person, on_delete=models.PROTECT, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Endereço'
+        verbose_name_plural = 'Endereços'
+
+    def __str__(self):
+        tpl = '{street}, {number}{complement} - {city_region} - {city} - {state} - CEP {zip_code}'
+        return tpl.format(
+            number=self.street_number,
+            street=self.street,
+            city_region=self.city_region,
+            city=self.city.name,
+            state=self.state.name,
+            zip_code=self.zip_code,
+            complement='/' + self.unit if self.unit else '')
+
+
+class ContactMechanismType(Audit):
+    name = models.CharField(max_length=255, null=False, unique=True)
+    type_contact_mechanism_type = models.IntegerField(
+        choices=CONTACT_MECHANISM_TYPE,
+        verbose_name='Tipo',
+        default=PHONE,
+        null=False)
+
+    def is_email(self):
+        return self.type_contact_mechanism_type == EMAIL
+
+    def __str__(self):
+        return self.name
+
+
+class ContactMechanism(Audit):
     description = models.CharField(
         max_length=255, null=False, verbose_name="Descrição")
     notes = models.CharField(
@@ -248,14 +291,17 @@ class ContactMechanism(models.Model):
     person = models.ForeignKey(
         Person, on_delete=models.CASCADE, blank=True, null=True)
 
+    contact_mechanism_type = models.ForeignKey(
+        ContactMechanismType,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+        verbose_name="Tipo")
+
     class Meta:
-        db_table = 'contact_mechanism'
         verbose_name = 'Mecanismo de contato'
         verbose_name_plural = 'Mecanismos de contato'
-        unique_together = (('description', 'person'))
+        unique_together = ('description', 'person')
 
     def __str__(self):
         return self.description
-
-
-
