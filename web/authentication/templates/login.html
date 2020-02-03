@@ -1,14 +1,12 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 {% block body_block %}
   <div class="container">
-    <div class="jumbotron">
-      <h1>Login here :</h1>
+      <h1>Entrar:</h1>
         <form method="post" action="{% url 'authentication:user_login' %}">
-          {% csrf_token %}
-          {# A more "HTML" way of creating the login form#}
-{{ user_form.as_p }}
-<input type="submit" name="" value="Login">
-</form>
-</div>
+        {% csrf_token %}
+        {{ user_form|crispy }}
+        <button type="submit" class="btn btn-success">Entrar</button>
+        </form>
   </div>
 {% endblock %}

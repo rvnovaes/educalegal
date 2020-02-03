@@ -1,20 +1,17 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 {% load static %}
 {% block body_block %}
   <div class="container">
-    <div class="jumbotron">
       {% if registered %}
-        <h1>Thank you for registering!</h1>
+        <h1>Obrigado por cadastrar-se</h1>
       {% else %}
-        <h1>Register Here</h1>
-        <h3>Just fill out the form.</h3>
-<form enctype="multipart/form-data" method="POST">
+        <h1>Cadastrar:</h1>
+        <form enctype="multipart/form-data" method="POST">
           {% csrf_token %}
-          {{ user_form.as_p }}
-          <input type="submit" name="" value="Register">
+          {{ user_form|crispy }}
+        <button type="submit" class="btn btn-success">Cadastrar</button>
         </form>
-        
       {% endif %}
-    </div>
   </div>
 {% endblock %}
