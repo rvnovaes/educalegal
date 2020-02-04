@@ -2,6 +2,8 @@ from enum import Enum
 from django.conf import settings
 from django.db import models
 
+from audit.models import Audit
+
 # Podem ser melhoradas)
 INVALIDO = 1
 PHONE = 2
@@ -42,37 +44,6 @@ class LegalType(Enum):
         """
         label = {'F': 'Física', 'J': 'Jurídica'}
         return label.get(value)
-
-
-class Audit(models.Model):
-    create_date = models.DateTimeField('Criado em', auto_now_add=True)
-    create_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
-        related_name='%(class)s_create_user',
-        verbose_name='Criado por')
-    alter_date = models.DateTimeField(
-        'Atualizado em', auto_now=True, blank=True, null=True)
-    alter_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-        related_name='%(class)s_alter_user',
-        verbose_name='Alterado por')
-    is_active = models.BooleanField(
-        null=False, default=True, verbose_name='Ativo')
-
-    class Meta:
-        abstract = True
-
-    def activate(self):
-        self.is_active = True
-        self.save()
-
-    def deactivate(self):
-        self.is_active = False
-        self.save()
 
 
 class AddressType(Audit):
@@ -227,7 +198,7 @@ class Person(AbstractPerson):
 
     auth_user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         blank=True,
         null=True,
         verbose_name='Usuário do sistema')
@@ -250,7 +221,6 @@ class Address(Audit):
         blank=False,
         null=False,
         verbose_name='Tipo')
-
     city = models.ForeignKey(
         City,
         on_delete=models.PROTECT,
@@ -273,6 +243,8 @@ class Address(Audit):
         Person, on_delete=models.CASCADE, blank=True, null=True)
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, blank=True, null=True)
+    # abstract_person = models.ForeignKey(
+    #     AbstractPerson, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Endereço'
