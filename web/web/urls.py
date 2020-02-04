@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
     url(r'^authentication/', include('authentication.urls')),
+    url(r'^person/', include('person.urls')),
     url(r'^logout/$', views.user_logout, name='logout'),
 
 ]
