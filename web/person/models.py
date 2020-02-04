@@ -2,7 +2,6 @@ from enum import Enum
 from django.conf import settings
 from django.db import models
 
-
 # Podem ser melhoradas)
 INVALIDO = 1
 PHONE = 2
@@ -79,6 +78,10 @@ class Audit(models.Model):
 class AddressType(Audit):
     name = models.CharField(max_length=255, null=False, unique=True)
 
+    class Meta:
+        verbose_name = 'Tipo de Endereço'
+        verbose_name_plural = 'Tipos de Endereço'
+
     def __str__(self):
         return self.name
 
@@ -124,7 +127,7 @@ class City(Audit):
         return '{} - {}'.format(self.name, self.state.initials)
 
 
-class Person(Audit):
+class AbstractPerson(Audit):
     legal_name = models.CharField(
         max_length=255, blank=False, verbose_name='Razão social/Nome completo')
     name = models.CharField(
@@ -144,12 +147,6 @@ class Person(Audit):
         null=True,
         unique=True,
         verbose_name='CPF/CNPJ')
-    auth_user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        verbose_name='Usuário do sistema')
 
     @property
     def cpf(self):
@@ -200,11 +197,14 @@ class Person(Audit):
     def get_address(self):
         return self.address_set.exclude(id=1)
 
+    class Meta:
+        abstract = True
+
     def __str__(self):
         return self.legal_name or ''
 
 
-class Company(Person):
+class Company(AbstractPerson):
     logo = models.ImageField(verbose_name='Logo', null=True, blank=True)
     units = models.ManyToManyField('self', blank=True, symmetrical=False)
 
@@ -216,8 +216,28 @@ class Company(Person):
         return self.legal_name
 
 
-class Address(Audit):
+class Person(AbstractPerson):
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name='Empresa'
+    )
 
+    auth_user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        verbose_name='Usuário do sistema')
+
+    class Meta:
+        verbose_name = 'Pessoa'
+        verbose_name_plural = 'Pessoas'
+
+
+class Address(Audit):
     street = models.CharField(max_length=255, verbose_name='Logradouro')
     street_number = models.CharField(max_length=255, verbose_name='Número')
     unit = models.CharField(
@@ -250,7 +270,9 @@ class Address(Audit):
         null=False,
         verbose_name='País')
     person = models.ForeignKey(
-        Person, on_delete=models.PROTECT, blank=True, null=True)
+        Person, on_delete=models.CASCADE, blank=True, null=True)
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Endereço'
@@ -290,6 +312,8 @@ class ContactMechanism(Audit):
         max_length=400, blank=True, verbose_name="Observações")
     person = models.ForeignKey(
         Person, on_delete=models.CASCADE, blank=True, null=True)
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, blank=True, null=True)
 
     contact_mechanism_type = models.ForeignKey(
         ContactMechanismType,
@@ -301,7 +325,7 @@ class ContactMechanism(Audit):
     class Meta:
         verbose_name = 'Mecanismo de contato'
         verbose_name_plural = 'Mecanismos de contato'
-        unique_together = ('description', 'person')
+        unique_together = (('description', 'person'), ('description', 'company'))
 
     def __str__(self):
         return self.description
