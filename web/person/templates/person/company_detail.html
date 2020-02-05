@@ -1,7 +1,22 @@
 {% extends 'authentication/base.html' %}
 {% block body_block %}
   <div class="container">
+    <div>
       <h1>Empresa</h1>
         {{ object.name }}
+    </div>
+    <div class="btn-group">
+        <form action="{% url 'person:company-update' pk=object.pk %}">
+            <button type="submit" class="btn btn-success">Editar</button>
+        </form>
+        <form action="{% url 'person:company-delete' pk=object.pk %}">
+            <button type="submit" class="btn btn-danger">Apagar</button>
+        </form>
+        <form action="{% url 'person:company-list' %}">
+            <button type="submit" class="btn btn-primary">Voltar para a lista</button>
+        </form>
+    </div>
+
   </div>
+
 {% endblock %}
