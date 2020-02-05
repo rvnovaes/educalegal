@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    return render(request, 'index.html')
+    return render(request, 'authentication/index.html')
 
 
 @login_required
@@ -29,8 +29,8 @@ def register(request):
             print(user_form.errors)
     else:
         user_form = UserForm()
-    return render(request,'registration.html',
-                          {'user_form':user_form,
+    return render(request, 'authentication/registration.html',
+                  {'user_form':user_form,
                            'registered':registered})
 
 
@@ -47,8 +47,8 @@ def user_login(request):
                 return HttpResponse("Your account was inactive.")
         else:
             print("Someone tried to login and failed.")
-            print("They used username: {} and password: {}".format(username,password))
+            print("They used username: {} and password: {}".format(username, password))
             return HttpResponse("Invalid login details given")
     else:
         user_form = UserForm()
-        return render(request, 'login.html', {'user_form':user_form})
+        return render(request, 'authentication/login.html', {'user_form': user_form})

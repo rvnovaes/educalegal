@@ -4,7 +4,7 @@ from .views import register, user_login
 app_name = 'authentication'
 
 # Be careful setting the name to just /login use userlogin instead!
-urlpatterns=[
+urlpatterns = [
     url(r'^register/$', register, name='register'),
-    url(r'^user_login/$', user_login, name='user_login'),
+    url(r'^login/$', user_login, name='login'),
 ]
