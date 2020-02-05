@@ -1,6 +1,8 @@
 from enum import Enum
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
+
 
 from audit.models import Audit
 
@@ -182,6 +184,9 @@ class Company(AbstractPerson):
     class Meta:
         verbose_name = 'Empresa'
         verbose_name_plural = 'Empresas'
+
+    def get_absolute_url(self):
+        return reverse('company-detail', kwargs={'pk': self.pk})
 
     def __str__(self):
         return self.legal_name
