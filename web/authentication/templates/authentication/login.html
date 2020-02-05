@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'authentication/base.html' %}
 {% load crispy_forms_tags %}
 {% block body_block %}
   <div class="container">
       <h1>Entrar</h1>
-        <form method="post" action="{% url 'authentication:user_login' %}">
+        <form method="post" action="{% url 'authentication:login' %}">
         {% csrf_token %}
         {{ user_form|crispy }}
         <button type="submit" class="btn btn-success">Entrar</button>
