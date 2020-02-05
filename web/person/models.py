@@ -186,7 +186,7 @@ class Company(AbstractPerson):
         verbose_name_plural = 'Empresas'
 
     def get_absolute_url(self):
-        return reverse('company-detail', kwargs={'pk': self.pk})
+        return reverse('person:company-detail', kwargs={'pk': self.pk})
 
     def __str__(self):
         return self.legal_name

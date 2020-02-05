@@ -1,12 +1,17 @@
 from django.shortcuts import render
 from django.views import View
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
 
 from audit.mixins import AuditFormMixin
 
 
+
 from .models import Company
-from .forms import CompanyForm
+
+
+class CompanyDetailView(DetailView):
+    model = Company
 
 
 class CompanyCreate(AuditFormMixin, CreateView):
