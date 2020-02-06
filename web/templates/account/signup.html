@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block body_block %}
   <div class="container">
-      <h1>Criar sua conta</h1>
+      <h2>Criar sua conta</h2>
         <form method="post">{% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-success">Criar</button>

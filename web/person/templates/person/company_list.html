@@ -1,18 +1,16 @@
 {% extends 'base.html' %}
 {% block body_block %}
   <div class="container">
-    <div>
+    <h2>Escolas</h2>
       <ul class="list-group">
         {% for company in companies %}
-          <li class="list-group-item"><a href="{{ company.get_absolute_url }}">{{ company.name }}</a></li>
+          <li class="list-group-item"><a href="{{ company.get_absolute_url }}">{{ company.name }} - {{ company.cpf_cnpj }}</a></li>
         {% endfor %}
       </ul>
-    </div>
     <div class="btn-group">
       <form action="{% url 'person:company-create' %}">
         <button type="submit" class="btn btn-success">Adicionar</button>
       </form>
-    </div>
+   </div>
   </div>
-
 {% endblock %}
