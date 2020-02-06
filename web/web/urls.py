@@ -16,9 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
+from django.conf import settings
+from django.conf.urls.static import static
 
 from authentication import views
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,5 +27,4 @@ urlpatterns = [
     url(r'^authentication/', include('authentication.urls')),
     url(r'^person/', include('person.urls')),
     url(r'^logout/$', views.user_logout, name='logout'),
-
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

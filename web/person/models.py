@@ -248,8 +248,6 @@ class Address(Audit):
         Person, on_delete=models.CASCADE, blank=True, null=True)
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, blank=True, null=True)
-    # abstract_person = models.ForeignKey(
-    #     AbstractPerson, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Endereço'

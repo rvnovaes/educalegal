@@ -2,8 +2,10 @@ from django.db import models
 from django.utils.translation import gettext, gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 
+from tenant.models import TenantAwareModel
 
-class User(AbstractUser):
+
+class User(AbstractUser, TenantAwareModel):
     is_analyst = models.BooleanField(
         _('Analyst'),
         default=False,

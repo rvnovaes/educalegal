@@ -3,13 +3,13 @@
   <div class="container">
     <div>
       <ul class="list-group">
-        {% for company in companies %}
-          <li class="list-group-item"><a href="{{ company.get_absolute_url }}">{{ company.name }}</a></li>
+        {% for address in addresses %}
+          <li class="list-group-item"><a href="{{ address.get_absolute_url }}">{{ address.street }}</a></li>
         {% endfor %}
       </ul>
     </div>
     <div class="btn-group">
-      <form action="{% url 'person:company-create' %}">
+      <form action="{% url 'person:address-create' %}">
         <button type="submit" class="btn btn-success">Adicionar</button>
       </form>
     </div>

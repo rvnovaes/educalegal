@@ -3,24 +3,20 @@
   <div class="container">
     <div class="card">
         <div class="card-header">
-            {{ company.name }}
+            {{ address.name }}
         </div>
         <div class="card-body">
-            <p class="card-text">Nome Completo / Razão Social: {{ company.legal_name }}</p>
-            <p class="card-text">CPF / CNPJ: {{ company.cpf_cnpj }}</p>
-            {% if company.logo %}
-            <img src="{{ company.logo.url }}">
-            {% endif %}
+            <p class="card-text">Rua: {{ address.street }}</p>
         </div>
     </div>
     <div class="btn-group">
-        <form action="{% url 'person:company-update' pk=object.pk %}">
+        <form action="{% url 'person:address-update' pk=object.pk %}">
             <button type="submit" class="btn btn-success" >Editar</button>
         </form>
-        <form action="{% url 'person:company-delete' pk=object.pk %}">
+        <form action="{% url 'person:address-delete' pk=object.pk %}">
             <button type="submit" class="btn btn-danger">Apagar</button>
         </form>
-        <form action="{% url 'person:company-list' %}">
+        <form action="{% url 'person:address-list' %}">
             <button type="submit" class="btn btn-primary">Voltar para a lista</button>
         </form>
     </div>

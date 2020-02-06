@@ -5,11 +5,11 @@ from .models import User
 
 
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'first_name', 'last_name', 'email',
+    list_display = ('tenant', 'username', 'first_name', 'last_name', 'email',
                     'is_staff', 'is_active', 'is_superuser', 'is_analyst', 'is_manager', 'is_administrator')
     list_display_links = ('username',)
     list_editable = ('is_staff', 'is_active', 'is_superuser', 'is_analyst', 'is_manager', 'is_administrator')
-    list_filter = ('is_staff', 'is_active', 'is_superuser', 'is_analyst', 'is_manager', 'is_administrator')
+    list_filter = ('tenant','is_staff', 'is_active', 'is_superuser', 'is_analyst', 'is_manager', 'is_administrator')
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
