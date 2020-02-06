@@ -18,13 +18,13 @@ from django.urls import path, include
 from django.conf.urls import url
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
-from authentication import views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^$', views.index, name='index'),
-    url(r'^authentication/', include('authentication.urls')),
+    url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
+    url(r'^accounts/', include('allauth.urls')),
     url(r'^person/', include('person.urls')),
-    url(r'^logout/$', views.user_logout, name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

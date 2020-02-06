@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from tenant.models import TenantAwareModel
 
 
-class User(AbstractUser, TenantAwareModel):
+class CustomUser(AbstractUser, TenantAwareModel):
     is_analyst = models.BooleanField(
         _('Analyst'),
         default=False,
