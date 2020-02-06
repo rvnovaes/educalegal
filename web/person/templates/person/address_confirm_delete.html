@@ -1,0 +1,10 @@
+{% extends 'authentication/base.html' %}
+{% block body_block %}
+  <div class="container">
+      <h1>Empresa</h1>
+        <form method="post">{% csrf_token %}
+            <p>Tem certeza que deseja apagar "{{ object }}"?</p>
+        <button type="submit" class="btn btn-danger">Confirmar</button>
+        </form>
+  </div>
+{% endblock %}

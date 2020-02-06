@@ -1,0 +1,18 @@
+{% extends 'authentication/base.html' %}
+{% block body_block %}
+  <div class="container">
+    <div>
+      <ul class="list-group">
+        {% for company in companies %}
+          <li class="list-group-item"><a href="{{ company.get_absolute_url }}">{{ company.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="btn-group">
+      <form action="{% url 'person:company-create' %}">
+        <button type="submit" class="btn btn-success">Adicionar</button>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
