@@ -7,7 +7,7 @@ class Tenant(models.Model):
 
 
 class TenantAwareModel(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, default=1)
 
     class Meta:
         abstract = True
