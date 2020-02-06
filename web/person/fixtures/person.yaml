@@ -1,0 +1,39 @@
+- model: person.AddressType
+  pk: 1
+  fields:
+    name: Comercial
+    create_user: 1
+    create_date: 2020-01-01
+- model: person.AddressType
+  pk: 2
+  fields:
+    name: Residencial
+    create_user: 1
+    create_date: 2020-01-01
+- model: person.AddressType
+  pk: 3
+  fields:
+    name: Correspondência
+    create_user: 1
+    create_date: 2020-01-01
+- model: person.Country
+  pk: 1
+  fields:
+    name: Brasil
+    create_user: 1
+    create_date: 2020-01-01
+- model: person.State
+  pk: 1
+  fields:
+    name: Minas Gerais
+    initials: MG
+    country: 1
+    create_user: 1
+    create_date: 2020-01-01
+- model: person.City
+  pk: 1
+  fields:
+    name: Belo Horizonte
+    state: 1
+    create_user: 1
+    create_date: 2020-01-01
