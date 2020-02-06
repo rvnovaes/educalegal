@@ -14,21 +14,24 @@ class AddressCreateView(AuditFormMixin, CreateView):
     model = Address
     fields = ['street', 'street_number', 'unit', 'city_region', 'zip_code', 'address_type', 'city', 'state', 'country']
 
+    def form_valid(self, form):
+        context = super().get_context_data()
+        company = context['view'].kwargs['company']
+        form.instance.company_id = company
+        return super().form_valid(form)
+
 
 class AddressDeleteView(DeleteView):
     model = Address
     context_object_name = 'address'
-    success_url = reverse_lazy('person:address-list')
+
+    def get_success_url(self):
+        return reverse_lazy('person:company-detail', args=[self.object.company.id])
 
 
 class AddressDetailView(LoginRequiredMixin, DetailView):
     model = Address
     context_object_name = 'address'
-
-
-class AddressListView(LoginRequiredMixin, ListView):
-    model = Address
-    context_object_name = 'addresses'
 
 
 class AddressUpdateView(AuditFormMixin, UpdateView):

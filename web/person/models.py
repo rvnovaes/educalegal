@@ -253,6 +253,9 @@ class Address(Audit):
         verbose_name = 'Endereço'
         verbose_name_plural = 'Endereços'
 
+    def get_absolute_url(self):
+        return reverse('person:address-detail', kwargs={'pk': self.pk})
+
     def __str__(self):
         tpl = '{street}, {number}{complement} - {city_region} - {city} - {state} - CEP {zip_code}'
         return tpl.format(

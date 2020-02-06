@@ -1,14 +1,13 @@
 from django.urls import path
-from .views import AddressCreateView, AddressDetailView, AddressDeleteView, AddressListView, AddressUpdateView
+from .views import AddressCreateView, AddressDetailView, AddressDeleteView, AddressUpdateView
 from .views import CompanyCreateView, CompanyDetailView, CompanyDeleteView, CompanyListView, CompanyUpdateView
 
 app_name = 'person'
 
 
 urlpatterns = [
-    path('address/', AddressListView.as_view(), name='address-list'),
     path('address/<int:pk>', AddressDetailView.as_view(), name='address-detail'),
-    path('address/create/', AddressCreateView.as_view(), name='address-create'),
+    path('address/create/<int:company>', AddressCreateView.as_view(), name='address-create'),
     path('address/update/<int:pk>', AddressUpdateView.as_view(), name='address-update'),
     path('address/delete/<int:pk>', AddressDeleteView.as_view(), name='address-delete'),
     path('company/', CompanyListView.as_view(), name='company-list'),
