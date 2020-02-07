@@ -1,10 +1,9 @@
-from django.shortcuts import render
 from django.views.generic.edit import CreateView
-from audit.mixins import AuditFormMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Tenant
 
 
-class TenantCreateView(AuditFormMixin, CreateView):
+class TenantCreateView(LoginRequiredMixin, CreateView):
     model = Tenant
     fields = ['name']

@@ -1,16 +1,16 @@
 from django.db import models
-from person.models import Company
+from tenant.models import TenantAwareModel
 
 
-class Configuration(models.Model):
+class GEDConfiguration(TenantAwareModel):
 
     ged_url = models.CharField(max_length=255, null=True, blank=True,
                                verbose_name='URL do GED')
+    token = models.CharField(max_length=255, null=True, blank=True,
+                               verbose_name='Token da API')
 
-    company = models.OneToOneField(
-        Company,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        verbose_name='Empresa'
-    )
+    def __str__(self):
+        return self.ged_url
+
+
+

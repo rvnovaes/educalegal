@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Configuration
+from .models import GEDConfiguration
 
 
-class ConfigurationAdmin(admin.ModelAdmin):
+class GEDConfigurationAdmin(admin.ModelAdmin):
     pass
 
-admin.site.register(Configuration, ConfigurationAdmin)
+
+admin.site.register(GEDConfiguration, GEDConfigurationAdmin)

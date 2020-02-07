@@ -1,0 +1,15 @@
+- model: school.Country
+  pk: 1
+  fields:
+    name: Brasil
+- model: school.State
+  pk: 1
+  fields:
+    name: Minas Gerais
+    initials: MG
+    country: 1
+- model: school.City
+  pk: 1
+  fields:
+    name: Belo Horizonte
+    state: 1

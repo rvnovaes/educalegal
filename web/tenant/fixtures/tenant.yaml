@@ -1,5 +1,5 @@
 - model: tenant.tenant
-  pk: 1
+  pk: 2
   fields:
     name: Educa Legal
     subdomain_prefix: edu

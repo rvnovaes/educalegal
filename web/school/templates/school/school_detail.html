@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block body_block %}
+  <div class="container">
+    <div class="card">
+        <div class="card-header">
+            {{ school.name }}
+        </div>
+        <div class="card-body">
+            <p class="card-text">Razão Social: {{ school.legal_name }}</p>
+            <p class="card-text">CNPJ: {{ school.cnpj }}</p>
+            {% if school.logo %}
+            <img src="{{ school.logo.url }}">
+            {% endif %}
+        </div>
+    </div>
+    <div class="btn-group">
+        <form action="{% url 'school:school-update' pk=school.pk %}">
+            <button type="submit" class="btn btn-primary" >Editar</button>
+        </form>
+        <form action="{% url 'school:school-list' %}">
+            <button type="submit" class="btn btn-primary">Voltar para a lista</button>
+        </form>
+        <form action="{% url 'school:school-delete' pk=school.pk %}">
+            <button type="submit" class="btn btn-danger">Apagar</button>
+        </form>
+    </div>
+  </div>
+
+{% endblock %}

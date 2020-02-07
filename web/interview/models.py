@@ -1,12 +1,8 @@
-from enum import Enum
-from django.conf import settings
 from django.db import models
-from django.urls import reverse
-
-from audit.models import Audit
+from tenant.models import TenantAwareModel
 
 
-class Interview(Audit):
+class Interview(TenantAwareModel):
     name = models.CharField(max_length=512, null=True)
     version = models.CharField(max_length=512, null=True)
     date_available = models.DateField(null=True)
@@ -15,3 +11,4 @@ class Interview(Audit):
 
     def __str__(self):
         return self.name
+
