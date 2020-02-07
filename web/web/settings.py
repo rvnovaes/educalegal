@@ -39,14 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'django_tables2',
     'tenant',
     'users',
     'school',
     'interview',
     'ged_configuration',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
 
 ]
 

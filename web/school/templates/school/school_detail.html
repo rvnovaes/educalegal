@@ -17,13 +17,9 @@
         <form action="{% url 'school:school-update' pk=school.pk %}">
             <button type="submit" class="btn btn-primary" >Editar</button>
         </form>
-        <form action="{% url 'school:school-list' %}">
-            <button type="submit" class="btn btn-primary">Voltar para a lista</button>
-        </form>
         <form action="{% url 'school:school-delete' pk=school.pk %}">
             <button type="submit" class="btn btn-danger">Apagar</button>
         </form>
     </div>
   </div>
-
 {% endblock %}

@@ -72,8 +72,8 @@ class City(models.Model):
 
 
 class School(TenantAwareModel):
-    legal_name = models.CharField(max_length=255, blank=False, verbose_name='Razão social/Nome completo')
-    name = models.CharField(max_length=255, null=True, blank=True, verbose_name='Nome Fantasia/Apelido')
+    legal_name = models.CharField(max_length=255, blank=False, verbose_name='Razão social')
+    name = models.CharField(max_length=255, null=True, blank=True, verbose_name='Nome Fantasia')
     legal_type = models.CharField(null=False,
         verbose_name='Tipo',
         max_length=1,
@@ -81,7 +81,6 @@ class School(TenantAwareModel):
         default=LegalType.JURIDICA)
     cnpj = models.CharField(max_length=255, blank=True, null=True, unique=True, verbose_name='CNPJ')
     logo = models.ImageField(verbose_name='Logo', null=True, blank=True)
-    units = models.ManyToManyField('self', blank=True, symmetrical=False, verbose_name='Unidades')
     street = models.CharField(max_length=255, null=True, blank=True, verbose_name='Logradouro')
     street_number = models.CharField(max_length=255, null=True, blank=True, verbose_name='Número')
     unit = models.CharField(max_length=255, blank=True, null=True, verbose_name='Complemento')

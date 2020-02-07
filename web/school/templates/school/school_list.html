@@ -1,14 +1,11 @@
 {% extends 'base.html' %}
+{% load render_table from django_tables2 %}
 {% block body_block %}
   <div class="container">
     <h2>Escolas</h2>
       {% if schools %}
-        <ul class="list-group">
-          {% for school in schools %}
-            <li class="list-group-item"><a href="{{ school.get_absolute_url }}">{{ school.name }} - {{ school.cnpj }}</a></li>
-          {% endfor %}
-        </ul>
-    {% else %}
+          {% render_table table %}
+      {% else %}
       <div class="alert alert-info" role="alert">
         Você não tem escolas cadastradas.
       </div>
