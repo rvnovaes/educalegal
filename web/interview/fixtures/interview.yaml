@@ -1,0 +1,71 @@
+- model: interview.Interview
+  pk: 1
+  fields:
+    name: Contrato do aluno
+    version: 1.1
+    date_available: 2020-01-23
+    description: Contrato de prestação de serviços educacionais entre aluno e escola.
+    url: https://docs.educalegal.com.br/interview?i=docassemble.playground6%3Abr-com-educalegal-contrato-prestacao-servicos-educacionais.yml&new_session=1
+    create_user: 1
+    create_date: 2020-01-01
+- model: interview.Interview
+  pk: 2
+  fields:
+    name: Contrato de consultoria
+    version: 1.1
+    date_available: 2020-01-23
+    description: Um contrato para consultores darem palpite sobre o que você já sabe e te cobrarem por isso.
+    url: https://docs.educalegal.com.br/interview?i=docassemble.playground6%3Abr-com-educalegal-contrato-prestacao-servicos-consultoria.yml&new_session=1
+    create_user: 1
+    create_date: 2020-01-01
+- model: interview.Interview
+  pk: 3
+  fields:
+    name: Termo de confidencialidade - NDA
+    version: 1.1
+    date_available: 2020-01-23
+    description: Promete guardar segredo?
+    url: https://docs.educalegal.com.br/interview?i=docassemble.playground6%3Abr-com-educalegal-termo-de-confidencialidade-nda.yml&new_session=1
+    create_user: 1
+    create_date: 2020-01-01
+- model: interview.Interview
+  pk: 4
+  fields:
+    name: Autorização de uso de imagem
+    version: 1.1
+    date_available: 2020-12-01
+    description: Posso tirar fotos do seu filho e colocar no Instagram da escola?
+    url: https://docs.educalegal.com.br/interview?i=docassemble.playground6%3Abr-com-educalegal-termo-de-autorizacao-do-uso-de-imagem.yml&new_session=1
+    create_user: 1
+    create_date: 2020-01-01
+- model: interview.Interview
+  pk: 5
+  fields:
+    name: Contrato de prestação de serviços
+    version: 1.1
+    date_available: 2020-01-23
+    description: Contrato para prestadores de serviço em geral não te darem tanta raiva.
+    url: https://docs.educalegal.com.br/interview?i=docassemble.playground6%3Abr-com-educalegal-contrato-prestacao-servicos-com-sem-cessao-mao-obra.yml&new_session=1
+    create_user: 1
+    create_date: 2020-01-01
+- model: interview.Interview
+  pk: 6
+  fields:
+    name: Contrato de locação de imóvel
+    version: 1.1
+    date_available: 2020-01-23
+    description: Usando nosso sistema você nunca mais vai perder o prazo da renovatória.
+    url: https://docs.educalegal.com.br/interview?i=docassemble.playground6%3Abr-com-educalegal-contrato-de-locacao-de-imovel.yml&new_session=1
+    create_user: 1
+    create_date: 2020-01-01
+- model: interview.Interview
+  pk: 7
+  fields:
+    name: Notificação de cobrança
+    version: 1.1
+    date_available: 2020-01-23
+    description: Aquela cartinha que ninguém gosta de receber. Por isso, use assinatura eletrônica para enviá-la.
+    url: https://docs.educalegal.com.br/interview?i=docassemble.playground6%3Abr-com-educalegal-notificacao-extrajudicial.yml&new_session=1
+    create_user: 1
+    create_date: 2020-01-01
+

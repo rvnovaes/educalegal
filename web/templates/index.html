@@ -4,10 +4,8 @@
 <div class="container">
     {% if user.is_authenticated %}
         <h2>Olá, {{ user.username }}</h2>
-
     {% else %}
         <img class="mx-auto d-block" src="{% static 'tenant/educa-legal-logo.png' %}" alt="Educa Legal Logo">
     {% endif %}
-
 </div>
 {% endblock %}

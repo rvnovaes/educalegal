@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block body_block %}
+  <div class="container">
+    <h2>Meus Modelos</h2>
+    <div class="card-columns">
+      {% for interview in interviews %}
+        <div class="card">
+          <div class="card-header" style="min-height: 5rem">
+            <h5>{{ interview.name }}</h5>
+          </div>
+          <div class="card-body" style="min-height: 16rem">
+            <p class="card-text">{{ interview.description }}</p>
+            <p class="card-text">Disponibilizado em: {{ interview.date_available|date:"d-m-yy" }}</p>
+            <p class="card-text">Versão: {{ interview.version }}</p>
+            <a href="{{ interview.url }}" target="_blank" class="btn btn-primary">Clique aqui</a>
+          </div>
+          <div class="card-footer">
+            <small class="text-muted">Versão: {{ interview.version }} - Disponibilizado em: {{ interview.date_available|date:"d-m-yy" }}</small>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+{% endblock %}

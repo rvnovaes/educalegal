@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'users',
     'audit',
     'person',
+    'interview',
     'ged_configuration',
     'allauth',
     'allauth.account',
