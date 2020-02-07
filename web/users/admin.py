@@ -12,7 +12,7 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ('tenant','is_staff', 'is_active', 'is_superuser', 'is_analyst', 'is_manager', 'is_administrator')
 
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
+        (None, {'fields': ('tenant','username', 'password')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
         (_('Permissions'), {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'is_analyst', 'is_manager', 'is_administrator',

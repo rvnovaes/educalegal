@@ -18,15 +18,14 @@ from django.urls import path, include
 from django.conf.urls import url
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import TemplateView
 
+from allauth.account.views import LoginView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
+    url(r'^$', LoginView.as_view()),
     url(r'^account/', include('allauth.urls')),
     url(r'^interview/', include('interview.urls')),
     url(r'^school/', include('school.urls')),
-    url(r'^tenant/', include('tenant.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -9,13 +9,9 @@ from .models import School
 
 class SchoolCreateView(LoginRequiredMixin, CreateView):
     model = School
-    fields = '__all__'
-
-    def get_form(self, form_class=None):
-        form = super().get_form()
-        # form.fields['tenant'].widget.attrs['readonly'] = 'readonly'
-        # form.fields['tenant'].widget.attrs['disabled'] = 'disabled'
-        return form
+    fields = ['name', 'legal_name', 'legal_type', 'cnpj', 'logo', 'units', 'street',
+              'street_number', 'unit', 'city_region', 'zip_code', 'phone', 'email',
+              'city', 'state', 'country']
 
 
 class SchoolDeleteView(LoginRequiredMixin, DeleteView):
@@ -36,5 +32,7 @@ class SchoolListView(LoginRequiredMixin, ListView):
 
 class SchoolUpdateView(LoginRequiredMixin, UpdateView):
     model = School
-    fields = '__all__'
+    fields = ['name', 'legal_name', 'legal_type', 'cnpj', 'logo', 'units', 'street',
+              'street_number', 'unit', 'city_region', 'zip_code', 'phone', 'email',
+              'city', 'state', 'country']
 

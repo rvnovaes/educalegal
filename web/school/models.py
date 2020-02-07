@@ -81,31 +81,31 @@ class School(TenantAwareModel):
         default=LegalType.JURIDICA)
     cnpj = models.CharField(max_length=255, blank=True, null=True, unique=True, verbose_name='CNPJ')
     logo = models.ImageField(verbose_name='Logo', null=True, blank=True)
-    units = models.ManyToManyField('self', blank=True, symmetrical=False)
-    street = models.CharField(max_length=255, verbose_name='Logradouro')
-    street_number = models.CharField(max_length=255, verbose_name='Número')
-    unit = models.CharField(max_length=255, blank=True, verbose_name='Complemento')
-    city_region = models.CharField(max_length=255, verbose_name='Bairro')
-    zip_code = models.CharField(max_length=255, verbose_name='CEP')
-    phone = models.CharField(max_length=255, verbose_name='Telefone')
-    email = models.EmailField(verbose_name='E-mail')
+    units = models.ManyToManyField('self', blank=True, symmetrical=False, verbose_name='Unidades')
+    street = models.CharField(max_length=255, null=True, blank=True, verbose_name='Logradouro')
+    street_number = models.CharField(max_length=255, null=True, blank=True, verbose_name='Número')
+    unit = models.CharField(max_length=255, blank=True, null=True, verbose_name='Complemento')
+    city_region = models.CharField(max_length=255, null=True, blank=True, verbose_name='Bairro')
+    zip_code = models.CharField(max_length=255, null=True, blank=True, verbose_name='CEP')
+    phone = models.CharField(max_length=255, null=True, blank=True, verbose_name='Telefone')
+    email = models.EmailField(null=True, blank=True, verbose_name='E-mail')
     city = models.ForeignKey(
         City,
         on_delete=models.PROTECT,
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         verbose_name='Cidade')
     state = models.ForeignKey(
         State,
         on_delete=models.PROTECT,
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         verbose_name='Estado')
     country = models.ForeignKey(
         Country,
         on_delete=models.PROTECT,
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         verbose_name='País')
 
     def __str__(self):

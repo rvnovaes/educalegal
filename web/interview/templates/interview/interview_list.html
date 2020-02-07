@@ -8,10 +8,8 @@
             <div class="card-header" style="min-height: 3rem">
               <h5>{{ interview.name }}</h5>
             </div>
-            <div class="card-body" style="min-height: 12rem">
+            <div class="card-body" style="min-height: 8rem">
               <p class="card-text">{{ interview.description }}</p>
-              <p class="card-text">Disponibilizado em: {{ interview.date_available|date:"d-m-yy" }}</p>
-              <p class="card-text">Versão: {{ interview.version }}</p>
               <a href="{{ interview.url }}" target="_blank" class="btn btn-primary">Clique aqui</a>
             </div>
             <div class="card-footer">
