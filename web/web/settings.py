@@ -47,8 +47,6 @@ INSTALLED_APPS = [
     'users',
     'school',
     'interview',
-    'ged_configuration',
-
 ]
 
 MIDDLEWARE = [
