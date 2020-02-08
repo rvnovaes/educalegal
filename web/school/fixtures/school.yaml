@@ -8,8 +8,30 @@
     name: Minas Gerais
     initials: MG
     country: 1
+- model: school.State
+  pk: 2
+  fields:
+    name: Rio de Janeiro
+    initials: RJ
+    country: 1
+- model: school.State
+  pk: 3
+  fields:
+    name: São Paulo
+    initials: SP
+    country: 1
 - model: school.City
   pk: 1
   fields:
     name: Belo Horizonte
     state: 1
+- model: school.City
+  pk: 2
+  fields:
+    name: Rio de Janeiro
+    state: 2
+- model: school.City
+  pk: 3
+  fields:
+    name: São Paulo
+    state: 3
