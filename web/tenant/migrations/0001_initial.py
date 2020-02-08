@@ -4,8 +4,8 @@ from django.db import migrations, models
 
 
 def create_system_tenant(apps, schema_editor):
-    Tenant = apps.get_model('tenant', 'Tenant')
-    system_tenant = Tenant(name='System', subdomain_prefix='sys')
+    Tenant = apps.get_model("tenant", "Tenant")
+    system_tenant = Tenant(name="System", subdomain_prefix="sys")
     system_tenant.save()
 
 
@@ -13,17 +13,24 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Tenant',
+            name="Tenant",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('subdomain_prefix', models.CharField(max_length=100, unique=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("subdomain_prefix", models.CharField(max_length=100, unique=True)),
             ],
         ),
-        migrations.RunPython(create_system_tenant)
+        migrations.RunPython(create_system_tenant),
     ]

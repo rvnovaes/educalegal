@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from rest_framework import generics
 
-# Create your views here.
+from tenant.models import Tenant
+from .serializers import TenantSerializer
+
+
+class TenantAPIViewList(generics.ListAPIView):
+    queryset = Tenant.objects.all()
+    serializer_class = TenantSerializer
+
+
+class TenantAPIViewDetail(generics.RetrieveAPIView):
+    queryset = Tenant.objects.all()
+    serializer_class = TenantSerializer

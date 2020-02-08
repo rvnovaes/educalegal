@@ -12,30 +12,60 @@ from .tables import SchoolTable
 
 class SchoolCreateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, CreateView):
     model = School
-    fields = ['name', 'legal_name', 'legal_type', 'cnpj', 'logo', 'street',
-              'street_number', 'unit', 'city_region', 'zip_code', 'phone', 'site',
-              'email', 'city', 'state', 'country']
+    fields = [
+        "name",
+        "legal_name",
+        "legal_type",
+        "cnpj",
+        "logo",
+        "street",
+        "street_number",
+        "unit",
+        "city_region",
+        "zip_code",
+        "phone",
+        "site",
+        "email",
+        "city",
+        "state",
+        "country",
+    ]
 
 
 class SchoolDeleteView(LoginRequiredMixin, TenantAwareViewMixin, DeleteView):
     model = School
-    context_object_name = 'school'
-    success_url = reverse_lazy('school:school-list')
+    context_object_name = "school"
+    success_url = reverse_lazy("school:school-list")
 
 
 class SchoolDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
     model = School
-    context_object_name = 'school'
+    context_object_name = "school"
 
 
 class SchoolListView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView):
     model = School
     table_class = SchoolTable
-    context_object_name = 'schools'
+    context_object_name = "schools"
 
 
 class SchoolUpdateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, UpdateView):
     model = School
-    fields = ['name', 'legal_name', 'legal_type', 'cnpj', 'logo', 'street',
-              'street_number', 'unit', 'city_region', 'zip_code', 'phone', 'site',
-              'email', 'city', 'state', 'country']
+    fields = [
+        "name",
+        "legal_name",
+        "legal_type",
+        "cnpj",
+        "logo",
+        "street",
+        "street_number",
+        "unit",
+        "city_region",
+        "zip_code",
+        "phone",
+        "site",
+        "email",
+        "city",
+        "state",
+        "country",
+    ]

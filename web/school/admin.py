@@ -22,5 +22,3 @@ admin.site.register(City, CityAdmin)
 admin.site.register(School, SchoolAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(State, StateAdmin)
-
-

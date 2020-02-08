@@ -23,9 +23,10 @@ from allauth.account.views import LoginView
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    url(r'^$', LoginView.as_view()),
-    url(r'^account/', include('allauth.urls')),
-    url(r'^interview/', include('interview.urls')),
-    url(r'^school/', include('school.urls')),
+    path("admin/", admin.site.urls),
+    url(r"^$", LoginView.as_view()),
+    url(r"^account/", include("allauth.urls")),
+    url(r"^interview/", include("interview.urls")),
+    url(r"^school/", include("school.urls")),
+    path("api/", include("api.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
