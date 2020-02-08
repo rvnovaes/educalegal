@@ -72,8 +72,8 @@ class City(models.Model):
 
 
 class School(TenantAwareModel):
-    legal_name = models.CharField(max_length=255, blank=False, verbose_name='Razão social')
     name = models.CharField(max_length=255, null=True, blank=True, verbose_name='Nome Fantasia')
+    legal_name = models.CharField(max_length=255, blank=False, verbose_name='Razão social')
     legal_type = models.CharField(null=False,
         verbose_name='Tipo',
         max_length=1,
@@ -112,15 +112,15 @@ class School(TenantAwareModel):
 
     @property
     def address(self):
-        tpl = '{street}, {number}{complement} - {city_region} - {city} - {state} - CEP {zip_code}'
+        tpl = '{street}, {street_number}{unit} - {city_region} - {city} - {state} - CEP {zip_code}'
         return tpl.format(
-            number=self.street_number,
-            street=self.street,
-            city_region=self.city_region,
-            city=self.city.name,
-            state=self.state.name,
-            zip_code=self.zip_code,
-            complement='/' + str(self.unit) if self.unit else '')
+            street_number=self.street_number if self.street_number else '',
+            street=self.street if self.street else '',
+            city_region=self.city_region if self.city_region else '',
+            city=self.city.name if self.city else '',
+            state=self.state.initials if self.state else '',
+            zip_code=self.zip_code if self.zip_code else '',
+            unit='/' + self.unit if self.unit else '')
 
     def get_absolute_url(self):
         return reverse('school:school-detail', kwargs={'pk': self.pk})

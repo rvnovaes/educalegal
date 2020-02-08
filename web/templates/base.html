@@ -15,9 +15,17 @@
         .card {
             margin-bottom: 1rem;
         }
+        .card-header{
+            min-height: 3rem;
+        }
+        .card-body{
+            min-height: 8rem;
+        }
         .docassemble-line-height{
             line-height: 1.2 !important;
         }
+
+
     </style>
 </head>
   <body>
@@ -30,6 +38,7 @@
             <ul class="navbar-nav mr-auto">
               <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}">Meus Modelos</a></li>
               <li class="nav-item"><a class="nav-link text-white" href="{% url 'school:school-list' %}">Escolas</a></li>
+              <li class="nav-item"><a class="nav-link text-white" href="{{ user.tenant.ged_url }}" target="_blank">{% if user.tenant.ged_url %} GED {% endif %}</a></li>
               <li class="nav-item"><a class="nav-link text-white" href="{% url 'account_logout' %}">Sair</a></li>
           </ul>
         </div>

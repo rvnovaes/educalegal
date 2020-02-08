@@ -5,10 +5,10 @@
       {% if interviews %}
         {% for interview in interviews %}
           <div class="card">
-            <div class="card-header" style="min-height: 3rem">
+            <div class="card-header">
               <h5>{{ interview.name }}</h5>
             </div>
-            <div class="card-body" style="min-height: 8rem">
+            <div class="card-body">
               <p class="card-text">{{ interview.description }}</p>
               <a href="{{ interview.url }}" target="_blank" class="btn btn-primary">Clique aqui</a>
             </div>

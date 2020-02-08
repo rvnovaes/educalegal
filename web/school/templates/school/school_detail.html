@@ -2,16 +2,23 @@
 {% block body_block %}
   <div class="container">
     <div class="card">
-        <div class="card-header">
-            {{ school.name }}
-        </div>
-        <div class="card-body">
-            <p class="card-text">Razão Social: {{ school.legal_name }}</p>
-            <p class="card-text">CNPJ: {{ school.cnpj }}</p>
-            {% if school.logo %}
-            <img src="{{ school.logo.url }}">
-            {% endif %}
-        </div>
+      <div class="card-header">
+        <h5>{% if school.name %}{{ school.name }}{% endif %}</h5>
+      </div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          {% if school.logo %}
+          <li class="list-group-item"><img class="img-rounded float-lef" src="{{ school.logo.url }}"></li>
+          {% endif %}
+          <li class="list-group-item">Razão Social: {{ school.legal_name }}</li>
+          <li class="list-group-item">
+              Tipo: {% if school.legal_type == 'J' %} Jurídica {% else %} Física {% endif %}
+          </li>
+          <li class="list-group-item">Telefone: {% if school.phone %}{{ school.phone }}{% endif %}</li>
+          <li class="list-group-item">E-mail: {% if school.email %}{{ school.email }}{% endif %}</li>
+          <li class="list-group-item">Endereço: {{ school.address }}</li>
+        </ul>
+      </div>
     </div>
     <div class="btn-group">
         <form action="{% url 'school:school-update' pk=school.pk %}">
