@@ -87,6 +87,7 @@ class School(TenantAwareModel):
     city_region = models.CharField(max_length=255, null=True, blank=True, verbose_name='Bairro')
     zip_code = models.CharField(max_length=255, null=True, blank=True, verbose_name='CEP')
     phone = models.CharField(max_length=255, null=True, blank=True, verbose_name='Telefone')
+    site = models.URLField(null=True, blank=True, verbose_name='Site')
     email = models.EmailField(null=True, blank=True, verbose_name='E-mail')
     city = models.ForeignKey(
         City,

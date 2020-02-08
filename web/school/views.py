@@ -12,8 +12,8 @@ from .tables import SchoolTable
 class SchoolCreateView(LoginRequiredMixin, CreateView):
     model = School
     fields = ['name', 'legal_name', 'legal_type', 'cnpj', 'logo', 'street',
-              'street_number', 'unit', 'city_region', 'zip_code', 'phone', 'email',
-              'city', 'state', 'country']
+              'street_number', 'unit', 'city_region', 'zip_code', 'phone', 'site',
+              'email', 'city', 'state', 'country']
 
     def form_valid(self, form):
         form.instance.tenant_id = self.request.user.tenant_id
@@ -49,8 +49,8 @@ class SchoolListView(LoginRequiredMixin, SingleTableView):
 class SchoolUpdateView(LoginRequiredMixin, UpdateView):
     model = School
     fields = ['name', 'legal_name', 'legal_type', 'cnpj', 'logo', 'street',
-              'street_number', 'unit', 'city_region', 'zip_code', 'phone', 'email',
-              'city', 'state', 'country']
+              'street_number', 'unit', 'city_region', 'zip_code', 'phone', 'site',
+              'email', 'city', 'state', 'country']
 
     def form_valid(self, form):
         form.instance.tenant_id = self.request.user.tenant_id
