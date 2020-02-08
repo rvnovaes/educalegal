@@ -11,9 +11,12 @@
           <li class="list-group-item"><img class="img-rounded float-lef" src="{{ school.logo.url }}"></li>
           {% endif %}
           <li class="list-group-item">
-              <span class="font-weight-bold">Razão Social: </span>{{ school.legal_name }}</li>
+              <span class="font-weight-bold">Razão Social: </span>{% if school.legal_name %}{{ school.legal_name }}{% endif %}</li>
           <li class="list-group-item">
               <span class="font-weight-bold">Tipo: </span>{% if school.legal_type == 'J' %} Jurídica {% else %} Física {% endif %}
+          </li>
+          <li class="list-group-item">
+              <span class="font-weight-bold">CNPJ: </span>{% if school.cnpj %}{{ school.cnpj}}{% endif %}
           </li>
           <li class="list-group-item">
               <span class="font-weight-bold">Telefone: </span>{% if school.phone %}{{ school.phone }}{% endif %}</li>
