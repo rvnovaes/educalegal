@@ -15,22 +15,28 @@
         .card {
             margin-bottom: 1rem;
         }
+        .docassemble-line-height{
+            line-height: 1.2 !important;
+        }
     </style>
 </head>
   <body>
-          {% if user.is_authenticated %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <span class="navbar-brand">{{ user.tenant.name}}</span>
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item"><a class="nav-link" href="{% url 'interview:interview-list' %}">Meus Modelos</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'school:school-list' %}">Escolas</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sair</a></li>
-        </ul>
+
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-fixed-top navbar-expand-md navbar-dark bg-dark docassemble-line-height">
+      <div class="container danavcontainer justify-content-start">
+        <span class="navbar-brand">{{ user.tenant.name}}</span>
+          <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}">Meus Modelos</a></li>
+              <li class="nav-item"><a class="nav-link text-white" href="{% url 'school:school-list' %}">Escolas</a></li>
+              <li class="nav-item"><a class="nav-link text-white" href="{% url 'account_logout' %}">Sair</a></li>
+          </ul>
+        </div>
       </div>
     </nav>
           {% endif %}
-    <div class="container">
+
     <br/>
     {% block body_block %}
     {% endblock %}
