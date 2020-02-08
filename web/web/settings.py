@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "django_tables2",
     "rest_framework",
+    "rest_framework_swagger",
+    "corsheaders",
     # Local
     "tenant",
     "users",
@@ -56,6 +58,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -155,3 +158,18 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_UNIQUE_EMAIL = True
 LOGIN_REDIRECT_URL = "interview:interview-list"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+
+# API Settings
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny", ],
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema"
+    # "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated",]
+}
+
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "https://dev.silexsistemas.com.br",
+    "https://docs.educalegal.com.br",
+)

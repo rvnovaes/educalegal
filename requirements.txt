@@ -1,8 +1,9 @@
 django==3.0.2
 djangorestframework==3.11.0
 django-cors-headers==3.2.1
+coreapi==2.3.3
 django-crispy-forms==1.8.1
 Pillow
-pyyaml
+pyyaml==5.1.2
 django-allauth
 django-tables2
