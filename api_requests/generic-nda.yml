@@ -1,0 +1,38 @@
+metadata:
+  title: Termo de Confidencialidade Genérico
+---
+modules:
+  - .element_educalegal_app
+---
+id: logic
+mandatory: true
+code: |
+  if 'tid' in url_args:
+    valid_tenant
+  else:
+    invalid_tenant
+---
+id: setup
+code: |
+  schema = "http://web:8000/api/docs"
+  tenant_uuid = url_args['tid']
+  params ={"unique_id": tenant_uuid}
+  tenant_data = get_tenant_data(schema, params)
+  tenant_name = tenant_data['name']
+  tenant_ged_url = tenant_data['ged_url']
+  tenant_ged_token = tenant_data['ged_token']
+---
+event: valid_tenant
+question: Valid Tenant
+subquestion: |
+  * ${ tenant_uuid }
+  * ${ tenant_name }
+  * ${ tenant_ged_url }
+  * ${ tenant_ged_token }
+buttons:
+  - Exit: exit
+---
+event: invalid_tenant
+question: Não é possível criar a entrevista
+buttons:
+  - Exit: exit
