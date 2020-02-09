@@ -25,7 +25,7 @@ SECRET_KEY = "mvyzst83ep^g72ho)29dm+zq&+we8qbg82u8q_(_7$$a=i_@*n"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "django_tables2",
     "rest_framework",
-    "rest_framework_swagger",
     "corsheaders",
     # Local
     "tenant",
@@ -92,8 +91,12 @@ WSGI_APPLICATION = "web.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": "db",
+        "PORT": 5432,
     }
 }
 
@@ -162,7 +165,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 # API Settings
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny", ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny",],
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema"
     # "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated",]
 }
