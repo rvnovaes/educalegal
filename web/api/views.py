@@ -9,6 +9,9 @@ class TenantAPIViewList(generics.ListAPIView):
     serializer_class = TenantSerializer
 
 
-class TenantAPIViewDetail(generics.RetrieveAPIView):
-    queryset = Tenant.objects.all()
+class TenantAPIViewDetail(generics.ListAPIView):
     serializer_class = TenantSerializer
+
+    def get_queryset(self):
+        uuid = self.kwargs['unique_id']
+        return Tenant.objects.filter(unique_id=uuid)

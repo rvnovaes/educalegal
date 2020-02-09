@@ -3,7 +3,11 @@ from .models import Tenant
 
 
 class TenantAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        "name",
+        "unique_id",
+        "ged_url"
+    ]
 
 
 admin.site.register(Tenant, TenantAdmin)
