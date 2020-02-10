@@ -5,7 +5,7 @@
     version: 1.1
     date_available: 2020-01-23
     description: Contrato de prestação de serviços educacionais entre aluno e escola.
-    base_url: https://localhost/interview?i=docassemble.playground6%3Abr-com-educalegal-contrato-prestacao-servicos-educacionais.yml
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-prestacao-servicos-educacionais.yml
 - model: interview.Interview
   pk: 2
   fields:
@@ -13,7 +13,7 @@
     version: 1.1
     date_available: 2020-01-23
     description: Um contrato para consultores darem palpite sobre o que você já sabe e te cobrarem por isso.
-    base_url: https://localhost/interview?i=docassemble.playground6%3Abr-com-educalegal-contrato-prestacao-servicos-consultoria.yml
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-prestacao-servicos-consultoria.yml
 - model: interview.Interview
   pk: 3
   fields:
@@ -21,7 +21,7 @@
     version: 1.1
     date_available: 2020-01-23
     description: Promete guardar segredo?
-    base_url: https://localhost/interview?i=docassemble.playground6%3Abr-com-educalegal-termo-de-confidencialidade-nda.yml
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-termo-de-confidencialidade-nda.yml
 - model: interview.Interview
   pk: 4
   fields:
@@ -29,7 +29,7 @@
     version: 1.1
     date_available: 2020-12-01
     description: Posso tirar fotos do seu filho e colocar no Instagram da escola?
-    base_url: https://localhost/interview?i=docassemble.playground6%3Abr-com-educalegal-termo-de-autorizacao-do-uso-de-imagem.yml
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-termo-de-autorizacao-do-uso-de-imagem.yml
 - model: interview.Interview
   pk: 5
   fields:
@@ -37,7 +37,7 @@
     version: 1.1
     date_available: 2020-01-23
     description: Contrato para prestadores de serviço em geral não te darem tanta raiva.
-    base_url: https://localhost/interview?i=docassemble.playground6%3Abr-com-educalegal-contrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
 - model: interview.Interview
   pk: 6
   fields:
@@ -45,7 +45,7 @@
     version: 1.1
     date_available: 2020-01-23
     description: Usando nosso sistema você nunca mais vai perder o prazo da renovatória.
-    base_url: https://localhost/interview?i=docassemble.playground6%3Abr-com-educalegal-contrato-de-locacao-de-imovel.yml
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-de-locacao-de-imovel.yml
 - model: interview.Interview
   pk: 7
   fields:
@@ -53,4 +53,12 @@
     version: 1.1
     date_available: 2020-01-23
     description: Aquela cartinha que ninguém gosta de receber. Por isso, use assinatura eletrônica para enviá-la.
-    base_url: https://localhost/interview?i=docassemble.playground6%3Abr-com-educalegal-notificacao-extrajudicial.yml
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-notificacao-extrajudicial.yml
+- model: interview.Interview
+  pk: 8
+  fields:
+    name: Generic NDA
+    version: 1.1
+    date_available: 2020-02-09
+    description: Modelo de entrevista genérica
+    base_url: http://localhost/interview?i=docassemble.playground1%3Ageneric-nda.yml
