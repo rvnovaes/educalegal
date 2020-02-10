@@ -35,3 +35,66 @@
   fields:
     name: São Paulo
     state: 3
+- model: school.school
+  pk: 1
+  fields:
+    tenant: 1
+    name: "Col\xE9gio Bacana"
+    legal_name: "Sociedade de Ensino Col\xE9gio Bacana Ltda."
+    legal_type: J
+    cnpj: 22.870.852/0001-72
+    logo: colegio_bacana.png
+    street: "Rua Cara\xE7a"
+    street_number: '28'
+    unit: null
+    city_region: Serra
+    zip_code: 30220-260
+    phone: 31-3223-0227
+    site: https://www.colegiobacana.com.br
+    email: contato@colegiobacana.com.br
+    city: 1
+    state: 1
+    country: 1
+    default_school: false
+- model: school.school
+  pk: 2
+  fields:
+    tenant: 1
+    name: "Escola da Fam\xEDlia"
+    legal_name: "Funda\xE7\xE3o Educacional Santa Helena"
+    legal_type: J
+    cnpj: 79.225.578/0001-04
+    logo: escola_da_familia.png
+    street: "Rua da Consola\xE7\xE3o"
+    street_number: '2301'
+    unit: null
+    city_region: "Consola\xE7\xE3o"
+    zip_code: 01301-100
+    phone: 11-3425-3565
+    site: https://www.escoladafamilia.edu
+    email: secretaria@escoladafamilia.edu
+    city: 3
+    state: 3
+    country: 1
+    default_school: false
+- model: school.school
+  pk: 3
+  fields:
+    tenant: 1
+    name: Escola da Lagoa
+    legal_name: "Mendon\xE7a e Machado Servi\xE7os Educacionais S/A"
+    legal_type: J
+    cnpj: 56.324.235/0001-93
+    logo: esocola_da_lagoa.png
+    street: Av. Borges de Medeiros
+    street_number: '2525'
+    unit: null
+    city_region: Lagoa
+    zip_code: 22470-022
+    phone: 21-5689-2356
+    site: https://www.escoladalagoa.com.br
+    email: contato@escoladalagoa.com.br
+    city: 2
+    state: 2
+    country: 1
+    default_school: false
