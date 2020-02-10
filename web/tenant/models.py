@@ -1,10 +1,8 @@
-import uuid
 from django.db import models
 
 
 class Tenant(models.Model):
     name = models.CharField(max_length=100)
-    unique_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     subdomain_prefix = models.CharField(
         max_length=100, blank=True, null=True, unique=True
     )

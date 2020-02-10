@@ -13,8 +13,8 @@ class InterviewListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        uuid = self.request.user.tenant.unique_id
+        tid = self.request.user.tenant.id
         for item in context['object_list']:
-            item.interview_url_with_uuid = item.base_url + '&tid=' + str(uuid) + '&new_session=1'
-            print(item.interview_url_with_uuid)
+            item.interview_with_tid = item.base_url + '&tid=' + str(tid) + '&new_session=1'
+            print(item.interview_with_tid)
         return context

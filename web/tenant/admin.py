@@ -5,7 +5,6 @@ from .models import Tenant
 class TenantAdmin(admin.ModelAdmin):
     list_display = [
         "name",
-        "unique_id",
         "ged_url"
     ]
 

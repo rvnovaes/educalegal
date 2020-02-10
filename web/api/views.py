@@ -14,10 +14,17 @@ class TenantAPIViewDetail(generics.ListAPIView):
     serializer_class = TenantSerializer
 
     def get_queryset(self):
-        uuid = self.kwargs["unique_id"]
-        return Tenant.objects.filter(unique_id=uuid)
+        pk = self.kwargs["pk"]
+        return Tenant.objects.filter(id=pk)
 
 
 class SchoolAPIViewList(generics.ListAPIView):
     queryset = School.objects.all()
     serializer_class = SchoolSerializer
+
+    def get_queryset(self):
+        tid = self.kwargs["pk"]
+        return School.objects.filter(tenant=tid)
+
+
+

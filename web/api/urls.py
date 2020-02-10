@@ -13,8 +13,8 @@ schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
     path("tenant", TenantAPIViewList.as_view()),
-    path("tenant/<uuid:unique_id>", TenantAPIViewDetail.as_view()),
-    path("school", SchoolAPIViewList.as_view()),
+    path("tenant/<int:pk>", TenantAPIViewDetail.as_view()),
+    path("school/<int:pk>", SchoolAPIViewList.as_view()),
     path("schema", schema_view),
     path("docs", include_docs_urls(API_TITLE)),
 ]
