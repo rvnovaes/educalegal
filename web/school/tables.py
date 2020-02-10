@@ -9,4 +9,4 @@ class SchoolTable(tables.Table):
     class Meta:
         model = School
         template_name = "django_tables2/bootstrap4.html"
-        fields = ("name", "legal_name", "city", "state", "default_school")
+        fields = ("name", "legal_name", "city", "state")

@@ -10,7 +10,7 @@ def get_tenant_data(schema, params):
     action = ["tenant", "read"]
     result = client.action(schema, action, params=params)
     # Return list of tenants. As we consulted by uuid, it will always return only one
-    return result[0]
+    return result
 
 
 def get_school_data(schema, params):
@@ -22,7 +22,7 @@ def get_school_data(schema, params):
     action = ["school", "read"]
     result = client.action(schema, action, params=params)
     # Return list of tenants. As we consulted by uuid, it will always return only one
-    return result[0]
+    return result
 
 
 if __name__ == "__main__":
