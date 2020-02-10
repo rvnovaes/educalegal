@@ -118,6 +118,7 @@ class School(TenantAwareModel):
     country = models.ForeignKey(
         Country, on_delete=models.PROTECT, blank=True, null=True, verbose_name="País"
     )
+    default_school = models.BooleanField(default=False, verbose_name="Escola Padrão")
 
     def __str__(self):
         return self.legal_name

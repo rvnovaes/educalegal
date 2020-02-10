@@ -12,3 +12,9 @@ services:
       - "8000:8000"
     depends_on:
       - db
+  docassemble:
+    image: jhpyle/docassemble
+    environment:
+      - DAPYTHONVERSION=3
+    ports:
+      - "80:80"
