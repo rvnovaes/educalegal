@@ -16,7 +16,7 @@ id: setup
 code: |
   schema = "http://web:8000/api/docs"
   tenant_id = url_args['tid']
-  params ={"id": tid}
+  params ={"id": tenant_id}
   tenant_data = get_tenant_data(schema, params)
   tenant_name = tenant_data['name']
   tenant_ged_url = tenant_data['ged_url']
@@ -29,6 +29,14 @@ subquestion: |
   * ${ tenant_name }
   * ${ tenant_ged_url }
   * ${ tenant_ged_token }
+attachment:
+  name: Termo de Confidencialidade - NDA
+  language: pt
+  filename: generic_nda
+  docx template file: generic-nda.docx
+  valid formats:
+    - pdf
+    - docx
 buttons:
   - Exit: exit
 ---
