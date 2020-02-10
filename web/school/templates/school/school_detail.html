@@ -26,6 +26,8 @@
               <span class="font-weight-bold">Site: </span>{% if school.site %}{{ school.site }}{% endif %}</li>
           <li class="list-group-item">
               <span class="font-weight-bold">Endereço: </span>{% if school.street %}{{ school.address }}{% endif %}</li>
+          <li class="list-group-item">
+              <span class="font-weight-bold">Estabelecimento Padrão: </span>{% if school.default_school %}<span class="true">✔</span>{% else %}<span class="false">✘</span>{% endif %}</li>
         </ul>
       </div>
     </div>
