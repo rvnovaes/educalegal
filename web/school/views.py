@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django_tables2 import SingleTableView
 
-from tenant.mixin import TenantAwareViewMixin, TenantAwareCreateUpdateMixin
+from tenant.mixins import TenantAwareViewMixin, TenantAwareCreateUpdateMixin
 from .models import School
 from .tables import SchoolTable
 
