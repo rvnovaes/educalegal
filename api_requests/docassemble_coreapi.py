@@ -19,21 +19,32 @@ def get_all_schools_data(schema, params):
     return result
 
 
-def get_all_schools_names(schema, params):
+def get_all_schools_names_data(schema, params):
     schema = client.get(schema)
     action = ["tenant", "school", "list"]
-    result = client.action(schema, action, params=params)
+    all_schools_data = client.action(schema, action, params=params)
     school_names_list = list()
-    for school in result:
+    school_data_dict = dict()
+    for school in all_schools_data:
         school_names_list.append(school['name'])
-    return school_names_list
+        school_data_dict[school['name']] = school
+    return school_names_list, school_data_dict
 
 
 if __name__ == "__main__":
     schema = "http://localhost:8000/api/docs"
-    params = {"id": 1}
+    params = {"id": 2}
     # result = get_tenant_data(schema, params)
     # result = get_all_schools_data(schema, params)
-    result = get_all_schools_names(schema, params)
-    print(len(result))
-    print(result)
+    school_names_list, school_data_dict = get_all_schools_names_data(schema, params)
+    selected_school = 'Escola da Lagoa'
+    print(school_names_list)
+    print(school_data_dict)
+    for school_name in school_names_list:
+        print(school_name)
+    for school_data in school_data_dict:
+        try:
+            selected_school_data = school_data_dict[selected_school]
+        except KeyError:
+            pass
+    print(selected_school_data)
