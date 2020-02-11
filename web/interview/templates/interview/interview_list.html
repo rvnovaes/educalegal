@@ -10,7 +10,7 @@
             </div>
             <div class="card-body">
               <p class="card-text">{{ interview.description }}</p>
-              <a href="{{ interview.interview_with_tid }}" target="_blank" class="btn btn-primary">Clique aqui</a>
+              <a href="{{ interview.interview_final_url }}" target="_blank" class="btn btn-primary">Clique aqui</a>
             </div>
             <div class="card-footer">
               <small class="text-muted">Versão: {{ interview.version }} - Disponibilizado em: {{ interview.date_available|date:"d-m-yy" }}</small>
