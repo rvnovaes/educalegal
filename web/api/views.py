@@ -7,6 +7,9 @@ from .serializers import SchoolSerializer, TenantSerializer
 
 
 class TenantViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Returns a list or retrieves a tenant
+    """
     queryset = Tenant.objects.all()
     serializer_class = TenantSerializer
 

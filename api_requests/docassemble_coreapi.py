@@ -1,13 +1,39 @@
 import coreapi
 
-# Initialize a client & load the schema document
 client = coreapi.Client()
-schema = client.get("http://localhost:8000/api/docs")
 
-# Interact with the API endpoint
-action = ["tenant", "read"]
-params = {
-    "unique_id": "a8c8ceb8-6717-4007-b894-5dd9f7e7b793",
-}
-result = client.action(schema, action, params=params)
-print(result[0]['name'])
+
+def get_tenant_data(schema, params):
+    schema = client.get(schema)
+    action = ["tenant", "read"]
+    result = client.action(schema, action, params=params)
+    # Return one tenant
+    return result
+
+
+def get_all_schools_data(schema, params):
+    schema = client.get(schema)
+    action = ["tenant", "school", "list"]
+    result = client.action(schema, action, params=params)
+    # Return all schools from a tenant
+    return result
+
+
+def get_all_schools_names(schema, params):
+    schema = client.get(schema)
+    action = ["tenant", "school", "list"]
+    result = client.action(schema, action, params=params)
+    school_names_list = list()
+    for school in result:
+        school_names_list.append(school['name'])
+    return school_names_list
+
+
+if __name__ == "__main__":
+    schema = "http://localhost:8000/api/docs"
+    params = {"id": 1}
+    # result = get_tenant_data(schema, params)
+    # result = get_all_schools_data(schema, params)
+    result = get_all_schools_names(schema, params)
+    print(len(result))
+    print(result)

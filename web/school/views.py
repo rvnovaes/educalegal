@@ -29,7 +29,6 @@ class SchoolCreateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, CreateV
         "city",
         "state",
         "country",
-        "default_school",
     ]
 
 
@@ -69,5 +68,4 @@ class SchoolUpdateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, UpdateV
         "city",
         "state",
         "country",
-        "default_school",
     ]
