@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load render_table from django_tables2 %}
+{% block body_block %}
+  <div class="container">
+    <h2>Escolas</h2>
+      {% if documents %}
+          {% render_table table %}
+      {% else %}
+      <div class="alert alert-info" role="alert">
+        Você não tem documentos em processo de assinatura.
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
