@@ -90,7 +90,7 @@ WSGI_APPLICATION = "web.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-if 'RUN_WITH_CONTAINERS' in os.environ:
+if 'RUN_WITHIN_CONTAINERS' in os.environ:
 # Use this with docker-compose
     DATABASES = {
         "default": {
