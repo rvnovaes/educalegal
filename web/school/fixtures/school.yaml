@@ -55,7 +55,6 @@
     city: 1
     state: 1
     country: 1
-    default_school: false
 - model: school.school
   pk: 2
   fields:
@@ -76,7 +75,6 @@
     city: 3
     state: 3
     country: 1
-    default_school: false
 - model: school.school
   pk: 3
   fields:
@@ -97,4 +95,3 @@
     city: 2
     state: 2
     country: 1
-    default_school: false
