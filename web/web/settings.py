@@ -26,7 +26,9 @@ SECRET_KEY = "mvyzst83ep^g72ho)29dm+zq&+we8qbg82u8q_(_7$$a=i_@*n"
 DEBUG = True
 
 if "ALLOWED_HOSTS" in os.environ:
-    ALLOWED_HOSTS = os.environ["ALLOWED_HOSTS"]
+    allowed_hosts_string = os.environ["ALLOWED_HOSTS"]
+    hosts = allowed_hosts_string.split(",")
+    ALLOWED_HOSTS = hosts
 else:
     ALLOWED_HOSTS = ["*"]
 
