@@ -25,7 +25,10 @@ SECRET_KEY = "mvyzst83ep^g72ho)29dm+zq&+we8qbg82u8q_(_7$$a=i_@*n"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+if "ALLOWED_HOSTS" in os.environ:
+    ALLOWED_HOSTS = os.environ["ALLOWED_HOSTS"]
+else:
+    ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -90,16 +93,16 @@ WSGI_APPLICATION = "web.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-if 'DATABASE_NAME' in os.environ:
-# Use this with docker-compose
+if "DATABASE_NAME" in os.environ:
+    # Use this with docker-compose
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ['DATABASE_NAME'],
-            "USER": os.environ['DATABASE_USER'],
-            "PASSWORD": os.environ['DATABASE_PASSWORD'],
-            "HOST": os.environ['DATABASE_HOST'],
-            "PORT": os.environ['DATABASE_PORT'],
+            "NAME": os.environ["DATABASE_NAME"],
+            "USER": os.environ["DATABASE_USER"],
+            "PASSWORD": os.environ["DATABASE_PASSWORD"],
+            "HOST": os.environ["DATABASE_HOST"],
+            "PORT": os.environ["DATABASE_PORT"],
         }
     }
 else:
@@ -134,7 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Sao_Paulo"
 
 USE_I18N = True
 
