@@ -2,7 +2,7 @@ FROM python:3.7
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN apt-get update
-RUN apt-get install -y postgresql-client
+RUN apt-get install -y supervisor
 RUN mkdir /code
 WORKDIR /code
 COPY requirements.txt /code/

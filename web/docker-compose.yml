@@ -1,25 +1,11 @@
 version: '3'
 
 services:
-  db:
-    image: postgres:11-alpine
   web:
+    container_name: educa_legal
     build: .
-#    command:  ["./wait-for-postgres.sh", "db", "python",  "manage.py runserver 0.0.0.0:8000"]
-#    command:  ["./wait-for-postgres.sh", "db", "gunicorn",  "web.wsgi:application --bind 0.0.0.0:8000"]
     command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4
     volumes:
       - .:/code
     ports:
       - "8000:8000"
-    environment:
-      - RUN_WITHIN_CONTAINERS=1
-    depends_on:
-      - db
-      - docassemble
-  docassemble:
-    image: jhpyle/docassemble
-    environment:
-      - DAPYTHONVERSION=3
-    ports:
-      - "80:80"

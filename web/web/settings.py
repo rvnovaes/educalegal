@@ -90,16 +90,16 @@ WSGI_APPLICATION = "web.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-if 'RUN_WITHIN_CONTAINERS' in os.environ:
+if 'DATABASE_NAME' in os.environ:
 # Use this with docker-compose
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": "postgres",
-            "USER": "postgres",
-            "PASSWORD": "postgres",
-            "HOST": "db",
-            "PORT": 5432,
+            "NAME": os.environ['DATABASE_NAME'],
+            "USER": os.environ['DATABASE_USER'],
+            "PASSWORD": os.environ['DATABASE_PASSWORD'],
+            "HOST": os.environ['DATABASE_HOST'],
+            "PORT": os.environ['DATABASE_PORT'],
         }
     }
 else:
