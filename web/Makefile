@@ -3,7 +3,11 @@ build:
 	docker-compose build web
 
 collectstatic:
+ifeq ($(e), prod)
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run web python manage.py collectstatic --noinput
+else
 	docker-compose run web python manage.py collectstatic --noinput
+endif
 
 create_certificate:
 	docker-compose run certbot certbot certonly --webroot -w /tmp/www -d app.educalegal.com.br -m sistemas@educalegal.com.br --agree-tos
@@ -40,7 +44,7 @@ ps:
 
 run:
 ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 else
 	docker-compose up -d
 endif

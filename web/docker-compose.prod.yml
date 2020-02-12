@@ -3,10 +3,11 @@ version: '3'
 services:
   web:
     environment:
+      - ALLOWED_HOSTS="[app.educalegal.com.br, 167.71.90.209]
       - DATABASE_NAME=educa-legal-app
       - DATABASE_USER=educa-legal-app
       - DATABASE_PASSWORD=e60k17byidfg20ye
       - DATABASE_HOST=educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
       - DATABASE_PORT=25060
-      - ALLOWED_HOSTS="[app.educalegal.com.br, 167.71.90.209]
+      - USE_DIGITAL_OCEAN_SPACES=1
 

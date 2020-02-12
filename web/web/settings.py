@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     "django_tables2",
     "rest_framework",
     "corsheaders",
+    "storages",
+    "boto3",
     # Local
     "tenant",
     "users",
@@ -148,8 +150,30 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
+ #https://www.digitalocean.com/community/tutorials/how-to-set-up-a-scalable-django-app-with-digitalocean-managed-databases-and-spaces
 
-STATIC_URL = "/static/"
+if "USE_DIGITAL_OCEAN_SPACES" in os.environ:
+    # https://www.digitalocean.com/docs/spaces/how-to/manage-access/
+    AWS_ACCESS_KEY_ID = 'AWNYACZSFSYOBCIOTFOP'
+    AWS_SECRET_ACCESS_KEY = 'k0GW8r3VnC9GzKD7S6RTdjCP2dVzN3bfOdthVfSCY/g'
+    # https://www.digitalocean.com/community/questions/getting-signaturedoesnotmatch-with-digitalocean-spaces
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
+    AWS_STORAGE_BUCKET_NAME = 'educalegal-app'
+    AWS_S3_ENDPOINT_URL = 'https://educalegal-app.nyc3.digitaloceanspaces.com/'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_LOCATION = 'static'
+    AWS_DEFAULT_ACL = 'public-read'
+
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+    STATIC_URL = '{}/{}/'.format(AWS_S3_ENDPOINT_URL, AWS_LOCATION)
+    STATIC_ROOT = 'static/'
+
+else:
+    STATIC_URL = "/static/"
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 AUTH_USER_MODEL = "users.CustomUser"
 
