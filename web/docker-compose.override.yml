@@ -54,6 +54,8 @@ services:
     image: postgres:11-alpine
     volumes:
     - /opt/educalegal/docker_volumes/postgres_db:/var/lib/postgresql/data
+    ports:
+      - "7654:5432"
   db_ged:
     container_name: db_ged
     image: postgres:9.6-alpine
@@ -61,5 +63,7 @@ services:
       POSTGRES_DB: mayan
       POSTGRES_PASSWORD: mayandbpass
       POSTGRES_USER: mayan
+    ports:
+      - "6543:5432"
     volumes:
       - /opt/educalegal/docker_volumes/postgres_db_ged:/var/lib/postgresql/data
