@@ -45,6 +45,8 @@ ps:
 run:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+else ifeq ($(e), debug)
+	docker-compose up
 else
 	docker-compose up -d
 endif
