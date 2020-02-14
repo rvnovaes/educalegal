@@ -32,12 +32,15 @@ else
 	docker-compose run web python manage.py makemigrations --noinput
 endif
 
-load_fixtures:
-ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run web python manage.py loaddata tenant school interview_dev
-else
+loaddata_prod:
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run web python manage.py loaddata tenant school interview
+
+loaddata_dev:
 	docker-compose run web python manage.py loaddata tenant school interview_dev
-endif
+
+# Not working
+install_docassemble_python_packages:
+	docker-compose run docassemble /usr/share/docassemble/local3.6/bin/pip install coreapi docassemble-wrappers num2words
 
 ps:
 	docker-compose ps
@@ -45,10 +48,10 @@ ps:
 run:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-else ifeq ($(e), debug)
-	docker-compose up
-else
+else ifeq ($(e), nodebug)
 	docker-compose up -d
+else
+	docker-compose up
 endif
 
 restart:
@@ -60,3 +63,5 @@ shell:
 
 stop:
 	docker-compose stop
+
+setup_dev: install_docassemble_python_packages migrate makemigrations loaddata_dev
