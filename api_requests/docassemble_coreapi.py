@@ -1,21 +1,23 @@
 import coreapi
 
 
-auth = coreapi.auth.TokenAuthentication(
-    scheme="Token",
-    token="6511907b374c6475c16c17d35795d1b36804005c"
-)
-client = coreapi.Client(auth=auth)
+def create_client(ut):
+    auth = coreapi.auth.TokenAuthentication(scheme="Token", token=ut)
+    client = coreapi.Client(auth=auth)
+    return client
 
-def get_tenant_data(schema, params):
+
+def get_tenant_data(ut, schema, params):
+    client = create_client(ut)
     schema = client.get(schema)
     action = ["tenant", "read"]
     result = client.action(schema, action, params=params)
-    # Return one tenant
+    # Return one tenants.
     return result
 
 
-def get_all_schools_data(schema, params):
+def get_all_schools_data(ut, schema, params):
+    client = create_client(ut)
     schema = client.get(schema)
     action = ["tenant", "school", "list"]
     result = client.action(schema, action, params=params)
@@ -23,15 +25,27 @@ def get_all_schools_data(schema, params):
     return result
 
 
-def get_all_schools_names_data(schema, params):
+def get_all_schools_names(ut, schema, params):
+    client = create_client(ut)
+    schema = client.get(schema)
+    action = ["tenant", "school", "list"]
+    result = client.action(schema, action, params=params)
+    school_names_list = list()
+    for school in result:
+        school_names_list.append(school["name"])
+    return school_names_list
+
+
+def get_all_schools_names_data(ut, schema, params):
+    client = create_client(ut)
     schema = client.get(schema)
     action = ["tenant", "school", "list"]
     all_schools_data = client.action(schema, action, params=params)
     school_names_list = list()
     school_data_dict = dict()
     for school in all_schools_data:
-        school_names_list.append(school['name'])
-        school_data_dict[school['name']] = school
+        school_names_list.append(school["name"])
+        school_data_dict[school["name"]] = school
     return school_names_list, school_data_dict
 
 
@@ -41,7 +55,7 @@ if __name__ == "__main__":
     # result = get_tenant_data(schema, params)
     # result = get_all_schools_data(schema, params)
     school_names_list, school_data_dict = get_all_schools_names_data(schema, params)
-    selected_school = 'Escola da Lagoa'
+    selected_school = "Escola da Lagoa"
     print(school_names_list)
     print(school_data_dict)
     for school_name in school_names_list:
