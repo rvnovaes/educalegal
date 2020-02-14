@@ -9,19 +9,22 @@ class EducaLegalClient:
         )
         self.schema = self.client.get(schema)
 
-    def get_tenant_data(self, params):
+    def get_tenant_data(self, tid):
+        params = {"id": tid}
         action = ["tenant", "read"]
         result = self.client.action(self.schema, action, params=params)
         # Return one tenant.
         return result
 
-    def get_all_schools_data(self, params):
+    def get_all_schools_data(self, tid):
+        params = {"id": tid}
         action = ["tenant", "school", "list"]
         result = self.client.action(self.schema, action, params=params)
         # Return all schools from a tenant
         return result
 
-    def get_all_schools_names(self, params):
+    def get_all_schools_names(self, tid):
+        params = {"id": tid}
         action = ["tenant", "school", "list"]
         result = self.client.action(self.schema, action, params=params)
         school_names_list = list()
@@ -29,7 +32,8 @@ class EducaLegalClient:
             school_names_list.append(school["name"])
         return school_names_list
 
-    def get_all_schools_names_data(self, params):
+    def get_all_schools_names_data(self, tid):
+        params = {"id": tid}
         action = ["tenant", "school", "list"]
         all_schools_data = self.client.action(self.schema, action, params=params)
         school_names_list = list()
