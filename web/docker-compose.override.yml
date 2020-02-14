@@ -1,21 +1,28 @@
-version: '3'
+version: '3.7'
 
 services:
   web:
     environment:
-      - DATABASE_NAME=postgres
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgres
-      - DATABASE_HOST=db
-      - DATABASE_PORT=5432
+      DATABASE_NAME: postgres
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
     ports:
       - "8000:8000"
     depends_on:
       - db
       - docassemble
+#      - ged
   db:
     container_name: db
     image: postgres:11-alpine
+#    environment:
+#      POSTGRES_DB: mayan
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_USER: postgres
+    volumes:
+    - /opt/educalegal/docker_volumes/postgres:/var/lib/postgresql/data
   docassemble:
     container_name: docassemble
     image: jhpyle/docassemble:latest
@@ -23,3 +30,31 @@ services:
       - DAPYTHONVERSION=3
     ports:
       - "80:80"
+#  ged:
+#    container_name: mayan
+#    image: mayanedms/mayanedms:3.3.12
+#    environment:
+#      MAYAN_CELERY_BROKER_URL: "redis://:mayanredispassword@redis:6379/0"
+#      MAYAN_CELERY_RESULT_BACKEND: "redis://:mayanredispassword@redis:6379/0"
+#      MAYAN_DATABASES: "{'default':{'ENGINE':'django.db.backends.postgresql','NAME':'postgres','PASSWORD':'postgres','USER':'postgres','HOST':'db'}}"
+#    volumes:
+#      - /opt/educalegal/docker_volumes/mayan:/var/lib/mayan
+#    ports:
+#      - "8080:8000"
+#    depends_on:
+#      - db
+#      - redis
+#  redis:
+#    container_name: redis
+#    image: redis:5.0-alpine
+#    command:
+#      - redis-server
+#      - --databases
+#      - "2"
+#      - --maxmemory-policy
+#      - allkeys-lru
+#      - --save
+#      - ""
+#      - --requirepass mayanredispassword
+#    volumes:
+#      - /opt/educalegal/docker_volumes/redis:/data
