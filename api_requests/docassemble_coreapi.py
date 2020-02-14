@@ -1,7 +1,11 @@
 import coreapi
 
-client = coreapi.Client()
 
+auth = coreapi.auth.TokenAuthentication(
+    scheme="Token",
+    token="6511907b374c6475c16c17d35795d1b36804005c"
+)
+client = coreapi.Client(auth=auth)
 
 def get_tenant_data(schema, params):
     schema = client.get(schema)
@@ -33,7 +37,7 @@ def get_all_schools_names_data(schema, params):
 
 if __name__ == "__main__":
     schema = "http://localhost:8000/api/docs"
-    params = {"id": 2}
+    params = {"id": 1}
     # result = get_tenant_data(schema, params)
     # result = get_all_schools_data(schema, params)
     school_names_list, school_data_dict = get_all_schools_names_data(schema, params)
@@ -45,6 +49,6 @@ if __name__ == "__main__":
     for school_data in school_data_dict:
         try:
             selected_school_data = school_data_dict[selected_school]
+            print(selected_school_data)
         except KeyError:
             pass
-    print(selected_school_data)

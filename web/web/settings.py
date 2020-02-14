@@ -43,15 +43,26 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # 3rd party
+    # 3rd party ==========================================
+    # Nice Boostrap Forms
     "crispy_forms",
+    # App authentication, passoword recovery, social auth facilities
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    # Easy and simple tables for Django
     "django_tables2",
+    # Good Old Rest Framework
     "rest_framework",
+    # Generates the tokens on the server for Rest Framework
+    "rest_framework.authtoken",
+    # Endpoints for authentication on Rest Framework
+    "rest_auth",
+    # Not sure yet what it does...
     "corsheaders",
+    # Alternative storage for files in Django
     "storages",
+    # Driver for AWS Compatible storage
     "boto3",
     # Local
     "tenant",
@@ -152,30 +163,30 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
- #https://www.digitalocean.com/community/tutorials/how-to-set-up-a-scalable-django-app-with-digitalocean-managed-databases-and-spaces
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-a-scalable-django-app-with-digitalocean-managed-databases-and-spaces
 
 if "USE_DIGITAL_OCEAN_SPACES" in os.environ:
     # https://www.digitalocean.com/docs/spaces/how-to/manage-access/
-    AWS_ACCESS_KEY_ID = 'AWNYACZSFSYOBCIOTFOP'
-    AWS_SECRET_ACCESS_KEY = 'k0GW8r3VnC9GzKD7S6RTdjCP2dVzN3bfOdthVfSCY/g'
+    AWS_ACCESS_KEY_ID = "AWNYACZSFSYOBCIOTFOP"
+    AWS_SECRET_ACCESS_KEY = "k0GW8r3VnC9GzKD7S6RTdjCP2dVzN3bfOdthVfSCY/g"
     # https://www.digitalocean.com/community/questions/getting-signaturedoesnotmatch-with-digitalocean-spaces
-    AWS_S3_SIGNATURE_VERSION = 's3v4'
-    AWS_STORAGE_BUCKET_NAME = 'educalegal-app'
-    AWS_S3_ENDPOINT_URL = 'https://educalegal-app.nyc3.digitaloceanspaces.com/'
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_STORAGE_BUCKET_NAME = "educalegal-app"
+    AWS_S3_ENDPOINT_URL = "https://educalegal-app.nyc3.digitaloceanspaces.com/"
     AWS_S3_OBJECT_PARAMETERS = {
-        'CacheControl': 'max-age=86400',
+        "CacheControl": "max-age=86400",
     }
-    AWS_LOCATION = 'static'
-    AWS_DEFAULT_ACL = 'public-read'
+    AWS_LOCATION = "static"
+    AWS_DEFAULT_ACL = "public-read"
 
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
-    STATIC_URL = '{}/{}/'.format(AWS_S3_ENDPOINT_URL, AWS_LOCATION)
-    STATIC_ROOT = 'static/'
+    STATIC_URL = "{}/{}/".format(AWS_S3_ENDPOINT_URL, AWS_LOCATION)
+    STATIC_ROOT = "static/"
 
 else:
     STATIC_URL = "/static/"
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+    STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 AUTH_USER_MODEL = "users.CustomUser"
 
@@ -209,10 +220,22 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 # API Settings
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny",],
-    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema"
-    # "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated",]
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # Session Authentication is kept here for the browseable API
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+    # https://www.django-rest-framework.org/api-guide/throttling/
+    # "DEFAULT_THROTTLE_CLASSES": [
+    #     "rest_framework.throttling.AnonRateThrottle",
+    #     "rest_framework.throttling.UserRateThrottle",
+    # ],
+    # "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "10000/day"},
 }
+
 
 CORS_ORIGIN_WHITELIST = (
     "http://localhost:3000",
