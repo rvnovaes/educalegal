@@ -6,11 +6,86 @@ class Tenant(models.Model):
     subdomain_prefix = models.CharField(
         max_length=100, blank=True, null=True, unique=True
     )
+    ged_name = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="GED - Nome Base"
+    )
     ged_url = models.CharField(
-        max_length=255, null=True, blank=True, verbose_name="URL do GED"
+        max_length=255, null=True, blank=True, verbose_name="GED - GED"
     )
     ged_token = models.CharField(
-        max_length=255, null=True, blank=True, verbose_name="Token da API do GED"
+        max_length=255, null=True, blank=True, verbose_name="GED - Token da API"
+    )
+    ged_database = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="GED - Banco de Dados do GED",
+    )
+    ged_database_user = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="GED - Usuário do Banco de Dados",
+    )
+    ged_database_user_password = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="GED - Senha do Usuário do Banco de Dados",
+    )
+    ged_database_host = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="GED - Host do Banco de Dados",
+    )
+    ged_database_port = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="GED - Porta do Banco de Dados",
+    )
+    ged_database_database_engine = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="GED - Sistema de Banco de Dados",
+        default="django.db.backends.postgresql",
+    )
+
+    ged_storage_provider = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="GED - Fornecedor de Armazenamento",
+    )
+
+    ged_storage_access_key = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="GED - Access Key Token"
+    )
+
+    ged_storage_secret_key = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="GED - Secret Key"
+    )
+
+    ged_storage_bucket_name = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="GED - Nome do Bucket"
+    )
+
+    ged_storage_default_acl = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="GED - ACL padrão",
+        default="private",
+    )
+
+    ged_storage_endpoint_url = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="GED - URL do Endpoint"
+    )
+
+    ged_storage_region_name = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="GED - Região"
     )
 
     def __str__(self):
