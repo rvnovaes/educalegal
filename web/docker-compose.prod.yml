@@ -11,12 +11,6 @@ services:
       - DATABASE_HOST=educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
       - DATABASE_PORT=25060
       - USE_DIGITAL_OCEAN_SPACES=1
-    deploy:
-      restart_policy:
-        condition: any
-        delay: 5s
-        max_attempts: 3
-        window: 120s
     ports:
       - "8100:8100"
 
