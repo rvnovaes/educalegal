@@ -41,7 +41,7 @@ event_notification = {
 
 
 def test_web_hook(url):
-    response = requests.post(url, headers=headers, data=payload)
+    response = requests.post(url, data=payload)
     print(response)
 
 

@@ -41,9 +41,10 @@ def docusign_webhook_listener(request):
     # if need be.
     logger.info(request.headers)
     logger.info(request.content_type)
+    logger.info(request.body)
     body_unicode = request.body.decode('utf-8')
-    data = json.loads(body_unicode)  # This is the entire incoming POST content.
-    logger.info(data)
+    #data = json.loads(body_unicode)  # This is the entire incoming POST content.
+    logger.info(body_unicode)
     data = request.body  # This is the entire incoming POST content.
     # This is dependent on your web server. In this case, Flask
 
