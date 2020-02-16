@@ -16,10 +16,7 @@ class Tenant(models.Model):
         max_length=255, null=True, blank=True, verbose_name="GED - Token da API"
     )
     ged_database = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True,
-        verbose_name="GED - Banco de Dados",
+        max_length=255, null=True, blank=True, verbose_name="GED - Banco de Dados",
     )
     ged_database_user = models.CharField(
         max_length=255,
@@ -86,6 +83,33 @@ class Tenant(models.Model):
 
     ged_storage_region_name = models.CharField(
         max_length=255, null=True, blank=True, verbose_name="GED - Região"
+    )
+
+    esignature_provider = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        default="Docusign",
+        verbose_name="ESignature - Fornecedor",
+    )
+
+    esignature_client_id = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="ESignature - Client ID"
+    )
+
+    esignature_impersonate_user_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="ESignature - Impersonated User",
+    )
+
+    esignature_test_mode = models.BooleanField(
+        null=True, blank=True, default=True, verbose_name="ESignature - Test Mode"
+    )
+
+    e_signature_private_key = models.TextField(
+        null=True, blank=True, verbose_name="ESignature - Private Key"
     )
 
     def __str__(self):

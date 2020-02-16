@@ -37,6 +37,18 @@ class TenantAdmin(admin.ModelAdmin):
                 )
             },
         ),
+        (
+            "ESignature",
+            {
+                "fields": (
+                    "esignature_provider",
+                    "esignature_client_id",
+                    "esignature_impersonate_user_id",
+                    "esignature_test_mode",
+                    "e_signature_private_key",
+                )
+            }
+        )
     )
 
 
