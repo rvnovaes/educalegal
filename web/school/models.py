@@ -68,7 +68,7 @@ class City(models.Model):
         unique_together = ("name", "state")
 
     def __str__(self):
-        return "{} - {}".format(self.name, self.state.initials)
+        return self.name
 
 
 class School(TenantAwareModel):
@@ -113,7 +113,7 @@ class School(TenantAwareModel):
         City, on_delete=models.PROTECT, blank=True, null=True, verbose_name="Cidade"
     )
     state = models.ForeignKey(
-        State, on_delete=models.PROTECT, blank=True, null=True, verbose_name="Estado"
+        State, on_delete=models.PROTECT, blank=True, null=True, verbose_name="Estado",
     )
     country = models.ForeignKey(
         Country, on_delete=models.PROTECT, blank=True, null=True, verbose_name="País"

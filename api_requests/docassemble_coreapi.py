@@ -43,17 +43,22 @@ class EducaLegalClient:
             school_data_dict[school["name"]] = school
         return school_names_list, school_data_dict
 
+    def get_interview_data(self, intind):
+        params = {"id": intind}
+        action = ["interview", "read"]
+        interview_data = self.client.action(self.schema, action, params=params)
+        return interview_data
+
 
 if __name__ == "__main__":
-    ut = "a80f958d2a484f756c4b738d04a6179c1b8a7676"
+    ut = "359efadb736eba60f0c705719a28093be699ea3f"
     schema = "http://localhost:8000/api/docs"
     el_client = EducaLegalClient(ut, schema)
-    print(el_client.get_tenant_data(1))
+    # print(el_client.get_tenant_data(1))
+    print(el_client.get_interview_data(1))
 
     try:
-        school_names_list, school_data_dict = el_client.get_all_schools_names_data(
-            params
-        )
+        school_names_list, school_data_dict = el_client.get_all_schools_names_data(1)
         selected_school = "Escola da Lagoa"
         print(school_names_list)
         print(school_data_dict)

@@ -14,6 +14,8 @@ class Interview(models.Model):
     version = models.CharField(max_length=512, null=True, verbose_name='Versão')
     date_available = models.DateField(null=True, verbose_name='Data de Disponibilização')
     description = models.TextField(null=True, verbose_name='Descrição')
+    language = models.CharField(max_length=64, null=True, default='por', verbose_name='Idioma')
+    custom_file_name = models.CharField(max_length=64, null=True, verbose_name='String base para o nome do arquivo a ser gerado')
     base_url = models.URLField(max_length=512, verbose_name='URL Base')
     is_generic = models.BooleanField(default=True, verbose_name='É Genérica?')
     tenants = models.ManyToManyField(Tenant, related_name='tenants')
