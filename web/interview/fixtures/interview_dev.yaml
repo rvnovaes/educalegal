@@ -1,3 +1,7 @@
+- model: interview.InterviewDocumentType
+  pk: 1
+  fields:
+    name: Documentos Padrão
 - model: interview.Interview
   pk: 1
   fields:
@@ -6,6 +10,7 @@
     date_available: 2020-01-23
     description: Contrato de prestação de serviços educacionais entre aluno e escola.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-prestacao-servicos-educacionais.yml
+    document_type_id: 1
 - model: interview.Interview
   pk: 2
   fields:
@@ -14,6 +19,7 @@
     date_available: 2020-01-23
     description: Um contrato para consultores darem palpite sobre o que você já sabe e te cobrarem por isso.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-prestacao-servicos-consultoria.yml
+    document_type_id: 1
 - model: interview.Interview
   pk: 3
   fields:
@@ -22,6 +28,7 @@
     date_available: 2020-01-23
     description: Promete guardar segredo?
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-termo-de-confidencialidade-nda.yml
+    document_type_id: 1
 - model: interview.Interview
   pk: 4
   fields:
@@ -30,6 +37,7 @@
     date_available: 2020-12-01
     description: Posso tirar fotos do seu filho e colocar no Instagram da escola?
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-termo-de-autorizacao-do-uso-de-imagem.yml
+    document_type_id: 1
 - model: interview.Interview
   pk: 5
   fields:
@@ -38,6 +46,7 @@
     date_available: 2020-01-23
     description: Contrato para prestadores de serviço em geral não te darem tanta raiva.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
+    document_type_id: 1
 - model: interview.Interview
   pk: 6
   fields:
@@ -46,6 +55,7 @@
     date_available: 2020-01-23
     description: Usando nosso sistema você nunca mais vai perder o prazo da renovatória.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-de-locacao-de-imovel.yml
+    document_type_id: 1
 - model: interview.Interview
   pk: 7
   fields:
@@ -54,6 +64,7 @@
     date_available: 2020-01-23
     description: Aquela cartinha que ninguém gosta de receber. Por isso, use assinatura eletrônica para enviá-la.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-notificacao-extrajudicial.yml
+    document_type_id: 1
 - model: interview.Interview
   pk: 8
   fields:
@@ -62,3 +73,4 @@
     date_available: 2020-02-09
     description: Modelo de entrevista genérica
     base_url: http://localhost/interview?i=docassemble.playground1%3Ageneric-nda.yml
+    document_type_id: 1

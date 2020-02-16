@@ -36,15 +36,25 @@ def document_create(url, headers, filename, document_type, label='', language=''
     return error_message
 
 
+def document_types(url, headers):
+    response = requests.get(url, headers=headers).json()
+    return response
+
+
 if __name__ == '__main__':
-    url = 'http://localhost:8080/api/documents/'
+    url_create_document = 'http://localhost:8080/api/documents/'
     headers = {'Authorization': "Token c05a8402be65112e0164a0bce95c62db62bf7e25"}
     file = 'jupiter.jpg'
     document_type = 1
     label = 'jupiter'
     description = 'Juptiter Picture'
+    # document_create(url_create_document, headers, file, document_type, label=label, description=description)
 
-    document_create(url, headers, file, document_type, label=label, description=description)
+    url_document_types = 'http://localhost:8080/api/document_types/'
+    response = document_types(url_document_types, headers)
+    print(response)
+
+
 
 
 
