@@ -41,10 +41,10 @@ def docusign_webhook_listener(request):
     # if need be.
     logger.info(request.headers)
     logger.info(request.content_type)
-    logger.info(request.body)
-    body_unicode = request.body.decode('utf-8')
+    #logger.info(request.body)
+    #body_unicode = request.body.decode('utf-8')
     #data = json.loads(body_unicode)  # This is the entire incoming POST content.
-    logger.info(body_unicode)
+    #logger.info(body_unicode)
     data = request.body  # This is the entire incoming POST content.
     # This is dependent on your web server. In this case, Flask
 
@@ -66,7 +66,7 @@ def docusign_webhook_listener(request):
     envelope_dir = os.path.join(BASE_DIR, 'media/docusign/')
     filename = "T" + time_generated.replace(':', '_') + ".xml"  # substitute _ for : for windows-land
     filepath = os.path.join(envelope_dir, filename)
-    with open(filepath, "w") as xml_file:
+    with open(filepath, "wb") as xml_file:
         xml_file.write(data)
 
 
