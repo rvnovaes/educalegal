@@ -10,7 +10,7 @@ class Tenant(models.Model):
         max_length=255, null=True, blank=True, verbose_name="GED - Nome Base"
     )
     ged_url = models.CharField(
-        max_length=255, null=True, blank=True, verbose_name="GED - GED"
+        max_length=255, null=True, blank=True, verbose_name="GED - URL"
     )
     ged_token = models.CharField(
         max_length=255, null=True, blank=True, verbose_name="GED - Token da API"
@@ -19,7 +19,7 @@ class Tenant(models.Model):
         max_length=255,
         null=True,
         blank=True,
-        verbose_name="GED - Banco de Dados do GED",
+        verbose_name="GED - Banco de Dados",
     )
     ged_database_user = models.CharField(
         max_length=255,
