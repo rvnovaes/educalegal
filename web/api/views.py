@@ -1,4 +1,5 @@
 import os
+import json
 import base64
 from bs4 import BeautifulSoup
 import logging
@@ -38,7 +39,11 @@ def docusign_webhook_listener(request):
     # 100 seconds to ensure that DocuSign's request to your app doesn't time out.
     # Tip: aim for no more than a couple of seconds! Use a separate queuing service
     # if need be.
-    logger.info(request.body)
+    logger.info(request.headers)
+    logger.info(request.content_type)
+    body_unicode = request.body.decode('utf-8')
+    data = json.loads(body_unicode)  # This is the entire incoming POST content.
+    logger.info(data)
     data = request.body  # This is the entire incoming POST content.
     # This is dependent on your web server. In this case, Flask
 
