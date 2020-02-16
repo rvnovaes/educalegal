@@ -5,6 +5,7 @@ from .views import DocumentCreateView
 from .views import InterviewViewSet
 from .views import SchoolViewSet
 from .views import TenantGEDViewSet, TenantSchoolsViewList
+from .views import docusign_webhook_listener
 
 API_TITLE = "Educa Legal API"
 API_DESCRIPTION = (
@@ -21,6 +22,7 @@ urlpatterns = [
     path("tenant/ged/", TenantGEDViewSet.as_view({"get": "list"})),
     path("tenant/ged/<int:pk>", TenantGEDViewSet.as_view({"get": "retrieve"})),
     path("tenant/<int:pk>/school/", TenantSchoolsViewList.as_view()),
+    path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
     path("docs/", include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
     path("v1/rest-auth/", include("rest_auth.urls")),
