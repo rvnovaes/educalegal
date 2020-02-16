@@ -3,15 +3,15 @@ from rest_framework import viewsets
 
 from tenant.models import Tenant
 from school.models import School
-from .serializers import SchoolSerializer, TenantSerializer
+from .serializers import SchoolSerializer, TenantGEDSerializer
 
 
-class TenantViewSet(viewsets.ReadOnlyModelViewSet):
+class TenantGEDViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Returns a list or retrieves a tenant
     """
     queryset = Tenant.objects.all()
-    serializer_class = TenantSerializer
+    serializer_class = TenantGEDSerializer
 
 
 class TenantSchoolsAPIViewList(generics.ListAPIView):

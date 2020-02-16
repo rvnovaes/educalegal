@@ -11,7 +11,7 @@ class EducaLegalClient:
 
     def get_tenant_data(self, tid):
         params = {"id": tid}
-        action = ["tenant", "read"]
+        action = ["tenant", "ged", "read"]
         result = self.client.action(self.schema, action, params=params)
         # Return one tenant.
         return result
@@ -45,12 +45,11 @@ class EducaLegalClient:
 
 
 if __name__ == "__main__":
-    ut = "359efadb736eba60f0c705719a28093be699ea3f"
+    ut = "a80f958d2a484f756c4b738d04a6179c1b8a7676"
     schema = "http://localhost:8000/api/docs"
-    params = {"id": 1}
-    # result = get_tenant_data(schema, params)
-    # result = get_all_schools_data(schema, params)
     el_client = EducaLegalClient(ut, schema)
+    print(el_client.get_tenant_data(1))
+
     try:
         school_names_list, school_data_dict = el_client.get_all_schools_names_data(
             params

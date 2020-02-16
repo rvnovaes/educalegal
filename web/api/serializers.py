@@ -4,10 +4,10 @@ from tenant.models import Tenant
 from school.models import School
 
 
-class TenantSerializer(serializers.ModelSerializer):
+class TenantGEDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tenant
-        fields = "__all__"
+        fields = ["name", "ged_url", "ged_token"]
 
 
 class SchoolSerializer(serializers.ModelSerializer):
