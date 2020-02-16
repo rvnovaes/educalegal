@@ -50,7 +50,9 @@ def docusign_webhook_listener(request):
 
     xml = BeautifulSoup(data, "xml")
     envelope_id = xml.EnvelopeStatus.EnvelopeID.string
+    logger.info(envelope_id)
     time_generated = xml.EnvelopeStatus.TimeGenerated.string
+    logger.info(time_generated)
 
     # Store the file.
     # Some systems might still not like files or directories to start with numbers.
