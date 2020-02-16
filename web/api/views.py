@@ -1,5 +1,5 @@
 import os
-import json
+from pathlib import Path
 import base64
 from bs4 import BeautifulSoup
 import logging
@@ -63,7 +63,8 @@ def docusign_webhook_listener(request):
     # Store the file.
     # Some systems might still not like files or directories to start with numbers.
     # So we prefix the envelope ids with E and the timestamps with T
-    envelope_dir = os.path.join(BASE_DIR, 'media/docusign/')
+    envelope_dir = os.path.join(BASE_DIR, 'media/docusign/', envelope_id)
+    Path(envelope_dir.mkdir(parents=True, exist_ok=True))
     filename = "T" + time_generated.replace(':', '_') + ".xml"  # substitute _ for : for windows-land
     filepath = os.path.join(envelope_dir, filename)
     with open(filepath, "wb") as xml_file:
