@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   web:
-    image: rvnovaes/educalegal:0.5
+    image: rvnovaes/educalegal:0.6
     container_name: educa_legal
     build: .
     command: python manage.py runserver 0.0.0.0:8000
