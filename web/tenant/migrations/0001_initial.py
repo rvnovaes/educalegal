@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 def create_system_tenant(apps, schema_editor):
     Tenant = apps.get_model("tenant", "Tenant")
-    system_tenant = Tenant(name="System", subdomain_prefix="sys", ged_url="http://ged:8000")
+    system_tenant = Tenant(name="System", subdomain_prefix="sys")
     system_tenant.save()
 
 

@@ -45,6 +45,11 @@ install_docassemble_python_packages:
 ps:
 	docker-compose ps
 
+# parametros
+# e=prod - conecta como producao
+# e=nodebug - conecta sem modo de debug (-d: detached mode)
+# se nao passar o parametro - conecta com modo de debug
+# make run e=prod or make run e=nodebug or make run
 run:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
