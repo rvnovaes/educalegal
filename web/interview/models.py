@@ -23,3 +23,10 @@ class Interview(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def list_tenants(self):
+        list_tenants = [x.__str__() for x in self.tenants.all().order_by('name')]
+        return list_tenants
+
+    list_tenants.fget.short_description = 'Instâncias'

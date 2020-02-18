@@ -4,9 +4,9 @@ from .models import Interview, InterviewDocumentType
 
 
 class InterviewAdmin(admin.ModelAdmin):
-    list_display = ("name", "version", "date_available")
-    list_display_links = ("name",)
-    list_filter = ("name",)
+    search_fields = ['name']
+    list_display = ['name', "version", "date_available", 'list_tenants']
+    filter_horizontal = ['tenants']
 
 
 class InterviewDocumentTypeAdmin(admin.ModelAdmin):
