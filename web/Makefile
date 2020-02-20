@@ -33,10 +33,10 @@ else
 endif
 
 loaddata_prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run web python manage.py loaddata tenant school interview
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run web python manage.py loaddata tenant country state city school interview
 
 loaddata_dev:
-	docker-compose run web python manage.py loaddata tenant school interview_dev
+	docker-compose run web python manage.py loaddata tenant country state city school interview_dev
 
 # Not working
 install_docassemble_python_packages:

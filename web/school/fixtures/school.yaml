@@ -1,40 +1,3 @@
-- model: school.Country
-  pk: 1
-  fields:
-    name: Brasil
-- model: school.State
-  pk: 1
-  fields:
-    name: Minas Gerais
-    initials: MG
-    country: 1
-- model: school.State
-  pk: 2
-  fields:
-    name: Rio de Janeiro
-    initials: RJ
-    country: 1
-- model: school.State
-  pk: 3
-  fields:
-    name: São Paulo
-    initials: SP
-    country: 1
-- model: school.City
-  pk: 1
-  fields:
-    name: Belo Horizonte
-    state: 1
-- model: school.City
-  pk: 2
-  fields:
-    name: Rio de Janeiro
-    state: 2
-- model: school.City
-  pk: 3
-  fields:
-    name: São Paulo
-    state: 3
 - model: school.school
   pk: 1
   fields:
@@ -52,8 +15,8 @@
     phone: 31-3223-0227
     site: https://www.colegiobacana.com.br
     email: contato@colegiobacana.com.br
-    city: 1
-    state: 1
+    city: 1900
+    state: 11
     country: 1
 - model: school.school
   pk: 2
@@ -72,8 +35,8 @@
     phone: 11-3425-3565
     site: https://www.escoladafamilia.edu
     email: secretaria@escoladafamilia.edu
-    city: 3
-    state: 3
+    city: 6971
+    state: 26
     country: 1
 - model: school.school
   pk: 3
@@ -92,6 +55,6 @@
     phone: 21-5689-2356
     site: https://www.escoladalagoa.com.br
     email: contato@escoladalagoa.com.br
-    city: 2
-    state: 2
+    city: 5242
+    state: 19
     country: 1
