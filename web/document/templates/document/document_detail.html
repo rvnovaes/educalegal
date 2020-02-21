@@ -21,6 +21,19 @@
               <span class="font-weight-bold">Provedor: </span>{{ document.signing_provider }}</li>
           <li class="list-group-item">
               <span class="font-weight-bold">Link: </span>{{ document.link }}</li>
+          <li class="list-group-item">
+              <span class="font-weight-bold">Descrição: </span>{{ document.description }}</li>
+            {% if document.related_documents.all %}
+                <br />
+                <h5>Documentos Relacionados</h5>
+                <div class="card-footer">
+                  <ul>
+                    {% for related_document in document.related_documents.all  %}
+                      <li><a href="{% url 'document:document-detail' pk=related_document.pk %}" target="_blank">{{ related_document.name }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+        {% endif %}
         </ul>
 
       </div>

@@ -17,3 +17,8 @@ class Document(TenantAwareModel):
     status = models.CharField(max_length=256, verbose_name="Status")
     signing_provider = models.CharField(max_length=256, verbose_name="Provedor")
     ged_link = models.URLField(null=True, blank=True, verbose_name="Link")
+    description = models.TextField(null=True, verbose_name='Descrição')
+    related_documents = models.ManyToManyField('self', related_name='documents')
+
+    def __str__(self):
+        return self.name + ' - ' + self.school.name
