@@ -63,7 +63,6 @@ fresh_install:
 	# https://stackoverflow.com/questions/2670130/make-how-to-continue-after-a-command-fails
 	-docker rmi -f jhpyle/docassemble
 	make build
-	docker-compose run docassemble /usr/share/docassemble/local3.6/bin/pip3 install coreapi docassemble-wrappers num2words validator-collection-br
 	make restart
 
 logs:
