@@ -1,14 +1,11 @@
 #!/bin/sh
 # wait-for-postgres.sh
 # https://docs.docker.com/compose/startup-order/
-
+# -e  Exit immediately if a command exits with a non-zero status.
 set -e
-
-host="$1"
-shift
 cmd="$@"
 
-until PGPASSWORD=$POSTGRES_PASSWORD psql -h "$host" -U "postgres" -c '\q'; do
+until PGPASSWORD=$DATABASE_PASSWORD psql -h $DATABASE_HOST -U $DATABASE_USER -c '\q'; do
   >&2 echo "Postgres is unavailable - sleeping"
   sleep 1
 done

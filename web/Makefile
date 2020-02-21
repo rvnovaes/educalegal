@@ -1,6 +1,24 @@
-# https://docs.docker.com/compose/extends/
 build:
 	docker-compose build web
+
+# parametros
+# e=prod - conecta como producao
+# e=nodebug - conecta sem modo de debug (-d: detached mode)
+# se nao passar o parametro - conecta com modo de debug
+# make run e=prod or make run e=nodebug or make run
+run:
+ifeq ($(e), prod)
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+else ifeq ($(e), nodebug)
+	docker-compose up -d
+else
+	docker-compose up
+endif
+
+stop:
+	docker-compose stop
+
+restart: stop run
 
 collectstatic:
 ifeq ($(e), prod)
@@ -8,15 +26,6 @@ ifeq ($(e), prod)
 else
 	docker-compose run web python manage.py collectstatic --noinput
 endif
-
-create_certificate:
-	docker-compose run certbot certbot certonly --webroot -w /tmp/www -d app.educalegal.com.br -m sistemas@educalegal.com.br --agree-tos
-
-create_certificate_test:
-	docker-compose run certbot certbot certonly --webroot -w /tmp/www -d app.educalegal.com.br -m sistemas@educalegal.com.br --agree-tos
-
-logs:
-	docker-compose logs --follow
 
 migrate:
 ifeq ($(e), prod)
@@ -38,35 +47,47 @@ loaddata_prod:
 loaddata_dev:
 	docker-compose run web python manage.py loaddata tenant country state city school interview_dev
 
-# Not working
-install_docassemble_python_packages:
-	docker-compose run docassemble /usr/share/docassemble/local3.6/bin/pip install coreapi docassemble-wrappers num2words
+create_super_user:
+	docker-compose run web ./create_super_user.sh
+
+setup_dev: makemigrations migrate loaddata_dev create_super_user run
+
+# Removes old databases for educa legal and ged
+# Removes old docassemble image
+# Builds new educa legal image
+# Installs into docassemble python packages required by educa legal app
+# Restarts everything
+# It is still necessary to run make setup_dev to apply
+fresh_install:
+	rm -rf ../docker_volumes
+	# https://stackoverflow.com/questions/2670130/make-how-to-continue-after-a-command-fails
+	-docker rmi -f jhpyle/docassemble
+	make build
+	docker-compose run docassemble /usr/share/docassemble/local3.6/bin/pip3 install coreapi docassemble-wrappers num2words validator-collection-br
+	make restart
+
+logs:
+	docker-compose logs --follow
 
 ps:
 	docker-compose ps
 
-# parametros
-# e=prod - conecta como producao
-# e=nodebug - conecta sem modo de debug (-d: detached mode)
-# se nao passar o parametro - conecta com modo de debug
-# make run e=prod or make run e=nodebug or make run
-run:
-ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-else ifeq ($(e), nodebug)
-	docker-compose up -d
-else
-	docker-compose up
-endif
-
-restart:
-	docker-compose stop
-	docker-compose up -d
-
 shell:
 	docker-compose run web bash
 
-stop:
-	docker-compose stop
 
-setup_dev: install_docassemble_python_packages migrate makemigrations loaddata_dev
+
+
+# https://docs.docker.com/compose/extends/
+#What’s the difference between up, run, and start?
+# UP - Typically, you want docker-compose up. Use up to start or restart all the services defined
+# in a docker-compose.yml. In the default “attached” mode, you see all the logs from all the
+# containers. In “detached” mode (-d), Compose exits after starting the containers, but the containers
+# continue to run in the background.
+# RUN - The docker-compose run command is for running “one-off” or “adhoc” tasks. It requires the service
+# name you want to run and only starts containers for services that the running service depends on.
+# Use run to run tests or perform an administrative task such as removing or adding data to a data volume
+# container. The run command acts like docker run -ti in that it opens an interactive terminal to the
+# container and returns an exit status matching the exit status of the process in the container.
+# START - The docker-compose start command is useful only to restart containers that were previously created,
+# but were stopped. It never creates new containers.
