@@ -5,10 +5,15 @@ from school.models import School
 
 
 class Document(TenantAwareModel):
-    name = models.CharField(max_length=512)
-    created_date = models.DateTimeField(auto_now_add=True)
-    altered_date = models.DateTimeField(auto_now=True)
-    interview = models.ForeignKey(Interview, on_delete=models.CASCADE)
-    school = models.ForeignKey(School, on_delete=models.CASCADE)
-    status = models.CharField(max_length=256)
-    signing_provider = models.CharField(max_length=256)
+    name = models.CharField(max_length=512, verbose_name="Nome")
+    school = models.ForeignKey(School, on_delete=models.CASCADE, verbose_name="Escola")
+    created_date = models.DateTimeField(
+        auto_now_add=True, verbose_name="Criação"
+    )
+    altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
+    interview = models.ForeignKey(
+        Interview, on_delete=models.CASCADE, verbose_name="Modelo"
+    )
+    status = models.CharField(max_length=256, verbose_name="Status")
+    signing_provider = models.CharField(max_length=256, verbose_name="Provedor")
+    ged_link = models.URLField(null=True, blank=True, verbose_name="Link")

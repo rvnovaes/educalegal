@@ -27,6 +27,7 @@ urlpatterns = [
     url(r"^$", LoginView.as_view()),
     url(r"^account/", include("allauth.urls")),
     url(r"^interview/", include("interview.urls")),
+    url(r"^document/", include("document.urls")),
     url(r"^school/", include("school.urls")),
     path("api/", include("api.urls")),
     path('api-auth/', include('rest_framework.urls')),

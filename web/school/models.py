@@ -120,7 +120,7 @@ class School(TenantAwareModel):
     )
 
     def __str__(self):
-        return self.legal_name
+        return self.name + ' - ' + self.legal_name
 
     @property
     def address(self):

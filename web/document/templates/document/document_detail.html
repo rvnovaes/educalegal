@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block body_block %}
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h5>{{ document.name }}</h5>
+      </div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+              <span class="font-weight-bold">Escola: </span>{{ document.school }}</li>
+          <li class="list-group-item">
+              <span class="font-weight-bold">Data de Criação: </span>{{ document.created_date }}</li>
+          <li class="list-group-item">
+              <span class="font-weight-bold">Data de Alteração: </span>{{ document.altered_date}}</li>
+          <li class="list-group-item">
+              <span class="font-weight-bold">Modelo: </span>{{ document.interview }}</li>
+          <li class="list-group-item">
+              <span class="font-weight-bold">Status: </span>{{ document.status }}</li>
+          <li class="list-group-item">
+              <span class="font-weight-bold">Provedor: </span>{{ document.signing_provider }}</li>
+          <li class="list-group-item">
+              <span class="font-weight-bold">Link: </span>{{ document.link }}</li>
+        </ul>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}
