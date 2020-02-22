@@ -22,7 +22,7 @@ services:
     ports:
       - "80:80"
   ged:
-    container_name: mayan
+    container_name: ged
     image: mayanedms/mayanedms:3.3.13
     environment:
       MAYAN_CELERY_BROKER_URL: "redis://:mayanredispassword@redis:6379/0"
