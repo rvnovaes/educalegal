@@ -3,4 +3,3 @@
   fields:
     name: Educa Legal
     subdomain_prefix: edu
-    ged_url: http://ged:8000

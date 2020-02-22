@@ -44,18 +44,24 @@ endif
 loaddata_prod:
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run web python manage.py loaddata tenant country state city school interview
 
+# Loads fixtures for development
 loaddata_dev:
 	docker-compose run web python manage.py loaddata tenant country state city school interview_dev
 
-create_super_user:
-	docker-compose run web ./create_super_user.sh
+# Creates Educa Legal superuser as admin / Silex2109
+create_super_user_educa_legal:
+	docker-compose run web ./create_super_user_educa_legal.sh
 
-setup_dev: makemigrations migrate loaddata_dev create_super_user run
+# Makes the migrations
+# Migrates
+# Loads fixtures for development
+setup_dev: makemigrations migrate loaddata_dev
+	-make create_super_user_educa_legal
+	make run
 
 # Removes old databases for educa legal and ged
 # Removes old docassemble image
 # Builds new educa legal image
-# Installs into docassemble python packages required by educa legal app
 # Restarts everything
 # It is still necessary to run make setup_dev to apply
 fresh_install:

@@ -1,55 +1,17 @@
 from django.contrib import admin
-from .models import Tenant
+from .models import Tenant, TenantGedData, TenantESignatureData
 
 
+@admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
-    list_display = ["name", "ged_url"]
-
-    fieldsets = (
-        (None, {"fields": ("name", "subdomain_prefix",)}),
-        (
-            "Ged",
-            {
-                "fields": (
-                    "ged_name",
-                    "ged_url",
-                    "ged_token",
-                    "ged_database",
-                    "ged_database_user",
-                    "ged_database_user_password",
-                    "ged_database_host",
-                    "ged_database_port",
-                    "ged_database_database_engine",
-                )
-            },
-        ),
-        (
-            "GED - Storage",
-            {
-                "fields": (
-                    "ged_storage_provider",
-                    "ged_storage_access_key",
-                    "ged_storage_secret_key",
-                    "ged_storage_bucket_name",
-                    "ged_storage_default_acl",
-                    "ged_storage_endpoint_url",
-                    "ged_storage_region_name",
-                )
-            },
-        ),
-        (
-            "ESignature",
-            {
-                "fields": (
-                    "esignature_provider",
-                    "esignature_client_id",
-                    "esignature_impersonate_user_id",
-                    "esignature_test_mode",
-                    "e_signature_private_key",
-                )
-            }
-        )
-    )
+    list_display = ["name"]
 
 
-admin.site.register(Tenant, TenantAdmin)
+@admin.register(TenantGedData)
+class TenantGedDataAdmin(admin.ModelAdmin):
+    list_display = ["name"]
+
+
+@admin.register(TenantESignatureData)
+class TenantESignatureDataAdmin(admin.ModelAdmin):
+    list_display = ["name"]
