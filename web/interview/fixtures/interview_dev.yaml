@@ -1,72 +1,131 @@
 - model: interview.Interview
-  pk: 1
+  pk: 2
   fields:
     name: Contrato do aluno
     version: 1.1
     date_available: 2020-01-23
     description: Contrato de prestação de serviços educacionais entre aluno e escola.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-prestacao-servicos-educacionais.yml
-    document_type_id: 1
+    document_type_id: 2
+    tenants: [1, 2]
 - model: interview.Interview
-  pk: 2
+  pk: 3
   fields:
     name: Contrato de consultoria
     version: 1.1
     date_available: 2020-01-23
     description: Um contrato para consultores darem palpite sobre o que você já sabe e te cobrarem por isso.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-prestacao-servicos-consultoria.yml
-    document_type_id: 1
+    document_type_id: 3
+    tenants: [1, 2]
 - model: interview.Interview
-  pk: 3
+  pk: 4
   fields:
     name: Termo de confidencialidade - NDA
     version: 1.1
     date_available: 2020-01-23
     description: Promete guardar segredo?
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-termo-de-confidencialidade-nda.yml
-    document_type_id: 1
+    document_type_id: 4
+    tenants: [1, 2]
 - model: interview.Interview
-  pk: 4
+  pk: 5
   fields:
     name: Autorização de uso de imagem
     version: 1.1
     date_available: 2020-12-01
     description: Posso tirar fotos do seu filho e colocar no Instagram da escola?
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-termo-de-autorizacao-do-uso-de-imagem.yml
-    document_type_id: 1
+    document_type_id: 5
+    tenants: [1, 2]
 - model: interview.Interview
-  pk: 5
+  pk: 6
   fields:
     name: Contrato de prestação de serviços
     version: 1.1
     date_available: 2020-01-23
     description: Contrato para prestadores de serviço em geral não te darem tanta raiva.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
-    document_type_id: 1
+    document_type_id: 6
+    tenants: [1, 2]
 - model: interview.Interview
-  pk: 6
+  pk: 7
   fields:
     name: Contrato de locação de imóvel
     version: 1.1
     date_available: 2020-01-23
     description: Usando nosso sistema você nunca mais vai perder o prazo da renovatória.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-de-locacao-de-imovel.yml
-    document_type_id: 1
+    document_type_id: 7
+    tenants: [1, 2]
 - model: interview.Interview
-  pk: 7
+  pk: 8
   fields:
     name: Notificação de cobrança
     version: 1.1
     date_available: 2020-01-23
     description: Aquela cartinha que ninguém gosta de receber. Por isso, use assinatura eletrônica para enviá-la.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-notificacao-extrajudicial.yml
-    document_type_id: 1
+    document_type_id: 8
+    tenants: [1, 2]
 - model: interview.Interview
-  pk: 8
+  pk: 9
   fields:
-    name: Generic NDA
+    name: Termo de confissão de dívida
     version: 1.1
     date_available: 2020-02-09
-    description: Modelo de entrevista genérica
-    base_url: http://localhost/interview?i=docassemble.playground1%3Ageneric-nda.yml
-    document_type_id: 1
+    description: Devo, não nego. Pago quando puder.
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-termo-de-confissao-de-divida.yml
+    document_type_id: 9
+    tenants: [1, 2]
+- model: interview.Interview
+  pk: 10
+  fields:
+    name: Contrato de cessão de espaço
+    version: 1.1
+    date_available: 2020-02-09
+    description:
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-de-cessao-de-espaco-para-fins-comerciais.yml
+    document_type_id: 10
+    tenants: [1, 2]
+- model: interview.Interview
+  pk: 11
+  fields:
+    name: Contrato de diretor estatutário
+    version: 1.1
+    date_available: 2020-02-09
+    description: Contrato do Big Boss
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-diretor-estatutario.yml
+    document_type_id: 11
+    tenants: [1, 2]
+- model: interview.Interview
+  pk: 12
+  fields:
+    name: Aditivo ao contrato de trabalho - banco de horas
+    version: 1.1
+    date_available: 2020-02-09
+    description:
+    base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-aditivo-contrato-trabalho-banco-horas.yml
+    document_type_id: 12
+    tenants: [1, 2]
+- model: interview.Interview
+  pk: 13
+  fields:
+    name: Contrato de viagem de formação pedagógica
+    version: 1.1
+    date_available: 2020-02-09
+    description:
+    base_url: http://localhost/interview?i=docassemble.playground1%3A
+    document_type_id: 13
+    tenants: [1, 2]
+- model: interview.Interview
+  pk: 14
+  fields:
+    name: Contrato de comodato de imóvel
+    version: 1.1
+    date_available: 2020-02-09
+    description: Me empresta seu imóvel sem cobrar nada?
+    base_url: http://localhost/interview?i=docassemble.playground1%3A
+    document_type_id: 14
+    tenants: [1, 2]
+
