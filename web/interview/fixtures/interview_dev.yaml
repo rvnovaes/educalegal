@@ -84,7 +84,7 @@
     name: Contrato de cessão de espaço
     version: 1.1
     date_available: 2020-02-09
-    description:
+    description: Give me some room.
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-contrato-de-cessao-de-espaco-para-fins-comerciais.yml
     document_type_id: 10
     tenants: [1, 2]
@@ -104,7 +104,7 @@
     name: Aditivo ao contrato de trabalho - banco de horas
     version: 1.1
     date_available: 2020-02-09
-    description:
+    description: O trabalho nunca acaba!
     base_url: http://localhost/interview?i=docassemble.playground1%3Abr-com-educalegal-aditivo-contrato-trabalho-banco-horas.yml
     document_type_id: 12
     tenants: [1, 2]
@@ -114,7 +114,7 @@
     name: Contrato de viagem de formação pedagógica
     version: 1.1
     date_available: 2020-02-09
-    description:
+    description: Conhecendo escolas de outro país.
     base_url: http://localhost/interview?i=docassemble.playground1%3A
     document_type_id: 13
     tenants: [1, 2]
