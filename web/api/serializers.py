@@ -3,7 +3,7 @@ from rest_framework import serializers
 from document.models import Document
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant
+from tenant.models import Tenant, TenantGedData, TenantESignatureData
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -22,13 +22,25 @@ class SchoolSerializer(serializers.ModelSerializer):
     city = serializers.StringRelatedField()
     state = serializers.StringRelatedField()
     country = serializers.StringRelatedField()
+
     class Meta:
         model = School
         fields = "__all__"
 
 
-class TenantGEDSerializer(serializers.ModelSerializer):
+class TenantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tenant
-        fields = ["name", "ged_url", "ged_token"]
+        fields = "__all__"
 
+
+class TenantGedDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenantGedData
+        fields = "__all__"
+
+
+class TenantESignatureDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenantESignatureData
+        fields = "__all__"
