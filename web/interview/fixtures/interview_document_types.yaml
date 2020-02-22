@@ -1,0 +1,59 @@
+- model: interview.InterviewDocumentType
+  pk: 1
+  fields:
+    name: Documentos anexos
+- model: interview.InterviewDocumentType
+  pk: 2
+  fields:
+    name: Contrato do aluno
+- model: interview.InterviewDocumentType
+  pk: 3
+  fields:
+    name: Contrato de consultoria
+- model: interview.InterviewDocumentType
+  pk: 4
+  fields:
+    name: Termo de confidencialidade - NDA
+- model: interview.InterviewDocumentType
+  pk: 5
+  fields:
+    name: Autorização de uso de imagem
+- model: interview.InterviewDocumentType
+  pk: 6
+  fields:
+    name: Contrato de prestação de serviços
+- model: interview.InterviewDocumentType
+  pk: 7
+  fields:
+    name: Contrato de locação de imóvel
+- model: interview.InterviewDocumentType
+  pk: 8
+  fields:
+    name: Notificação de cobrança
+- model: interview.InterviewDocumentType
+  pk: 9
+  fields:
+    name: Termo de confissão de dívida
+- model: interview.InterviewDocumentType
+  pk: 10
+  fields:
+    name: Contrato de cessão de espaço
+- model: interview.InterviewDocumentType
+  pk: 11
+  fields:
+    name: Contrato de diretor estatutário
+- model: interview.InterviewDocumentType
+  pk: 12
+  fields:
+    name: Aditivo ao contrato de trabalho - banco de horas
+- model: interview.InterviewDocumentType
+  pk: 13
+  fields:
+    name: Contrato de viagem de formação pedagógica
+- model: interview.InterviewDocumentType
+  pk: 14
+  fields:
+    name: Contrato de comodato de imóvel
+
+
+

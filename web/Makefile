@@ -42,11 +42,11 @@ else
 endif
 
 loaddata_prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run web python manage.py loaddata tenant country state city school interview
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run web python manage.py loaddata tenant country state city school interview_document_types interview
 
 # Loads fixtures for development
 loaddata_dev:
-	docker-compose run web python manage.py loaddata tenant country state city school interview_dev
+	docker-compose run web python manage.py loaddata tenant country state city school interview_document_types interview_dev
 
 # Creates Educa Legal superuser as admin / Silex2109
 create_super_user_educa_legal:

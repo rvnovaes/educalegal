@@ -1,7 +1,3 @@
-- model: interview.InterviewDocumentType
-  pk: 1
-  fields:
-    name: Documentos Padrão
 - model: interview.Interview
   pk: 1
   fields:
