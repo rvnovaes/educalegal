@@ -9,7 +9,7 @@ class InterviewTable(tables.Table):
         model = Interview
         order_by = "name"
         template_name = "django_tables2/bootstrap4.html"
-        fields = ("name", "version", "date_available", "description", "base_url")
+        fields = ("name", "description", "version", "date_available", "base_url")
 
     base_url = InterviewCustomUrlColumn(
         template_name="interview/criar_button.html", verbose_name="Criar"
