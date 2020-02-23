@@ -1,17 +1,25 @@
 django~=3.0.3
+# API
 djangorestframework~=3.11.0
 django-cors-headers~=3.2.1
 coreapi~=2.3.3
 coreapi-cli~=1.0.9
+django-rest-auth~=0.9.5
+# Formating of forms
 django-crispy-forms~=1.8.1
+# Database Access
 psycopg2-binary~=2.8.4
+# Authentication
+django-allauth
+# Used to create tables and filtering
+django-tables2
+django-filter~=2.2.0
+# Store files on Digital Ocean Spaces
+django-storages~=1.9.1
+boto3~=1.12.5
+# Misc
+lxml~=4.5.0
+beautifulsoup4~=4.8.2
 Pillow
 pyyaml~=5.3
-django-allauth
-django-tables2
-gunicorn~=20.0.4
-django-storages~=1.9.1
-boto3~=1.12.0
-django-rest-auth~=0.9.5
-beautifulsoup4~=4.8.2
-lxml~=4.5.0
+django-bootstrap4~=1.1.1

@@ -1,26 +1,22 @@
 {% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load render_table from django_tables2 %}
+
 {% block body_block %}
   <div class="container">
-    <h2>Meus Modelos</h2>
+  {% if filter %}
+      <form action="" method="get" class="form form-inline" style="float: right">
+        {% bootstrap_form filter.form layout="inline" %}
+        {% bootstrap_button "Buscar" %}
+      </form>
+  {% endif %}
+    <h2>Modelos</h2>
       {% if interviews %}
-        {% for interview in interviews %}
-          <div class="card">
-            <div class="card-header">
-              <h5>{{ interview.name }}</h5>
-            </div>
-            <div class="card-body">
-              <p class="card-text">{{ interview.description }}</p>
-              <a href="{{ interview.interview_final_url }}" target="_blank" class="btn btn-primary">Clique aqui</a>
-            </div>
-            <div class="card-footer">
-              <small class="text-muted">Versão: {{ interview.version }} - Disponibilizado em: {{ interview.date_available|date:"d-m-yy" }}</small>
-            </div>
-          </div>
-        {% endfor %}
+          {% render_table table %}
       {% else %}
-          <div class="alert alert-info" role="alert">
-            Você não tem modelos disponíveis.
-          </div>
-      {% endif %}
-    </div>
+      <div class="alert alert-info" role="alert">
+        Você não tem modelos disponíveis.
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}

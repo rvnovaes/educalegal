@@ -50,8 +50,9 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    # Easy and simple tables for Django
+    # Easy and simple tables for Django and filtering for tables
     "django_tables2",
+    "django_filters",
     # Good Old Rest Framework
     "rest_framework",
     # Generates the tokens on the server for Rest Framework
@@ -64,6 +65,8 @@ INSTALLED_APPS = [
     "storages",
     # Driver for AWS Compatible storage
     "boto3",
+    # Integration with Boostrap 4
+    "bootstrap4",
     # Local
     "tenant",
     "users",
@@ -221,7 +224,6 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
-
     "DEFAULT_AUTHENTICATION_CLASSES": [
         # Session Authentication is kept here for the browseable API
         "rest_framework.authentication.SessionAuthentication",
@@ -246,32 +248,20 @@ CORS_ORIGIN_WHITELIST = (
 
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'console': {
-            'format': '%(name)-12s %(levelname)-8s %(message)s'
-        },
-        'file': {
-            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
-        }
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console": {"format": "%(name)-12s %(levelname)-8s %(message)s"},
+        "file": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"},
     },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'console'
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "console"},
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "formatter": "file",
+            "filename": os.path.join(BASE_DIR, "media/info.log"),
         },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'formatter': 'file',
-            'filename':  os.path.join(BASE_DIR, 'media/info.log')
-        }
     },
-    'loggers': {
-        '': {
-            'level': 'DEBUG',
-            'handlers': ['console', 'file']
-        }
-    }
+    "loggers": {"": {"level": "DEBUG", "handlers": ["console", "file"]}},
 }
