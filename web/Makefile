@@ -57,7 +57,6 @@ create_super_user_educa_legal:
 # Loads fixtures for development
 setup_dev: makemigrations migrate loaddata_dev
 	-make create_super_user_educa_legal
-	make run
 
 # Removes old databases for educa legal and ged
 # Removes old docassemble image
