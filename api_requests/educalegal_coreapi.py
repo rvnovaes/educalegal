@@ -1,61 +1,17 @@
+import sys
 import coreapi
 from coreapi.exceptions import ErrorMessage
 
+sys.path.append('/opt/docassemble-elements/docassemble/elements/data')
 
-class EducaLegalClient:
-    def __init__(self, user_token, schema):
-        self.client = coreapi.Client(
-            auth=coreapi.auth.TokenAuthentication(scheme="Token", token=user_token)
-        )
-        self.schema = self.client.get(schema)
-
-    def get_tenant_data(self, tid):
-        params = {"id": tid}
-        action = ["tenant", "ged", "read"]
-        result = self.client.action(self.schema, action, params=params)
-        # Return one tenant.
-        return result
-
-    def get_all_schools_data(self, tid):
-        params = {"id": tid}
-        action = ["tenant", "school", "list"]
-        result = self.client.action(self.schema, action, params=params)
-        # Return all schools from a tenant
-        return result
-
-    def get_all_schools_names(self, tid):
-        params = {"id": tid}
-        action = ["tenant", "school", "list"]
-        result = self.client.action(self.schema, action, params=params)
-        school_names_list = list()
-        for school in result:
-            school_names_list.append(school["name"])
-        return school_names_list
-
-    def get_all_schools_names_data(self, tid):
-        params = {"id": tid}
-        action = ["tenant", "school", "list"]
-        all_schools_data = self.client.action(self.schema, action, params=params)
-        school_names_list = list()
-        school_data_dict = dict()
-        for school in all_schools_data:
-            school_names_list.append(school["name"])
-            school_data_dict[school["name"]] = school
-        return school_names_list, school_data_dict
-
-    def get_interview_data(self, intind):
-        params = {"id": intind}
-        action = ["interview", "read"]
-        interview_data = self.client.action(self.schema, action, params=params)
-        return interview_data
-
+from element_educalegal_app import EducaLegalClient
 
 if __name__ == "__main__":
-    ut = "359efadb736eba60f0c705719a28093be699ea3f"
-    schema = "http://localhost:8000/api/docs"
+    ut = "960fc6c3c51349ef0637039c67b09eff497dfa21"
+    schema = "http://localhost:8000/v1/docs"
     el_client = EducaLegalClient(ut, schema)
-    # print(el_client.get_tenant_data(1))
-    print(el_client.get_interview_data(1))
+    print(el_client.get_tenant_ged_data(1))
+    print(el_client.get_interview_data(2))
 
     try:
         school_names_list, school_data_dict = el_client.get_all_schools_names_data(1)
