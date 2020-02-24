@@ -1,6 +1,9 @@
 from django.db import models
 
 
+# For genenral informations about the structure we used here, see:
+# https://books.agiliq.com/projects/django-multi-tenant/en/latest/
+
 class Tenant(models.Model):
     name = models.CharField(max_length=100)
     subdomain_prefix = models.CharField(
@@ -18,7 +21,8 @@ class TenantAwareModel(models.Model):
         abstract = True
 
 
-class TenantGedData(TenantAwareModel):
+class TenantGedData(models.Model):
+    tenant = models.OneToOneField(Tenant, on_delete=models.CASCADE, primary_key=True)
     name = models.CharField(max_length=255, null=True, blank=True, verbose_name="Nome")
     url = models.CharField(max_length=512, null=True, blank=True, verbose_name="URL")
     token = models.CharField(
@@ -89,7 +93,9 @@ class TenantGedData(TenantAwareModel):
         return self.name
 
 
-class TenantESignatureData(TenantAwareModel):
+class TenantESignatureData(models.Model):
+
+    tenant = models.OneToOneField(Tenant, on_delete=models.CASCADE, primary_key=True)
 
     name = models.CharField(max_length=255, null=True, blank=True, verbose_name="Nome")
 
