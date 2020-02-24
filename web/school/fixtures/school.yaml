@@ -1,7 +1,7 @@
 - model: school.school
   pk: 1
   fields:
-    tenant: 1
+    tenant: 2
     name: "Col\xE9gio Bacana"
     legal_name: "Sociedade de Ensino Col\xE9gio Bacana Ltda."
     legal_type: J
@@ -21,7 +21,7 @@
 - model: school.school
   pk: 2
   fields:
-    tenant: 1
+    tenant: 2
     name: "Escola da Fam\xEDlia"
     legal_name: "Funda\xE7\xE3o Educacional Santa Helena"
     legal_type: J
@@ -41,7 +41,7 @@
 - model: school.school
   pk: 3
   fields:
-    tenant: 1
+    tenant: 2
     name: Escola da Lagoa
     legal_name: "Mendon\xE7a e Machado Servi\xE7os Educacionais S/A"
     legal_type: J

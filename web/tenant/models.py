@@ -102,11 +102,11 @@ class TenantESignatureData(TenantAwareModel):
     )
 
     client_id = models.CharField(
-        max_length=255, null=True, blank=True, verbose_name="Client ID"
+        max_length=255, null=True, blank=True, verbose_name="Client ID", help_text='AKA Integration Key'
     )
 
-    impersonate_user_id = models.CharField(
-        max_length=255, null=True, blank=True, verbose_name="Impersonated User",
+    impersonated_user_guid = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Impersonated User", help_text='AKA API Username'
     )
 
     test_mode = models.BooleanField(
