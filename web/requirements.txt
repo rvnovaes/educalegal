@@ -18,6 +18,8 @@ django-filter~=2.2.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
 boto3~=1.12.6
+# Production server
+gunicorn
 # Misc
 lxml~=4.5.0
 beautifulsoup4~=4.8.2
