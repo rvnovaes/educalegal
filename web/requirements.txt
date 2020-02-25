@@ -5,6 +5,7 @@ django-cors-headers~=3.2.1
 coreapi~=2.3.3
 coreapi-cli~=1.0.9
 django-rest-auth~=0.9.5
+retry-requests
 # Formating of forms
 django-crispy-forms~=1.8.1
 # Database Access
@@ -16,7 +17,7 @@ django-tables2
 django-filter~=2.2.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.12.5
+boto3~=1.12.6
 # Misc
 lxml~=4.5.0
 beautifulsoup4~=4.8.2
