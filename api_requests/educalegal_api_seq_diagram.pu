@@ -49,7 +49,7 @@ element_docusign.py
 end note
 activate Docusign
 Docusign -> Docassemble: envelope_data
-Docassemble -> EducaLegal: create_document(updates envelope_id, envelope_status)
+Docassemble -> EducaLegal: PATCH patch_document(ged_id, status, envelope_id, signing_provider)
 deactivate Docassemble
 activate EducaLegal
 Docusign -> Recipients: Send emails

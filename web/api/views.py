@@ -97,12 +97,17 @@ def docusign_webhook_listener(request):
     return HttpResponse("Success")
 
 
-class DocumentCreateView(generics.CreateAPIView):
+class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
 
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+    def partial_update(self, request, *args, **kwargs):
+        ged_id = request.data['ged_id']
+        instance = self.queryset.get(ged_id=ged_id)
+        serializer = self.serializer_class(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class InterviewViewSet(viewsets.ReadOnlyModelViewSet):

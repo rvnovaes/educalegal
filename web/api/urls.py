@@ -1,7 +1,7 @@
 from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 from django.urls import path, include
-from .views import DocumentCreateView
+from .views import DocumentViewSet
 from .views import InterviewViewSet
 from .views import TenantSchoolViewSet
 from .views import TenantViewSet, TenantGedDataViewSet, TenantESignatureDataViewSet
@@ -15,7 +15,7 @@ API_DESCRIPTION = (
 schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
-    path("documents/", DocumentCreateView.as_view()),
+    path("documents/", DocumentViewSet.as_view({"post": "create", "patch": "partial_update"})),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
     path("tenants/", TenantViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>", TenantViewSet.as_view({"get": "retrieve"})),
