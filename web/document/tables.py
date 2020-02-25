@@ -4,9 +4,18 @@ from .models import Document
 
 
 class DocumentTable(tables.Table):
-    name = tables.LinkColumn("document:document-detail", args=[A("pk")])
+    interview = tables.LinkColumn("document:document-detail", args=[A("pk")])
+    ged_link = tables.TemplateColumn(template_name="document/ir_button.html", verbose_name="Link")
 
     class Meta:
         model = Document
         template_name = "django_tables2/bootstrap4.html"
-        fields = ("name", "school", "created_date", "altered_date", "interview", "status", "signing_provider")
+        fields = (
+            "interview",
+            "school",
+            "created_date",
+            "altered_date",
+            "status",
+            "signing_provider",
+            "ged_link"
+        )
