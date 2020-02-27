@@ -58,13 +58,11 @@ create_super_user_educa_legal:
 setup_dev: makemigrations migrate loaddata_dev
 	-make create_super_user_educa_legal
 
-# Removes old databases for educa legal and ged
 # Removes old docassemble image
 # Builds new educa legal image
 # Restarts everything
-# It is still necessary to run make setup_dev to apply
+# It is still necessary to run make setup_dev
 fresh_install:
-	rm -rf ../docker_volumes
 	# https://stackoverflow.com/questions/2670130/make-how-to-continue-after-a-command-fails
 	-docker rmi -f jhpyle/docassemble
 	make build
