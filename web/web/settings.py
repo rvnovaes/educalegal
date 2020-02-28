@@ -24,6 +24,7 @@ SECRET_KEY = "mvyzst83ep^g72ho)29dm+zq&+we8qbg82u8q_(_7$$a=i_@*n"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+SILK = False
 
 if "ALLOWED_HOSTS" in os.environ:
     allowed_hosts_string = os.environ["ALLOWED_HOSTS"]
@@ -76,7 +77,7 @@ INSTALLED_APPS = [
     "document",
 ]
 
-if DEBUG:
+if SILK:
     INSTALLED_APPS.append("silk")
 
 
@@ -95,7 +96,7 @@ MIDDLEWARE = [
 # The middleware placement is sensitive. If the middleware before silk.middleware.SilkyMiddleware returns from process_
 # request then SilkyMiddleware will never get the chance to execute. Therefore you must ensure that any middleware
 # placed before never returns anything from process_request.
-if DEBUG:
+if SILK:
     MIDDLEWARE.insert(0, 'silk.middleware.SilkyMiddleware')
 
 

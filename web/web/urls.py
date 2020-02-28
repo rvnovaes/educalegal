@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 
 from allauth.account.views import LoginView
 
-from .settings import DEBUG
+from .settings import SILK
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -34,6 +34,6 @@ urlpatterns = [
     path("v1/api-auth/", include("rest_framework.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if DEBUG:
+if SILK:
     urlpatterns.append(url(r'^silk/', include('silk.urls', namespace='silk')))
 
