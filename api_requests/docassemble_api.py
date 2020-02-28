@@ -38,6 +38,7 @@ if __name__ == "__main__":
     )
     elements_questions = "/opt/docassemble-elements/docassemble/elements/data/questions"
     elements_modules = "/opt/docassemble-elements/docassemble/elements/data/"
+
     # post_to_docassemble(api_key_localhost, server_url_localhost, brcomeducalegal_questions, "questions")
     # post_to_docassemble(api_key_localhost, server_url_localhost, brcomeducalegal_templates, "templates")
     # post_to_docassemble(api_key_localhost, server_url_localhost, elements_questions, "questions")

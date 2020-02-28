@@ -4,12 +4,12 @@ sys.path.append("/opt/docassemble-elements/docassemble/elements/data")
 from element_educalegal_client import EducaLegalClient
 
 if __name__ == "__main__":
-    # api_base_url_localhost = "http://localhost:8000"
-    # token_localhost = "914c485c0f1b7ac35097474ac9932c34a3b16783"
-    api_base_url_docs_silex = "https://app.educalegal.com.br"
-    token_docs_silex = "83c0867e920cab1977d6dd0384f95e2508e6b9d4"
+    api_base_url_localhost = "http://localhost:8000"
+    token_localhost = "914c485c0f1b7ac35097474ac9932c34a3b16783"
+    # api_base_url_docs_silex = "https://app.educalegal.com.br"
+    # token_docs_silex = "83c0867e920cab1977d6dd0384f95e2508e6b9d4"
 
-    el = EducaLegalClient(api_base_url_docs_silex, token_docs_silex)
+    el = EducaLegalClient(api_base_url_localhost, token_localhost)
     print(el.tenants_ged_read(2))
     print(el.tenants_esignature_read(2))
     print(el.tenants_schools_list(2))
