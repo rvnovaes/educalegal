@@ -6,6 +6,8 @@ coreapi~=2.3.3
 coreapi-cli~=1.0.9
 django-rest-auth~=0.9.5
 retry-requests
+# API Debugging
+django-silk
 # Formating of forms
 django-crispy-forms~=1.8.1
 # Database Access

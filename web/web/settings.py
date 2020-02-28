@@ -76,6 +76,10 @@ INSTALLED_APPS = [
     "document",
 ]
 
+if DEBUG:
+    INSTALLED_APPS.append("silk")
+
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -86,6 +90,14 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+
+# The middleware placement is sensitive. If the middleware before silk.middleware.SilkyMiddleware returns from process_
+# request then SilkyMiddleware will never get the chance to execute. Therefore you must ensure that any middleware
+# placed before never returns anything from process_request.
+if DEBUG:
+    MIDDLEWARE.insert(0, 'silk.middleware.SilkyMiddleware')
+
 
 ROOT_URLCONF = "web.urls"
 
