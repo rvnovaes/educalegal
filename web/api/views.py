@@ -54,47 +54,47 @@ def docusign_webhook_listener(request):
     # data = json.loads(body_unicode)  # This is the entire incoming POST content.
     # logger.info(body_unicode)
     data = request.body  # This is the entire incoming POST content.
-    # This is dependent on your web server. In this case, Flask
-
-    # f = open(os.getcwd() + "/app/example_completed_notification.xml")
-    # data = f.read()
 
     # Note, there are many options for parsing XML in Python
     # For this recipe, we're using Beautiful Soup, http://www.crummy.com/software/BeautifulSoup/
 
     xml = BeautifulSoup(data, "xml")
-    envelope_id = xml.EnvelopeStatus.EnvelopeID.string
-    logger.info(envelope_id)
-    time_generated = xml.EnvelopeStatus.TimeGenerated.string
-    logger.info(time_generated)
+    try:
+        envelope_id = xml.EnvelopeStatus.EnvelopeID.string
+        logger.info(envelope_id)
+        time_generated = xml.EnvelopeStatus.TimeGenerated.string
+        logger.info(time_generated)
+        # Store the file.
+        # Some systems might still not like files or directories to start with numbers.
+        # So we prefix the envelope ids with E and the timestamps with T
+        envelope_dir = os.path.join(BASE_DIR, "media/docusign/", envelope_id)
+        Path(envelope_dir).mkdir(parents=True, exist_ok=True)
+        filename = (
+                "T" + time_generated.replace(":", "_") + ".xml"
+        )  # substitute _ for : for windows-land
+        filepath = os.path.join(envelope_dir, filename)
+        with open(filepath, "wb") as xml_file:
+            xml_file.write(data)
 
-    # Store the file.
-    # Some systems might still not like files or directories to start with numbers.
-    # So we prefix the envelope ids with E and the timestamps with T
-    envelope_dir = os.path.join(BASE_DIR, "media/docusign/", envelope_id)
-    Path(envelope_dir).mkdir(parents=True, exist_ok=True)
-    filename = (
-        "T" + time_generated.replace(":", "_") + ".xml"
-    )  # substitute _ for : for windows-land
-    filepath = os.path.join(envelope_dir, filename)
-    with open(filepath, "wb") as xml_file:
-        xml_file.write(data)
+        # If the envelope is completed, pull out the PDFs from the notification XML
+        if xml.EnvelopeStatus.Status.string == "Completed":
+            # Loop through the DocumentPDFs element, storing each document.
+            for pdf in xml.DocumentPDFs.children:
+                if pdf.DocumentType.string == "CONTENT":
+                    filename = "Completed_" + pdf.Name.string
+                elif pdf.DocumentType.string == "SUMMARY":
+                    filename = pdf.Name.string
+                else:
+                    filename = pdf.DocumentType.string + "_" + pdf.Name.string
+                full_filename = os.path.join(envelope_dir, filename)
+                with open(full_filename, "wb") as pdf_file:
+                    pdf_file.write(base64.b64decode(pdf.PDFBytes.string))
 
-    # If the envelope is completed, pull out the PDFs from the notification XML
-    if xml.EnvelopeStatus.Status.string == "Completed":
-        # Loop through the DocumentPDFs element, storing each document.
-        for pdf in xml.DocumentPDFs.children:
-            if pdf.DocumentType.string == "CONTENT":
-                filename = "Completed_" + pdf.Name.string
-            elif pdf.DocumentType.string == "SUMMARY":
-                filename = pdf.Name.string
-            else:
-                filename = pdf.DocumentType.string + "_" + pdf.Name.string
-            full_filename = os.path.join(envelope_dir, filename)
-            with open(full_filename, "wb") as pdf_file:
-                pdf_file.write(base64.b64decode(pdf.PDFBytes.string))
-
-    return HttpResponse("Success")
+        return HttpResponse("Success")
+    except AttributeError as e:
+        msg = str(e)
+        logger.exception(msg)
+        return HttpResponse(msg)
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
