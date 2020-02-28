@@ -1,0 +1,35 @@
+@startuml
+start
+:Captura dos dados do Pai, Aluno e dados contratuais;
+note right: Papel
+:Cadastro em sistema dos dados do Pai e do Aluno;
+note right: Sponte
+:Cadastro em sistema dos dados contratuais;
+note right: Sponte
+:Gera contas a receber;
+note right: Sponte
+:Captura dos documentos pessoais;
+note right: Link CRM
+floating note left
+	Faltou:
+	* Conferência dos documentos pessoais
+	* Cadastro dos dados médicos após coleta
+	* Termo de uso de imagem
+end note
+:Geração do Contrato (Documento);
+note right: Sponte
+:Carrega no **Docusign**;
+:Aplica o template do Envelope;
+note right: Docusign
+:Monitora status dos Envelopes;
+note right: Docusign
+:Baixa o documento completo;
+:Salva em uma pasta local;
+:Localiza o cadastro no aluno;
+note right: Sponte
+:Anexa o documento;
+note right: Sponte
+:Cadastro da Ficha médica;
+note right: Google Form
+stop
+@enduml
