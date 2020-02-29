@@ -31,70 +31,128 @@ from .serializers import (
 logger = logging.getLogger(__name__)
 
 
+def docusign_xml_parser(data):
+    envelope_data = dict()
+    xml = BeautifulSoup(data, "xml")
+    e_id = xml.EnvelopeStatus.EnvelopeID.string
+    envelope_data['envelope_id'] = e_id
+    e_status = xml.EnvelopeStatus.Status.string
+    envelope_data['envelope_status'] = e_status
+    e_created = xml.EnvelopeStatus.Created.string
+    envelope_data['envelope_created'] = e_created
+    e_sent = xml.EnvelopeStatus.Sent.string
+    envelope_data['envelope_sent'] = e_sent
+    e_time_generated = xml.EnvelopeStatus.TimeGenerated.string
+    envelope_data['envelope_time_generated'] = e_time_generated
+    e_status_detail = (
+            "Envelope ID: "
+            + e_id
+            + "\n"
+            + "Envelope Status: "
+            + e_status
+            + "\n"
+            + "Envelope Created: "
+            + e_created
+            + "\n"
+            + "Envelope Sent: "
+            + e_sent
+            + "\n"
+            + "Time Generated: "
+            + e_time_generated
+            + "\n"
+    )
+    envelope_data['envelope_status_detail_message'] = e_status_detail
+    recipient_statuses = xml.find_all("RecipientStatus")
+    r_status_detail = ""
+
+    for i in recipient_statuses:
+        r_routing_order = i.RoutingOrder.string
+        r_user_name = i.UserName.string
+        r_email = i.Email.string
+        r_type = i.Type.string
+        r_status = i.Status.string
+        r_status_detail += (
+                r_routing_order
+                + " - "
+                + r_user_name
+                + " - "
+                + r_email
+                + " - "
+                + r_type
+                + " - "
+                + r_status
+                + "\n"
+        )
+    envelope_data['envelope_recipient_status_detail_message'] = r_status_detail
+    all_details = (
+            "### Detalhes do Envelope ###\n"
+            + e_status_detail
+            + "\n"
+            + "### Detalhes dos Destinatários ###\n"
+            + r_status_detail
+            + "\n"
+    )
+    envelope_data['envelope_all_details_message'] = all_details
+    return envelope_data
+
+
+def docusign_pdf_files_saver(data, envelope_dir):
+    pdf_documents = list()
+    xml = BeautifulSoup(data, "xml")
+    # Loop through the DocumentPDFs element, storing each document.
+    for pdf in xml.find_all("DocumentPDFs"):
+        if pdf.DocumentType.string == "CONTENT":
+            filename = "Completed_" + pdf.Name.string
+
+        elif pdf.DocumentType.string == "SUMMARY":
+            filename = pdf.Name.string
+        else:
+            filename = pdf.DocumentType.string + "_" + pdf.Name.string
+        pdf_documents.append(filename)
+
+        full_filename = os.path.join(envelope_dir, filename)
+        with open(full_filename, "wb") as pdf_file:
+            pdf_file.write(base64.b64decode(pdf.PDFBytes.string))
+    return pdf_documents
+
+
 @require_POST
 @csrf_exempt
 def docusign_webhook_listener(request):
-    # Process the incoming webhook data. See the DocuSign Connect guide
-    # for more information
-    #
-    # Strategy: examine the data to pull out the envelope_id and time_generated fields.
-    # Then store the entire xml on our local file system using those fields.
-    #
-    # If the envelope status=="Completed" then store the files as doc1.pdf, doc2.pdf, etc
-    #
-    # This function could also enter the data into a dbms, add it to a queue, etc.
-    # Note that the total processing time of this function must be less than
-    # 100 seconds to ensure that DocuSign's request to your app doesn't time out.
-    # Tip: aim for no more than a couple of seconds! Use a separate queuing service
-    # if need be.
     logger.info(request.headers)
     logger.info(request.content_type)
-    # logger.info(request.body)
-    # body_unicode = request.body.decode('utf-8')
-    # data = json.loads(body_unicode)  # This is the entire incoming POST content.
-    # logger.info(body_unicode)
-    data = request.body  # This is the entire incoming POST content.
-
-    # Note, there are many options for parsing XML in Python
-    # For this recipe, we're using Beautiful Soup, http://www.crummy.com/software/BeautifulSoup/
-
-    xml = BeautifulSoup(data, "xml")
+    data = request.body  # This is the entire incoming POST content in Django
     try:
-        envelope_id = xml.EnvelopeStatus.EnvelopeID.string
-        logger.info(envelope_id)
-        time_generated = xml.EnvelopeStatus.TimeGenerated.string
-        logger.info(time_generated)
-        # Store the file.
-        # Some systems might still not like files or directories to start with numbers.
-        # So we prefix the envelope ids with E and the timestamps with T
-        envelope_dir = os.path.join(BASE_DIR, "media/docusign/", envelope_id)
+        envelope_data = docusign_xml_parser(data) # Parses XML data and returns a dictionary and formated messages
+        logger.info(envelope_data['envelope_id'])
+        logger.info(envelope_data['envelope_time_generated'])
+        logger.debug(envelope_data['envelope_all_details_message'])
+
+        # Store the XML file on disk
+        envelope_dir = os.path.join(BASE_DIR, "media/docusign/", envelope_data['envelope_id'])
         Path(envelope_dir).mkdir(parents=True, exist_ok=True)
         filename = (
-                "T" + time_generated.replace(":", "_") + ".xml"
+                envelope_data['envelope_time_generated'].replace(":", "_") + ".xml"
         )  # substitute _ for : for windows-land
         filepath = os.path.join(envelope_dir, filename)
         with open(filepath, "wb") as xml_file:
             xml_file.write(data)
 
-        # If the envelope is completed, pull out the PDFs from the notification XML
-        if xml.EnvelopeStatus.Status.string == "Completed":
-            # Loop through the DocumentPDFs element, storing each document.
-            for pdf in xml.DocumentPDFs.children:
-                if pdf.DocumentType.string == "CONTENT":
-                    filename = "Completed_" + pdf.Name.string
-                elif pdf.DocumentType.string == "SUMMARY":
-                    filename = pdf.Name.string
-                else:
-                    filename = pdf.DocumentType.string + "_" + pdf.Name.string
-                full_filename = os.path.join(envelope_dir, filename)
-                with open(full_filename, "wb") as pdf_file:
-                    pdf_file.write(base64.b64decode(pdf.PDFBytes.string))
-
-        return HttpResponse("Success")
-    except AttributeError as e:
+    except Exception as e:
         msg = str(e)
         logger.exception(msg)
         return HttpResponse(msg)
+
+    # If the envelope is completed, pull out the PDFs from the notification XML
+    if envelope_data['envelope_status'] == "Completed":
+        try:
+            envelope_data['pdf_documents '] = docusign_pdf_files_saver(data, envelope_dir)
+        except Exception as e:
+            msg = str(e)
+            logger.exception(msg)
+            return HttpResponse(msg)
+    logger.debug(envelope_data)
+    return HttpResponse("Success!")
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
