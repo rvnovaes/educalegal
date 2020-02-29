@@ -1,5 +1,5 @@
 build:
-	docker-compose build educa_legal
+	docker-compose build educalegal
 
 # parametros
 # e=prod - conecta como producao
@@ -22,35 +22,35 @@ restart: stop run
 
 collectstatic:
 ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educa_legal python manage.py collectstatic --noinput
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py collectstatic --noinput
 else
-	docker-compose run educa_legal python manage.py collectstatic --noinput
+	docker-compose run educalegal python manage.py collectstatic --noinput
 endif
 
 migrate:
 ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educa_legal python manage.py migrate --noinput
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py migrate --noinput
 else
-	docker-compose run educa_legal python manage.py migrate --noinput
+	docker-compose run educalegal python manage.py migrate --noinput
 endif
 
 makemigrations:
 ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educa_legal python manage.py makemigrations --noinput
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py makemigrations --noinput
 else
-	docker-compose run educa_legal python manage.py makemigrations --noinput
+	docker-compose run educalegal python manage.py makemigrations --noinput
 endif
 
 loaddata_prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educa_legal python manage.py loaddata tenant country state city school interview_document_types interview
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py loaddata tenant country state city school interview_document_types interview
 
 # Loads fixtures for development
 loaddata_dev:
-	docker-compose run educa_legal python manage.py loaddata tenant country state city school interview_document_types interview_dev
+	docker-compose run educalegal python manage.py loaddata tenant country state city school interview_document_types interview_dev
 
 # Creates Educa Legal superuser as admin / Silex2109
 create_super_user_educa_legal:
-	docker-compose run educa_legal ./create_super_user_educa_legal.sh
+	docker-compose run educalegal ./create_super_user_educa_legal.sh
 
 # Makes the migrations
 # Migrates
@@ -75,7 +75,7 @@ ps:
 	docker-compose ps
 
 shell:
-	docker-compose run educa_legal bash
+	docker-compose run educalegal bash
 
 
 
