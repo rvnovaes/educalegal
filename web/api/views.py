@@ -100,10 +100,9 @@ def docusign_pdf_files_saver(data, envelope_dir):
     pdf_documents = list()
     xml = BeautifulSoup(data, "xml")
     # Loop through the DocumentPDFs element, storing each document.
-    for pdf in xml.find_all("DocumentPDFs"):
+    for pdf in xml.find_all("DocumentPDF"):
         if pdf.DocumentType.string == "CONTENT":
             filename = "Completed_" + pdf.Name.string
-
         elif pdf.DocumentType.string == "SUMMARY":
             filename = pdf.Name.string
         else:
