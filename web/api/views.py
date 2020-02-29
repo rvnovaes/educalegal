@@ -97,12 +97,12 @@ def docusign_pdf_files_saver(data, envelope_dir):
         elif pdf['DocumentType'] == "SUMMARY":
             filename = pdf['Name']
         else:
-            filename = pdf['DocumentType']  + "_" + pdf['Name']
+            filename = pdf['DocumentType'] + "_" + pdf['Name']
         pdf_documents.append(filename)
 
         full_filename = os.path.join(envelope_dir, filename)
         with open(full_filename, "wb") as pdf_file:
-            pdf_file.write(base64.b64decode(pdf.PDFBytes.string))
+            pdf_file.write(base64.b64decode(pdf['PDFBytes']))
     return pdf_documents
 
 
