@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 import base64
-from bs4 import BeautifulSoup
+import xmltodict
+
 import logging
 
 from django.views.decorators.http import require_POST
@@ -10,7 +11,6 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 
 from rest_framework.response import Response
-from rest_framework import generics
 from rest_framework import viewsets
 
 from web.settings import BASE_DIR
@@ -33,54 +33,45 @@ logger = logging.getLogger(__name__)
 
 def docusign_xml_parser(data):
     envelope_data = dict()
-    xml = BeautifulSoup(data, "xml")
-    e_id = xml.EnvelopeStatus.EnvelopeID.string
-    envelope_data['envelope_id'] = e_id
-    e_status = xml.EnvelopeStatus.Status.string
-    envelope_data['envelope_status'] = e_status
-    e_created = xml.EnvelopeStatus.Created.string
-    envelope_data['envelope_created'] = e_created
-    e_sent = xml.EnvelopeStatus.Sent.string
-    envelope_data['envelope_sent'] = e_sent
-    e_time_generated = xml.EnvelopeStatus.TimeGenerated.string
-    envelope_data['envelope_time_generated'] = e_time_generated
+    xml = xmltodict.parse(data)['DocuSignEnvelopeInformation']
+    envelope_data['envelope_id'] = xml['EnvelopeStatus']['EnvelopeID']
+    envelope_data['envelope_status'] = xml['EnvelopeStatus']['Status']
+    envelope_data['envelope_created'] = xml['EnvelopeStatus']['Created']
+    envelope_data['envelope_sent'] = xml['EnvelopeStatus']['Sent']
+    envelope_data['envelope_time_generated'] = xml['EnvelopeStatus']['TimeGenerated']
+
     e_status_detail = (
             "Envelope ID: "
-            + e_id
+            + envelope_data['envelope_id']
             + "\n"
             + "Envelope Status: "
-            + e_status
+            + envelope_data['envelope_status']
             + "\n"
             + "Envelope Created: "
-            + e_created
+            + envelope_data['envelope_created']
             + "\n"
             + "Envelope Sent: "
-            + e_sent
+            + envelope_data['envelope_sent']
             + "\n"
             + "Time Generated: "
-            + e_time_generated
+            + envelope_data['envelope_time_generated']
             + "\n"
     )
     envelope_data['envelope_status_detail_message'] = e_status_detail
-    recipient_statuses = xml.find_all("RecipientStatus")
-    r_status_detail = ""
+    recipient_statuses = xml['EnvelopeStatus']['RecipientStatuses']['RecipientStatus']
 
-    for i in recipient_statuses:
-        r_routing_order = i.RoutingOrder.string
-        r_user_name = i.UserName.string
-        r_email = i.Email.string
-        r_type = i.Type.string
-        r_status = i.Status.string
+    r_status_detail = ""
+    for r in recipient_statuses:
         r_status_detail += (
-                r_routing_order
+                r['RoutingOrder']
                 + " - "
-                + r_user_name
+                + r['UserName']
                 + " - "
-                + r_email
+                + r['Email']
                 + " - "
-                + r_type
+                + r['Type']
                 + " - "
-                + r_status
+                + r['Status']
                 + "\n"
         )
     envelope_data['envelope_recipient_status_detail_message'] = r_status_detail
@@ -98,15 +89,15 @@ def docusign_xml_parser(data):
 
 def docusign_pdf_files_saver(data, envelope_dir):
     pdf_documents = list()
-    xml = BeautifulSoup(data, "xml")
+    xml = xmltodict.parse(data)['DocuSignEnvelopeInformation']
     # Loop through the DocumentPDFs element, storing each document.
-    for pdf in xml.find_all("DocumentPDF"):
-        if pdf.DocumentType.string == "CONTENT":
-            filename = "Completed_" + pdf.Name.string
-        elif pdf.DocumentType.string == "SUMMARY":
-            filename = pdf.Name.string
+    for pdf in xml['DocumentPDFs']['DocumentPDF']:
+        if pdf['DocumentType'] == "CONTENT":
+            filename = "Completed_" + pdf['Name']
+        elif pdf['DocumentType'] == "SUMMARY":
+            filename = pdf['Name']
         else:
-            filename = pdf.DocumentType.string + "_" + pdf.Name.string
+            filename = pdf['DocumentType']  + "_" + pdf['Name']
         pdf_documents.append(filename)
 
         full_filename = os.path.join(envelope_dir, filename)

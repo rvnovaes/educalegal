@@ -2,8 +2,6 @@ django~=3.0.3
 # API
 djangorestframework~=3.11.0
 django-cors-headers~=3.2.1
-coreapi~=2.3.3
-coreapi-cli~=1.0.9
 django-rest-auth~=0.9.5
 retry-requests
 # API Debugging
@@ -24,7 +22,7 @@ boto3~=1.12.6
 gunicorn
 # Misc
 lxml~=4.5.0
-beautifulsoup4~=4.8.2
+xmltodict~=0.12.0
 Pillow
 pyyaml~=5.3
 django-bootstrap4~=1.1.1
