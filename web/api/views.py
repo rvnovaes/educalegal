@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 
 from web.settings import BASE_DIR
-from document.models import Document
+from document.models import Document, DocumentESignatureLog
 from interview.models import Interview
 from school.models import School
 from tenant.models import Tenant, TenantGedData, TenantESignatureData
@@ -141,7 +141,16 @@ def docusign_webhook_listener(request):
             msg = str(e)
             logger.exception(msg)
             return HttpResponse(msg)
+
     logger.debug(envelope_data)
+
+    # Updates Main Document Status
+    main_document = Document.objects.get(main_document=True, envelope_id=envelope_data['envelope_id'])
+    main_document.status = envelope_data['envelope_status']
+    esignature_log = DocumentESignatureLog(esignature_log=request.data['esignature_log'], document=main_document)
+    esignature_log.save()
+    main_document.save()
+
     return HttpResponse("Success!")
 
 
