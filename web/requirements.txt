@@ -2,6 +2,7 @@ django~=3.0.3
 # API
 djangorestframework~=3.11.0
 django-cors-headers~=3.2.1
+coreapi~=2.3.3
 django-rest-auth~=0.9.5
 retry-requests
 # API Debugging
