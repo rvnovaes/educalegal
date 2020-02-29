@@ -17,3 +17,7 @@ class DocumentListView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView
     model = Document
     table_class = DocumentTable
     context_object_name = "documents"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(main_document=True)

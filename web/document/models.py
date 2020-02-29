@@ -6,6 +6,7 @@ from school.models import School
 
 class Document(TenantAwareModel):
     name = models.CharField(max_length=512, null=True, verbose_name="Nome")
+    main_document = models.BooleanField(blank=True, null=True, verbose_name='Documento Principal')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
     status = models.CharField(
@@ -38,3 +39,14 @@ class Document(TenantAwareModel):
 
     def __str__(self):
         return self.name + " - " + self.school.name
+
+
+class DocumentESignatureLog(TenantAwareModel):
+    esignature_log = models.TextField(null=True, blank=True, verbose_name="Andamentos da Assinatura Eletrônica")
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
+    document = models.ForeignKey(
+        Document, null=True, on_delete=models.CASCADE, verbose_name="Documento", related_name="logs"
+    )
+
+    def __str__(self):
+        return self.esignature_log + ' | ' + str(self.created_date)
