@@ -2,15 +2,17 @@ from os import listdir
 from os.path import isfile, join
 
 import requests
+###### LOCALHOST ######
+# api_key = "GHHnjFWG9H4KKYYkMgd3yE0yPlNYMQ18"
+# server_url = "http://localhost/api/playground"
+###### docs.silexsistemas.com.br #####
+api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
+server_url = "https://docs.silexsistemas.com.br/api/playground"
+##### docs.educalegal.com.br #####
+# api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
+# server_url = "https://docs.educalegal.com.br/api/playground"
 
-api_key_localhost = "GHHnjFWG9H4KKYYkMgd3yE0yPlNYMQ18"
-server_url_localhost = "http://localhost/api/playground"
-api_key_docs_silex = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
-server_url_docs_silex = "https://docs.silexsistemas.com.br/api/playground"
-api_key_docs_educalegal = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
-server_url_docs_educalegal = "https://docs.educalegal.com.br/api/playground"
-project_educalegal = "Development"
-
+project = "Development"
 
 def post_to_docassemble(api_key, server_url, path, destination, project="default"):
     payload = {"key": api_key, "user_id": 1, "folder": destination, "project": project}
@@ -36,21 +38,8 @@ if __name__ == "__main__":
     brcomeducalegal_templates = (
         "/opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data/templates"
     )
-    elements_questions = "/opt/docassemble-elements/docassemble/elements/data/questions"
-    elements_modules = "/opt/docassemble-elements/docassemble/elements/data/"
+    brcomeducalegal_modules = "/opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data/"
 
-    # post_to_docassemble(api_key_localhost, server_url_localhost, brcomeducalegal_questions, "questions")
-    # post_to_docassemble(api_key_localhost, server_url_localhost, brcomeducalegal_templates, "templates")
-    # post_to_docassemble(api_key_localhost, server_url_localhost, elements_questions, "questions")
-    # post_to_docassemble(api_key_localhost, server_url_localhost, elements_modules, "modules")
-
-
-    post_to_docassemble(api_key_docs_silex, server_url_docs_silex, brcomeducalegal_questions, "questions")
-    # post_to_docassemble(api_key_docs_silex, server_url_docs_silex, brcomeducalegal_templates, "templates")
-    post_to_docassemble(api_key_docs_silex, server_url_docs_silex, elements_questions, "questions")
-    post_to_docassemble(api_key_docs_silex, server_url_docs_silex, elements_modules, "modules")
-
-    # post_to_docassemble(api_key_docs_educalegal, server_url_docs_educalegal, brcomeducalegal_questions, "questions", project_educalegal)
-    # post_to_docassemble(api_key_docs_educalegal, server_url_docs_educalegal, brcomeducalegal_templates, "templates", project_educalegal)
-    # post_to_docassemble(api_key_docs_educalegal, server_url_docs_educalegal, elements_questions, "questions", project_educalegal)
-    # post_to_docassemble(api_key_docs_educalegal, server_url_docs_educalegal, elements_modules, "modules", project_educalegal)
+    post_to_docassemble(api_key, server_url, brcomeducalegal_questions, "questions", project)
+    post_to_docassemble(api_key, server_url, brcomeducalegal_templates, "templates", project)
+    post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", project)
