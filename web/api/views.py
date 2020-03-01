@@ -90,12 +90,23 @@ def docusign_xml_parser(data):
 def docusign_pdf_files_saver(data, envelope_dir):
     pdf_documents = list()
     xml = xmltodict.parse(data)["DocuSignEnvelopeInformation"]
+    # Loop through the DocumentPDFs element, to create a variable with the name of the document
+    main_filename_no_extension = ""
+    for pdf in xml["DocumentPDFs"]["DocumentPDF"]:
+        if pdf["DocumentType"] == "CONTENT":
+            main_filename_no_extension = pdf["Name"].split(".")[0]
+        else:
+            main_filename_no_extension = "unnamed_document"
+            logger.debug(
+                "Unnamed document on envelope" + xml["EnvelopeStatus"]["EnvelopeID"]
+            )
+
     # Loop through the DocumentPDFs element, storing each document.
     for pdf in xml["DocumentPDFs"]["DocumentPDF"]:
         if pdf["DocumentType"] == "CONTENT":
-            filename = "Completed_" + pdf["Name"]
+            filename = main_filename_no_extension + "_assinado.pdf"
         elif pdf["DocumentType"] == "SUMMARY":
-            filename = pdf["Name"]
+            filename = main_filename_no_extension + "_certificado.pdf"
         else:
             filename = pdf["DocumentType"] + "_" + pdf["Name"]
         pdf_documents.append(filename)
@@ -150,17 +161,14 @@ def docusign_webhook_listener(request):
 
     logger.debug(envelope_data)
 
-    # Updates Main Document Status
-    main_document = Document.objects.get(
-        main_document=True, envelope_id=envelope_data["envelope_id"]
-    )
-    main_document.status = envelope_data["envelope_status"]
+    # Updates Document Status
+    document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
+    document.status = envelope_data["envelope_status"]
     esignature_log = DocumentESignatureLog(
-        esignature_log=envelope_data["envelope_all_details_message"],
-        document=main_document,
+        esignature_log=envelope_data["envelope_all_details_message"], document=document,
     )
     esignature_log.save()
-    main_document.save()
+    document.save()
 
     return HttpResponse("Success!")
 
