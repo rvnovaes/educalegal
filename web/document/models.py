@@ -6,7 +6,6 @@ from school.models import School
 
 class Document(TenantAwareModel):
     name = models.CharField(max_length=512, null=True, verbose_name="Nome")
-    main_document = models.BooleanField(blank=True, null=True, verbose_name='Documento Principal')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
     status = models.CharField(
