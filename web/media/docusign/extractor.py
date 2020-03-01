@@ -66,14 +66,13 @@ def docusign_xml_parser(data):
 
 if __name__ == '__main__':
 
-    with open("2020-02-29T08_46_47.7061489.xml", 'r') as file:
+    with open("4a07d560-5a76-4aa8-80e3-fe0489d6ba37/2020-02-29T10_49_11.6502835.xml", 'r') as file:
         print(docusign_xml_parser(file.read())['envelope_all_details_message'])
 
-    with open("2020-02-29T08_51_25.6544563.xml", 'r') as file:
+    with open("4a07d560-5a76-4aa8-80e3-fe0489d6ba37/2020-02-29T10_52_19.4028499.xml", 'r') as file:
         print(docusign_xml_parser(file.read())['envelope_all_details_message'])
 
-
-    with open("2020-02-29T08_56_02.6043592.xml", 'r') as file:
+    with open("4a07d560-5a76-4aa8-80e3-fe0489d6ba37/2020-02-29T10_52_54.4970792.xml", 'r') as file:
         print(docusign_xml_parser(file.read())['envelope_all_details_message'])
 
 

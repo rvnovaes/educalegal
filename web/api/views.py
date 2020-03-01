@@ -231,6 +231,7 @@ def docusign_webhook_listener(request):
         for pdf in envelope_data["pdf_documents"]:
             log += (pdf["filename"] + "<br>")
 
+        log += "<br>"
         esignature_log_documents = DocumentESignatureLog(
             esignature_log=log, document=document,
         )
