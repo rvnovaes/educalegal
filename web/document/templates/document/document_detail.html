@@ -32,7 +32,7 @@
                 <div class="card-footer">
                   <ul>
                     {% for log in document.logs.all %}
-                      <li>{{ log.created_date }} <br> {{ log.esignature_log }}</li>
+                      <li>{{ log.created_date }} <br> {{ log.esignature_log|safe }}</li>
                     {% endfor %}
                   </ul>
                 </div>
