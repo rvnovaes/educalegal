@@ -3,14 +3,14 @@ from os.path import isfile, join
 
 import requests
 ###### LOCALHOST ######
-# api_key = "GHHnjFWG9H4KKYYkMgd3yE0yPlNYMQ18"
+# api_key = "lIoccm3XmObzR4jYoxejTecDaTHzeJw0"
 # server_url = "http://localhost/api/playground"
 ###### docs.silexsistemas.com.br #####
 # api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
 # server_url = "https://docs.silexsistemas.com.br/api/playground"
 ##### docs.educalegal.com.br #####
-api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
-server_url = "https://docs.educalegal.com.br/api/playground"
+# api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
+# server_url = "https://docs.educalegal.com.br/api/playground"
 
 project = "Development"
 
