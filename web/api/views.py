@@ -76,10 +76,10 @@ def docusign_xml_parser(data):
         )
     envelope_data["envelope_recipient_status_detail_message"] = r_status_detail
     all_details = (
-        "### Detalhes do Envelope ###<br>"
+        "<bold> Detalhes do Envelope </bold><br>"
         + e_status_detail
         + "<br>"
-        + "### Detalhes dos Destinatários ###<br>"
+        + "<bold> Detalhes dos Destinatários </bold><br>"
         + r_status_detail
         + "<br>"
     )
