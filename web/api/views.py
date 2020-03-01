@@ -43,19 +43,19 @@ def docusign_xml_parser(data):
     e_status_detail = (
         "Envelope ID: "
         + envelope_data["envelope_id"]
-        + "\n"
+        + "<br>"
         + "Envelope Status: "
         + envelope_data["envelope_status"]
-        + "\n"
+        + "<br>"
         + "Envelope Created: "
         + envelope_data["envelope_created"]
-        + "\n"
+        + "<br>"
         + "Envelope Sent: "
         + envelope_data["envelope_sent"]
-        + "\n"
+        + "<br>"
         + "Time Generated: "
         + envelope_data["envelope_time_generated"]
-        + "\n"
+        + "<br>"
     )
     envelope_data["envelope_status_detail_message"] = e_status_detail
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
@@ -72,16 +72,16 @@ def docusign_xml_parser(data):
             + r["Type"]
             + " - "
             + r["Status"]
-            + "\n"
+            + "<br>"
         )
     envelope_data["envelope_recipient_status_detail_message"] = r_status_detail
     all_details = (
-        "### Detalhes do Envelope ###\n"
+        "### Detalhes do Envelope ###<br>"
         + e_status_detail
-        + "\n"
-        + "### Detalhes dos Destinatários ###\n"
+        + "<br>"
+        + "### Detalhes dos Destinatários ###<br>"
         + r_status_detail
-        + "\n"
+        + "<br>"
     )
     envelope_data["envelope_all_details_message"] = all_details
     return envelope_data
