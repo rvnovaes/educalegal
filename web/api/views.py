@@ -165,8 +165,8 @@ def docusign_pdf_files_saver(data, envelope_dir):
 @require_POST
 @csrf_exempt
 def docusign_webhook_listener(request):
-    logger.info(request.headers)
-    logger.info(request.content_type)
+    logger.debug(request.headers)
+    logger.debug(request.content_type)
     data = request.body  # This is the entire incoming POST content in Django
     try:
         envelope_data = docusign_xml_parser(
@@ -184,6 +184,7 @@ def docusign_webhook_listener(request):
         filename = (
             envelope_data["envelope_time_generated"].replace(":", "_") + ".xml"
         )  # substitute _ for : for windows-land
+        logger.debug(envelope_data)
         filepath = os.path.join(envelope_dir, filename)
         with open(filepath, "wb") as xml_file:
             xml_file.write(data)
@@ -195,35 +196,32 @@ def docusign_webhook_listener(request):
 
     document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
 
-    # If the envelope is completed, pull out the PDFs from the notification XML an save on disk
+    # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
     if envelope_data["envelope_status"] == "Completed":
         try:
             (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
                 data, envelope_dir
             )
+            logger.debug(envelope_data)
+
+            # Get document related interview data to post to GED
+            interview = Interview.objects.get(pk=document.interview.pk)
+            document_type_pk = interview.document_type.pk
+            document_language = interview.language
+
+            # Post documents to GED
+            tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
+            mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
+
+            for pdf in envelope_data["pdf_documents"]:
+                response = mc.document_create(pdf["full_filename"], document_type_pk, pdf["filename"], document_language, pdf["description"])
+                logger.debug("Posting document to GED: " + pdf["filename"])
+                logger.debug(response.text)
+
         except Exception as e:
             msg = str(e)
             logger.exception(msg)
             return HttpResponse(msg)
-
-        interview = Interview.objects.get(pk=document.interview.pk)
-        document_type_pk = interview.document_type.pk
-        document_language = interview.language
-
-        for pdf_document in envelope_data["pdf_documents"]:
-            pdf_document["document_type"] = document_type_pk
-            pdf_document["language"] = document_language
-
-    logger.debug(envelope_data)
-
-    # Post documents to GED
-    tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
-    mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
-
-    for pdf in envelope_data["pdf_documents"]:
-        response = mc.document_create(pdf["full_filename"], pdf["document_type"], pdf["filename"], pdf["language"], pdf["description"])
-        logger.debug("Posting document to GED: " + pdf["filename"])
-        logger.debug(response.text)
 
     # Updates Document Status
     document.status = envelope_data["envelope_status"]
@@ -235,7 +233,7 @@ def docusign_webhook_listener(request):
     if envelope_data["envelope_status"] == "Completed":
         log = ""
         for pdf in envelope_data["pdf_documents"]:
-            log += pdf["filename"]
+            log += (pdf["filename"] + "<br>")
 
         esignature_log_documents = DocumentESignatureLog(
             esignature_log=envelope_data["pdf_documents"], document=document,
