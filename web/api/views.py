@@ -172,8 +172,8 @@ def docusign_webhook_listener(request):
         envelope_data = docusign_xml_parser(
             data
         )  # Parses XML data and returns a dictionary and formated messages
-        logger.info(envelope_data["envelope_id"])
-        logger.info(envelope_data["envelope_time_generated"])
+        logger.debug(envelope_data["envelope_id"])
+        logger.debug(envelope_data["envelope_time_generated"])
         logger.debug(envelope_data["envelope_all_details_message"])
 
         # Store the XML file on disk
@@ -225,10 +225,6 @@ def docusign_webhook_listener(request):
 
     # Updates Document Status
     document.status = envelope_data["envelope_status"]
-    esignature_log_messages = DocumentESignatureLog(
-        esignature_log=envelope_data["envelope_all_details_message"], document=document,
-    )
-    esignature_log_messages.save()
 
     if envelope_data["envelope_status"] == "Completed":
         log = ""
@@ -236,9 +232,14 @@ def docusign_webhook_listener(request):
             log += (pdf["filename"] + "<br>")
 
         esignature_log_documents = DocumentESignatureLog(
-            esignature_log=envelope_data["pdf_documents"], document=document,
+            esignature_log=log, document=document,
         )
         esignature_log_documents.save()
+
+    esignature_log_messages = DocumentESignatureLog(
+        esignature_log=envelope_data["envelope_all_details_message"], document=document,
+    )
+    esignature_log_messages.save()
 
     document.save()
 
