@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 import base64
 import xmltodict
-
+from requests import Session
+from retry_requests import retry
 import logging
 
 from django.views.decorators.http import require_POST
@@ -29,6 +30,35 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class MayanClient:
+    def __init__(self, api_base_url, token):
+        self.api_base_url = api_base_url
+        headers = {"Authorization": "Token " + token}
+        self.session = retry(
+            Session(),
+            retries=3,
+            backoff_factor=0.5,
+            status_to_retry=(500, 502, 504, 404),
+        )
+        self.session.headers.update(headers)
+
+    def document_create(
+        self, filename, document_type, label="", language="", description=""
+    ):
+        file_object = open(filename, mode="rb")
+        payload = {
+            "document_type": document_type,
+            "label": label,
+            "language": language,
+            "description": description,
+        }
+        final_url = self.api_base_url + "/api/documents/"
+        response = self.session.post(
+            final_url, data=payload, files={"file": file_object}
+        )
+        return response
 
 
 def docusign_xml_parser(data):
@@ -76,10 +106,10 @@ def docusign_xml_parser(data):
         )
     envelope_data["envelope_recipient_status_detail_message"] = r_status_detail
     all_details = (
-        "<bold> Detalhes do Envelope </bold><br>"
+        "<b> Detalhes do Envelope </b><br>"
         + e_status_detail
         + "<br>"
-        + "<bold> Detalhes dos Destinatários </bold><br>"
+        + "<b> Detalhes dos Destinatários </b><br>"
         + r_status_detail
         + "<br>"
     )
@@ -90,30 +120,45 @@ def docusign_xml_parser(data):
 def docusign_pdf_files_saver(data, envelope_dir):
     pdf_documents = list()
     xml = xmltodict.parse(data)["DocuSignEnvelopeInformation"]
-    # Loop through the DocumentPDFs element, to create a variable with the name of the document
-    main_filename_no_extension = ""
+    # Loop through the DocumentPDFs element to create a variable with the name of the document
     for pdf in xml["DocumentPDFs"]["DocumentPDF"]:
         if pdf["DocumentType"] == "CONTENT":
-            main_filename_no_extension = pdf["Name"].split(".")[0]
+            main_filename_no_extension = str(pdf["Name"].split(".")[0])
+            break
         else:
             main_filename_no_extension = "unnamed_document"
-            logger.debug(
-                "Unnamed document on envelope" + xml["EnvelopeStatus"]["EnvelopeID"]
-            )
+
+    logger.info(
+        "Trying to create documents "
+        + main_filename_no_extension
+        + " on envelope "
+        + str(xml["EnvelopeStatus"]["EnvelopeID"])
+    )
 
     # Loop through the DocumentPDFs element, storing each document.
     for pdf in xml["DocumentPDFs"]["DocumentPDF"]:
         if pdf["DocumentType"] == "CONTENT":
             filename = main_filename_no_extension + "_assinado.pdf"
+            description = main_filename_no_extension + ".pdf completo."
         elif pdf["DocumentType"] == "SUMMARY":
             filename = main_filename_no_extension + "_certificado.pdf"
+            description = (
+                main_filename_no_extension + ".pdf certificado de assinaturas."
+            )
         else:
             filename = pdf["DocumentType"] + "_" + pdf["Name"]
-        pdf_documents.append(filename)
+            description = filename
 
         full_filename = os.path.join(envelope_dir, filename)
+        pdf_file_data = dict()
+        pdf_file_data["filename"] = filename
+        pdf_file_data["description"] = description
+        pdf_file_data["full_filename"] = full_filename
+        pdf_documents.append(pdf_file_data)
+
         with open(full_filename, "wb") as pdf_file:
             pdf_file.write(base64.b64decode(pdf["PDFBytes"]))
+
     return pdf_documents
 
 
@@ -148,10 +193,12 @@ def docusign_webhook_listener(request):
         logger.exception(msg)
         return HttpResponse(msg)
 
-    # If the envelope is completed, pull out the PDFs from the notification XML
+    document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
+
+    # If the envelope is completed, pull out the PDFs from the notification XML an save on disk
     if envelope_data["envelope_status"] == "Completed":
         try:
-            envelope_data["pdf_documents "] = docusign_pdf_files_saver(
+            (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
                 data, envelope_dir
             )
         except Exception as e:
@@ -159,15 +206,42 @@ def docusign_webhook_listener(request):
             logger.exception(msg)
             return HttpResponse(msg)
 
+        interview = Interview.objects.get(pk=document.interview.pk)
+        document_type_pk = interview.document_type.pk
+        document_language = interview.language
+
+        for pdf_document in envelope_data["pdf_documents"]:
+            pdf_document["document_type"] = document_type_pk
+            pdf_document["language"] = document_language
+
     logger.debug(envelope_data)
 
+    # Post documents to GED
+    tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
+    mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
+
+    for pdf in envelope_data["pdf_documents"]:
+        response = mc.document_create(pdf["full_filename"], pdf["document_type"], pdf["filename"], pdf["language"], pdf["description"])
+        logger.debug("Posting document to GED: " + pdf["filename"])
+        logger.debug(response.text)
+
     # Updates Document Status
-    document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
     document.status = envelope_data["envelope_status"]
-    esignature_log = DocumentESignatureLog(
+    esignature_log_messages = DocumentESignatureLog(
         esignature_log=envelope_data["envelope_all_details_message"], document=document,
     )
-    esignature_log.save()
+    esignature_log_messages.save()
+
+    if envelope_data["envelope_status"] == "Completed":
+        log = ""
+        for pdf in envelope_data["pdf_documents"]:
+            log += pdf["filename"]
+
+        esignature_log_documents = DocumentESignatureLog(
+            esignature_log=envelope_data["pdf_documents"], document=document,
+        )
+        esignature_log_documents.save()
+
     document.save()
 
     return HttpResponse("Success!")
