@@ -3,6 +3,9 @@ from os.path import isfile, join
 
 import requests
 ###### LOCALHOST ######
+# iasmini
+# api_key = "CREI52r9wGtHRKTnTwoMw1lIwbfNA1tj"
+# roberto
 # api_key = "lIoccm3XmObzR4jYoxejTecDaTHzeJw0"
 # server_url = "http://localhost/api/playground"
 ###### docs.silexsistemas.com.br #####

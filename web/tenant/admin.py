@@ -10,9 +10,9 @@ class TenantAdmin(admin.ModelAdmin):
 
 @admin.register(TenantGedData)
 class TenantGedDataAdmin(admin.ModelAdmin):
-    list_display = ["name"]
+    list_display = ["url"]
 
 
 @admin.register(TenantESignatureData)
 class TenantESignatureDataAdmin(admin.ModelAdmin):
-    list_display = ["name"]
+    list_display = ["provider"]
