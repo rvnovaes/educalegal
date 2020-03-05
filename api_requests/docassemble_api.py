@@ -9,8 +9,8 @@ import requests
 # api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
 # server_url = "https://docs.silexsistemas.com.br/api/playground"
 ##### docs.educalegal.com.br #####
-api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
-server_url = "https://docs.educalegal.com.br/api/playground"
+# api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
+# server_url = "https://docs.educalegal.com.br/api/playground"
 
 project = "Development"
 
