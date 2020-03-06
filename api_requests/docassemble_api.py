@@ -5,6 +5,8 @@ import requests
 ###### LOCALHOST ######
 # iasmini
 # api_key = "CREI52r9wGtHRKTnTwoMw1lIwbfNA1tj"
+# luis paim
+# api_key = "Ti33Sv5KMNQCV9MDlwxY4RnBIbUWnAVD"
 # roberto
 # api_key = "lIoccm3XmObzR4jYoxejTecDaTHzeJw0"
 # server_url = "http://localhost/api/playground"
