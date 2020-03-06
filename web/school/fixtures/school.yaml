@@ -9,8 +9,7 @@
     logo: colegio_bacana.png
     street: "Rua Cara\xE7a"
     street_number: '28'
-    unit: null
-    city_region: Serra
+    neighborhood: Serra
     zip_code: 30220-260
     phone: 31-3223-0227
     site: https://www.colegiobacana.com.br
@@ -29,8 +28,7 @@
     logo: escola_da_familia.png
     street: "Rua da Consola\xE7\xE3o"
     street_number: '2301'
-    unit: null
-    city_region: "Consola\xE7\xE3o"
+    neighborhood: "Consola\xE7\xE3o"
     zip_code: 01301-100
     phone: 11-3425-3565
     site: https://www.escoladafamilia.edu
@@ -49,8 +47,7 @@
     logo: esocola_da_lagoa.png
     street: Av. Borges de Medeiros
     street_number: '2525'
-    unit: null
-    city_region: Lagoa
+    neighborhood: Lagoa
     zip_code: 22470-022
     phone: 21-5689-2356
     site: https://www.escoladalagoa.com.br
