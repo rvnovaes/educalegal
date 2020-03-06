@@ -109,6 +109,9 @@ class School(TenantAwareModel):
     )
     site = models.URLField(null=True, blank=True, verbose_name="Site")
     email = models.EmailField(null=True, blank=True, verbose_name="E-mail")
+    letterhead = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Timbrado"
+    )
     city = models.ForeignKey(
         City, on_delete=models.PROTECT, blank=True, null=True, verbose_name="Cidade"
     )
