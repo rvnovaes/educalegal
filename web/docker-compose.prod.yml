@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   educalegal:
-    command:  gunicorn web.wsgi:application --bind 0.0.0.0:8100 --workers=4
+    command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4
     environment:
       - ALLOWED_HOSTS=app.educalegal.com.br, 167.71.90.209
       - DATABASE_NAME=educa-legal-app
@@ -12,4 +12,4 @@ services:
       - DATABASE_PORT=25060
       - USE_DIGITAL_OCEAN_SPACES=1
     ports:
-      - "8100:8100"
+      - "8000:8000"
