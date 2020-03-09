@@ -100,6 +100,9 @@ class School(TenantAwareModel):
     country = models.ForeignKey(
         Country, on_delete=models.PROTECT, blank=True, null=True, verbose_name="País"
     )
+    letterhead = models.CharField(
+        max_length=255, verbose_name="Timbrado"
+    )
 
     def __str__(self):
         return self.name + ' - ' + self.legal_name
