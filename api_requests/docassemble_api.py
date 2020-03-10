@@ -10,14 +10,16 @@ import requests
 # roberto
 # api_key = "lIoccm3XmObzR4jYoxejTecDaTHzeJw0"
 # server_url = "http://localhost/api/playground"
-###### docs.silexsistemas.com.br #####
+###### teste.educalegal.com.br #####
+# usuario: teste
 # api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
-# server_url = "https://docs.silexsistemas.com.br/api/playground"
+# server_url = "https://teste.educalegal.com.br/api/playground"
 ##### docs.educalegal.com.br #####
-api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
-server_url = "https://docs.educalegal.com.br/api/playground"
+# api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
+# server_url = "https://docs.educalegal.com.br/api/playground"
 
 project = "Development"
+
 
 def post_to_docassemble(api_key, server_url, path, destination, project="default"):
     payload = {"key": api_key, "user_id": 1, "folder": destination, "project": project}
