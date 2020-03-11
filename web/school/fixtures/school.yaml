@@ -10,7 +10,7 @@
     street: "Rua Cara\xE7a"
     street_number: '28'
     neighborhood: Serra
-    zip_code: 30220-260
+    zip: 30220-260
     phone: 31-3223-0227
     site: https://www.colegiobacana.com.br
     email: colegio.bacana@gmail.com
@@ -30,7 +30,7 @@
     street: "Rua da Consola\xE7\xE3o"
     street_number: '2301'
     neighborhood: "Consola\xE7\xE3o"
-    zip_code: 01301-100
+    zip: 01301-100
     phone: 11-3425-3565
     site: https://www.escoladafamilia.edu
     email: secretaria@escoladafamilia.edu
@@ -50,7 +50,7 @@
     street: Av. Borges de Medeiros
     street_number: '2525'
     neighborhood: Lagoa
-    zip_code: 22470-022
+    zip: 22470-022
     phone: 21-5689-2356
     site: https://www.escoladalagoa.com.br
     email: contato@escoladalagoa.com.br

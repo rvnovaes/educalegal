@@ -81,24 +81,24 @@ class School(TenantAwareModel):
     # https://docs.djangoproject.com/en/3.0/ref/models/fields/
     # when a CharField has both unique=True and blank=True set null=True is required to
     # avoid unique constraint violations when saving multiple objects with blank values
-    cnpj = models.CharField(max_length=255, null=True, blank=True, unique=True, verbose_name="CNPJ")
+    cnpj = models.CharField(max_length=255, unique=True, verbose_name="CNPJ")
     logo = models.ImageField(verbose_name="Logo", blank=True)
-    phone = models.CharField(max_length=255, blank=True, verbose_name="Telefone")
-    site = models.URLField(blank=True, verbose_name="Site")
-    email = models.EmailField(blank=True, verbose_name="E-mail")
-    street = models.CharField(max_length=255, blank=True, verbose_name="Logradouro")
-    street_number = models.CharField(max_length=255, blank=True, verbose_name="Número")
+    phone = models.CharField(max_length=255, verbose_name="Telefone")
+    site = models.URLField(verbose_name="Site")
+    email = models.EmailField(verbose_name="E-mail")
+    street = models.CharField(max_length=255, verbose_name="Logradouro")
+    street_number = models.CharField(max_length=255, verbose_name="Número")
     unit = models.CharField(max_length=255, blank=True, verbose_name="Complemento")
-    neighborhood = models.CharField(max_length=255, blank=True, verbose_name="Bairro")
-    zip_code = models.CharField(max_length=255, blank=True, verbose_name="CEP")
+    neighborhood = models.CharField(max_length=255, verbose_name="Bairro")
+    zip = models.CharField(max_length=255, verbose_name="CEP")
     city = models.ForeignKey(
-        City, on_delete=models.PROTECT, blank=True, null=True, verbose_name="Cidade"
+        City, on_delete=models.PROTECT, verbose_name="Cidade"
     )
     state = models.ForeignKey(
-        State, on_delete=models.PROTECT, blank=True, null=True, verbose_name="Estado",
+        State, on_delete=models.PROTECT, verbose_name="Estado",
     )
     country = models.ForeignKey(
-        Country, on_delete=models.PROTECT, blank=True, null=True, verbose_name="País"
+        Country, on_delete=models.PROTECT, verbose_name="País"
     )
     letterhead = models.CharField(
         max_length=255, verbose_name="Timbrado"
@@ -109,14 +109,14 @@ class School(TenantAwareModel):
 
     @property
     def address(self):
-        tpl = "{street}, {street_number}{unit} - {neighborhood} - {city} - {state} - CEP {zip_code}"
+        tpl = "{street}, {street_number}{unit} - {neighborhood} - {city} - {state} - CEP {zip}"
         return tpl.format(
             street_number=self.street_number if self.street_number else "",
             street=self.street if self.street else "",
             neighborhood=self.neighborhood if self.neighborhood else "",
             city=self.city.name if self.city else "",
             state=self.state.initials if self.state else "",
-            zip_code=self.zip_code if self.zip_code else "",
+            zip=self.zip if self.zip else "",
             unit="/" + self.unit if self.unit else "",
         )
 
