@@ -9,9 +9,11 @@ import requests
 # api_key = "Ti33Sv5KMNQCV9MDlwxY4RnBIbUWnAVD"
 # roberto
 # api_key = "lIoccm3XmObzR4jYoxejTecDaTHzeJw0"
-# server_url = "http://localhost/api/playground"
+# isabela
+#api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"
+#server_url = "http://localhost/api/playground"
 ###### teste.educalegal.com.br #####
-# usuario: teste
+# usuario: teste@educalegal.com
 # api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
 # server_url = "https://teste.educalegal.com.br/api/playground"
 ##### docs.educalegal.com.br #####
