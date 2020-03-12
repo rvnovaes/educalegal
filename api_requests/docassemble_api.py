@@ -5,7 +5,7 @@ import requests
 ###### LOCALHOST ######
 # iasmini
 # api_key = "CREI52r9wGtHRKTnTwoMw1lIwbfNA1tj"
-# luis paima
+# luis paim
 # api_key = "Ti33Sv5KMNQCV9MDlwxY4RnBIbUWnAVD"
 # roberto
 # api_key = "lIoccm3XmObzR4jYoxejTecDaTHzeJw0"
@@ -14,8 +14,8 @@ import requests
 #server_url = "http://localhost/api/playground"
 ###### teste.educalegal.com.br #####
 # usuario: teste@educalegal.com
-# api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
-# server_url = "https://teste.educalegal.com.br/api/playground"
+api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
+server_url = "https://teste.educalegal.com.br/api/playground"
 ##### docs.educalegal.com.br #####
 # api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
 # server_url = "https://docs.educalegal.com.br/api/playground"
@@ -51,4 +51,4 @@ if __name__ == "__main__":
 
     post_to_docassemble(api_key, server_url, brcomeducalegal_questions, "questions", project)
     post_to_docassemble(api_key, server_url, brcomeducalegal_templates, "templates", project)
-    post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", project)
+    # post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", project)
