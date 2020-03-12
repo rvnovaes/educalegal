@@ -14,8 +14,8 @@ import requests
 #server_url = "http://localhost/api/playground"
 ###### teste.educalegal.com.br #####
 # usuario: teste@educalegal.com
-# api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
-# server_url = "https://teste.educalegal.com.br/api/playground"
+api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
+server_url = "https://teste.educalegal.com.br/api/playground"
 ##### docs.educalegal.com.br #####
 # api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
 # server_url = "https://docs.educalegal.com.br/api/playground"
