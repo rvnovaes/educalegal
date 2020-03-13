@@ -10,8 +10,8 @@ import requests
 # roberto
 # api_key = "lIoccm3XmObzR4jYoxejTecDaTHzeJw0"
 # isabela
-#api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"
-#server_url = "http://localhost/api/playground"
+# api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"
+# server_url = "http://localhost/api/playground"
 ###### teste.educalegal.com.br #####
 # usuario: teste@educalegal.com
 # api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
@@ -51,4 +51,4 @@ if __name__ == "__main__":
 
     post_to_docassemble(api_key, server_url, brcomeducalegal_questions, "questions", project)
     post_to_docassemble(api_key, server_url, brcomeducalegal_templates, "templates", project)
-    # post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", project)
+    post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", project)
