@@ -16,7 +16,7 @@ services:
       - ged
   docassemble:
     container_name: docassemble
-    image: jhpyle/docassemble:latest
+    image: rvnovaes/docassemble:0.1
     environment:
       - DAPYTHONVERSION=3
     ports:
