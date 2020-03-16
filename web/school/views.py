@@ -13,8 +13,8 @@ from .tables import SchoolTable
 class SchoolCreateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, CreateView):
     model = School
     fields = [
-        "name",
         "legal_name",
+        "name",
         "legal_type",
         "cnpj",
         "logo",
@@ -53,8 +53,8 @@ class SchoolListView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView):
 class SchoolUpdateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, UpdateView):
     model = School
     fields = [
-        "name",
         "legal_name",
+        "name",
         "legal_type",
         "cnpj",
         "logo",
