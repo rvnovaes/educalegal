@@ -63,10 +63,11 @@ class City(models.Model):
     class Meta:
         verbose_name = "Cidade"
         verbose_name_plural = "Cidades"
+        ordering = ('name',)
         unique_together = ("name", "state")
 
     def __str__(self):
-        return self.name
+        return self.name + ' - ' + self.state.initials
 
 
 class School(TenantAwareModel):
