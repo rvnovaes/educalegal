@@ -40,7 +40,8 @@
               <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}">Modelos</a></li>
               <li class="nav-item"><a class="nav-link text-white" href="{% url 'document:document-list' %}">Documentos</a></li>
               <li class="nav-item"><a class="nav-link text-white" href="{% url 'school:school-list' %}">Escolas</a></li>
-              <li class="nav-item"><a class="nav-link text-white" href="{{ user.tenant.ged_url }}" target="_blank">{% if user.tenant.ged_url %} GED {% endif %}</a></li>
+              <li class="nav-item"><a class="nav-link text-white" href="{{ user.tenant.tenantgeddata.url }}" target="_blank">{% if user.tenant.tenantgeddata.url %} GED {% endif %}</a></li>
+              <li class="nav-item"><a class="nav-link text-white" href="https://atendimento.atlassian.net/servicedesk/customer/portal/2" target="_blank">Portal do Cliente</a></li>
             </ul>
             <span class="navbar-text text-white">
               Olá, {{ user.first_name }} {{ user.last_name }}!

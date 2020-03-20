@@ -1,0 +1,162 @@
+- model: school.state
+  pk: 1
+  fields:
+    name: Acre
+    initials: AC
+    country: 1
+- model: school.state
+  pk: 2
+  fields:
+    name: Alagoas
+    initials: AL
+    country: 1
+- model: school.state
+  pk: 3
+  fields:
+    name: Amazonas
+    initials: AM
+    country: 1
+- model: school.state
+  pk: 4
+  fields:
+    name: "Amap\xE1"
+    initials: AP
+    country: 1
+- model: school.state
+  pk: 5
+  fields:
+    name: Bahia
+    initials: BA
+    country: 1
+- model: school.state
+  pk: 6
+  fields:
+    name: "Cear\xE1"
+    initials: CE
+    country: 1
+- model: school.state
+  pk: 7
+  fields:
+    name: Distrito Federal
+    initials: DF
+    country: 1
+- model: school.state
+  pk: 8
+  fields:
+    name: "Esp\xEDrito Santo"
+    initials: ES
+    country: 1
+- model: school.state
+  pk: 9
+  fields:
+    name: "Goi\xE1s"
+    initials: GO
+    country: 1
+- model: school.state
+  pk: 10
+  fields:
+    name: "Maranh\xE3o"
+    initials: MA
+    country: 1
+- model: school.state
+  pk: 11
+  fields:
+    name: Minas Gerais
+    initials: MG
+    country: 1
+- model: school.state
+  pk: 12
+  fields:
+    name: Mato Grosso
+    initials: MT
+    country: 1
+- model: school.state
+  pk: 13
+  fields:
+    name: Mato Grosso do Sul
+    initials: MS
+    country: 1
+- model: school.state
+  pk: 14
+  fields:
+    name: "Par\xE1"
+    initials: PA
+    country: 1
+- model: school.state
+  pk: 15
+  fields:
+    name: "Para\xEDba"
+    initials: PB
+    country: 1
+- model: school.state
+  pk: 16
+  fields:
+    name: Pernambuco
+    initials: PE
+    country: 1
+- model: school.state
+  pk: 17
+  fields:
+    name: "Piau\xED"
+    initials: PI
+    country: 1
+- model: school.state
+  pk: 18
+  fields:
+    name: "Paran\xE1"
+    initials: PR
+    country: 1
+- model: school.state
+  pk: 19
+  fields:
+    name: Rio de Janeiro
+    initials: RJ
+    country: 1
+- model: school.state
+  pk: 20
+  fields:
+    name: Rio Grande do Norte
+    initials: RN
+    country: 1
+- model: school.state
+  pk: 21
+  fields:
+    name: "Rond\xF4nia"
+    initials: RO
+    country: 1
+- model: school.state
+  pk: 22
+  fields:
+    name: Roraima
+    initials: RR
+    country: 1
+- model: school.state
+  pk: 23
+  fields:
+    name: Rio Grande do Sul
+    initials: RS
+    country: 1
+- model: school.state
+  pk: 24
+  fields:
+    name: Santa Catarina
+    initials: SC
+    country: 1
+- model: school.state
+  pk: 25
+  fields:
+    name: Sergipe
+    initials: SE
+    country: 1
+- model: school.state
+  pk: 26
+  fields:
+    name: "S\xE3o Paulo"
+    initials: SP
+    country: 1
+- model: school.state
+  pk: 27
+  fields:
+    name: Tocantins
+    initials: TO
+    country: 1

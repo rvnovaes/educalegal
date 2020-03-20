@@ -1,0 +1,13 @@
+@startuml
+|Cliente|
+start
+:Requisição de serviço;
+if (Requer aprovação?) then (sim)
+	:Aprovação;
+else (não)
+endif
+|Atendimento 1|
+:Aguardando atendimento;
+:Completo;
+stop
+@enduml

@@ -80,6 +80,9 @@ INSTALLED_APPS = [
 if SILK:
     INSTALLED_APPS.append("silk")
 
+if DEBUG:
+    INSTALLED_APPS.append("debug_toolbar")
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -98,6 +101,17 @@ MIDDLEWARE = [
 # placed before never returns anything from process_request.
 if SILK:
     MIDDLEWARE.insert(0, 'silk.middleware.SilkyMiddleware')
+    
+if DEBUG:
+    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+
+# The Debug Toolbar is shown only if your IP address is listed in the INTERNAL_IPS setting. This means that for local
+# development, you must add '127.0.0.1' to INTERNAL_IPS; you’ll need to create this setting if it doesn’t already exist
+# in your settings module:
+
+INTERNAL_IPS = [
+    '127.0.0.1'
+]
 
 
 ROOT_URLCONF = "web.urls"
