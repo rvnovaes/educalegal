@@ -11,6 +11,7 @@ class DocumentTable(tables.Table):
 
     class Meta:
         model = Document
+        order_by = "-created_date"
         template_name = "django_tables2/bootstrap4.html"
         fields = (
             "interview",

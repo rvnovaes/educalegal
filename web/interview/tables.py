@@ -5,6 +5,8 @@ from .columns import InterviewCustomUrlColumn
 
 
 class InterviewTable(tables.Table):
+    date_available = tables.DateTimeColumn(format='d/m/Y')
+
     class Meta:
         model = Interview
         order_by = "name"
