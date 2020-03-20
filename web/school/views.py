@@ -26,9 +26,9 @@ class SchoolCreateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, CreateV
         "unit",
         "neighborhood",
         "zip",
-        "country",
-        "state",
         "city",
+        "state",
+        "country",
         "letterhead"
     ]
 
