@@ -7,14 +7,16 @@
         <h5>{{ document.name }}</h5>
       </div>
       <div class="card-body">
-        <ul class="list-group list-group-flush">
+          <ul class="list-group list-group-flush">
           <li class="list-group-item">
 
               <span class="font-weight-bold">Escola: </span>{{ document.school }}</li>
           <li class="list-group-item">
-              <span class="font-weight-bold">Data de Criação: </span>{{ document.created_date }}</li>
+              {# documentacao do django para formatacao de data no template #}
+              {# https://docs.djangoproject.com/en/3.0/ref/templates/builtins/#date #}
+              <span class="font-weight-bold">Data de Criação: </span>{{ document.created_date|date:"d/m/Y H:i" }}</li>
           <li class="list-group-item">
-              <span class="font-weight-bold">Data de Alteração: </span>{{ document.altered_date}}</li>
+              <span class="font-weight-bold">Data de Alteração: </span>{{ document.altered_date|date:"d/m/Y H:i" }}</li>
           <li class="list-group-item">
               <span class="font-weight-bold">Status: </span>{{ document.status }}</li>
           <li class="list-group-item">
@@ -49,7 +51,6 @@
                 </div>
             {% endif %}
         </ul>
-
       </div>
     </div>
   </div>

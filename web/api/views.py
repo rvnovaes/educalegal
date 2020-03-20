@@ -195,9 +195,10 @@ def docusign_webhook_listener(request):
         return HttpResponse(msg)
 
     document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
+    envelope_status = envelope_data["envelope_status"].lower()
 
     # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
-    if envelope_data["envelope_status"] == "Completed":
+    if envelope_status == "completed":
         try:
             (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
                 data, envelope_dir
@@ -224,9 +225,17 @@ def docusign_webhook_listener(request):
             return HttpResponse(msg)
 
     # Updates Document Status
-    document.status = envelope_data["envelope_status"]
+    envelope_statuses = {'sent': 'enviado',
+                         'delivered': 'entregue',
+                         'completed': 'completado',
+                         'declined': 'recusado',
+                         'voided': 'violado'}
+    if envelope_status in envelope_statuses.keys():
+        document.status = envelope_statuses[envelope_status]
+    else:
+        document.status = 'not found in docusign statuses list'
 
-    if envelope_data["envelope_status"] == "Completed":
+    if envelope_status == "completed":
         log = ""
         for pdf in envelope_data["pdf_documents"]:
             log += (pdf["filename"] + "<br>")
