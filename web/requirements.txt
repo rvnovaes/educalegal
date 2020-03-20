@@ -1,14 +1,12 @@
-django~=3.0.3
+django~=3.0.4
 # API
 djangorestframework~=3.11.0
 django-cors-headers~=3.2.1
 coreapi~=2.3.3
 django-rest-auth~=0.9.5
 retry-requests
-# API Debugging
-django-silk
 # Formating of forms
-django-crispy-forms~=1.8.1
+django-crispy-forms~=1.9.0
 # Database Access
 psycopg2-binary~=2.8.4
 # Authentication
@@ -18,12 +16,16 @@ django-tables2
 django-filter~=2.2.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.12.6
+boto3~=1.12.25
 # Production server
 gunicorn
 # Misc
 lxml~=4.5.0
 xmltodict~=0.12.0
 Pillow
-pyyaml~=5.3
+pyyaml~=5.3.1
 django-bootstrap4~=1.1.1
+# Debug
+django-debug-toolbar~=2.2
+# API Debugging
+django-silk~=4.0.1
