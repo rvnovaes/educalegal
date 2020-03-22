@@ -134,7 +134,7 @@
   pk: 3
   fields:
     tenant: 1
-    name: Super Bacana
+    name: "Super Bacana"
     school: 1
 - model: school.schoolunit
   pk: 4
