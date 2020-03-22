@@ -215,7 +215,13 @@ def docusign_webhook_listener(request):
             mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
 
             for pdf in envelope_data["pdf_documents"]:
-                response = mc.document_create(pdf["full_filename"], document_type_pk, pdf["filename"], document_language, pdf["description"])
+                response = mc.document_create(
+                    pdf["full_filename"],
+                    document_type_pk,
+                    pdf["filename"],
+                    document_language,
+                    pdf["description"],
+                )
                 logger.debug("Posting document to GED: " + pdf["filename"])
                 logger.debug(response.text)
 
@@ -225,20 +231,22 @@ def docusign_webhook_listener(request):
             return HttpResponse(msg)
 
     # Updates Document Status
-    envelope_statuses = {'sent': 'enviado',
-                         'delivered': 'entregue',
-                         'completed': 'completado',
-                         'declined': 'recusado',
-                         'voided': 'violado'}
+    envelope_statuses = {
+        "sent": "enviado",
+        "delivered": "entregue",
+        "completed": "completado",
+        "declined": "recusado",
+        "voided": "violado",
+    }
     if envelope_status in envelope_statuses.keys():
         document.status = envelope_statuses[envelope_status]
     else:
-        document.status = 'not found in docusign statuses list'
+        document.status = "not found in docusign statuses list"
 
     if envelope_status == "completed":
         log = ""
         for pdf in envelope_data["pdf_documents"]:
-            log += (pdf["filename"] + "<br>")
+            log += pdf["filename"] + "<br>"
 
         log += "<br>"
         esignature_log_documents = DocumentESignatureLog(

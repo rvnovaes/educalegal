@@ -10,7 +10,7 @@ from .filters import InterviewFilter
 
 
 class InterviewListView(LoginRequiredMixin, SingleTableMixin, FilterView):
-    template_name = 'interview/interview_list.html'
+    template_name = "interview/interview_list.html"
     model = Interview
     context_object_name = "interviews"
     table_class = InterviewTable

@@ -7,45 +7,59 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('school', '0001_initial'),
-        ('interview', '0001_initial'),
-        ('document', '0001_initial'),
+        ("school", "0001_initial"),
+        ("interview", "0001_initial"),
+        ("document", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='document',
-            name='envelope_id',
-            field=models.CharField(blank=True, max_length=256, verbose_name='Id do Envelope'),
+            model_name="document",
+            name="envelope_id",
+            field=models.CharField(
+                blank=True, max_length=256, verbose_name="Id do Envelope"
+            ),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='ged_id',
-            field=models.CharField(blank=True, max_length=128, verbose_name='ID do Documento no GED'),
+            model_name="document",
+            name="ged_id",
+            field=models.CharField(
+                blank=True, max_length=128, verbose_name="ID do Documento no GED"
+            ),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='ged_link',
-            field=models.CharField(blank=True, max_length=256, verbose_name='Link'),
+            model_name="document",
+            name="ged_link",
+            field=models.CharField(blank=True, max_length=256, verbose_name="Link"),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='interview',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='interview.Interview', verbose_name='Modelo'),
+            model_name="document",
+            name="interview",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="interview.Interview",
+                verbose_name="Modelo",
+            ),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='school',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='school.School', verbose_name='Escola'),
+            model_name="document",
+            name="school",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="school.School",
+                verbose_name="Escola",
+            ),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='signing_provider',
-            field=models.CharField(blank=True, max_length=256, verbose_name='Provedor'),
+            model_name="document",
+            name="signing_provider",
+            field=models.CharField(blank=True, max_length=256, verbose_name="Provedor"),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='status',
-            field=models.CharField(blank=True, max_length=256, verbose_name='Status'),
+            model_name="document",
+            name="status",
+            field=models.CharField(blank=True, max_length=256, verbose_name="Status"),
         ),
     ]

@@ -5,9 +5,11 @@ from .models import Document
 
 class DocumentTable(tables.Table):
     interview = tables.LinkColumn("document:document-detail", args=[A("pk")])
-    ged_link = tables.TemplateColumn(template_name="document/ir_button.html", verbose_name="Link")
-    created_date = tables.DateTimeColumn(format='d/m/Y H:i')
-    altered_date = tables.DateTimeColumn(format='d/m/Y H:i')
+    ged_link = tables.TemplateColumn(
+        template_name="document/ir_button.html", verbose_name="Link"
+    )
+    created_date = tables.DateTimeColumn(format="d/m/Y H:i")
+    altered_date = tables.DateTimeColumn(format="d/m/Y H:i")
 
     class Meta:
         model = Document
@@ -20,5 +22,5 @@ class DocumentTable(tables.Table):
             "altered_date",
             "status",
             "signing_provider",
-            "ged_link"
+            "ged_link",
         )

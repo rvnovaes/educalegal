@@ -5,14 +5,14 @@ from .models import Tenant, TenantGedData, TenantESignatureData
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
     list_display = ["name"]
-    fields = ["name", "subdomain_prefix", 'use_esignature']
+    fields = ["name", "subdomain_prefix", "use_esignature"]
 
 
 @admin.register(TenantGedData)
 class TenantGedDataAdmin(admin.ModelAdmin):
-    list_display = ['tenant', "url"]
+    list_display = ["tenant", "url"]
 
 
 @admin.register(TenantESignatureData)
 class TenantESignatureDataAdmin(admin.ModelAdmin):
-    list_display = ['tenant', "provider"]
+    list_display = ["tenant", "provider"]

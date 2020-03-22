@@ -10,31 +10,78 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('tenant', '0001_initial'),
+        ("tenant", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='InterviewDocumentType',
+            name="InterviewDocumentType",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, unique=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Interview',
+            name="Interview",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=512, unique=True, verbose_name='Nome')),
-                ('version', models.CharField(max_length=30, verbose_name='Versão')),
-                ('date_available', models.DateField(default=datetime.date.today, verbose_name='Data de Disponibilização')),
-                ('description', models.TextField(blank=True, verbose_name='Descrição')),
-                ('language', models.CharField(default='por', max_length=64, verbose_name='Idioma')),
-                ('custom_file_name', models.CharField(max_length=64, verbose_name='Nome do arquivo a ser gerado')),
-                ('base_url', models.URLField(max_length=512, verbose_name='URL Base')),
-                ('is_generic', models.BooleanField(default=True, verbose_name='É Genérica?')),
-                ('document_type', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='interview.InterviewDocumentType')),
-                ('tenants', models.ManyToManyField(related_name='tenants', to='tenant.Tenant')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=512, unique=True, verbose_name="Nome"),
+                ),
+                ("version", models.CharField(max_length=30, verbose_name="Versão")),
+                (
+                    "date_available",
+                    models.DateField(
+                        default=datetime.date.today,
+                        verbose_name="Data de Disponibilização",
+                    ),
+                ),
+                ("description", models.TextField(blank=True, verbose_name="Descrição")),
+                (
+                    "language",
+                    models.CharField(
+                        default="por", max_length=64, verbose_name="Idioma"
+                    ),
+                ),
+                (
+                    "custom_file_name",
+                    models.CharField(
+                        max_length=64, verbose_name="Nome do arquivo a ser gerado"
+                    ),
+                ),
+                ("base_url", models.URLField(max_length=512, verbose_name="URL Base")),
+                (
+                    "is_generic",
+                    models.BooleanField(default=True, verbose_name="É Genérica?"),
+                ),
+                (
+                    "document_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="interview.InterviewDocumentType",
+                    ),
+                ),
+                (
+                    "tenants",
+                    models.ManyToManyField(related_name="tenants", to="tenant.Tenant"),
+                ),
             ],
         ),
     ]

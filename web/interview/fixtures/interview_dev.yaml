@@ -6,7 +6,7 @@
     date_available: 2020-01-23
     description: Contrato de prestação de serviços educacionais entre aluno e escola.
     custom_file_name: contrato_de_prestacao_de_servicos_educacionais
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-contrato-prestacao-servicos-educacionais.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-educacionais.yml
     document_type_id: 2
     tenants: [1, 2]
 - model: interview.Interview

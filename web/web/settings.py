@@ -100,8 +100,8 @@ MIDDLEWARE = [
 # request then SilkyMiddleware will never get the chance to execute. Therefore you must ensure that any middleware
 # placed before never returns anything from process_request.
 if SILK:
-    MIDDLEWARE.insert(0, 'silk.middleware.SilkyMiddleware')
-    
+    MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")
+
 if DEBUG:
     MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
 
@@ -109,9 +109,7 @@ if DEBUG:
 # development, you must add '127.0.0.1' to INTERNAL_IPS; you’ll need to create this setting if it doesn’t already exist
 # in your settings module:
 
-INTERNAL_IPS = [
-    '127.0.0.1'
-]
+INTERNAL_IPS = ["127.0.0.1"]
 
 
 ROOT_URLCONF = "web.urls"
