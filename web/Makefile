@@ -42,7 +42,7 @@ else
 endif
 
 loaddata_prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py loaddata tenant country state city school interview_document_types interview
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py loaddata tenant country state_current city_current school interview_document_types interview
 
 # Loads fixtures for development
 loaddata_dev:
