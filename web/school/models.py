@@ -130,6 +130,9 @@ class SchoolUnit(TenantAwareModel):
         verbose_name="Unidade Escolar",
     )
 
+    def __str__(self):
+        return self.name
+
     def get_absolute_url(self):
         return reverse("school:school-unit-detail", kwargs={"pk": self.pk})
 
