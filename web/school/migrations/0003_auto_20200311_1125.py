@@ -7,72 +7,86 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('school', '0002_school_letterhead'),
+        ("school", "0002_school_letterhead"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='school',
-            name='zip_code',
-        ),
+        migrations.RemoveField(model_name="school", name="zip_code",),
         migrations.AddField(
-            model_name='school',
-            name='zip',
-            field=models.CharField(default=1, max_length=255, verbose_name='CEP'),
+            model_name="school",
+            name="zip",
+            field=models.CharField(default=1, max_length=255, verbose_name="CEP"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='school',
-            name='city',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.PROTECT, to='school.City', verbose_name='Cidade'),
+            model_name="school",
+            name="city",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="school.City",
+                verbose_name="Cidade",
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='school',
-            name='cnpj',
-            field=models.CharField(default=1, max_length=255, unique=True, verbose_name='CNPJ'),
+            model_name="school",
+            name="cnpj",
+            field=models.CharField(
+                default=1, max_length=255, unique=True, verbose_name="CNPJ"
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='school',
-            name='country',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.PROTECT, to='school.Country', verbose_name='País'),
+            model_name="school",
+            name="country",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="school.Country",
+                verbose_name="País",
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='school',
-            name='email',
-            field=models.EmailField(max_length=254, verbose_name='E-mail'),
+            model_name="school",
+            name="email",
+            field=models.EmailField(max_length=254, verbose_name="E-mail"),
         ),
         migrations.AlterField(
-            model_name='school',
-            name='neighborhood',
-            field=models.CharField(max_length=255, verbose_name='Bairro'),
+            model_name="school",
+            name="neighborhood",
+            field=models.CharField(max_length=255, verbose_name="Bairro"),
         ),
         migrations.AlterField(
-            model_name='school',
-            name='phone',
-            field=models.CharField(max_length=255, verbose_name='Telefone'),
+            model_name="school",
+            name="phone",
+            field=models.CharField(max_length=255, verbose_name="Telefone"),
         ),
         migrations.AlterField(
-            model_name='school',
-            name='site',
-            field=models.URLField(verbose_name='Site'),
+            model_name="school",
+            name="site",
+            field=models.URLField(verbose_name="Site"),
         ),
         migrations.AlterField(
-            model_name='school',
-            name='state',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.PROTECT, to='school.State', verbose_name='Estado'),
+            model_name="school",
+            name="state",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="school.State",
+                verbose_name="Estado",
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='school',
-            name='street',
-            field=models.CharField(max_length=255, verbose_name='Logradouro'),
+            model_name="school",
+            name="street",
+            field=models.CharField(max_length=255, verbose_name="Logradouro"),
         ),
         migrations.AlterField(
-            model_name='school',
-            name='street_number',
-            field=models.CharField(max_length=255, verbose_name='Número'),
+            model_name="school",
+            name="street_number",
+            field=models.CharField(max_length=255, verbose_name="Número"),
         ),
     ]

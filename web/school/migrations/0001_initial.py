@@ -10,81 +10,204 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('tenant', '0001_initial'),
+        ("tenant", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='City',
+            name="City",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+            ],
+            options={"verbose_name": "Cidade", "verbose_name_plural": "Cidades",},
+        ),
+        migrations.CreateModel(
+            name="Country",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, unique=True)),
             ],
             options={
-                'verbose_name': 'Cidade',
-                'verbose_name_plural': 'Cidades',
+                "verbose_name": "País",
+                "verbose_name_plural": "Países",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Country',
+            name="State",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, unique=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, unique=True)),
+                ("initials", models.CharField(max_length=10, unique=True)),
+                (
+                    "country",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="school.Country"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'País',
-                'verbose_name_plural': 'Países',
-                'ordering': ['name'],
+                "verbose_name": "Estado",
+                "verbose_name_plural": "Estados",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='State',
+            name="School",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, unique=True)),
-                ('initials', models.CharField(max_length=10, unique=True)),
-                ('country', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='school.Country')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "legal_name",
+                    models.CharField(max_length=255, verbose_name="Razão social"),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True, max_length=255, verbose_name="Nome Fantasia"
+                    ),
+                ),
+                (
+                    "legal_type",
+                    models.CharField(
+                        choices=[("F", "Física"), ("J", "Jurídica")],
+                        default=school.models.LegalType["JURIDICA"],
+                        max_length=1,
+                        verbose_name="Tipo",
+                    ),
+                ),
+                (
+                    "cnpj",
+                    models.CharField(
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        unique=True,
+                        verbose_name="CNPJ",
+                    ),
+                ),
+                (
+                    "logo",
+                    models.ImageField(blank=True, upload_to="", verbose_name="Logo"),
+                ),
+                (
+                    "phone",
+                    models.CharField(
+                        blank=True, max_length=255, verbose_name="Telefone"
+                    ),
+                ),
+                ("site", models.URLField(blank=True, verbose_name="Site")),
+                (
+                    "email",
+                    models.EmailField(
+                        blank=True, max_length=254, verbose_name="E-mail"
+                    ),
+                ),
+                (
+                    "street",
+                    models.CharField(
+                        blank=True, max_length=255, verbose_name="Logradouro"
+                    ),
+                ),
+                (
+                    "street_number",
+                    models.CharField(blank=True, max_length=255, verbose_name="Número"),
+                ),
+                (
+                    "unit",
+                    models.CharField(
+                        blank=True, max_length=255, verbose_name="Complemento"
+                    ),
+                ),
+                (
+                    "neighborhood",
+                    models.CharField(blank=True, max_length=255, verbose_name="Bairro"),
+                ),
+                (
+                    "zip_code",
+                    models.CharField(blank=True, max_length=255, verbose_name="CEP"),
+                ),
+                (
+                    "city",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="school.City",
+                        verbose_name="Cidade",
+                    ),
+                ),
+                (
+                    "country",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="school.Country",
+                        verbose_name="País",
+                    ),
+                ),
+                (
+                    "state",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="school.State",
+                        verbose_name="Estado",
+                    ),
+                ),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        default=1,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="tenant.Tenant",
+                    ),
+                ),
             ],
-            options={
-                'verbose_name': 'Estado',
-                'verbose_name_plural': 'Estados',
-                'ordering': ['name'],
-            },
-        ),
-        migrations.CreateModel(
-            name='School',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('legal_name', models.CharField(max_length=255, verbose_name='Razão social')),
-                ('name', models.CharField(blank=True, max_length=255, verbose_name='Nome Fantasia')),
-                ('legal_type', models.CharField(choices=[('F', 'Física'), ('J', 'Jurídica')], default=school.models.LegalType['JURIDICA'], max_length=1, verbose_name='Tipo')),
-                ('cnpj', models.CharField(blank=True, max_length=255, null=True, unique=True, verbose_name='CNPJ')),
-                ('logo', models.ImageField(blank=True, upload_to='', verbose_name='Logo')),
-                ('phone', models.CharField(blank=True, max_length=255, verbose_name='Telefone')),
-                ('site', models.URLField(blank=True, verbose_name='Site')),
-                ('email', models.EmailField(blank=True, max_length=254, verbose_name='E-mail')),
-                ('street', models.CharField(blank=True, max_length=255, verbose_name='Logradouro')),
-                ('street_number', models.CharField(blank=True, max_length=255, verbose_name='Número')),
-                ('unit', models.CharField(blank=True, max_length=255, verbose_name='Complemento')),
-                ('neighborhood', models.CharField(blank=True, max_length=255, verbose_name='Bairro')),
-                ('zip_code', models.CharField(blank=True, max_length=255, verbose_name='CEP')),
-                ('city', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='school.City', verbose_name='Cidade')),
-                ('country', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='school.Country', verbose_name='País')),
-                ('state', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='school.State', verbose_name='Estado')),
-                ('tenant', models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='tenant.Tenant')),
-            ],
-            options={
-                'verbose_name': 'Escola',
-                'verbose_name_plural': 'Escolas',
-            },
+            options={"verbose_name": "Escola", "verbose_name_plural": "Escolas",},
         ),
         migrations.AddField(
-            model_name='city',
-            name='state',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='school.State'),
+            model_name="city",
+            name="state",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="school.State"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='city',
-            unique_together={('name', 'state')},
+            name="city", unique_together={("name", "state")},
         ),
     ]

@@ -63,11 +63,11 @@ class City(models.Model):
     class Meta:
         verbose_name = "Cidade"
         verbose_name_plural = "Cidades"
-        ordering = ('name',)
+        ordering = ("name",)
         unique_together = ("name", "state")
 
     def __str__(self):
-        return self.name + ' - ' + self.state.initials
+        return self.name + " - " + self.state.initials
 
 
 class School(TenantAwareModel):
@@ -82,7 +82,7 @@ class School(TenantAwareModel):
     # https://docs.djangoproject.com/en/3.0/ref/models/fields/
     # when a CharField has both unique=True and blank=True set null=True is required to
     # avoid unique constraint violations when saving multiple objects with blank values
-    cnpj = models.CharField(max_length=255, unique=True, verbose_name="CNPJ")
+    cnpj = models.CharField(max_length=255, verbose_name="CNPJ")
     logo = models.ImageField(verbose_name="Logo", blank=True)
     phone = models.CharField(max_length=255, verbose_name="Telefone")
     site = models.URLField(verbose_name="Site")
@@ -92,21 +92,13 @@ class School(TenantAwareModel):
     unit = models.CharField(max_length=255, blank=True, verbose_name="Complemento")
     neighborhood = models.CharField(max_length=255, verbose_name="Bairro")
     zip = models.CharField(max_length=255, verbose_name="CEP")
-    city = models.ForeignKey(
-        City, on_delete=models.PROTECT, verbose_name="Cidade"
-    )
-    state = models.ForeignKey(
-        State, on_delete=models.PROTECT, verbose_name="Estado",
-    )
-    country = models.ForeignKey(
-        Country, on_delete=models.PROTECT, verbose_name="País"
-    )
-    letterhead = models.CharField(
-        max_length=255, verbose_name="Timbrado"
-    )
+    city = models.ForeignKey(City, on_delete=models.PROTECT, verbose_name="Cidade")
+    state = models.ForeignKey(State, on_delete=models.PROTECT, verbose_name="Estado",)
+    country = models.ForeignKey(Country, on_delete=models.PROTECT, verbose_name="País")
+    letterhead = models.CharField(max_length=255, verbose_name="Timbrado")
 
     def __str__(self):
-        return self.name + ' - ' + self.legal_name
+        return self.name + " - " + self.legal_name
 
     @property
     def address(self):
@@ -127,3 +119,21 @@ class School(TenantAwareModel):
     class Meta:
         verbose_name = "Escola"
         verbose_name_plural = "Escolas"
+
+
+class SchoolUnit(TenantAwareModel):
+    name = models.CharField(max_length=255, blank=True, verbose_name="Nome")
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name="school_units",
+        verbose_name="Unidade Escolar",
+    )
+
+    def get_absolute_url(self):
+        return reverse("school:school-unit-detail", kwargs={"pk": self.pk})
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Unidade Escolar"
+        verbose_name_plural = "Unidades Escolares"

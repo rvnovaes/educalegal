@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block body_block %}
+  <div class="container">
+    <h2>Unidade Escolar</h2>
+        <p>{{ school_unit.name }}</p>
+    <div class="btn-group">
+        <form action="{% url 'school:school-unit-update' school_id=school_unit.school.pk pk=school_unit.pk %}">
+            <button type="submit" class="btn btn-primary" >Editar</button>
+        </form>
+        <form action="{% url 'school:school-unit-delete' school_id=school_unit.school.pk pk=school_unit.pk %}">
+            <button type="submit" class="btn btn-danger">Apagar</button>
+        </form>
+    </div>
+  </div>
+{% endblock %}

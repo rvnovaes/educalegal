@@ -28,12 +28,25 @@
               <span class="font-weight-bold">Endereço: </span>{% if school.street %}{{ school.address }}{% endif %}</li>
           <li class="list-group-item">
               <span class="font-weight-bold">Timbrado: </span>{{ school.letterhead }}</li>
+          {% if school.school_units.all|length > 0 %}
+          <li class="list-group-item">
+              <span class="font-weight-bold">Unidades Escolares: </span>
+              <ul>
+                  {% for school_unit in school.school_units.all %}
+                      <li><a href="{% url 'school:school-unit-detail' school_id=school.pk pk=school_unit.pk %}">{{ school_unit.name }}</a></li>
+                  {% endfor %}
+              </ul>
+          </li>
+          {% endif %}
         </ul>
       </div>
     </div>
     <div class="btn-group">
         <form action="{% url 'school:school-update' pk=school.pk %}">
-            <button type="submit" class="btn btn-primary" >Editar</button>
+            <button type="submit" class="btn btn-primary" >Editar Dados da Escola</button>
+        </form>
+        <form action="{% url 'school:school-unit-create' school_id=school.pk %}">
+            <button type="submit" class="btn btn-primary">Criar Unidade Escolar</button>
         </form>
         <form action="{% url 'school:school-delete' pk=school.pk %}">
             <button type="submit" class="btn btn-danger">Apagar</button>

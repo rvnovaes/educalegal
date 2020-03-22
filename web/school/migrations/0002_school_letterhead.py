@@ -6,14 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('school', '0001_initial'),
+        ("school", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='school',
-            name='letterhead',
-            field=models.CharField(default='timbrado.docx', max_length=255, verbose_name='Timbrado'),
+            model_name="school",
+            name="letterhead",
+            field=models.CharField(
+                default="timbrado.docx", max_length=255, verbose_name="Timbrado"
+            ),
             preserve_default=False,
         ),
     ]

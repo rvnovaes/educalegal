@@ -1,6 +1,66 @@
 - model: school.school
   pk: 1
   fields:
+    tenant: 1
+    name: "System Col\xE9gio Bacana"
+    legal_name: "System Sociedade de Ensino Col\xE9gio Bacana Ltda."
+    legal_type: J
+    cnpj: 22.870.852/0001-72
+    logo: colegio_bacana.png
+    street: "Rua Cara\xE7a"
+    street_number: '28'
+    neighborhood: Serra
+    zip: 30220-260
+    phone: 31-3223-0227
+    site: https://www.colegiobacana.com.br
+    email: colegio.bacana@gmail.com
+    city: 1900
+    state: 11
+    country: 1
+    letterhead: colegio_bacana_timbrado.docx
+- model: school.school
+  pk: 2
+  fields:
+    tenant: 1
+    name: "System Escola da Fam\xEDlia"
+    legal_name: "System Funda\xE7\xE3o Educacional Santa Helena"
+    legal_type: J
+    cnpj: 79.225.578/0001-04
+    logo: escola_da_familia.png
+    street: "Rua da Consola\xE7\xE3o"
+    street_number: '2301'
+    neighborhood: "Consola\xE7\xE3o"
+    zip: 01301-100
+    phone: 11-3425-3565
+    site: https://www.escoladafamilia.edu
+    email: secretaria@escoladafamilia.edu
+    city: 6971
+    state: 26
+    country: 1
+    letterhead: escola_da_familia_timbrado.docx
+- model: school.school
+  pk: 3
+  fields:
+    tenant: 1
+    name: System Escola da Lagoa
+    legal_name: "Mendon\xE7a e Machado Servi\xE7os Educacionais S/A"
+    legal_type: J
+    cnpj: 56.324.235/0001-93
+    logo: esocola_da_lagoa.png
+    street: Av. Borges de Medeiros
+    street_number: '2525'
+    neighborhood: Lagoa
+    zip: 22470-022
+    phone: 21-5689-2356
+    site: https://www.escoladalagoa.com.br
+    email: contato@escoladalagoa.com.br
+    city: 5242
+    state: 19
+    country: 1
+    letterhead: escola_da_lagoa_timbrado.docx
+- model: school.school
+  pk: 4
+  fields:
     tenant: 2
     name: "Col\xE9gio Bacana"
     legal_name: "Sociedade de Ensino Col\xE9gio Bacana Ltda."
@@ -19,7 +79,7 @@
     country: 1
     letterhead: colegio_bacana_timbrado.docx
 - model: school.school
-  pk: 2
+  pk: 5
   fields:
     tenant: 2
     name: "Escola da Fam\xEDlia"
@@ -39,7 +99,7 @@
     country: 1
     letterhead: escola_da_familia_timbrado.docx
 - model: school.school
-  pk: 3
+  pk: 6
   fields:
     tenant: 2
     name: Escola da Lagoa
@@ -58,3 +118,65 @@
     state: 19
     country: 1
     letterhead: escola_da_lagoa_timbrado.docx
+- model: school.schoolunit
+  pk: 1
+  fields:
+    tenant: 1
+    name: "Fundamental I"
+    school: 1
+- model: school.schoolunit
+  pk: 2
+  fields:
+    tenant: 1
+    name: "Fundamental II"
+    school: 1
+- model: school.schoolunit
+  pk: 3
+  fields:
+    tenant: 1
+    name: Super Bacana
+    school: 1
+- model: school.schoolunit
+  pk: 4
+  fields:
+    tenant: 2
+    name: "Fundamental I"
+    school: 4
+- model: school.schoolunit
+  pk: 5
+  fields:
+    tenant: 2
+    name: "Fundamental II"
+    school: 4
+- model: school.schoolunit
+  pk: 6
+  fields:
+    tenant: 2
+    name: "Super Bacana"
+    school: 4
+- model: school.schoolunit
+  pk: 7
+  fields:
+    tenant: 1
+    name: "Familiar 1"
+    school: 2
+- model: school.schoolunit
+  pk: 8
+  fields:
+    tenant: 1
+    name: "Familar 2"
+    school: 2
+- model: school.schoolunit
+  pk: 9
+  fields:
+    tenant: 2
+    name: "Familiar 1"
+    school: 5
+- model: school.schoolunit
+  pk: 10
+  fields:
+    tenant: 1
+    name: "Familar 2"
+    school: 5
+
+
