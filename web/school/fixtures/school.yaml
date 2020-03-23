@@ -17,7 +17,7 @@
     city: 1900
     state: 11
     country: 1
-    letterhead: colegio_bacana_timbrado.docx
+    letterhead: timbrado-colegio-bacana.docx
 - model: school.school
   pk: 2
   fields:
@@ -37,7 +37,7 @@
     city: 6971
     state: 26
     country: 1
-    letterhead: escola_da_familia_timbrado.docx
+    letterhead: timbrado-escola-da-familia.docx
 - model: school.school
   pk: 3
   fields:
@@ -57,7 +57,7 @@
     city: 5242
     state: 19
     country: 1
-    letterhead: escola_da_lagoa_timbrado.docx
+    letterhead: timbrado-escola-da-lagoa.docx
 - model: school.school
   pk: 4
   fields:
@@ -77,7 +77,7 @@
     city: 1900
     state: 11
     country: 1
-    letterhead: colegio_bacana_timbrado.docx
+    letterhead: timbrado-colegio-bacana.docx
 - model: school.school
   pk: 5
   fields:
@@ -97,7 +97,7 @@
     city: 6971
     state: 26
     country: 1
-    letterhead: escola_da_familia_timbrado.docx
+    letterhead: timbrado-escola-da-familia.docx
 - model: school.school
   pk: 6
   fields:
@@ -117,7 +117,7 @@
     city: 5242
     state: 19
     country: 1
-    letterhead: escola_da_lagoa_timbrado.docx
+    letterhead: timbrado-escola-da-lagoa.docx
 - model: school.schoolunit
   pk: 1
   fields:
