@@ -41,8 +41,9 @@ else
 	docker-compose run educalegal python manage.py makemigrations --noinput
 endif
 
+# Loads fixtures for production
 loaddata_prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py loaddata tenant country state_current city_current school interview_document_types interview
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py loaddata tenant country state_current city_current school interview_document_types interview_prod
 
 # Loads fixtures for development
 loaddata_dev:
