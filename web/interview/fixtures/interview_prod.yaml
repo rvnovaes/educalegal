@@ -245,7 +245,7 @@
   fields:
     name: Teste_Termo de Confidencialidade NDA
     version: '2.0'
-    date_available: 2100-01-01
+    date_available: 2020-03-09
     description: teste
     language: por
     custom_file_name: termo-de-confidencialidade-nda
@@ -259,7 +259,7 @@
   fields:
     name: "Teste_Contrato de presta\xE7\xE3o de servi\xE7os"
     version: '2.0'
-    date_available: 2100-01-01
+    date_available: 2020-03-09
     description: teste
     language: por
     custom_file_name: contrato_prestacao_servicos_com_sem_cessao_mao_obra
