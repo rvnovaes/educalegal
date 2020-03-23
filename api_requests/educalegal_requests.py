@@ -16,9 +16,12 @@ if __name__ == "__main__":
     elc = EducaLegalClient(api_base_url, token)
     # print(elc.tenants_ged_read(2))
     # print(elc.tenants_esignature_read(2))
-    print(elc.tenants_schools_list(2))
+    # print(elc.tenants_schools_list(2))
     # print(elc.tenants_schools_names(2))
-    print(elc.tenants_school_names_school_data(2))
+    school_names_list, school_units_dict, school_data_dict =  elc.tenants_school_names_school_data(2)
+    print(school_names_list)
+    print(school_units_dict)
+    print(school_names_list, school_units_dict, school_data_dict)
     # print(elc.interviews_read(2))
 
     # name = "20200229_666666_contrato_de_prestacao_de_servicos_educacionais.pdf"
