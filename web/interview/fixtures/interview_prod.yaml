@@ -334,7 +334,7 @@
     description: Autotest
     language: por
     custom_file_name: contrato_de_prestacao_de_servicos_educacionais
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Acontrato-prestacao-servicos-educacionais.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-educacionais.yml
     is_generic: true
     document_type: 2
     tenants:
@@ -349,7 +349,7 @@
     description: Autotest
     language: por
     custom_file_name: contrato_prestacao_servicos_consultoria
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Acontrato-prestacao-servicos-consultoria.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-consultoria.yml
     is_generic: true
     document_type: 3
     tenants:
@@ -364,7 +364,7 @@
     description: Autotest
     language: por
     custom_file_name: termo-de-autorizacao-do-uso-de-imagem
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Atermo-de-autorizacao-do-uso-de-imagem.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-autorizacao-do-uso-de-imagem.yml
     is_generic: true
     document_type: 5
     tenants:
@@ -379,7 +379,7 @@
     description: Autotest
     language: por
     custom_file_name: notificacao_extrajudicial
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Anotificacao-extrajudicial.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Anotificacao-extrajudicial.yml
     is_generic: true
     document_type: 8
     tenants:
@@ -394,7 +394,7 @@
     description: Autotest
     language: por
     custom_file_name: termo-de-confidencialidade-nda
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Atermo-de-confidencialidade-nda.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-confidencialidade-nda.yml
     is_generic: true
     document_type: 4
     tenants:
@@ -409,7 +409,7 @@
     description: Autotest
     language: por
     custom_file_name: contrato_prestacao_servicos_com_sem_cessao_mao_obra
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
     is_generic: true
     document_type: 6
     tenants:
@@ -424,7 +424,7 @@
     description: Autotest
     language: por
     custom_file_name: contrato_de_locacao_de_imovel
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Acontrato-de-locacao-de-imovel.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-locacao-de-imovel.yml
     is_generic: true
     document_type: 7
     tenants:
@@ -439,7 +439,7 @@
     description: Autotest
     language: por
     custom_file_name: contrato_de_cessao_de_espaco
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
     is_generic: true
     document_type: 10
     tenants:
@@ -454,7 +454,7 @@
     description: Autotest
     language: por
     custom_file_name: termo_de_confissao_de_divida
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Atermo-de-confissao-de-divida.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-confissao-de-divida.yml
     is_generic: true
     document_type: 9
     tenants:
@@ -469,7 +469,7 @@
     description: Autotest
     language: por
     custom_file_name: aditivo_contrato_trabalho_banco_horas
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playgorund1Autotest%3Aaditivo-contrato-trabalho-banco-horas.yml
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Aaditivo-contrato-trabalho-banco-horas.yml
     is_generic: true
     document_type: 12
     tenants:
