@@ -11,7 +11,7 @@ import requests
 # api_key = "CJrCAwt5Aul45RkOXeS2z9ZwISc6JkOf"
 # isabela
 # api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"
-server_url = "http://localhost/api/playground"
+# server_url = "http://localhost/api/playground"
 ###### teste.educalegal.com.br #####
 # usuario: teste@educalegal.com
 # api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
@@ -20,6 +20,7 @@ server_url = "http://localhost/api/playground"
 # api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
 # server_url = "https://docs.educalegal.com.br/api/playground"
 
+# project = "Autotest"
 project = "Development"
 
 
