@@ -4,7 +4,7 @@ from os.path import isfile, join
 import requests
 ###### LOCALHOST ######
 # iasmini
-# api_key = "CREI52r9wGtHRKTnTwoMw1lIwbfNA1tj"
+# api_key = "NzTNZeZr7UsyLIj1XtYAz0NfiZO3rtoD"
 # luis paim
 # api_key = "Ti33Sv5KMNQCV9MDlwxY4RnBIbUWnAVD"
 # roberto
