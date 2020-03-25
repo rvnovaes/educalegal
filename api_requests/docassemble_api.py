@@ -18,9 +18,9 @@ import requests
 # server_url = "https://teste.educalegal.com.br/api/playground"
 ###### Autotest teste.educalegal.com.br #####
 # usuario: teste@educalegal.com
-# api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
-# server_url = "https://teste.educalegal.com.br/api/playground"
-# project = "Autotest"
+api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
+server_url = "https://teste.educalegal.com.br/api/playground"
+project = "Autotest"
 
 
 ##### docs.educalegal.com.br #####
