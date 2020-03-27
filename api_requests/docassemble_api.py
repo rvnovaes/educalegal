@@ -53,7 +53,7 @@ if __name__ == "__main__":
         """)
         if user == "1":
             # iasmini
-            api_key = "CREI52r9wGtHRKTnTwoMw1lIwbfNA1tj"
+            api_key = "NzTNZeZr7UsyLIj1XtYAz0NfiZO3rtoD"
         elif user == "2":
             # isabela
             api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"
@@ -128,12 +128,6 @@ if __name__ == "__main__":
         "/opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data/"
     )
 
-    post_to_docassemble(
-        api_key, server_url, brcomeducalegal_questions, "questions", user_id, project
-    )
-    post_to_docassemble(
-        api_key, server_url, brcomeducalegal_templates, "templates", user_id, project
-    )
-    post_to_docassemble(
-        api_key, server_url, brcomeducalegal_modules, "modules", user_id, project
-    )
+    post_to_docassemble(api_key, server_url, brcomeducalegal_questions, "questions", user_id, project)
+    post_to_docassemble(api_key, server_url, brcomeducalegal_templates, "templates", user_id, project)
+    post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", user_id, project)
