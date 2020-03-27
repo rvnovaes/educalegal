@@ -44,7 +44,7 @@
   pk: 8
   fields:
     name: "Escola Viva"
-    subdomain_prefix: auto
+    subdomain_prefix: viva
     use_esignature: true
 - model: tenant.tenantgeddata
   pk: 1
