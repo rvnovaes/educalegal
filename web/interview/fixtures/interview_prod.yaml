@@ -265,7 +265,7 @@
 - model: interview.interview
   pk: 15
   fields:
-    name: Autotest_Contrato do aluno
+    name: AutotestProd_Contrato do aluno
     version: '2.1'
     date_available: 2020-03-27
     description: "Contrato tem por objeto regular a presta\xE7\xE3o de servi\xE7os
@@ -281,7 +281,7 @@
 - model: interview.interview
   pk: 16
   fields:
-    name: Autotest_Contrato de consultoria
+    name: AutotestProd_Contrato de consultoria
     version: '2.1'
     date_available: 2020-03-27
     description: "O contrato tem por objeto a presta\xE7\xE3o, por parte da contratada
@@ -297,7 +297,7 @@
 - model: interview.interview
   pk: 17
   fields:
-    name: Autotest_Termo de confidencialidade - NDA
+    name: AutotestProd_Termo de confidencialidade - NDA
     version: '2.1'
     date_available: 2020-03-27
     description: "O acordo estabelece um relacionamento de confidencialidade entre
@@ -314,7 +314,7 @@
 - model: interview.interview
   pk: 18
   fields:
-    name: "Autotest_Autoriza\xE7\xE3o de uso de imagem"
+    name: "AutotestProd_Autoriza\xE7\xE3o de uso de imagem"
     version: '2.1'
     date_available: 2020-03-27
     description: "O termo autoriza o uso da imagem e/ou voz captadas em fotos e v\xEDdeos,
@@ -330,7 +330,7 @@
 - model: interview.interview
   pk: 19
   fields:
-    name: "Autotest_Contrato de presta\xE7\xE3o de servi\xE7os"
+    name: "AutotestProd_Contrato de presta\xE7\xE3o de servi\xE7os"
     version: '2.1'
     date_available: 2020-03-27
     description: "O contrato tem por objeto estabelecer as condi\xE7\xF5es dos servi\xE7os
@@ -346,7 +346,7 @@
 - model: interview.interview
   pk: 20
   fields:
-    name: "Autotest_Contrato de loca\xE7\xE3o de im\xF3vel"
+    name: "AutotestProd_Contrato de loca\xE7\xE3o de im\xF3vel"
     version: '2.1'
     date_available: 2020-03-27
     description: "Considerando o interesse da locat\xE1ria em alugar o im\xF3vel da
@@ -362,7 +362,7 @@
 - model: interview.interview
   pk: 21
   fields:
-    name: "Autotest_Notifica\xE7\xE3o de cobran\xE7a"
+    name: "AutotestProd_Notifica\xE7\xE3o de cobran\xE7a"
     version: '2.1'
     date_available: 2020-03-27
     description: "Notifica\xE7\xE3o do n\xE3o pagamento da(s) parcela(s) discriminada(s)
@@ -377,7 +377,7 @@
 - model: interview.interview
   pk: 22
   fields:
-    name: "Autotest_Termo de confiss\xE3o de d\xEDvida"
+    name: "AutotestProd_Termo de confiss\xE3o de d\xEDvida"
     version: '2.1'
     date_available: 2020-03-27
     description: "Considerando que existe uma situa\xE7\xE3o atual de inadimpl\xEAncia
@@ -394,7 +394,7 @@
 - model: interview.interview
   pk: 23
   fields:
-    name: "Autotest_Contrato de cess\xE3o de espa\xE7o"
+    name: "AutotestProd_Contrato de cess\xE3o de espa\xE7o"
     version: '2.1'
     date_available: 2020-03-27
     description: "O contrato regula a cess\xE3o de espa\xE7o localizado no estabelecimento
@@ -409,7 +409,7 @@
 - model: interview.interview
   pk: 24
   fields:
-    name: "Autotest_Contrato de diretor estatut\xE1rio"
+    name: "AutotestProd_Contrato de diretor estatut\xE1rio"
     version: '2.1'
     date_available: 2020-03-27
     description: "O contrato formaliza o relacionamento da Contratada como diretor(a)
@@ -427,7 +427,7 @@
 - model: interview.interview
   pk: 25
   fields:
-    name: Autotest_Aditivo ao contrato de trabalho - banco de horas
+    name: AutotestProd_Aditivo ao contrato de trabalho - banco de horas
     version: '2.1'
     date_available: 2020-03-27
     description: "As partes convencionam que haver\xE1 sistema de compensa\xE7\xE3o
@@ -444,7 +444,7 @@
 - model: interview.interview
   pk: 26
   fields:
-    name: "Autotest_Contrato de viagem de forma\xE7\xE3o pedag\xF3gica"
+    name: "AutotestProd_Contrato de viagem de forma\xE7\xE3o pedag\xF3gica"
     version: '1.1'
     date_available: 2020-02-09
     description: "Conhecendo escolas de outro pa\xEDs."
@@ -458,7 +458,7 @@
 - model: interview.interview
   pk: 27
   fields:
-    name: "Autotest_Contrato de comodato de im\xF3vel"
+    name: "AutotestProd_Contrato de comodato de im\xF3vel"
     version: '1.1'
     date_available: 2020-03-27
     description: "Me empresta seu im\xF3vel sem cobrar nada?"
