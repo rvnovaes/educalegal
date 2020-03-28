@@ -1,161 +1,238 @@
+############ Production docs.educalegal.com.br ##########
 - model: interview.interview
   pk: 2
   fields:
     name: Contrato do aluno
-    version: '2.0'
-    date_available: 2020-03-18
-    description: "Contrato de presta\xE7\xE3o de servi\xE7os educacionais entre aluno
-      e escola."
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Contrato tem por objeto regular a presta\xE7\xE3o de servi\xE7os
+      educacionais em favor do(a) aluno(a) de acordo com o calend\xE1rio escolar e
+      planos de ensino."
     language: por
     custom_file_name: contrato_de_prestacao_de_servicos_educacionais
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-educacionais.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-prestacao-servicos-educacionais.yml
     is_generic: true
     document_type: 2
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 3
   fields:
     name: Contrato de consultoria
-    version: '2.0'
-    date_available: 2020-03-16
-    description: "Um contrato para consultores darem palpite sobre o que voc\xEA j\xE1
-      sabe e te cobrarem por isso."
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato tem por objeto a presta\xE7\xE3o, por parte da contratada
+      \xE0 contratante, dos Servi\xE7os de assessoria e consultoria Para tanto, a
+      contratada obriga-se a fornecer m\xE3o de obra especializada e devidamente habilitada."
     language: por
     custom_file_name: contrato_prestacao_servicos_consultoria
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-consultoria.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-prestacao-servicos-consultoria.yml
     is_generic: true
     document_type: 3
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 4
   fields:
     name: Termo de confidencialidade - NDA
-    version: '2.0'
-    date_available: 2020-03-17
-    description: Promete guardar segredo?
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O acordo estabelece um relacionamento de confidencialidade entre
+      as Partes com rela\xE7\xE3o \xE0s Informa\xE7\xF5es, sendo que a Parte Receptora
+      somente poder\xE1 se utilizar das Informa\xE7\xF5es para os fins do Projeto
+      Confidencial;"
     language: por
     custom_file_name: termo_de_confidencialidade_nda
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Atermo-de-confidencialidade-nda.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Atermo-de-confidencialidade-nda.yml
     is_generic: true
     document_type: 4
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 5
   fields:
     name: "Autoriza\xE7\xE3o de uso de imagem"
-    version: '2.0'
-    date_available: 2100-01-01
-    description: Posso tirar fotos do seu filho e colocar no Instagram da escola?
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O termo autoriza o uso da imagem e/ou voz captadas em fotos e v\xEDdeos,
+      para utiliza\xE7\xE3o em campanhas institucionais ou publicit\xE1rias, materiais
+      impressos, audiovisuais e virtuais, incluindo m\xEDdias sociais e websites."
     language: por
     custom_file_name: termo_autorizaca_uso_imagem
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Atermo-de-autorizacao-do-uso-de-imagem.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Atermo-de-autorizacao-do-uso-de-imagem.yml
     is_generic: true
     document_type: 5
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 6
   fields:
     name: "Contrato de presta\xE7\xE3o de servi\xE7os"
-    version: '2.0'
-    date_available: 2020-03-17
-    description: "Contrato para prestadores de servi\xE7o em geral n\xE3o te darem
-      tanta raiva."
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato tem por objeto estabelecer as condi\xE7\xF5es dos servi\xE7os
+      com ou sem cess\xE3o de m\xE3o de obra que ser\xE3o prestados pela contratada
+      \xE0 contrante."
     language: por
     custom_file_name: contrato_prestacao_servicos_com_sem_cessao_mao_obra
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
     is_generic: true
     document_type: 6
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 7
   fields:
     name: "Contrato de loca\xE7\xE3o de im\xF3vel"
-    version: '2.0'
-    date_available: 2020-03-18
-    description: "Usando nosso sistema voc\xEA nunca mais vai perder o prazo da renovat\xF3ria."
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Considerando o interesse da locat\xE1ria em alugar o im\xF3vel da
+      locadora, o presente contrato estabelece as condi\xE7\xF5es do aluguel do im\xF3vel
+      para fins n\xE3o comerciais."
     language: por
     custom_file_name: contrato_de_locacao_de_imovel
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-de-locacao-de-imovel.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-de-locacao-de-imovel.yml
     is_generic: true
     document_type: 7
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 8
   fields:
     name: "Notifica\xE7\xE3o de cobran\xE7a"
-    version: '1.1'
-    date_available: 2020-01-23
-    description: "Aquela cartinha que ningu\xE9m gosta de receber. Por isso, use assinatura
-      eletr\xF4nica para envi\xE1-la."
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Notifica\xE7\xE3o do n\xE3o pagamento da(s) parcela(s) discriminada(s)
+      e no contrato de presta\xE7\xE3o se servi\xE7os educacionais."
     language: por
     custom_file_name: notificacao_de_cobranca
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Abr-com-educalegal-notificacao-extrajudicial.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Anotificacao-extrajudicial.yml
     is_generic: true
     document_type: 8
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 9
   fields:
     name: "Termo de confiss\xE3o de d\xEDvida"
-    version: '1.1'
-    date_available: 2020-02-09
-    description: "Devo, n\xE3o nego. Pago quando puder."
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Considerando que existe uma situa\xE7\xE3o atual de inadimpl\xEAncia
+      contratual de ordem financeira da devedora junto \xE0 credora em rela\xE7\xE3o
+      ao contrato principal, a devedora, por meio deste, assume que tem obriga\xE7\xF5es
+      inadimplidas e que tem interesse de recompor seu d\xE9bito junto \xE0 credora."
     language: por
     custom_file_name: termo_de_confissao_de_divida
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Abr-com-educalegal-termo-de-confissao-de-divida.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Atermo-de-confissao-de-divida.yml
     is_generic: true
     document_type: 9
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 10
   fields:
     name: "Contrato de cess\xE3o de espa\xE7o"
-    version: '1.1'
-    date_available: 2020-02-09
-    description: Give me some room.
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato regula a cess\xE3o de espa\xE7o localizado no estabelecimento
+      da cedente exclusivamente para a instala\xE7\xE3o e uso para fins comerciais."
     language: por
     custom_file_name: "contrato_de_cessao_de_espa\xE7o"
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Abr-com-educalegal-contrato-de-cessao-de-espaco-para-fins-comerciais.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
     is_generic: true
     document_type: 10
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 11
   fields:
     name: "Contrato de diretor estatut\xE1rio"
-    version: '1.1'
-    date_available: 2020-02-09
-    description: Contrato do Big Boss.
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato formaliza o relacionamento da Contratada como diretor(a)
+      da Contratante. A rela\xE7\xE3o decorrente do presente Contrato tem como base
+      a confian\xE7a m\xFAtua entre as partes. A Contratada dever\xE1 exercer os direitos
+      e obriga\xE7\xF5es e desempenhar com total compet\xEAncia atividades que a Contratante
+      lhe atribua, compreendidas nas suas fun\xE7\xF5es."
     language: por
     custom_file_name: contrato_de_diretor_estatutario
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Abr-com-educalegal-contrato-diretor-estatutario.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-diretor-estatutario.yml
     is_generic: true
     document_type: 11
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 12
   fields:
     name: Aditivo ao contrato de trabalho - banco de horas
-    version: '1.1'
-    date_available: 2020-02-09
-    description: O trabalho nunca acaba!
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "As partes convencionam que haver\xE1 sistema de compensa\xE7\xE3o
+      de horas extras eventualmente laboradas, pelo qual as horas extras efetivamente
+      realizadas pelo trabalhador durante o m\xEAs poder\xE3o ser compensadas em prazo
+      determinado."
     language: por
     custom_file_name: aditivo_contrato_trabalho_banco_horas
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Abr-com-educalegal-aditivo-contrato-trabalho-banco-horas.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Aaditivo-contrato-trabalho-banco-horas.yml
     is_generic: true
     document_type: 12
     tenants:
     - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
 - model: interview.interview
   pk: 13
   fields:
@@ -169,13 +246,13 @@
     is_generic: true
     document_type: 13
     tenants:
-    - 2
+    - 1
 - model: interview.interview
   pk: 14
   fields:
     name: "Contrato de comodato de im\xF3vel"
     version: '1.1'
-    date_available: 2020-02-09
+    date_available: 2020-03-27
     description: "Me empresta seu im\xF3vel sem cobrar nada?"
     language: por
     custom_file_name: contrato_comodato_imovel
@@ -183,295 +260,420 @@
     is_generic: true
     document_type: 14
     tenants:
-    - 2
+    - 1
+########## Autotest docs.educalegal.com.br ##########
 - model: interview.interview
   pk: 15
   fields:
-    name: Teste_Contrato do aluno
-    version: '2.0'
-    date_available: 2020-03-09
-    description: teste
+    name: Autotest_Contrato do aluno
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Contrato tem por objeto regular a presta\xE7\xE3o de servi\xE7os
+      educacionais em favor do(a) aluno(a) de acordo com o calend\xE1rio escolar e
+      planos de ensino."
     language: por
     custom_file_name: contrato_de_prestacao_de_servicos_educacionais
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-educacionais.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-educacionais.yml
     is_generic: true
     document_type: 2
     tenants:
-    - 1
+    - 7
 - model: interview.interview
   pk: 16
   fields:
-    name: Teste_Contrato de consultoria
-    version: '2.0'
-    date_available: 2020-03-09
-    description: teste
+    name: Autotest_Contrato de consultoria
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato tem por objeto a presta\xE7\xE3o, por parte da contratada
+      \xE0 contratante, dos Servi\xE7os de assessoria e consultoria Para tanto, a
+      contratada obriga-se a fornecer m\xE3o de obra especializada e devidamente habilitada."
     language: por
     custom_file_name: contrato_prestacao_servicos_consultoria
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-consultoria.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-consultoria.yml
     is_generic: true
     document_type: 3
     tenants:
-    - 1
+    - 7
 - model: interview.interview
   pk: 17
   fields:
-    name: "Teste_Termo autoriza\xE7\xE3o de uso de imagem"
-    version: '2.0'
-    date_available: 2020-03-11
-    description: teste
+    name: Autotest_Termo de confidencialidade - NDA
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O acordo estabelece um relacionamento de confidencialidade entre
+      as Partes com rela\xE7\xE3o \xE0s Informa\xE7\xF5es, sendo que a Parte Receptora
+      somente poder\xE1 se utilizar das Informa\xE7\xF5es para os fins do Projeto
+      Confidencial;"
     language: por
-    custom_file_name: termo-de-autorizacao-do-uso-de-imagem
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Atermo-de-autorizacao-do-uso-de-imagem.yml
-    is_generic: true
-    document_type: 5
-    tenants:
-    - 1
-- model: interview.interview
-  pk: 18
-  fields:
-    name: "Teste_Notifica\xE7\xE3o Extrajudicial"
-    version: '2.0'
-    date_available: 2020-03-11
-    description: teste
-    language: por
-    custom_file_name: notificacao_extrajudicial
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Anotificacao-extrajudicial.yml
-    is_generic: true
-    document_type: 8
-    tenants:
-    - 1
-- model: interview.interview
-  pk: 19
-  fields:
-    name: Teste_Termo de Confidencialidade NDA
-    version: '2.0'
-    date_available: 2020-03-09
-    description: teste
-    language: por
-    custom_file_name: termo-de-confidencialidade-nda
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Atermo-de-confidencialidade-nda.yml
+    custom_file_name: termo_de_confidencialidade_nda
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-confidencialidade-nda.yml
     is_generic: true
     document_type: 4
     tenants:
-    - 1
+    - 7
 - model: interview.interview
-  pk: 20
+  pk: 18
   fields:
-    name: "Teste_Contrato de presta\xE7\xE3o de servi\xE7os"
-    version: '2.0'
-    date_available: 2020-03-09
-    description: teste
+    name: "Autotest_Autoriza\xE7\xE3o de uso de imagem"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O termo autoriza o uso da imagem e/ou voz captadas em fotos e v\xEDdeos,
+      para utiliza\xE7\xE3o em campanhas institucionais ou publicit\xE1rias, materiais
+      impressos, audiovisuais e virtuais, incluindo m\xEDdias sociais e websites."
+    language: por
+    custom_file_name: termo_autorizaca_uso_imagem
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-autorizacao-do-uso-de-imagem.yml
+    is_generic: true
+    document_type: 5
+    tenants:
+    - 7
+- model: interview.interview
+  pk: 19
+  fields:
+    name: "Autotest_Contrato de presta\xE7\xE3o de servi\xE7os"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato tem por objeto estabelecer as condi\xE7\xF5es dos servi\xE7os
+      com ou sem cess\xE3o de m\xE3o de obra que ser\xE3o prestados pela contratada
+      \xE0 contrante."
     language: por
     custom_file_name: contrato_prestacao_servicos_com_sem_cessao_mao_obra
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
     is_generic: true
     document_type: 6
     tenants:
-    - 1
+    - 7
 - model: interview.interview
-  pk: 21
+  pk: 20
   fields:
-    name: "Teste_Contrato de loca\xE7\xE3o de im\xF3vel"
-    version: '2.0'
-    date_available: 2020-03-16
-    description: teste
+    name: "Autotest_Contrato de loca\xE7\xE3o de im\xF3vel"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Considerando o interesse da locat\xE1ria em alugar o im\xF3vel da
+      locadora, o presente contrato estabelece as condi\xE7\xF5es do aluguel do im\xF3vel
+      para fins n\xE3o comerciais."
     language: por
     custom_file_name: contrato_de_locacao_de_imovel
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-de-locacao-de-imovel.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-locacao-de-imovel.yml
     is_generic: true
     document_type: 7
     tenants:
-    - 1
+    - 7
+- model: interview.interview
+  pk: 21
+  fields:
+    name: "Autotest_Notifica\xE7\xE3o de cobran\xE7a"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Notifica\xE7\xE3o do n\xE3o pagamento da(s) parcela(s) discriminada(s)
+      e no contrato de presta\xE7\xE3o se servi\xE7os educacionais."
+    language: por
+    custom_file_name: notificacao_de_cobranca
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Anotificacao-extrajudicial.yml
+    is_generic: true
+    document_type: 8
+    tenants:
+    - 7
 - model: interview.interview
   pk: 22
   fields:
-    name: "Teste_Contrato de Cess\xE3o de Espa\xE7o"
-    version: '2.0'
-    date_available: 2020-03-17
-    description: teste
-    language: por
-    custom_file_name: contrato_de_cessao_de_espaco
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
-    is_generic: true
-    document_type: 10
-    tenants:
-    - 1
-- model: interview.interview
-  pk: 23
-  fields:
-    name: "Teste_Termo de confiss\xE3o de d\xEDvida"
-    version: '2.0'
-    date_available: 2020-03-17
-    description: teste
+    name: "Autotest_Termo de confiss\xE3o de d\xEDvida"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Considerando que existe uma situa\xE7\xE3o atual de inadimpl\xEAncia
+      contratual de ordem financeira da devedora junto \xE0 credora em rela\xE7\xE3o
+      ao contrato principal, a devedora, por meio deste, assume que tem obriga\xE7\xF5es
+      inadimplidas e que tem interesse de recompor seu d\xE9bito junto \xE0 credora."
     language: por
     custom_file_name: termo_de_confissao_de_divida
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Atermo-de-confissao-de-divida.yml
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Atermo-de-confissao-de-divida.yml
     is_generic: true
     document_type: 9
     tenants:
-    - 1
+    - 7
+- model: interview.interview
+  pk: 23
+  fields:
+    name: "Autotest_Contrato de cess\xE3o de espa\xE7o"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato regula a cess\xE3o de espa\xE7o localizado no estabelecimento
+      da cedente exclusivamente para a instala\xE7\xE3o e uso para fins comerciais."
+    language: por
+    custom_file_name: "contrato_de_cessao_de_espa\xE7o"
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
+    is_generic: true
+    document_type: 10
+    tenants:
+    - 7
 - model: interview.interview
   pk: 24
   fields:
-    name: Teste_Aditivo ao contrato de trabalho - banco de horas
-    version: '2.0'
-    date_available: 2020-03-18
-    description: teste
+    name: "Autotest_Contrato de diretor estatut\xE1rio"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato formaliza o relacionamento da Contratada como diretor(a)
+      da Contratante. A rela\xE7\xE3o decorrente do presente Contrato tem como base
+      a confian\xE7a m\xFAtua entre as partes. A Contratada dever\xE1 exercer os direitos
+      e obriga\xE7\xF5es e desempenhar com total compet\xEAncia atividades que a Contratante
+      lhe atribua, compreendidas nas suas fun\xE7\xF5es."
     language: por
-    custom_file_name: aditivo_contrato_trabalho_banco_horas
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3Aaditivo-contrato-trabalho-banco-horas.yml
+    custom_file_name: contrato_de_diretor_estatutario
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-diretor-estatutario.yml
     is_generic: true
-    document_type: 12
+    document_type: 11
     tenants:
-    - 1
-######## Autotest Interviews ########
+    - 7
 - model: interview.interview
   pk: 25
   fields:
+    name: Autotest_Aditivo ao contrato de trabalho - banco de horas
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "As partes convencionam que haver\xE1 sistema de compensa\xE7\xE3o
+      de horas extras eventualmente laboradas, pelo qual as horas extras efetivamente
+      realizadas pelo trabalhador durante o m\xEAs poder\xE3o ser compensadas em prazo
+      determinado."
+    language: por
+    custom_file_name: aditivo_contrato_trabalho_banco_horas
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Aaditivo-contrato-trabalho-banco-horas.yml
+    is_generic: true
+    document_type: 12
+    tenants:
+    - 7
+- model: interview.interview
+  pk: 26
+  fields:
+    name: "Autotest_Contrato de viagem de forma\xE7\xE3o pedag\xF3gica"
+    version: '1.1'
+    date_available: 2020-02-09
+    description: "Conhecendo escolas de outro pa\xEDs."
+    language: por
+    custom_file_name: contrato_viagem_formacao_pedagogica
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3A
+    is_generic: true
+    document_type: 13
+    tenants:
+    - 7
+- model: interview.interview
+  pk: 27
+  fields:
+    name: "Autotest_Contrato de comodato de im\xF3vel"
+    version: '1.1'
+    date_available: 2020-03-27
+    description: "Me empresta seu im\xF3vel sem cobrar nada?"
+    language: por
+    custom_file_name: contrato_comodato_imovel
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3A
+    is_generic: true
+    document_type: 14
+    tenants:
+    - 7
+########## Autotest teste.educalegal.com.br ##########
+- model: interview.interview
+  pk: 28
+  fields:
     name: Autotest_Contrato do aluno
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Contrato tem por objeto regular a presta\xE7\xE3o de servi\xE7os
+      educacionais em favor do(a) aluno(a) de acordo com o calend\xE1rio escolar e
+      planos de ensino."
     language: por
     custom_file_name: contrato_de_prestacao_de_servicos_educacionais
     base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-educacionais.yml
     is_generic: true
     document_type: 2
     tenants:
-    - 1
     - 7
 - model: interview.interview
-  pk: 26
+  pk: 29
   fields:
     name: Autotest_Contrato de consultoria
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato tem por objeto a presta\xE7\xE3o, por parte da contratada
+      \xE0 contratante, dos Servi\xE7os de assessoria e consultoria Para tanto, a
+      contratada obriga-se a fornecer m\xE3o de obra especializada e devidamente habilitada."
     language: por
     custom_file_name: contrato_prestacao_servicos_consultoria
     base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-consultoria.yml
     is_generic: true
     document_type: 3
     tenants:
-    - 1
-    - 7
-- model: interview.interview
-  pk: 27
-  fields:
-    name: "Autotest_Termo autoriza\xE7\xE3o de uso de imagem"
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
-    language: por
-    custom_file_name: termo-de-autorizacao-do-uso-de-imagem
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-autorizacao-do-uso-de-imagem.yml
-    is_generic: true
-    document_type: 5
-    tenants:
-    - 1
-    - 7
-- model: interview.interview
-  pk: 28
-  fields:
-    name: "Autotest_Notifica\xE7\xE3o Extrajudicial"
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
-    language: por
-    custom_file_name: notificacao_extrajudicial
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Anotificacao-extrajudicial.yml
-    is_generic: true
-    document_type: 8
-    tenants:
-    - 1
-    - 7
-- model: interview.interview
-  pk: 29
-  fields:
-    name: Autotest_Termo de Confidencialidade NDA
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
-    language: por
-    custom_file_name: termo-de-confidencialidade-nda
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-confidencialidade-nda.yml
-    is_generic: true
-    document_type: 4
-    tenants:
-    - 1
     - 7
 - model: interview.interview
   pk: 30
   fields:
+    name: Autotest_Termo de confidencialidade - NDA
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O acordo estabelece um relacionamento de confidencialidade entre
+      as Partes com rela\xE7\xE3o \xE0s Informa\xE7\xF5es, sendo que a Parte Receptora
+      somente poder\xE1 se utilizar das Informa\xE7\xF5es para os fins do Projeto
+      Confidencial;"
+    language: por
+    custom_file_name: termo_de_confidencialidade_nda
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-confidencialidade-nda.yml
+    is_generic: true
+    document_type: 4
+    tenants:
+    - 7
+- model: interview.interview
+  pk: 31
+  fields:
+    name: "Autotest_Autoriza\xE7\xE3o de uso de imagem"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O termo autoriza o uso da imagem e/ou voz captadas em fotos e v\xEDdeos,
+      para utiliza\xE7\xE3o em campanhas institucionais ou publicit\xE1rias, materiais
+      impressos, audiovisuais e virtuais, incluindo m\xEDdias sociais e websites."
+    language: por
+    custom_file_name: termo_autorizaca_uso_imagem
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-autorizacao-do-uso-de-imagem.yml
+    is_generic: true
+    document_type: 5
+    tenants:
+    - 7
+- model: interview.interview
+  pk: 32
+  fields:
     name: "Autotest_Contrato de presta\xE7\xE3o de servi\xE7os"
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato tem por objeto estabelecer as condi\xE7\xF5es dos servi\xE7os
+      com ou sem cess\xE3o de m\xE3o de obra que ser\xE3o prestados pela contratada
+      \xE0 contrante."
     language: por
     custom_file_name: contrato_prestacao_servicos_com_sem_cessao_mao_obra
     base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
     is_generic: true
     document_type: 6
     tenants:
-    - 1
     - 7
 - model: interview.interview
-  pk: 31
+  pk: 33
   fields:
     name: "Autotest_Contrato de loca\xE7\xE3o de im\xF3vel"
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Considerando o interesse da locat\xE1ria em alugar o im\xF3vel da
+      locadora, o presente contrato estabelece as condi\xE7\xF5es do aluguel do im\xF3vel
+      para fins n\xE3o comerciais."
     language: por
     custom_file_name: contrato_de_locacao_de_imovel
     base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-locacao-de-imovel.yml
     is_generic: true
     document_type: 7
     tenants:
-    - 1
     - 7
 - model: interview.interview
-  pk: 32
+  pk: 34
   fields:
-    name: "Autotest_Contrato de Cess\xE3o de Espa\xE7o"
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
+    name: "Autotest_Notifica\xE7\xE3o de cobran\xE7a"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Notifica\xE7\xE3o do n\xE3o pagamento da(s) parcela(s) discriminada(s)
+      e no contrato de presta\xE7\xE3o se servi\xE7os educacionais."
     language: por
-    custom_file_name: contrato_de_cessao_de_espaco
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
+    custom_file_name: notificacao_de_cobranca
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Anotificacao-extrajudicial.yml
     is_generic: true
-    document_type: 10
+    document_type: 8
     tenants:
-    - 1
     - 7
 - model: interview.interview
-  pk: 33
+  pk: 35
   fields:
     name: "Autotest_Termo de confiss\xE3o de d\xEDvida"
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "Considerando que existe uma situa\xE7\xE3o atual de inadimpl\xEAncia
+      contratual de ordem financeira da devedora junto \xE0 credora em rela\xE7\xE3o
+      ao contrato principal, a devedora, por meio deste, assume que tem obriga\xE7\xF5es
+      inadimplidas e que tem interesse de recompor seu d\xE9bito junto \xE0 credora."
     language: por
     custom_file_name: termo_de_confissao_de_divida
     base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-confissao-de-divida.yml
     is_generic: true
     document_type: 9
     tenants:
-    - 1
     - 7
 - model: interview.interview
-  pk: 34
+  pk: 36
+  fields:
+    name: "Autotest_Contrato de cess\xE3o de espa\xE7o"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato regula a cess\xE3o de espa\xE7o localizado no estabelecimento
+      da cedente exclusivamente para a instala\xE7\xE3o e uso para fins comerciais."
+    language: por
+    custom_file_name: "contrato_de_cessao_de_espa\xE7o"
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
+    is_generic: true
+    document_type: 10
+    tenants:
+    - 7
+- model: interview.interview
+  pk: 37
+  fields:
+    name: "Autotest_Contrato de diretor estatut\xE1rio"
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "O contrato formaliza o relacionamento da Contratada como diretor(a)
+      da Contratante. A rela\xE7\xE3o decorrente do presente Contrato tem como base
+      a confian\xE7a m\xFAtua entre as partes. A Contratada dever\xE1 exercer os direitos
+      e obriga\xE7\xF5es e desempenhar com total compet\xEAncia atividades que a Contratante
+      lhe atribua, compreendidas nas suas fun\xE7\xF5es."
+    language: por
+    custom_file_name: contrato_de_diretor_estatutario
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-diretor-estatutario.yml
+    is_generic: true
+    document_type: 11
+    tenants:
+    - 7
+- model: interview.interview
+  pk: 38
   fields:
     name: Autotest_Aditivo ao contrato de trabalho - banco de horas
-    version: 'autotest'
-    date_available: 2100-01-01
-    description: Autotest
+    version: '2.1'
+    date_available: 2020-03-27
+    description: "As partes convencionam que haver\xE1 sistema de compensa\xE7\xE3o
+      de horas extras eventualmente laboradas, pelo qual as horas extras efetivamente
+      realizadas pelo trabalhador durante o m\xEAs poder\xE3o ser compensadas em prazo
+      determinado."
     language: por
     custom_file_name: aditivo_contrato_trabalho_banco_horas
     base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Aaditivo-contrato-trabalho-banco-horas.yml
     is_generic: true
     document_type: 12
     tenants:
-    - 1
+    - 7
+- model: interview.interview
+  pk: 39
+  fields:
+    name: "Autotest_Contrato de viagem de forma\xE7\xE3o pedag\xF3gica"
+    version: '1.1'
+    date_available: 2020-02-09
+    description: "Conhecendo escolas de outro pa\xEDs."
+    language: por
+    custom_file_name: contrato_viagem_formacao_pedagogica
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3A
+    is_generic: true
+    document_type: 13
+    tenants:
+    - 7
+- model: interview.interview
+  pk: 40
+  fields:
+    name: "Autotest_Contrato de comodato de im\xF3vel"
+    version: '1.1'
+    date_available: 2020-03-27
+    description: "Me empresta seu im\xF3vel sem cobrar nada?"
+    language: por
+    custom_file_name: contrato_comodato_imovel
+    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3A
+    is_generic: true
+    document_type: 14
+    tenants:
     - 7
