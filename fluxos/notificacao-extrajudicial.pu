@@ -1,0 +1,10 @@
+@startuml
+start
+:Escola - E-mail do cadastro;
+note right: Signer
+:Notificado - E-mail do notificado preenchido na entrevista;
+note right: certifiedDeliveries
+:Financeiro Escola - E-mail do financeiro preenchido na entrevista;
+note right: carbonCopies
+stop
+@enduml
