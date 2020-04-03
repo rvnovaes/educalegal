@@ -42,16 +42,17 @@ def document_types(url, headers):
 
 
 if __name__ == '__main__':
-    url_create_document = 'http://localhost:8080/api/documents/'
-    headers = {'Authorization': "Token c05a8402be65112e0164a0bce95c62db62bf7e25"}
+    # url_create_document = 'http://localhost:8080/api/documents/'
+    url_create_document = 'https://ged-escolamais.educalegal.com.br/api/documents/'
+    headers = {'Authorization': "Token 886f0d850f2fe1f93b782c8ce2afedf4207a0474"}
     file = 'jupiter.jpg'
     document_type = 1
     label = 'jupiter'
     description = 'Juptiter Picture'
-    # document_create(url_create_document, headers, file, document_type, label=label, description=description)
+    response = document_create(url_create_document, headers, file, document_type, label=label, description=description)
 
-    url_document_types = 'http://localhost:8080/api/document_types/'
-    response = document_types(url_document_types, headers)
+    # url_document_types = 'http://localhost:8080/api/document_types/'
+    # response = document_types(url_document_types, headers)
     print(response)
 
 
