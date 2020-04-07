@@ -62,7 +62,7 @@ if __name__ == "__main__":
             api_key = "Ti33Sv5KMNQCV9MDlwxY4RnBIbUWnAVD"
         elif user == "4":
             # roberto
-            api_key = "CJrCAwt5Aul45RkOXeS2z9ZwISc6JkOf"
+            api_key = "0pwe5lfjST10DG2HsrpWUzFdedQ9zhwp"
 
     if destination == "2":
         # 2 - teste.educalegal.com.br - Development - Playground do seu usuário no servidor de teste
