@@ -10,6 +10,6 @@ if __name__ == "__main__":
 
     # se nao passar o parametro secret tem que colocar isso no yml da entrevista
     # mandatory: True
-    #   code: |
-    #     multi_user = True
+    # code: |
+    #   multi_user = True
     print(dac.interview_set_variables('docassemble.playground1Development:favorite.yml', {'favorite_animal': 'dog'}))

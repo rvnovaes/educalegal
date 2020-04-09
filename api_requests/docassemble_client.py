@@ -1,4 +1,5 @@
 import json
+import sys
 
 from requests import Session
 
@@ -38,9 +39,16 @@ class DocassembleClient:
 
         final_url = self.api_base_url + "/api/session/new"
         payload = {'i': interview_name}
-        response = self.session.get(final_url, params=payload).json()
-        session = response['session']
-        return session
+
+        try:
+            response = self.session.get(final_url, params=payload).json()
+            session = response['session']
+            return session
+        except Exception:
+            extype, ex, tb = sys.exc_info()
+            message = "Erro ao criar nova sessão. Response: {response}. Exception: {ex}".format(response=response,
+                                                                                                ex=ex.__str__())
+            raise Exception(message).with_traceback(ex.__traceback__)
 
     def interview_set_variables(self, interview_name, variables):
         """ Set variables in an interview
