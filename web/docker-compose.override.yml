@@ -16,16 +16,16 @@ services:
       - ged
   docassemble:
     container_name: docassemble
-    image: rvnovaes/docassemble:0.1
+    image: rvnovaes/docassemble:0.2
     environment:
       - DAPYTHONVERSION=3
     ports:
       - "80:80"
   ged:
     container_name: ged
-    image: mayanedms/mayanedms:3.3.13
-    environment:
-      MAYAN_CELERY_BROKER_URL: "redis://:mayanredispassword@redis:6379/0"
+    image: mayanedms/mayanedms:3.4.4
+    environment: &mayan_env
+      MAYAN_CELERY_BROKER_URL: amqp://mayan:mayanrabbitpass@rabbitmq:5672/mayan
       MAYAN_CELERY_RESULT_BACKEND: "redis://:mayanredispassword@redis:6379/0"
       MAYAN_DATABASES: "{'default':{'ENGINE':'django.db.backends.postgresql','NAME':'mayan','PASSWORD':'mayandbpass','USER':'mayan','HOST':'db_ged'}}"
     volumes:
@@ -49,6 +49,31 @@ services:
       - --requirepass mayanredispassword
     volumes:
       - /opt/educalegal/docker_volumes/redis:/data
+  rabbitmq:
+    container_name: rabbitmq
+    image: healthcheck/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: mayan
+      RABBITMQ_DEFAULT_PASS: mayanrabbitpass
+      RABBITMQ_DEFAULT_VHOST: mayan
+    restart: unless-stopped
+    volumes:
+      - /opt/educalegal/docker_volumes/rabbitmq:/var/lib/rabbitmq
+  celery_flower:
+    command:
+      - run_celery
+      - flower
+    depends_on:
+      - db_ged
+      - redis
+      - rabbitmq
+    environment:
+      <<: *mayan_env
+    image: mayanedms/mayanedms:3
+    ports:
+      - "5555:5555"
+    restart: unless-stopped
+
   db:
     container_name: db
     image: postgres:11-alpine
