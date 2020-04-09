@@ -73,7 +73,6 @@ services:
     ports:
       - "5555:5555"
     restart: unless-stopped
-
   db:
     container_name: db
     image: postgres:11-alpine

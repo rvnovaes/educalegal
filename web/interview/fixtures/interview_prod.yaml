@@ -265,7 +265,7 @@
 - model: interview.interview
   pk: 15
   fields:
-    name: AutotestProd_Contrato do aluno
+    name: Autotest_Contrato do aluno
     version: '2.1'
     date_available: 2020-03-27
     description: "Contrato tem por objeto regular a presta\xE7\xE3o de servi\xE7os
@@ -281,7 +281,7 @@
 - model: interview.interview
   pk: 16
   fields:
-    name: AutotestProd_Contrato de consultoria
+    name: Autotest_Contrato de consultoria
     version: '2.1'
     date_available: 2020-03-27
     description: "O contrato tem por objeto a presta\xE7\xE3o, por parte da contratada
@@ -297,7 +297,7 @@
 - model: interview.interview
   pk: 17
   fields:
-    name: AutotestProd_Termo de confidencialidade - NDA
+    name: Autotest_Termo de confidencialidade - NDA
     version: '2.1'
     date_available: 2020-03-27
     description: "O acordo estabelece um relacionamento de confidencialidade entre
@@ -314,7 +314,7 @@
 - model: interview.interview
   pk: 18
   fields:
-    name: "AutotestProd_Autoriza\xE7\xE3o de uso de imagem"
+    name: "Autotest_Autoriza\xE7\xE3o de uso de imagem"
     version: '2.1'
     date_available: 2020-03-27
     description: "O termo autoriza o uso da imagem e/ou voz captadas em fotos e v\xEDdeos,
@@ -330,7 +330,7 @@
 - model: interview.interview
   pk: 19
   fields:
-    name: "AutotestProd_Contrato de presta\xE7\xE3o de servi\xE7os"
+    name: "Autotest_Contrato de presta\xE7\xE3o de servi\xE7os"
     version: '2.1'
     date_available: 2020-03-27
     description: "O contrato tem por objeto estabelecer as condi\xE7\xF5es dos servi\xE7os
@@ -346,7 +346,7 @@
 - model: interview.interview
   pk: 20
   fields:
-    name: "AutotestProd_Contrato de loca\xE7\xE3o de im\xF3vel"
+    name: "Autotest_Contrato de loca\xE7\xE3o de im\xF3vel"
     version: '2.1'
     date_available: 2020-03-27
     description: "Considerando o interesse da locat\xE1ria em alugar o im\xF3vel da
@@ -362,7 +362,7 @@
 - model: interview.interview
   pk: 21
   fields:
-    name: "AutotestProd_Notifica\xE7\xE3o de cobran\xE7a"
+    name: "Autotest_Notifica\xE7\xE3o de cobran\xE7a"
     version: '2.1'
     date_available: 2020-03-27
     description: "Notifica\xE7\xE3o do n\xE3o pagamento da(s) parcela(s) discriminada(s)
@@ -377,7 +377,7 @@
 - model: interview.interview
   pk: 22
   fields:
-    name: "AutotestProd_Termo de confiss\xE3o de d\xEDvida"
+    name: "Autotest_Termo de confiss\xE3o de d\xEDvida"
     version: '2.1'
     date_available: 2020-03-27
     description: "Considerando que existe uma situa\xE7\xE3o atual de inadimpl\xEAncia
@@ -394,7 +394,7 @@
 - model: interview.interview
   pk: 23
   fields:
-    name: "AutotestProd_Contrato de cess\xE3o de espa\xE7o"
+    name: "Autotest_Contrato de cess\xE3o de espa\xE7o"
     version: '2.1'
     date_available: 2020-03-27
     description: "O contrato regula a cess\xE3o de espa\xE7o localizado no estabelecimento
@@ -409,7 +409,7 @@
 - model: interview.interview
   pk: 24
   fields:
-    name: "AutotestProd_Contrato de diretor estatut\xE1rio"
+    name: "Autotest_Contrato de diretor estatut\xE1rio"
     version: '2.1'
     date_available: 2020-03-27
     description: "O contrato formaliza o relacionamento da Contratada como diretor(a)
@@ -427,7 +427,7 @@
 - model: interview.interview
   pk: 25
   fields:
-    name: AutotestProd_Aditivo ao contrato de trabalho - banco de horas
+    name: Autotest_Aditivo ao contrato de trabalho - banco de horas
     version: '2.1'
     date_available: 2020-03-27
     description: "As partes convencionam que haver\xE1 sistema de compensa\xE7\xE3o
@@ -444,7 +444,7 @@
 - model: interview.interview
   pk: 26
   fields:
-    name: "AutotestProd_Contrato de viagem de forma\xE7\xE3o pedag\xF3gica"
+    name: "Autotest_Contrato de viagem de forma\xE7\xE3o pedag\xF3gica"
     version: '1.1'
     date_available: 2020-02-09
     description: "Conhecendo escolas de outro pa\xEDs."
@@ -458,221 +458,13 @@
 - model: interview.interview
   pk: 27
   fields:
-    name: "AutotestProd_Contrato de comodato de im\xF3vel"
-    version: '1.1'
-    date_available: 2020-03-27
-    description: "Me empresta seu im\xF3vel sem cobrar nada?"
-    language: por
-    custom_file_name: contrato_comodato_imovel
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3A
-    is_generic: true
-    document_type: 14
-    tenants:
-    - 7
-########## Autotest teste.educalegal.com.br ##########
-- model: interview.interview
-  pk: 28
-  fields:
-    name: Autotest_Contrato do aluno
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "Contrato tem por objeto regular a presta\xE7\xE3o de servi\xE7os
-      educacionais em favor do(a) aluno(a) de acordo com o calend\xE1rio escolar e
-      planos de ensino."
-    language: por
-    custom_file_name: contrato_de_prestacao_de_servicos_educacionais
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-educacionais.yml
-    is_generic: true
-    document_type: 2
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 29
-  fields:
-    name: Autotest_Contrato de consultoria
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "O contrato tem por objeto a presta\xE7\xE3o, por parte da contratada
-      \xE0 contratante, dos Servi\xE7os de assessoria e consultoria Para tanto, a
-      contratada obriga-se a fornecer m\xE3o de obra especializada e devidamente habilitada."
-    language: por
-    custom_file_name: contrato_prestacao_servicos_consultoria
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-consultoria.yml
-    is_generic: true
-    document_type: 3
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 30
-  fields:
-    name: Autotest_Termo de confidencialidade - NDA
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "O acordo estabelece um relacionamento de confidencialidade entre
-      as Partes com rela\xE7\xE3o \xE0s Informa\xE7\xF5es, sendo que a Parte Receptora
-      somente poder\xE1 se utilizar das Informa\xE7\xF5es para os fins do Projeto
-      Confidencial;"
-    language: por
-    custom_file_name: termo_de_confidencialidade_nda
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-confidencialidade-nda.yml
-    is_generic: true
-    document_type: 4
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 31
-  fields:
-    name: "Autotest_Autoriza\xE7\xE3o de uso de imagem"
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "O termo autoriza o uso da imagem e/ou voz captadas em fotos e v\xEDdeos,
-      para utiliza\xE7\xE3o em campanhas institucionais ou publicit\xE1rias, materiais
-      impressos, audiovisuais e virtuais, incluindo m\xEDdias sociais e websites."
-    language: por
-    custom_file_name: termo_autorizaca_uso_imagem
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-autorizacao-do-uso-de-imagem.yml
-    is_generic: true
-    document_type: 5
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 32
-  fields:
-    name: "Autotest_Contrato de presta\xE7\xE3o de servi\xE7os"
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "O contrato tem por objeto estabelecer as condi\xE7\xF5es dos servi\xE7os
-      com ou sem cess\xE3o de m\xE3o de obra que ser\xE3o prestados pela contratada
-      \xE0 contrante."
-    language: por
-    custom_file_name: contrato_prestacao_servicos_com_sem_cessao_mao_obra
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
-    is_generic: true
-    document_type: 6
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 33
-  fields:
-    name: "Autotest_Contrato de loca\xE7\xE3o de im\xF3vel"
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "Considerando o interesse da locat\xE1ria em alugar o im\xF3vel da
-      locadora, o presente contrato estabelece as condi\xE7\xF5es do aluguel do im\xF3vel
-      para fins n\xE3o comerciais."
-    language: por
-    custom_file_name: contrato_de_locacao_de_imovel
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-locacao-de-imovel.yml
-    is_generic: true
-    document_type: 7
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 34
-  fields:
-    name: "Autotest_Notifica\xE7\xE3o de cobran\xE7a"
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "Notifica\xE7\xE3o do n\xE3o pagamento da(s) parcela(s) discriminada(s)
-      e no contrato de presta\xE7\xE3o se servi\xE7os educacionais."
-    language: por
-    custom_file_name: notificacao_de_cobranca
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Anotificacao-extrajudicial.yml
-    is_generic: true
-    document_type: 8
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 35
-  fields:
-    name: "Autotest_Termo de confiss\xE3o de d\xEDvida"
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "Considerando que existe uma situa\xE7\xE3o atual de inadimpl\xEAncia
-      contratual de ordem financeira da devedora junto \xE0 credora em rela\xE7\xE3o
-      ao contrato principal, a devedora, por meio deste, assume que tem obriga\xE7\xF5es
-      inadimplidas e que tem interesse de recompor seu d\xE9bito junto \xE0 credora."
-    language: por
-    custom_file_name: termo_de_confissao_de_divida
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-confissao-de-divida.yml
-    is_generic: true
-    document_type: 9
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 36
-  fields:
-    name: "Autotest_Contrato de cess\xE3o de espa\xE7o"
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "O contrato regula a cess\xE3o de espa\xE7o localizado no estabelecimento
-      da cedente exclusivamente para a instala\xE7\xE3o e uso para fins comerciais."
-    language: por
-    custom_file_name: "contrato_de_cessao_de_espa\xE7o"
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
-    is_generic: true
-    document_type: 10
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 37
-  fields:
-    name: "Autotest_Contrato de diretor estatut\xE1rio"
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "O contrato formaliza o relacionamento da Contratada como diretor(a)
-      da Contratante. A rela\xE7\xE3o decorrente do presente Contrato tem como base
-      a confian\xE7a m\xFAtua entre as partes. A Contratada dever\xE1 exercer os direitos
-      e obriga\xE7\xF5es e desempenhar com total compet\xEAncia atividades que a Contratante
-      lhe atribua, compreendidas nas suas fun\xE7\xF5es."
-    language: por
-    custom_file_name: contrato_de_diretor_estatutario
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-diretor-estatutario.yml
-    is_generic: true
-    document_type: 11
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 38
-  fields:
-    name: Autotest_Aditivo ao contrato de trabalho - banco de horas
-    version: '2.1'
-    date_available: 2020-03-27
-    description: "As partes convencionam que haver\xE1 sistema de compensa\xE7\xE3o
-      de horas extras eventualmente laboradas, pelo qual as horas extras efetivamente
-      realizadas pelo trabalhador durante o m\xEAs poder\xE3o ser compensadas em prazo
-      determinado."
-    language: por
-    custom_file_name: aditivo_contrato_trabalho_banco_horas
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Aaditivo-contrato-trabalho-banco-horas.yml
-    is_generic: true
-    document_type: 12
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 39
-  fields:
-    name: "Autotest_Contrato de viagem de forma\xE7\xE3o pedag\xF3gica"
-    version: '1.1'
-    date_available: 2020-02-09
-    description: "Conhecendo escolas de outro pa\xEDs."
-    language: por
-    custom_file_name: contrato_viagem_formacao_pedagogica
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3A
-    is_generic: true
-    document_type: 13
-    tenants:
-    - 7
-- model: interview.interview
-  pk: 40
-  fields:
     name: "Autotest_Contrato de comodato de im\xF3vel"
     version: '1.1'
     date_available: 2020-03-27
     description: "Me empresta seu im\xF3vel sem cobrar nada?"
     language: por
     custom_file_name: contrato_comodato_imovel
-    base_url: https://teste.educalegal.com.br/interview?i=docassemble.playground1Development%3A
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3A
     is_generic: true
     document_type: 14
     tenants:
