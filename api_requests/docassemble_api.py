@@ -26,10 +26,9 @@ if __name__ == "__main__":
         """
         Para onde você deseja enviar?:
             1 - localhost - Development - Seu próprio playground na máquina local
-            2 - teste.educalegal.com.br - Development - Playground do seu usuário no servidor de teste
-            3 - teste.educalegal.com.br - Autotest - Playground do admin@admin.com
-            4 - docs.educalegal.com.br  - Autotest - Playground do admin@admin.com
-            5 - docs.educalegal.com.br  - Production - Playground do admin@admin.com
+            2 - docs.educalegal.com.br - Development - Playground do seu usuário no servidor produção            
+            3 - docs.educalegal.com.br  - Autotest - Playground do admin@admin.com
+            4 - docs.educalegal.com.br  - Production - Playground do admin@admin.com
     """
     )
 
@@ -53,7 +52,7 @@ if __name__ == "__main__":
         """)
         if user == "1":
             # iasmini
-            api_key = "NzTNZeZr7UsyLIj1XtYAz0NfiZO3rtoD"
+            api_key = "u0AFroAWHD1XF5hQSv0qdzKEaifI7imK"
         elif user == "2":
             # isabela
             api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"
@@ -65,12 +64,12 @@ if __name__ == "__main__":
             api_key = "0pwe5lfjST10DG2HsrpWUzFdedQ9zhwp"
 
     if destination == "2":
-        # 2 - teste.educalegal.com.br - Development - Playground do seu usuário no servidor de teste
-        server_url = "https://teste.educalegal.com.br/api/playground"
+        # 2 - docs.educalegal.com.br - Development - Playground do seu usuário no servidor produção
+        server_url = "https://docs.educalegal.com.br/api/playground"
         project = "Development"
         print(
             """
-        Você optou por enviar para seu próprio playground no ambiente de teste.
+        Você optou por enviar para seu próprio playground no ambiente de produção.
         """
         )
         user = input(
@@ -84,32 +83,26 @@ if __name__ == "__main__":
         if user == "1":
             # iasmini
             user_id = 4
-            api_key = "RjjFEJSMzS8XexNAy5qCgci40KUs5AHA"
+            api_key = "OkHYL2fYJApLfjwTeM2gRUZfybEzbqy5"
         elif user == "2":
             # isabela
             user_id = 9
-            api_key = "ZG8HISzu3ki9LnVruVK7ihXtPrVxmkoB"
+            api_key = "wlbF8RfxKD2uP9ysiUxlKvSIUeIfKxDA"
         elif user == "3":
             # luis paim
             user_id = 5
-            api_key = "KSgYY16NeSWWtdgjhBPFdfuXBVEfyome"
+            api_key = "AeJ34g4IlBQepoCW3wvmp570m3yrjwfl"
         elif user == "4":
             # roberto
             user_id = 14
-            api_key = "MNBexgT3cCDvmqXeKtUpp5YHMwfXWZxZ"
+            api_key = "k99JrqjxoTTeH3o7tiVhaHVX2CiKaLoC"
     if destination == "3":
-        # teste.educalegal.com.br - Autotest - Playground do admin@admin.com
-        server_url = "https://teste.educalegal.com.br/api/playground"
-        project = "Autotest"
-        user_id = 1
-        api_key = "O2wG8BRr70yZnanUJmysCNLQ2nWG44cL"
-    if destination == "4":
         # docs.educalegal.com.br - Autotest - Playground do admin@admin.com
         server_url = "https://docs.educalegal.com.br/api/playground"
         project = "Autotest"
         user_id = 1
         api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
-    if destination == "5":
+    if destination == "4":
         # docs.educalegal.com.br - Production - Playground do admin@admin.com
         server_url = "https://docs.educalegal.com.br/api/playground"
         project = "Production"
@@ -130,4 +123,4 @@ if __name__ == "__main__":
 
     post_to_docassemble(api_key, server_url, brcomeducalegal_questions, "questions", user_id, project)
     post_to_docassemble(api_key, server_url, brcomeducalegal_templates, "templates", user_id, project)
-    post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", user_id, project)
+    # post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", user_id, project)
