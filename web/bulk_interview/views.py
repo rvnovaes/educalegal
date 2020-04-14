@@ -9,7 +9,7 @@ key = "u0AFroAWHD1XF5hQSv0qdzKEaifI7imK"
 # filename = "favorite.csv"
 # interview_name = 'docassemble.playground1Development:favorite.yml'
 
-filename = "/home/iasmini/Área de Trabalho/contrato-prestacao-servicos-educacionais.csv"
+filename = "contrato-prestacao-servicos-educacionais.csv"
 interview_name = 'docassemble.playground1Development:contrato-prestacao-servicos-educacionais.yml'
 
 # https://pandas.pydata.org/pandas-docs/stable/user_guide/io.html?highlight=orient
