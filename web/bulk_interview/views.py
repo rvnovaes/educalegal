@@ -4,12 +4,15 @@ from docassemble_client import DocassembleClient
 
 
 ###### LOCALHOST ######
-api_base_url = "http://localhost"
-key = "u0AFroAWHD1XF5hQSv0qdzKEaifI7imK"
+# api_base_url = "http://localhost"
+# key = "u0AFroAWHD1XF5hQSv0qdzKEaifI7imK"
+###### docs.educalegal ######
+key = api_base_url = "https://docs.educalegal.com.br"
+'OkHYL2fYJApLfjwTeM2gRUZfybEzbqy5'
 # filename = "favorite.csv"
 # interview_name = 'docassemble.playground1Development:favorite.yml'
 
-filename = "/home/iasmini/Área de Trabalho/contrato-prestacao-servicos-educacionais.csv"
+filename = "contrato-prestacao-servicos-educacionais.csv"
 interview_name = 'docassemble.playground1Development:contrato-prestacao-servicos-educacionais.yml'
 
 # https://pandas.pydata.org/pandas-docs/stable/user_guide/io.html?highlight=orient

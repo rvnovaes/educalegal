@@ -56,6 +56,10 @@ class DocassembleClient:
         """
         session = self.session_read(interview_name)
 
+        # TODO iasmini - obter e passar os parametros
+        url_args = {'tid': '2', 'ut': '75ac0e9e0f7830683ab9e21161603261beac7a18', 'intid': '2'}
+        variables['url_args'] = url_args
+
         final_url = self.api_base_url + "/api/session"
         data = {'i': interview_name, 'session': session, 'variables': json.dumps(variables)}
         response = self.session.post(final_url, data=data)
