@@ -236,7 +236,7 @@ def docusign_webhook_listener(request):
         "delivered": "entregue",
         "completed": "completado",
         "declined": "recusado",
-        "voided": "violado",
+        "voided": "inválido",
     }
     if envelope_status in envelope_statuses.keys():
         document.status = envelope_statuses[envelope_status]

@@ -29,3 +29,5 @@ django-bootstrap4~=1.1.1
 django-debug-toolbar~=2.2
 # API Debugging
 django-silk~=4.0.1
+# Read csv, excel
+pandas~=1.0.3
