@@ -4,8 +4,11 @@ from docassemble_client import DocassembleClient
 
 
 ###### LOCALHOST ######
-api_base_url = "http://localhost"
-key = "u0AFroAWHD1XF5hQSv0qdzKEaifI7imK"
+# api_base_url = "http://localhost"
+# key = "u0AFroAWHD1XF5hQSv0qdzKEaifI7imK"
+###### docs.educalegal ######
+key = api_base_url = "https://docs.educalegal.com.br"
+'OkHYL2fYJApLfjwTeM2gRUZfybEzbqy5'
 # filename = "favorite.csv"
 # interview_name = 'docassemble.playground1Development:favorite.yml'
 
