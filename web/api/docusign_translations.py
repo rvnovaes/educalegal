@@ -7,24 +7,24 @@ envelope_statuses = {
 }
 
 recipient_statuses_dict = {
-    "Created": "criado",
-    "Sent": "enviado",
-    "Delivered": "entregue",
-    "Signed": "assinado",
-    "Declined": "recusado",
-    "Completed": "completado",
-    "Faxpending": "anexo de fax pendente",
-    "Autoresponded": "respondido automaticamente",
+    "created": "criado",
+    "sent": "enviado",
+    "delivered": "entregue",
+    "signed": "assinado",
+    "declined": "recusado",
+    "completed": "completado",
+    "faxpending": "anexo de fax pendente",
+    "autoresponded": "respondido automaticamente",
 }
 
 recipient_types_dict = {
-    "Agent": "agente",
-    "CarbonCopie": "em cópia",
-    "CertifiedDeliverie": "certificante",
-    "Editor": "editor",
-    "InPersonSigner": "destinatário pessoal",
-    "Intermediarie": "intermediário",
-    "Seal": "selo",
-    "Signer": "assinante",
-    "Witness": "testemunha",
+    "agent": "agente",
+    "carboncopy": "em cópia",
+    "certifieddelivery": "entrega certificada",
+    "editor": "editor",
+    "inpersonsigner": "assinatura presencial",
+    "intermediary": "intermediário",
+    "seal": "selo",
+    "signer": "signatário",
+    "witness": "testemunha",
 }

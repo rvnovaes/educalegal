@@ -80,7 +80,7 @@ def docusign_xml_parser(data):
     #converting US dates to Brazil dates
     envelope_data['envelope_created'] = str(dt.strptime(envelope_data['envelope_created'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S'))
     envelope_data['envelope_sent'] = str(dt.strptime(envelope_data['envelope_sent'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S'))
-    envelope_data['envelope_time_generated'] = str(dt.strptime(envelope_data['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S')
+    envelope_data['envelope_time_generated'] = str(dt.strptime(envelope_data['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S'))
 
     e_status_detail = (
         "Envelope ID: "
@@ -107,11 +107,9 @@ def docusign_xml_parser(data):
         recipient_status['Type'] = recipient_status['Type'].lower()
         if recipient_status['Type'] in recipient_types_dict.keys():
             recipient_status['Type'] = recipient_types_dict[recipient_status['Type']]
-            print(recipient_status['Type'])
         recipient_status['Status'] = recipient_status['Status'].lower()
         if recipient_status['Status'] in recipient_statuses_dict.keys():
             recipient_status['Status'] = recipient_statuses_dict[recipient_status['Status']]
-            print(recipient_status['Status'])
 
     r_status_detail = ""
     for r in recipient_statuses:
