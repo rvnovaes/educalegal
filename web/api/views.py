@@ -5,6 +5,7 @@ import xmltodict
 from requests import Session
 from retry_requests import retry
 import logging
+from datetime import datetime as dt
 
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
@@ -28,6 +29,7 @@ from .serializers import (
     TenantGedDataSerializer,
     TenantESignatureDataSerializer,
 )
+from .docusign_translations import envelope_statuses, recipient_statuses_dict, recipient_types_dict
 
 logger = logging.getLogger(__name__)
 
@@ -70,25 +72,44 @@ def docusign_xml_parser(data):
     envelope_data["envelope_sent"] = xml["EnvelopeStatus"]["Sent"]
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
 
+    #formatting strings: 2020-04-15T11:20:19.693
+    envelope_data['envelope_created'] = envelope_data['envelope_created'].replace("T", " ").split(".")[0]
+    envelope_data['envelope_sent'] = envelope_data['envelope_sent'].replace("T", " ").split(".")[0]
+    envelope_data['envelope_time_generated'] = envelope_data['envelope_time_generated'].replace("T", " ").split(".")[0]
+
+    #converting US dates to Brazil dates
+    envelope_data['envelope_created'] = str(dt.strptime(envelope_data['envelope_created'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S'))
+    envelope_data['envelope_sent'] = str(dt.strptime(envelope_data['envelope_sent'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S'))
+    envelope_data['envelope_time_generated'] = str(dt.strptime(envelope_data['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S'))
+
     e_status_detail = (
         "Envelope ID: "
         + envelope_data["envelope_id"]
         + "<br>"
-        + "Envelope Status: "
+        + "Status do envelope: "
         + envelope_data["envelope_status"]
         + "<br>"
-        + "Envelope Created: "
+        + "Data de criação: "
         + envelope_data["envelope_created"]
         + "<br>"
-        + "Envelope Sent: "
+        + "Data de envio: "
         + envelope_data["envelope_sent"]
         + "<br>"
-        + "Time Generated: "
+        + "Criação do envelope: "
         + envelope_data["envelope_time_generated"]
         + "<br>"
     )
     envelope_data["envelope_status_detail_message"] = e_status_detail
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
+
+    # translation of the type and status of the recipient
+    for recipient_status in recipient_statuses:
+        recipient_status['Type'] = recipient_status['Type'].lower()
+        if recipient_status['Type'] in recipient_types_dict.keys():
+            recipient_status['Type'] = recipient_types_dict[recipient_status['Type']]
+        recipient_status['Status'] = recipient_status['Status'].lower()
+        if recipient_status['Status'] in recipient_statuses_dict.keys():
+            recipient_status['Status'] = recipient_statuses_dict[recipient_status['Status']]
 
     r_status_detail = ""
     for r in recipient_statuses:
@@ -115,7 +136,6 @@ def docusign_xml_parser(data):
     )
     envelope_data["envelope_all_details_message"] = all_details
     return envelope_data
-
 
 def docusign_pdf_files_saver(data, envelope_dir):
     pdf_documents = list()
@@ -230,14 +250,6 @@ def docusign_webhook_listener(request):
             logger.exception(msg)
             return HttpResponse(msg)
 
-    # Updates Document Status
-    envelope_statuses = {
-        "sent": "enviado",
-        "delivered": "entregue",
-        "completed": "completado",
-        "declined": "recusado",
-        "voided": "inválido",
-    }
     if envelope_status in envelope_statuses.keys():
         document.status = envelope_statuses[envelope_status]
     else:
