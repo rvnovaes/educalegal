@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.postgres.fields import JSONField
+
 from tenant.models import TenantAwareModel
 from interview.models import Interview
 from school.models import School
@@ -38,6 +40,7 @@ class Document(TenantAwareModel):
         blank=True,
         related_name="documents",
     )
+    document_data = JSONField(null=True, verbose_name="Dados do Documento")
 
     def __str__(self):
         return self.name + " - " + self.school.name

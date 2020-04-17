@@ -4,6 +4,9 @@
 {% block body_block %}
   <div class="container">
       <img class="mx-auto d-block" src="{% static 'tenant/educa-legal-logo.png' %}" alt="Educa Legal Logo">
+        <p class="text-right">
+            <a href="{% url 'account_signup' %}">Não possui conta? Crie aqui!</a>
+        </p>
         <form method="post">{% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-success">Entrar</button>

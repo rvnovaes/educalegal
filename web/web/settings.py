@@ -157,7 +157,7 @@ else:
             "USER": "educalegal",
             "PASSWORD": "educalegal",
             "HOST": "localhost",
-            "PORT": 5432,
+            "PORT": 7654,
         }
     }
 
@@ -178,7 +178,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "pt-br"
 
 TIME_ZONE = "America/Sao_Paulo"
 
@@ -238,12 +238,20 @@ SITE_ID = 1
 
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_UNIQUE_EMAIL = True
+# The issue is that django-allauth ’s ACCOUNT_LOGOUT_REDIRECT actually overrides the
+# built-in LOGOUT_REDIRECT_URL , however, since they both point to the homepage this
+# change may not be apparent. To future-proof our application since maybe we don’t
+# want to always redirect to the homepage on logout, we should be explicit here with
+# the logout redirect.
 LOGIN_REDIRECT_URL = "interview:interview-list"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+
+
+ACCOUNT_SESSION_REMEMBER = True
 
 # API Settings
 
