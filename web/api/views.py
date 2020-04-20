@@ -84,7 +84,7 @@ def docusign_xml_parser(data):
 
     # translated the envelope status
     envelope_data_translated = envelope_data
-    envelope_data_translated["envelope_status"] = envelope_data_translated["envelope_status"].lower()
+    envelope_data_translated["envelope_status"] = str(envelope_data_translated["envelope_status"]).lower()
     if envelope_data_translated["envelope_status"] in envelope_statuses.keys():
         envelope_data_translated["envelope_status"] = envelope_statuses[envelope_data_translated["envelope_status"]]
     else:
@@ -112,12 +112,12 @@ def docusign_xml_parser(data):
 
     # translation of the type and status of the recipient
     for recipient_status in recipient_statuses:
-        recipient_status['Type'] = recipient_status['Type'].lower()
+        recipient_status['Type'] = str(recipient_status['Type']).lower()
         if recipient_status['Type'] in recipient_types_dict.keys():
             recipient_status['Type'] = recipient_types_dict[recipient_status['Type']]
         else:
             recipient_status['Type'] = 'não encontrado'
-        recipient_status['Status'] = recipient_status['Status'].lower()
+        recipient_status['Status'] = str(recipient_status['Status']).lower()
         if recipient_status['Status'] in recipient_statuses_dict.keys():
             recipient_status['Status'] = recipient_statuses_dict[recipient_status['Status']]
         else:
@@ -227,7 +227,7 @@ def docusign_webhook_listener(request):
         return HttpResponse(msg)
 
     document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
-    envelope_status = envelope_data["envelope_status"].lower()
+    envelope_status = str(envelope_data["envelope_status"]).lower()
 
     # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
     if envelope_status == "completed":
