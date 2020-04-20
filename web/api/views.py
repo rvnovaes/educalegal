@@ -73,21 +73,27 @@ def docusign_xml_parser(data):
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
 
     #formatting strings: 2020-04-15T11:20:19.693
-    envelope_data['envelope_created'] = envelope_data['envelope_created'].replace("T", " ").split(".")[0]
-    envelope_data['envelope_sent'] = envelope_data['envelope_sent'].replace("T", " ").split(".")[0]
-    envelope_data['envelope_time_generated'] = envelope_data['envelope_time_generated'].replace("T", " ").split(".")[0]
+    envelope_data['envelope_created'] = envelope_data['envelope_created'].replace("T", " ").split(".")[0].replace("-", "/")
+    envelope_data['envelope_sent'] = envelope_data['envelope_sent'].replace("T", " ").split(".")[0].replace("-", "/")
+    envelope_data['envelope_time_generated'] = envelope_data['envelope_time_generated'].replace("T", " ").split(".")[0].replace("-", "/")
 
     #converting US dates to Brazil dates
-    envelope_data['envelope_created'] = str(dt.strptime(envelope_data['envelope_created'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S'))
-    envelope_data['envelope_sent'] = str(dt.strptime(envelope_data['envelope_sent'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S'))
-    envelope_data['envelope_time_generated'] = str(dt.strptime(envelope_data['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S'))
+    envelope_data['envelope_created'] = str(dt.strptime(envelope_data['envelope_created'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S')).replace("-", "/")
+    envelope_data['envelope_sent'] = str(dt.strptime(envelope_data['envelope_sent'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S')).replace("-", "/")
+    envelope_data['envelope_time_generated'] = str(dt.strptime(envelope_data['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S')).replace("-", "/")
+
+    # translated the envelope status
+    envelope_data_translated = envelope_data
+    envelope_data_translated["envelope_status"] = envelope_data_translated["envelope_status"].lower()
+    if envelope_data_translated["envelope_status"] in envelope_statuses.keys():
+        envelope_data_translated["envelope_status"] = envelope_statuses[envelope_data_translated["envelope_status"]]
 
     e_status_detail = (
         "Envelope ID: "
         + envelope_data["envelope_id"]
         + "<br>"
         + "Status do envelope: "
-        + envelope_data["envelope_status"]
+        + envelope_data_translated["envelope_status"]
         + "<br>"
         + "Data de criação: "
         + envelope_data["envelope_created"]

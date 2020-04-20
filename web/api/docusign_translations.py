@@ -1,7 +1,7 @@
 envelope_statuses = {
     "sent": "enviado",
     "delivered": "entregue",
-    "completed": "completado",
+    "completed": "finalizado",
     "declined": "recusado",
     "voided": "inválido",
 }
@@ -12,7 +12,7 @@ recipient_statuses_dict = {
     "delivered": "entregue",
     "signed": "assinado",
     "declined": "recusado",
-    "completed": "completado",
+    "completed": "finalizado",
     "faxpending": "anexo de fax pendente",
     "autoresponded": "respondido automaticamente",
 }
