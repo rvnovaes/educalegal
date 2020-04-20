@@ -35,7 +35,7 @@ def docusign_xml_parser(data):
     envelope_data['envelope_time_generated'] = str(dt.strptime(envelope_data['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
 
     # translated the envelope status
-    envelope_data_translated = envelope_data
+    envelope_data_translated = envelope_data.copy()
     envelope_data_translated["envelope_status"] = str(envelope_data_translated["envelope_status"]).lower()
     if envelope_data_translated["envelope_status"] in envelope_statuses.keys():
         envelope_data_translated["envelope_status"] = envelope_statuses[envelope_data_translated["envelope_status"]]
