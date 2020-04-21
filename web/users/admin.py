@@ -14,27 +14,18 @@ class CustomUserAdmin(UserAdmin):
         "is_staff",
         "is_active",
         "is_superuser",
-        "is_analyst",
-        "is_manager",
-        "is_administrator",
     )
     list_display_links = ("username",)
     list_editable = (
         "is_staff",
         "is_active",
         "is_superuser",
-        "is_analyst",
-        "is_manager",
-        "is_administrator",
     )
     list_filter = (
         "tenant",
         "is_staff",
         "is_active",
         "is_superuser",
-        "is_analyst",
-        "is_manager",
-        "is_administrator",
     )
 
     fieldsets = (
@@ -47,9 +38,6 @@ class CustomUserAdmin(UserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
-                    "is_analyst",
-                    "is_manager",
-                    "is_administrator",
                     "groups",
                     "user_permissions",
                 ),

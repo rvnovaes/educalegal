@@ -1,10 +1,12 @@
 {% load static %}
+{% load user_groups %}
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <title>Educa Legal</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="shortcut icon" href="{% static 'tenant/favicon.ico' %}" />
     <style type="text/css">
         body{
             margin-bottom: 2rem;
@@ -14,15 +16,6 @@
         }
         .btn {
             margin-left: 0.2rem;
-        }
-        .card {
-            margin-bottom: 1rem;
-        }
-        .card-header{
-            min-height: 3rem;
-        }
-        .card-body{
-            min-height: 8rem;
         }
         .docassemble-line-height{
             line-height: 1.2 !important;
@@ -38,8 +31,10 @@
           <div class="collapse navbar-collapse">
             <ul class="navbar-nav mr-auto">
               <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}">Modelos</a></li>
+              {% if request.user|has_group:"Customers" %}
               <li class="nav-item"><a class="nav-link text-white" href="{% url 'document:document-list' %}">Documentos</a></li>
               <li class="nav-item"><a class="nav-link text-white" href="{% url 'school:school-list' %}">Escolas</a></li>
+              {% endif %}
               <li class="nav-item"><a class="nav-link text-white" href="{{ user.tenant.tenantgeddata.url }}" target="_blank">{% if user.tenant.tenantgeddata.url %} GED {% endif %}</a></li>
               <li class="nav-item"><a class="nav-link text-white" href="https://atendimento.atlassian.net/servicedesk/customer/portal/2" target="_blank">Portal do Cliente</a></li>
             </ul>

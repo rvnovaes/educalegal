@@ -23,7 +23,8 @@ class Interview(models.Model):
     )
     base_url = models.URLField(max_length=512, verbose_name="URL Base")
     is_generic = models.BooleanField(default=True, verbose_name="É Genérica?")
-    tenants = models.ManyToManyField(Tenant, related_name="tenants")
+    is_freemium = models.BooleanField(default=False, verbose_name="É Freemium?")
+    tenants = models.ManyToManyField(Tenant)
     document_type = models.ForeignKey(InterviewDocumentType, on_delete=models.PROTECT)
 
     def __str__(self):

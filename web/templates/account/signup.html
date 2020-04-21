@@ -2,10 +2,13 @@
 {% load crispy_forms_tags %}
 {% block body_block %}
   <div class="container">
-      <h2>Criar sua conta</h2>
+      <h2>Crie sua conta</h2>
         <form method="post">{% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit" class="btn btn-success">Criar</button>
+            {{ form|crispy }}
         </form>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Criar</button>
+      <p class="text-right">
+        <a href="http://www.educalegal.com.br/politica-de-privacidade/" target="_blank">Política de Privacidade</a>
+      </p>
   </div>
 {% endblock %}
