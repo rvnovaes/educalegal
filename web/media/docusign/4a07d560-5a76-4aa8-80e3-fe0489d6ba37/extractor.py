@@ -14,28 +14,18 @@ def docusign_xml_parser(data):
     envelope_data["envelope_sent"] = xml["EnvelopeStatus"]["Sent"]
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
 
-    for pdf in xml["DocumentPDFs"]["DocumentPDF"]:
-        if pdf["DocumentType"] == "CONTENT":
-            main_filename_no_extension = pdf["Name"].split(".")[0]
-            break
-        else:
-            main_filename_no_extension = "unnamed_document"
-
-
-    print(main_filename_no_extension)
+    envelope_data_translated = envelope_data.copy()
 
     #formatting strings: 2020-04-15T11:20:19.693
-    envelope_data['envelope_created'] = envelope_data['envelope_created'].replace("T", " ").split(".")[0]
-    envelope_data['envelope_sent'] = envelope_data['envelope_sent'].replace("T", " ").split(".")[0]
-    envelope_data['envelope_time_generated'] = envelope_data['envelope_time_generated'].replace("T", " ").split(".")[0]
+    envelope_data_translated['envelope_created'] = envelope_data_translated['envelope_created'].replace("T", " ").split(".")[0]
+    envelope_data_translated['envelope_sent'] = envelope_data_translated['envelope_sent'].replace("T", " ").split(".")[0]
+    envelope_data_translated['envelope_time_generated'] = envelope_data_translated['envelope_time_generated'].replace("T", " ").split(".")[0]
 
     #converting US dates to Brazil dates
-    envelope_data['envelope_created'] = str(dt.strptime(envelope_data['envelope_created'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
-    envelope_data['envelope_sent'] = str(dt.strptime(envelope_data['envelope_sent'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
-    envelope_data['envelope_time_generated'] = str(dt.strptime(envelope_data['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
+    envelope_data_translated['envelope_created'] = str(dt.strptime(envelope_data_translated['envelope_created'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
+    envelope_data_translated['envelope_sent'] = str(dt.strptime(envelope_data_translated['envelope_sent'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
+    envelope_data_translated['envelope_time_generated'] = str(dt.strptime(envelope_data_translated['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
 
-    # translated the envelope status
-    envelope_data_translated = envelope_data.copy()
     envelope_data_translated["envelope_status"] = str(envelope_data_translated["envelope_status"]).lower()
     if envelope_data_translated["envelope_status"] in envelope_statuses.keys():
         envelope_data_translated["envelope_status"] = envelope_statuses[envelope_data_translated["envelope_status"]]
