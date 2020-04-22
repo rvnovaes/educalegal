@@ -240,6 +240,7 @@ ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = None
 # The issue is that django-allauth ’s ACCOUNT_LOGOUT_REDIRECT actually overrides the
 # built-in LOGOUT_REDIRECT_URL , however, since they both point to the homepage this
 # change may not be apparent. To future-proof our application since maybe we don’t
