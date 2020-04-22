@@ -225,8 +225,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # AllAuth --> https://wsvincent.com/django-login-with-email-not-username/
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
@@ -242,6 +240,7 @@ ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = None
 # The issue is that django-allauth ’s ACCOUNT_LOGOUT_REDIRECT actually overrides the
 # built-in LOGOUT_REDIRECT_URL , however, since they both point to the homepage this
 # change may not be apparent. To future-proof our application since maybe we don’t
@@ -249,12 +248,22 @@ ACCOUNT_UNIQUE_EMAIL = True
 # the logout redirect.
 LOGIN_REDIRECT_URL = "interview:interview-list"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+ACCOUNT_FORMS = {"signup": "tenant.forms.EducaLegalSignupForm"}
 
 
-ACCOUNT_SESSION_REMEMBER = True
+# E-mail sending Settings
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_HOST_USER = "apikey"
+EMAIL_HOST_PASSWORD = "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"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = "sistemas@educalegal.com.br"
+
+
 
 # API Settings
-
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -275,7 +284,6 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_WHITELIST = (
     "http://localhost:3000",
     "http://localhost:8000",
-    "https://dev.silexsistemas.com.br",
     "https://docs.educalegal.com.br",
 )
 
