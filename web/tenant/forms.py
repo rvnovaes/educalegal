@@ -11,7 +11,9 @@ from interview.models import Interview
 class EducaLegalSignupForm(SignupForm):
     full_name = forms.CharField(label="Nome Completo", required=True)
     tenant_name = forms.CharField(label="Nome da Escola", required=True)
-    eua = forms.BooleanField(label="Concordo com a política de privacidade e os termos de uso", required=True)
+    eua = forms.BooleanField(
+        label="Concordo com a política de privacidade e os termos de uso", required=True
+    )
 
     field_order = ["full_name", "tenant_name", "email", "password1", "password2", "eua"]
 
@@ -27,11 +29,11 @@ class EducaLegalSignupForm(SignupForm):
             return self.cleaned_data
 
     def save(self, request):
-
         tenant = Tenant.objects.create(
             name=self.cleaned_data.get("tenant_name"),
             subdomain_prefix=None,
             use_esignature=False,
+            use_ged=False,
             eua_agreement=self.cleaned_data.get("eua"),
         )
         tenant.save()

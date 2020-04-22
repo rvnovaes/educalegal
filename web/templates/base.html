@@ -2,56 +2,71 @@
 {% load user_groups %}
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <title>Educa Legal</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="shortcut icon" href="{% static 'tenant/favicon.ico' %}" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="shortcut icon" href="{% static 'tenant/favicon.ico' %}"/>
     <style type="text/css">
-        body{
+        body {
             margin-bottom: 2rem;
         }
+
         .btn-group {
             padding-top: 1.5rem;
         }
+
         .btn {
             margin-left: 0.2rem;
         }
-        .docassemble-line-height{
+
+        .docassemble-line-height {
             line-height: 1.2 !important;
         }
     </style>
 </head>
-  <body>
-
-    {% if user.is_authenticated %}
+<body>
+{% if user.is_authenticated %}
     <nav class="navbar navbar-fixed-top navbar-expand-md navbar-dark bg-dark docassemble-line-height">
-      <div class="container danavcontainer justify-content-start">
-        <span class="navbar-brand">{{ user.tenant.name}}</span>
-          <div class="collapse navbar-collapse">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}">Modelos</a></li>
-              {% if request.user|has_group:"Customers" %}
-              <li class="nav-item"><a class="nav-link text-white" href="{% url 'document:document-list' %}">Documentos</a></li>
-              <li class="nav-item"><a class="nav-link text-white" href="{% url 'school:school-list' %}">Escolas</a></li>
-              {% endif %}
-              <li class="nav-item"><a class="nav-link text-white" href="{{ user.tenant.tenantgeddata.url }}" target="_blank">{% if user.tenant.tenantgeddata.url %} GED {% endif %}</a></li>
-              <li class="nav-item"><a class="nav-link text-white" href="https://atendimento.atlassian.net/servicedesk/customer/portal/2" target="_blank">Portal do Cliente</a></li>
-            </ul>
-            <span class="navbar-text text-white">
-              Olá, {{ user.first_name }} {{ user.last_name }}!
-            </span>
-            <a class="btn btn-outline-success text-white ml-4" href="{% url 'account_logout' %}">Sair</a>
+        <div class="container danavcontainer justify-content-start">
+            <span class="navbar-brand">{{ user.tenant.name }}</span>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}">Modelos</a>
+                    </li>
+                    {% if request.user|has_group:"Customers" %}
+                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'document:document-list' %}">Documentos</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'school:school-list' %}">Escolas</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ user.tenant.tenantgeddata.url }}"
+                                            target="_blank">{% if user.tenant.tenantgeddata.url %} GED {% endif %}</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link text-white"
+                                            href="https://atendimento.atlassian.net/servicedesk/customer/portal/2"
+                                            target="_blank">Portal do Cliente</a></li>
+                </ul>
+                <span class="navbar-text text-white">
+                  Olá, {{ user.first_name }} {{ user.last_name }}!
+                </span>
+                <a class="btn btn-outline-success text-white ml-4" href="{% url 'account_logout' %}">Sair</a>
+            </div>
         </div>
-      </div>
     </nav>
-          {% endif %}
-
-    <br/>
-    {% block body_block %}
-    {% endblock %}
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-  </body>
+{% endif %}
+<br/>
+{% block body_block %}
+{% endblock %}
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+</body>
 </html>
