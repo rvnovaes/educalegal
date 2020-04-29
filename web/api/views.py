@@ -229,8 +229,9 @@ def docusign_webhook_listener(request):
     document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
     envelope_status = str(envelope_data["envelope_status"]).lower()
 
+    tenant = Tenant.objects.get(pk=document.tenant.pk)
     # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
-    if envelope_status == "completed":
+    if envelope_status == "completed" and tenant.use_ged:
         try:
             (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
                 data, envelope_dir
