@@ -130,3 +130,9 @@ dmypy.json
 /.idea/
 /docker_volumes/mayan/
 /docker_volumes/rabbitmq/
+
+/web/media/dump.yaml
+/web/static/admin/
+/web/static/rest_framework/
+/web/static/debug_toolbar/
+/web/static/django_tables2/
