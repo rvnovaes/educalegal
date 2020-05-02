@@ -294,8 +294,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentSerializer
 
     def partial_update(self, request, *args, **kwargs):
-        ged_id = request.data["ged_id"]
-        instance = self.queryset.get(ged_id=ged_id)
+        el_document_id = request.data["el_document_created_id"]
+        instance = self.queryset.get(pk=el_document_id)
         serializer = self.serializer_class(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
