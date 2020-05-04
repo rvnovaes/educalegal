@@ -34,6 +34,7 @@ class EducaLegalSignupForm(SignupForm):
             subdomain_prefix=None,
             use_esignature=False,
             use_ged=False,
+            use_bulk_interview=False,
             eua_agreement=self.cleaned_data.get("eua"),
         )
         tenant.save()
@@ -45,9 +46,6 @@ class EducaLegalSignupForm(SignupForm):
         tenant.interview_set.add(*freemium_interviews)
         # Creates the user
         user = super().save(request)
-        # Sets the new user as member of Freemium Group
-        freemium_group = Group.objects.get(name="Freemium")
-        user.groups.add(freemium_group)
         # Sets the newly created tenant to be user's tenant
         user.tenant = tenant
         # Splits the full name field into first and "rest of the name" for the user
