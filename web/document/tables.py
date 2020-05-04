@@ -1,5 +1,6 @@
 import django_tables2 as tables
 from django_tables2.utils import A
+
 from .models import Document
 
 
@@ -10,6 +11,12 @@ class DocumentTable(tables.Table):
     )
     created_date = tables.DateTimeColumn(format="d/m/Y H:i")
     altered_date = tables.DateTimeColumn(format="d/m/Y H:i")
+
+    def before_render(self, request):
+        if not request.user.tenant.use_esignature:
+            self.columns.hide('signing_provider')
+        if not request.user.tenant.use_ged:
+            self.columns.hide('ged_link')
 
     class Meta:
         model = Document
