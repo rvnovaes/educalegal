@@ -36,7 +36,6 @@ class EducaLegalSignupForm(SignupForm):
             subdomain_prefix=None,
             use_esignature=False,
             use_ged=False,
-            use_bulk_interview=False,
             eua_agreement=self.cleaned_data.get("eua"),
         )
         tenant.save()

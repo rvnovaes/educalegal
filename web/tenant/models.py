@@ -16,9 +16,6 @@ class Tenant(models.Model):
     use_ged = models.BooleanField(
         default=False, verbose_name="Usa gestão eletrônica de documentos"
     )
-    use_bulk_interview = models.BooleanField(
-        default=False, verbose_name="Usa geração em lote de documentos"
-    )
     eua_agreement = models.BooleanField(
         default=True, verbose_name="Concordo com os termos de uso"
     )
