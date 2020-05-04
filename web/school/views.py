@@ -29,8 +29,6 @@ class SchoolCreateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, CreateV
         "zip",
         "city",
         "state",
-        "country",
-        "letterhead",
     ]
 
 
@@ -69,8 +67,6 @@ class SchoolUpdateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, UpdateV
         "zip",
         "city",
         "state",
-        "country",
-        "letterhead",
     ]
 
 
