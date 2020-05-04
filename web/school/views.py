@@ -22,15 +22,13 @@ class SchoolCreateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, CreateV
         "phone",
         "site",
         "email",
+        "zip",
         "street",
         "street_number",
         "unit",
         "neighborhood",
-        "zip",
         "city",
         "state",
-        "country",
-        "letterhead",
     ]
 
 
@@ -62,15 +60,13 @@ class SchoolUpdateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, UpdateV
         "phone",
         "site",
         "email",
+        "zip",
         "street",
         "street_number",
         "unit",
         "neighborhood",
-        "zip",
         "city",
         "state",
-        "country",
-        "letterhead",
     ]
 
 

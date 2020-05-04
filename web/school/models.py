@@ -30,46 +30,6 @@ class LegalType(Enum):
         return label.get(value)
 
 
-class Country(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-
-    class Meta:
-        verbose_name = "País"
-        verbose_name_plural = "Países"
-        ordering = ["name"]
-
-    def __str__(self):
-        return self.name
-
-
-class State(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    initials = models.CharField(max_length=10, unique=True)
-    country = models.ForeignKey(Country, on_delete=models.PROTECT)
-
-    class Meta:
-        verbose_name = "Estado"
-        verbose_name_plural = "Estados"
-        ordering = ["name"]
-
-    def __str__(self):
-        return self.name
-
-
-class City(models.Model):
-    name = models.CharField(max_length=255)
-    state = models.ForeignKey(State, on_delete=models.PROTECT)
-
-    class Meta:
-        verbose_name = "Cidade"
-        verbose_name_plural = "Cidades"
-        ordering = ("name",)
-        unique_together = ("name", "state")
-
-    def __str__(self):
-        return self.name + " - " + self.state.initials
-
-
 class School(TenantAwareModel):
     legal_name = models.CharField(max_length=255, verbose_name="Razão social")
     name = models.CharField(max_length=255, blank=True, verbose_name="Nome Fantasia")
@@ -82,7 +42,7 @@ class School(TenantAwareModel):
     # https://docs.djangoproject.com/en/3.0/ref/models/fields/
     # when a CharField has both unique=True and blank=True set null=True is required to
     # avoid unique constraint violations when saving multiple objects with blank values
-    cnpj = models.CharField(max_length=255, verbose_name="CNPJ")
+    cnpj = models.CharField(max_length=255, verbose_name="CNPJ/CPF")
     logo = models.ImageField(verbose_name="Logo", blank=True)
     phone = models.CharField(max_length=255, verbose_name="Telefone")
     site = models.URLField(verbose_name="Site")
@@ -92,10 +52,10 @@ class School(TenantAwareModel):
     unit = models.CharField(max_length=255, blank=True, verbose_name="Complemento")
     neighborhood = models.CharField(max_length=255, verbose_name="Bairro")
     zip = models.CharField(max_length=255, verbose_name="CEP")
-    city = models.ForeignKey(City, on_delete=models.PROTECT, verbose_name="Cidade")
-    state = models.ForeignKey(State, on_delete=models.PROTECT, verbose_name="Estado",)
-    country = models.ForeignKey(Country, on_delete=models.PROTECT, verbose_name="País")
-    letterhead = models.CharField(max_length=255, verbose_name="Timbrado")
+    city = models.CharField(max_length=255, verbose_name="Cidade")
+    state = models.CharField(max_length=255, verbose_name="Estado",)
+    country = models.CharField(max_length=255, default="Brasil", verbose_name="País")
+    letterhead = models.CharField(max_length=255, default="timbrado-padrao.docx", verbose_name="Timbrado")
 
     def __str__(self):
         return self.name + " - " + self.legal_name
@@ -107,8 +67,8 @@ class School(TenantAwareModel):
             street_number=self.street_number if self.street_number else "",
             street=self.street if self.street else "",
             neighborhood=self.neighborhood if self.neighborhood else "",
-            city=self.city.name if self.city else "",
-            state=self.state.initials if self.state else "",
+            city=self.city if self.city else "",
+            state=self.state if self.state else "",
             zip=self.zip if self.zip else "",
             unit="/" + self.unit if self.unit else "",
         )

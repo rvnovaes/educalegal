@@ -1,1 +1,5 @@
+{% if record.ged_link %}
 <a class="btn btn-success btn-sm" href="{{ record.ged_link }}" target="_blank">Ir</a>
+{% else %}
+    ---
+{% endif %}

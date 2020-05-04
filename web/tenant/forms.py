@@ -5,6 +5,8 @@ from django.contrib.auth.models import Group
 from allauth.account.forms import SignupForm
 
 from tenant.models import Tenant
+from tenant.models import TenantGedData
+from tenant.models import TenantESignatureData
 from interview.models import Interview
 
 
@@ -37,6 +39,31 @@ class EducaLegalSignupForm(SignupForm):
             eua_agreement=self.cleaned_data.get("eua"),
         )
         tenant.save()
+        tenant_ged_data = TenantGedData.objects.create(
+            tenant=tenant,
+            url="",
+            token="",
+            database="",
+            database_user="",
+            database_user_password="",
+            database_host="",
+            database_port="",
+            storage_secret_key="",
+            storage_bucket_name="",
+            storage_default_acl="",
+            storage_endpoint_url="",
+            storage_region_name=""
+        )
+        tenant_ged_data.save()
+        tenant_esignatura_data = TenantESignatureData.objects.create(
+            tenant=tenant,
+            provider="",
+            private_key="",
+            client_id="",
+            impersonated_user_guid="",
+            test_mode=True
+        )
+        tenant_esignatura_data.save()
         # Selects every freemium interview and adds to newly created tenant
         freemium_interviews = Interview.objects.filter(is_freemium=True)
         # https://docs.djangoproject.com/en/3.0/ref/models/relations/#django.db.models.fields.related.RelatedManager.add
@@ -45,9 +72,6 @@ class EducaLegalSignupForm(SignupForm):
         tenant.interview_set.add(*freemium_interviews)
         # Creates the user
         user = super().save(request)
-        # Sets the new user as member of Freemium Group
-        freemium_group = Group.objects.get(name="Freemium")
-        user.groups.add(freemium_group)
         # Sets the newly created tenant to be user's tenant
         user.tenant = tenant
         # Splits the full name field into first and "rest of the name" for the user

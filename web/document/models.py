@@ -18,11 +18,13 @@ class Document(TenantAwareModel):
     )
     status = models.CharField(max_length=256, blank=True, verbose_name="Status")
     ged_id = models.CharField(
-        max_length=128, blank=True, verbose_name="ID do Documento no GED"
+        max_length=128, null=True, blank=True, verbose_name="ID do Documento no GED"
     )
-    ged_link = models.CharField(max_length=256, blank=True, verbose_name="Link")
+    ged_link = models.CharField(max_length=256, null=True, blank=True, verbose_name="Link")
     ged_uuid = models.CharField(
         max_length=256,
+        null=True,
+        blank=True,
         help_text="UUID do documento. UUID = Universally Unique ID.",
         verbose_name="UUID",
     )

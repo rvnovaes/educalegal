@@ -52,7 +52,7 @@ if __name__ == "__main__":
         """)
         if user == "1":
             # iasmini
-            api_key = "CP5J7t71DkodckJoZf6QWpUEJTMT6xkk"
+            api_key = "mO44qWLdA2JKgBF1FsocjGAdb8ZmRHPY"
         elif user == "2":
             # isabela
             api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"

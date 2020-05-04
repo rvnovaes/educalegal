@@ -4,6 +4,26 @@
 
 {% block body_block %}
   <div class="container">
+  <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    {% if user.tenant.school_set.count == 0 %}
+        <div class="modal fade" id="school_modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Bem-vindo à plataforma Educa Legal!</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Para iniciar o uso, é necessário primeiro cadastrar uma <b>Escola</b>.</p>
+                        <p>Os dados da <b>Escola</b> serão usados na criação dos documentos.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{% url 'school:school-list' %}" class="btn btn-primary">Criar Escola</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
   {% if filter %}
       <form action="" method="get" class="form form-inline" style="float: right">
         {% bootstrap_form filter.form layout="inline" %}
@@ -19,4 +39,12 @@
       </div>
     {% endif %}
   </div>
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+        $(window).on('load',function(){
+            $('#school_modal').modal({backdrop: 'static', keyboard: false});
+            $('#school_modal').modal('show');
+        });
+    </script>
 {% endblock %}
