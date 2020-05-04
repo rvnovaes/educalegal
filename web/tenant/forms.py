@@ -5,6 +5,8 @@ from django.contrib.auth.models import Group
 from allauth.account.forms import SignupForm
 
 from tenant.models import Tenant
+from tenant.models import TenantGedData
+from tenant.models import TenantESignatureData
 from interview.models import Interview
 
 
@@ -38,6 +40,31 @@ class EducaLegalSignupForm(SignupForm):
             eua_agreement=self.cleaned_data.get("eua"),
         )
         tenant.save()
+        tenant_ged_data = TenantGedData.objects.create(
+            tenant=tenant,
+            url="",
+            token="",
+            database="",
+            database_user="",
+            database_user_password="",
+            database_host="",
+            database_port="",
+            storage_secret_key="",
+            storage_bucket_name="",
+            storage_default_acl="",
+            storage_endpoint_url="",
+            storage_region_name=""
+        )
+        tenant_ged_data.save()
+        tenant_esignatura_data = TenantESignatureData.objects.create(
+            tenant=tenant,
+            provider="",
+            private_key="",
+            client_id="",
+            impersonated_user_guid="",
+            test_mode=True
+        )
+        tenant_esignatura_data.save()
         # Selects every freemium interview and adds to newly created tenant
         freemium_interviews = Interview.objects.filter(is_freemium=True)
         # https://docs.djangoproject.com/en/3.0/ref/models/relations/#django.db.models.fields.related.RelatedManager.add
