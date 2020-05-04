@@ -36,10 +36,8 @@
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}">Modelos</a>
                     </li>
-                    {% if user.tenant.use_ged or user.tenant.use_esignature %}
-                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'document:document-list' %}">Documentos</a>
-                        </li>
-                    {% endif %}
+                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'document:document-list' %}">Documentos</a>
+                    </li>
                         <li class="nav-item"><a class="nav-link text-white" href="{% url 'school:school-list' %}">Escolas</a>
                         </li>
                     {% if user.tenant.use_ged %}
