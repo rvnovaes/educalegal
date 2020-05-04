@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   educalegal:
-    image: rvnovaes/educalegal:0.44
+    image: rvnovaes/educalegal:0.45
     container_name: educalegal
     build: .
     command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8000"]
