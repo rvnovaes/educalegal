@@ -9,7 +9,6 @@
       <div class="card-body">
           <ul class="list-group list-group-flush">
           <li class="list-group-item">
-
               <span class="font-weight-bold">Escola: </span>{{ document.school }}</li>
           <li class="list-group-item">
               {# documentacao do django para formatacao de data no template #}
@@ -19,16 +18,20 @@
               <span class="font-weight-bold">Data de Alteração: </span>{{ document.altered_date|date:"d/m/Y H:i" }}</li>
           <li class="list-group-item">
               <span class="font-weight-bold">Status: </span>{{ document.status }}</li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">Envelope ID: </span>{{ document.envelope_id }}</li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">Provedor: </span>{{ document.signing_provider }}</li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">Link: </span><a href="{{ document.ged_link }}" target="_blank">{{ document.ged_link }}</a></li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">Descrição: </span>{{ document.description }}</li>
-          <li class="list-group-item">
-            {% if document.logs.all %}
+          {% if user.tenant.use_esignature  %}
+              <li class="list-group-item">
+                  <span class="font-weight-bold">Envelope ID: </span>{{ document.envelope_id }}</li>
+              <li class="list-group-item">
+                  <span class="font-weight-bold">Provedor: </span>{{ document.signing_provider }}</li>
+          {% endif %}
+          {% if user.tenant.user_ged %}
+              <li class="list-group-item">
+                  <span class="font-weight-bold">Link: </span><a href="{{ document.ged_link }}" target="_blank">{{ document.ged_link }}</a></li>
+          {% endif %}
+              <li class="list-group-item">
+                  <span class="font-weight-bold">Descrição: </span>{{ document.description }}</li>
+          {% if document.logs.all %}
+              <li class="list-group-item">
                 <br />
                 <h5>Andamentos da Assinatura Eletrônica</h5>
                 <div class="card-footer">
