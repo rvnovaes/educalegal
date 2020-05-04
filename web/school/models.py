@@ -55,7 +55,7 @@ class School(TenantAwareModel):
     city = models.CharField(max_length=255, verbose_name="Cidade")
     state = models.CharField(max_length=255, verbose_name="Estado",)
     country = models.CharField(max_length=255, default="Brasil", verbose_name="País")
-    letterhead = models.CharField(max_length=255, default="timbrado-pradrao.docx", verbose_name="Timbrado")
+    letterhead = models.CharField(max_length=255, default="timbrado-padrao.docx", verbose_name="Timbrado")
 
     def __str__(self):
         return self.name + " - " + self.legal_name
