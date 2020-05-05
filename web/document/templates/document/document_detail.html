@@ -14,8 +14,10 @@
               {# documentacao do django para formatacao de data no template #}
               {# https://docs.djangoproject.com/en/3.0/ref/templates/builtins/#date #}
               <span class="font-weight-bold">Data de Criação: </span>{{ document.created_date|date:"d/m/Y H:i" }}</li>
-          <li class="list-group-item">
+          {% if user.tenant.use_ged or user.tenant.use_esignature %}
+              <li class="list-group-item">
               <span class="font-weight-bold">Data de Alteração: </span>{{ document.altered_date|date:"d/m/Y H:i" }}</li>
+          {% endif %}
           <li class="list-group-item">
               <span class="font-weight-bold">Status: </span>{{ document.status }}</li>
           {% if user.tenant.use_esignature  %}

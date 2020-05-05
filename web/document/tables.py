@@ -17,6 +17,8 @@ class DocumentTable(tables.Table):
             self.columns.hide('signing_provider')
         if not request.user.tenant.use_ged:
             self.columns.hide('ged_link')
+        if not (request.user.tenant.use_ged or request.user.tenant.use_esignature):
+            self.columns.hide('altered_date')
 
     class Meta:
         model = Document
