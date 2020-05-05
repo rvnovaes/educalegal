@@ -1,19 +1,25 @@
 {% extends 'base.html' %}
 {% load render_table from django_tables2 %}
 {% block body_block %}
-  <div class="container">
-    <h2>Escolas</h2>
-      {% if schools %}
-          {% render_table table %}
-      {% else %}
-      <div class="alert alert-info" role="alert">
-        Você não tem escolas cadastradas.
-      </div>
-    {% endif %}
-    <div class="btn-group">
-      <form action="{% url 'school:school-create' %}">
-        <button type="submit" class="btn btn-success">Adicionar</button>
-      </form>
+    <div class="container">
+        <h2>Escolas</h2>
+        {% if schools %}
+            {% render_table table %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                Você não tem escolas cadastradas.
+            </div>
+        {% endif %}
+        <div class="btn-group">
+            <form action="{% url 'school:school-create' %}">
+                <button type="submit" class="btn btn-success"
+                        data-toggle="tooltip" data-placement="top"
+                        title="Os dados de uma escola são usados no preenchimento de diversos campos dos documentos.
+                               Você deverá cadastrar na Escola os dados da sua organização, que em geral irá figurar
+                               como parte nos contratos, tais como Razão Social, Endereço, e-mail, entre outros.">
+                    Adicionar
+                </button>
+            </form>
+        </div>
     </div>
-  </div>
 {% endblock %}

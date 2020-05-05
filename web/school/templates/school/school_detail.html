@@ -1,54 +1,65 @@
 {% extends 'base.html' %}
 {% block body_block %}
-  <div class="container">
-    <div class="card">
-      <div class="card-header">
-        <h5>{% if school.name %}{{ school.name }}{% endif %}</h5>
-      </div>
-      <div class="card-body">
-        <ul class="list-group list-group-flush">
-          {% if school.logo %}
-          <li class="list-group-item"><img class="img-rounded float-lef" src="{{ school.logo.url }}"></li>
-          {% endif %}
-          <li class="list-group-item">
-              <span class="font-weight-bold">Razão Social: </span>{% if school.legal_name %}{{ school.legal_name }}{% endif %}</li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">Tipo: </span>{% if school.legal_type == 'J' %} Jurídica {% else %} Física {% endif %}
-          </li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">CNPJ: </span>{% if school.cnpj %}{{ school.cnpj}}{% endif %}
-          </li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">Telefone: </span>{% if school.phone %}{{ school.phone }}{% endif %}</li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">E-mail: </span>{% if school.email %}{{ school.email }}{% endif %}</li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">Site: </span>{% if school.site %}{{ school.site }}{% endif %}</li>
-          <li class="list-group-item">
-              <span class="font-weight-bold">Endereço: </span>{% if school.street %}{{ school.address }}{% endif %}</li>
-          {% if school.school_units.all|length > 0 %}
-          <li class="list-group-item">
-              <span class="font-weight-bold">Unidades Escolares: </span>
-              <ul>
-                  {% for school_unit in school.school_units.all %}
-                      <li><a href="{% url 'school:school-unit-detail' school_id=school.pk pk=school_unit.pk %}">{{ school_unit.name }}</a></li>
-                  {% endfor %}
-              </ul>
-          </li>
-          {% endif %}
-        </ul>
-      </div>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h5>{% if school.name %}{{ school.name }}{% endif %}</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% if school.logo %}
+                        <li class="list-group-item"><img class="img-rounded float-lef" src="{{ school.logo.url }}"></li>
+                    {% endif %}
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Razão Social: </span>{% if school.legal_name %}
+                        {{ school.legal_name }}{% endif %}</li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Tipo: </span>{% if school.legal_type == 'J' %}
+                        Jurídica {% else %} Física {% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">CNPJ: </span>{% if school.cnpj %}{{ school.cnpj }}{% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Telefone: </span>{% if school.phone %}
+                        {{ school.phone }}{% endif %}</li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">E-mail: </span>{% if school.email %}{{ school.email }}{% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Site: </span>{% if school.site %}{{ school.site }}{% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Endereço: </span>{% if school.street %}
+                        {{ school.address }}{% endif %}</li>
+                    {% if school.school_units.all|length > 0 %}
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Unidades Escolares: </span>
+                            <ul>
+                                {% for school_unit in school.school_units.all %}
+                                    <li>
+                                        <a href="{% url 'school:school-unit-detail' school_id=school.pk pk=school_unit.pk %}">{{ school_unit.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        <div class="btn-group">
+            <form action="{% url 'school:school-update' pk=school.pk %}">
+                <button type="submit" class="btn btn-primary">Editar Dados da Escola</button>
+            </form>
+            <form action="{% url 'school:school-unit-create' school_id=school.pk %}">
+                <button type="submit" class="btn btn-primary" data-toggle="tooltip" data-placement="top"
+                        title="Uma unidade escolar é um nome que representa uma subdivisão de uma mesma escola. Por exemplo: Jardim, Ensino Fundamental, Ensino Médio. Usada apenas nos contratos que diferenciam essas subdivisões. Se não estiver certo do que fazer, não é necessário criar nenhuma unidade escolar.">
+                    Criar Unidade Escolar
+                </button>
+            </form>
+            <form action="{% url 'school:school-delete' pk=school.pk %}">
+                <button type="submit" class="btn btn-danger">Apagar</button>
+            </form>
+        </div>
     </div>
-    <div class="btn-group">
-        <form action="{% url 'school:school-update' pk=school.pk %}">
-            <button type="submit" class="btn btn-primary" >Editar Dados da Escola</button>
-        </form>
-        <form action="{% url 'school:school-unit-create' school_id=school.pk %}">
-            <button type="submit" class="btn btn-primary">Criar Unidade Escolar</button>
-        </form>
-        <form action="{% url 'school:school-delete' pk=school.pk %}">
-            <button type="submit" class="btn btn-danger">Apagar</button>
-        </form>
-    </div>
-  </div>
 {% endblock %}

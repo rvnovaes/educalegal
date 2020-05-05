@@ -34,19 +34,29 @@
             <span class="navbar-brand">{{ user.tenant.name }}</span>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}">Modelos</a>
+                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}"
+                                            data-toggle="tooltip" data-placement="bottom"
+                                            title="Criar novos contratos e documentos.">Modelos</a>
                     </li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'document:document-list' %}">Documentos</a>
+                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'document:document-list' %}"
+                                            data-toggle="tooltip" data-placement="bottom"
+                                            title="Ver detalhes dos documentos que você já criou.">Documentos</a>
                     </li>
-                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'school:school-list' %}">Escolas</a>
-                        </li>
+                    <li class="nav-item"><a class="nav-link text-white"
+                                            href="{% url 'school:school-list' %}" data-toggle="tooltip"
+                                            data-placement="bottom"
+                                            title="Cadastrar ou editar dados das suas escolas. Esses dados são usados na geração dos documentos e contratos.">Escolas</a>
+                    </li>
                     {% if user.tenant.use_ged %}
                         <li class="nav-item"><a class="nav-link text-white" href="{{ user.tenant.tenantgeddata.url }}"
-                                            target="_blank">GED</a>
+                                                target="_blank" data-toggle="tooltip" data-placement="bottom"
+                                                title="Acesse os documentos armazenados.">GED</a>
                         </li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link text-white"
                                             href="https://atendimento.atlassian.net/servicedesk/customer/portal/2"
+                                            data-toggle="tooltip" data-placement="bottom"
+                                            title="Faça perguntas para nossos advogados e acesse a base de conhecimento."
                                             target="_blank">Portal do Cliente</a></li>
                 </ul>
                 <span class="navbar-text text-white">
@@ -63,16 +73,18 @@
 <script src="https://code.jquery.com/jquery-3.5.0.min.js"
         integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ="
         crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
+        integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm"
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"
         integrity="sha256-Kg2zTcFO9LXOc7IwcBx1YeUBJmekycsnTsq2RuFHSZU="
         crossorigin="anonymous"></script>
 {% block scripts %}
+    <script type="text/javascript">
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
 {% endblock %}
 </body>
 </html>

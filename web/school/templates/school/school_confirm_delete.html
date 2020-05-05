@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
 {% block body_block %}
-  <div class="container">
-      <h2>Escola</h2>
+    <div class="container">
+        <h2>Escola</h2>
         <form method="post">{% csrf_token %}
             <p>Tem certeza que deseja apagar "{{ school }}"?</p>
-        <button type="submit" class="btn btn-danger">Confirmar</button>
+            <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="top"
+                    title="Cuidado! Essa operação não pode ser desfeita!">Confirmar
+            </button>
         </form>
-  </div>
+    </div>
 {% endblock %}
