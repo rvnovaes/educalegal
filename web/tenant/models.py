@@ -1,4 +1,5 @@
 from django.db import models
+from billing.models import Plan
 
 
 # For genenral informations about the structure we used here, see:
@@ -19,6 +20,7 @@ class Tenant(models.Model):
     eua_agreement = models.BooleanField(
         default=True, verbose_name="Concordo com os termos de uso"
     )
+    plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="tenants", verbose_name="Plano", default=1)
 
     def __str__(self):
         return self.name
