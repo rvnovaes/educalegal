@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block body_block %}
     <div class="container">
+    <img class="mx-auto d-block"  src="{% static 'tenant/educa-legal-logo-horizontal.png' %}" alt="Educa Legal Logo">
+        <hr style="border-top: 1px solid #000000;">
         <p class="text-right">
             <a href="{% url 'account_login' %}">Já possui conta? Clique aqui entrar no sistema!</a>
         </p>
