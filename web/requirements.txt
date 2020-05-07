@@ -8,7 +8,7 @@ retry-requests
 # Formating of forms
 django-crispy-forms~=1.9.0
 # Database Access
-psycopg2-binary~=2.8.4
+psycopg2-binary~=2.8.5
 # Authentication
 django-allauth
 # Used to create tables and filtering
@@ -31,3 +31,5 @@ django-debug-toolbar~=2.2
 django-silk~=4.0.1
 # Read csv, excel
 pandas~=1.0.3
+# Google Analytics
+django-google-analytics-app

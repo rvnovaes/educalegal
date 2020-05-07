@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf.urls import url
 from django.conf import settings
 from django.conf.urls.static import static
@@ -36,6 +36,9 @@ urlpatterns = [
 
 if SILK:
     urlpatterns.append(url(r"^silk/", include("silk.urls", namespace="silk")))
+
+if not settings.DEBUG:
+    urlpatterns.append(re_path('djga/', include('google_analytics.urls')))
 
 if settings.DEBUG:
     import debug_toolbar

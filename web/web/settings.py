@@ -77,6 +77,9 @@ INSTALLED_APPS = [
     "document",
 ]
 
+if not DEBUG:
+    INSTALLED_APPS.append("google_analytics")
+
 if SILK:
     INSTALLED_APPS.append("silk")
 
@@ -305,4 +308,9 @@ LOGGING = {
         },
     },
     "loggers": {"": {"level": "DEBUG", "handlers": ["console", "file"]}},
+}
+
+# Google Analytics django-google-analytics-app
+GOOGLE_ANALYTICS = {
+    'google_analytics_id': 'UA-149363385-1',
 }
