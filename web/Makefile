@@ -43,11 +43,11 @@ endif
 
 # Loads fixtures for production
 loaddata_prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py loaddata tenant country state_current city_current school interview_document_types interview_prod
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py loaddata tenant school interview_document_types interview_prod
 
 # Loads fixtures for development
 loaddata_dev:
-	docker-compose run educalegal python manage.py loaddata tenant country state_current city_current school interview_document_types interview_dev
+	docker-compose run educalegal python manage.py loaddata tenant school interview_document_types interview_dev
 
 # Creates Educa Legal superuser as admin / Silex2109
 create_super_user_educa_legal:
