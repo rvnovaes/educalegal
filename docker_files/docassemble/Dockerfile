@@ -9,6 +9,11 @@ bash -c \
    num2words \
    validator-collection-br \
    retry-requests"
+ENV \
+CONTAINERROLE="all" \
+LOCALE="pt_BR.UTF-8 UTF-8" \
+TIMEZONE="America/Sao_Paulo" \
+DAPYTHONVERSION="3"
 
 USER root
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
