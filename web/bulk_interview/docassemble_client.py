@@ -1,6 +1,7 @@
 import json
 import sys
 
+from django.http import JsonResponse
 from requests import Session
 
 # https://github.com/bustawin/retry-requests
@@ -8,9 +9,9 @@ from retry_requests import retry
 
 
 class DocassembleClient:
-    def __init__(self, api_base_url, key):
-        self.api_base_url = api_base_url
-        headers = {"X-API-Key": key}
+    def __init__(self, base_url, admin_key):
+        self.api_base_url = base_url
+        headers = {"X-API-Key": admin_key}
         self.session = retry(
             Session(),
             retries=3,
@@ -25,10 +26,19 @@ class DocassembleClient:
         final_url = self.api_base_url + "/api/secret"
         payload = {'username': username, 'password': password}
         response = self.session.get(final_url, params=payload)
+
+        return response.json()
+
+    def config_read(self):
+        """ Get the server configuration """
+
+        final_url = self.api_base_url + "/api/config"
+        response = self.session.get(final_url)
         return response.json()
 
     def user_interviews_list(self):
-        """ List interviews of the user """
+        """ Provides a filterable list of interview sessions stored on the system where the owner of the API is
+        associated with the session """
 
         final_url = self.api_base_url + "/api/user/interviews"
         response = self.session.get(final_url)
@@ -39,6 +49,7 @@ class DocassembleClient:
 
         final_url = self.api_base_url + "/api/session/new"
         payload = {'i': interview_name}
+        response = None
 
         try:
             response = self.session.get(final_url, params=payload).json()
@@ -50,17 +61,17 @@ class DocassembleClient:
                                                                                                 ex=ex.__str__())
             raise Exception(message).with_traceback(ex.__traceback__)
 
-    def interview_set_variables(self, interview_name, variables):
+    def interview_set_variables(self, secret, interview_name, variables):
         """ Set variables in an interview
             variables - dict with all the variables for the interview
         """
         session = self.session_read(interview_name)
 
-        # TODO iasmini - obter e passar os parametros
-        url_args = {'tid': '2', 'ut': '75ac0e9e0f7830683ab9e21161603261beac7a18', 'intid': '2'}
-        variables['url_args'] = url_args
-
         final_url = self.api_base_url + "/api/session"
-        data = {'i': interview_name, 'session': session, 'variables': json.dumps(variables)}
-        response = self.session.post(final_url, data=data)
-        return response.json()
+        data = {'i': interview_name, 'session': session, 'secret': secret, 'variables': json.dumps(variables)}
+
+        try:
+            response = self.session.post(final_url, data=data)
+            return response.json(), response.status_code
+        except Exception as e:
+            print('Erro: ', e.__class__.__name__)

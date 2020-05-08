@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Interview, InterviewDocumentType
+from .models import Interview, InterviewDocumentType, ServerConfig
 
 
 @admin.register(Interview)
@@ -14,8 +14,14 @@ class InterviewAdmin(admin.ModelAdmin):
         "list_tenants",
     ]
     filter_horizontal = ["tenants"]
+    readonly_fields = ["base_url"]
 
 
 @admin.register(InterviewDocumentType)
 class InterviewDocumentTypeAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ServerConfig)
+class ServerConfigAdmin(admin.ModelAdmin):
     pass

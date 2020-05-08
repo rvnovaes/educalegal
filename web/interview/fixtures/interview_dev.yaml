@@ -8,6 +8,9 @@
     custom_file_name: contrato_de_prestacao_de_servicos_educacionais
     base_url: http://localhost/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-educacionais.yml
     document_type_id: 2
+    use_bulk_interview: true
+    yaml_name: "contrato-prestacao-servicos-educacionais.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 3
@@ -17,8 +20,10 @@
     date_available: 2020-01-23
     description: Um contrato para consultores darem palpite sobre o que você já sabe e te cobrarem por isso.
     custom_file_name: contrato_prestacao_servicos_consultoria
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-contrato-prestacao-servicos-consultoria.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-consultoria.yml
     document_type_id: 3
+    yaml_name: "contrato-prestacao-servicos-consultoria.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 4
@@ -28,8 +33,10 @@
     date_available: 2020-01-23
     description: Promete guardar segredo?
     custom_file_name: termo_de_confidencialidade_nda
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-termo-de-confidencialidade-nda.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Atermo-de-confidencialidade-nda.yml
     document_type_id: 4
+    yaml_name: "termo-de-confidencialidade-nda.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 5
@@ -39,8 +46,10 @@
     date_available: 2020-12-01
     description: Posso tirar fotos do seu filho e colocar no Instagram da escola?
     custom_file_name: termo_autorizaca_uso_imagem
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-termo-de-autorizacao-do-uso-de-imagem.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Atermo-de-autorizacao-do-uso-de-imagem.yml
     document_type_id: 5
+    yaml_name: "termo-de-autorizacao-do-uso-de-imagem.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 6
@@ -50,8 +59,10 @@
     date_available: 2020-01-23
     description: Contrato para prestadores de serviço em geral não te darem tanta raiva.
     custom_file_name: contrato_prestacao_servicos_com_sem_cessao_mao_obra
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-contrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
     document_type_id: 6
+    yaml_name: "contrato-prestacao-servicos-com-sem-cessao-mao-obra.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 7
@@ -61,8 +72,10 @@
     date_available: 2020-01-23
     description: Usando nosso sistema você nunca mais vai perder o prazo da renovatória.
     custom_file_name: contrato_de_locacao_de_imovel
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-contrato-de-locacao-de-imovel.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Acontrato-de-locacao-de-imovel.yml
     document_type_id: 7
+    yaml_name: "contrato-de-locacao-de-imovel.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 8
@@ -72,8 +85,10 @@
     date_available: 2020-01-23
     description: Aquela cartinha que ninguém gosta de receber. Por isso, use assinatura eletrônica para enviá-la.
     custom_file_name: notificacao_de_cobranca
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-notificacao-extrajudicial.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Anotificacao-extrajudicial.yml
     document_type_id: 8
+    yaml_name: "notificacao-extrajudicial.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 9
@@ -83,8 +98,10 @@
     date_available: 2020-02-09
     description: Devo, não nego. Pago quando puder.
     custom_file_name: termo_de_confissao_de_divida
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-termo-de-confissao-de-divida.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Atermo-de-confissao-de-divida.yml
     document_type_id: 9
+    yaml_name: "termo-de-confissao-de-divida.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 10
@@ -94,8 +111,10 @@
     date_available: 2020-02-09
     description: Give me some room.
     custom_file_name: contrato_de_cessao_de_espaço
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-contrato-de-cessao-de-espaco-para-fins-comerciais.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
     document_type_id: 10
+    yaml_name: "contrato-de-cessao-de-espaco-para-fins-comerciais.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 11
@@ -105,8 +124,10 @@
     date_available: 2020-02-09
     description: Contrato do Big Boss.
     custom_file_name: contrato_de_diretor_estatutario
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-contrato-diretor-estatutario.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Acontrato-diretor-estatutario.yml
     document_type_id: 11
+    yaml_name: "contrato-diretor-estatutario.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 12
@@ -116,8 +137,10 @@
     date_available: 2020-02-09
     description: O trabalho nunca acaba!
     custom_file_name: aditivo_contrato_trabalho_banco_horas
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3Abr-com-educalegal-aditivo-contrato-trabalho-banco-horas.yml
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Aaditivo-contrato-trabalho-banco-horas.yml
     document_type_id: 12
+    yaml_name: "aditivo-contrato-trabalho-banco-horas.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 13
@@ -127,8 +150,10 @@
     date_available: 2020-02-09
     description: Conhecendo escolas de outro país.
     custom_file_name: contrato_viagem_formacao_pedagogica
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3A
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Acontrato-de-inscricao-em-programa-de-viagem-pedagogica.yml
     document_type_id: 13
+    yaml_name: "contrato-de-inscricao-em-programa-de-viagem-pedagogica.yml"
+    server_config: 1
     tenants: [1, 2]
 - model: interview.Interview
   pk: 14
@@ -138,7 +163,9 @@
     date_available: 2020-02-09
     description: Me empresta seu imóvel sem cobrar nada?
     custom_file_name: contrato_comodato_imovel
-    base_url: http://localhost/interview?i=docassemble.playground1Development%3A
+    base_url: http://localhost/interview?i=docassemble.playground1Development%3Acontrato-de-comodato-de-imovel.yml
     document_type_id: 14
+    yaml_name: "contrato-de-comodato-de-imovel.yml"
+    server_config: 1
     tenants: [1, 2]
 

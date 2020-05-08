@@ -10,6 +10,7 @@ services:
       - DATABASE_PASSWORD=e60k17byidfg20ye
       - DATABASE_HOST=educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
       - DATABASE_PORT=25060
-      - USE_DIGITAL_OCEAN_SPACES=1
+      - EL_USE_DIGITAL_OCEAN_SPACES=1
+      - EL_ENV=production
     ports:
       - "8000:8000"

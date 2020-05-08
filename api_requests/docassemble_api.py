@@ -52,7 +52,7 @@ if __name__ == "__main__":
         """)
         if user == "1":
             # iasmini
-            api_key = "mO44qWLdA2JKgBF1FsocjGAdb8ZmRHPY"
+            api_key = "i5lRzQWnkPNgK8ez4i9OosSgvwuxzyKg"
         elif user == "2":
             # isabela
             api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"
@@ -61,7 +61,7 @@ if __name__ == "__main__":
             api_key = "FXpI0DXm6FwFLN0jQEhJYoERcmIjIP10"
         elif user == "4":
             # roberto
-            api_key = "4usR7z88CxKuXtTEZHriexP38C9LMVXN"
+            api_key = "nAqmKnvAPyqcE1S45Wfp7XTcwmwqeZDE"
 
     if destination == "2":
         # 2 - docs.educalegal.com.br - Development - Playground do seu usuário no servidor produção
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         if user == "1":
             # iasmini
             user_id = 4
-            api_key = "i5lRzQWnkPNgK8ez4i9OosSgvwuxzyKg"
+            api_key = "OkHYL2fYJApLfjwTeM2gRUZfybEzbqy5"
         elif user == "2":
             # isabela
             user_id = 9
@@ -123,4 +123,4 @@ if __name__ == "__main__":
 
     post_to_docassemble(api_key, server_url, brcomeducalegal_questions, "questions", user_id, project)
     post_to_docassemble(api_key, server_url, brcomeducalegal_templates, "templates", user_id, project)
-    post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", user_id, project)
+    # post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", user_id, project)

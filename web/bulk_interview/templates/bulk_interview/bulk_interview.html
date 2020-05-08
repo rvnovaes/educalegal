@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block body_block %}
+  <div class="container">
+    <h2>Entrevista em lote</h2>
+    <br>
+    <label class="control-label">Baixe aqui o </label>
+    <a href="https://atendimento.atlassian.net/wiki/spaces/EL/pages/40468495/Entrevista+em+lote?preview=%2F40468495%2F40501286%2Fcontrato-prestacao-servicos-educacionais.csv">layout do csv de importação (versão 1)</a> do contrato de prestação de serviços educacionais.
+    <form enctype="multipart/form-data" action="{% url 'bulk_interview:bulk_interview' interview_id %}" method="POST">
+      {% csrf_token %}
+      <div class="custom-file">
+        <label class="custom-file-label" for="customFile">Selecione o arquivo CSV</label>
+        <input type="file" accept=".csv" class="custom-file-input" id="customFile" value="{{ form.file }}">
+      </div>
+      <br>
+      <br>
+      <button type="submit" class="btn btn-success">Importar</button>
+    </form>
+    <br>
+    <br>
+    {% if row_errors %}
+      <label class="control-label">Erros na importação: </label>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Linha</th>
+            <th scope="col">Erro</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in row_errors %}
+            <tr>
+              <th scope="row">{{ row.0 }}</th>
+              <td>{{ row.1 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    {% if messages %}
+      {% for message in messages %}
+        <div id="success-message" class="modal fade in" style="display: block;">
+          <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">Entrevista em lote</h4>
+              </div>
+              <div class="modal-body">
+                <p class="text-center">{{ message }}</p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      <script type="application/javascript">
+        $(document).ready(function(){
+            $('#success-message').modal({show:true});
+        });
+      </script>
+    {% endif %}
+  </div>
+
+  <script>
+  // Add the following code if you want the name of the file appear on select
+  $(".custom-file-input").on("change", function() {
+    var fileName = $(this).val().split("\\").pop();
+    $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+  });
+  </script>
+{% endblock %}

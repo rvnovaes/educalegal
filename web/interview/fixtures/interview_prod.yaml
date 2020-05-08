@@ -13,6 +13,9 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-prestacao-servicos-educacionais.yml
     is_generic: true
     document_type: 2
+    use_bulk_interview: true
+    yaml_name: "contrato-prestacao-servicos-educacionais.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -34,6 +37,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-prestacao-servicos-consultoria.yml
     is_generic: true
     document_type: 3
+    yaml_name: "contrato-prestacao-servicos-consultoria.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -56,6 +61,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Atermo-de-confidencialidade-nda.yml
     is_generic: true
     document_type: 4
+    yaml_name: "termo-de-confidencialidade-nda.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -77,6 +84,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Atermo-de-autorizacao-do-uso-de-imagem.yml
     is_generic: true
     document_type: 5
+    yaml_name: "termo-de-autorizacao-do-uso-de-imagem.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -98,6 +107,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
     is_generic: true
     document_type: 6
+    yaml_name: "contrato-prestacao-servicos-com-sem-cessao-mao-obra.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -119,6 +130,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-de-locacao-de-imovel.yml
     is_generic: true
     document_type: 7
+    yaml_name: "contrato-de-locacao-de-imovel.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -139,6 +152,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Anotificacao-extrajudicial.yml
     is_generic: true
     document_type: 8
+    yaml_name: "notificacao-extrajudicial.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -161,6 +176,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Atermo-de-confissao-de-divida.yml
     is_generic: true
     document_type: 9
+    yaml_name: "termo-de-confissao-de-divida.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -181,6 +198,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
     is_generic: true
     document_type: 10
+    yaml_name: "contrato-de-cessao-de-espaco-para-fins-comerciais.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -204,6 +223,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-diretor-estatutario.yml
     is_generic: true
     document_type: 11
+    yaml_name: "contrato-diretor-estatutario.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -226,6 +247,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Aaditivo-contrato-trabalho-banco-horas.yml
     is_generic: true
     document_type: 12
+    yaml_name: "aditivo-contrato-trabalho-banco-horas.yml"
+    server_config: 1
     tenants:
     - 2
     - 3
@@ -242,9 +265,11 @@
     description: "Conhecendo escolas de outro pa\xEDs."
     language: por
     custom_file_name: contrato_viagem_formacao_pedagogica
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3A
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-de-inscricao-em-programa-de-viagem-pedagogica.yml
     is_generic: true
     document_type: 13
+    yaml_name: "contrato-de-inscricao-em-programa-de-viagem-pedagogica.yml"
+    server_config: 1
     tenants:
     - 1
 - model: interview.interview
@@ -256,9 +281,11 @@
     description: "Me empresta seu im\xF3vel sem cobrar nada?"
     language: por
     custom_file_name: contrato_comodato_imovel
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3A
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-de-comodato-de-imovel.yml
     is_generic: true
     document_type: 14
+    yaml_name: "contrato-de-comodato-de-imovel.yml"
+    server_config: 1
     tenants:
     - 1
 ########## Autotest docs.educalegal.com.br ##########
@@ -276,6 +303,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-educacionais.yml
     is_generic: true
     document_type: 2
+    yaml_name: "contrato-prestacao-servicos-educacionais.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -292,6 +321,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-consultoria.yml
     is_generic: true
     document_type: 3
+    yaml_name: "contrato-prestacao-servicos-consultoria.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -309,6 +340,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-confidencialidade-nda.yml
     is_generic: true
     document_type: 4
+    yaml_name: "termo-de-confidencialidade-nda.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -325,6 +358,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Atermo-de-autorizacao-do-uso-de-imagem.yml
     is_generic: true
     document_type: 5
+    yaml_name: "termo-de-autorizacao-do-uso-de-imagem.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -341,6 +376,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-prestacao-servicos-com-sem-cessao-mao-obra.yml
     is_generic: true
     document_type: 6
+    yaml_name: "contrato-prestacao-servicos-com-sem-cessao-mao-obra.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -357,6 +394,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-locacao-de-imovel.yml
     is_generic: true
     document_type: 7
+    yaml_name: "contrato-de-locacao-de-imovel.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -372,6 +411,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Anotificacao-extrajudicial.yml
     is_generic: true
     document_type: 8
+    yaml_name: "notificacao-extrajudicial.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -389,6 +430,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Atermo-de-confissao-de-divida.yml
     is_generic: true
     document_type: 9
+    yaml_name: "termo-de-confissao-de-divida.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -404,6 +447,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Acontrato-de-cessao-de-espaco-para-fins-comerciais.yml
     is_generic: true
     document_type: 10
+    yaml_name: "contrato-de-cessao-de-espaco-para-fins-comerciais.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -422,6 +467,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-diretor-estatutario.yml
     is_generic: true
     document_type: 11
+    yaml_name: "contrato-diretor-estatutario.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -439,6 +486,8 @@
     base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Aaditivo-contrato-trabalho-banco-horas.yml
     is_generic: true
     document_type: 12
+    yaml_name: "aditivo-contrato-trabalho-banco-horas.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -450,9 +499,11 @@
     description: "Conhecendo escolas de outro pa\xEDs."
     language: por
     custom_file_name: contrato_viagem_formacao_pedagogica
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3A
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-de-inscricao-em-programa-de-viagem-pedagogica.yml
     is_generic: true
     document_type: 13
+    yaml_name: "contrato-de-inscricao-em-programa-de-viagem-pedagogica.yml"
+    server_config: 1
     tenants:
     - 7
 - model: interview.interview
@@ -464,8 +515,10 @@
     description: "Me empresta seu im\xF3vel sem cobrar nada?"
     language: por
     custom_file_name: contrato_comodato_imovel
-    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3A
+    base_url: https://docs.educalegal.com.br/interview?i=docassemble.playground1Development%3Acontrato-de-comodato-de-imovel.yml
     is_generic: true
     document_type: 14
+    yaml_name: "contrato-de-comodato-de-imovel.yml"
+    server_config: 1
     tenants:
     - 7

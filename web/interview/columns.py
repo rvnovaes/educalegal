@@ -19,3 +19,10 @@ class InterviewCustomUrlColumn(TemplateColumn):
         else:
             value = record.base_url + "&new_session=1"
         return super().render(record, table, value, bound_column, **kwargs)
+
+
+class BulkInterviewColumn(TemplateColumn):
+    def render(self, record, table, value, bound_column, **kwargs):
+        if not record.use_bulk_interview:
+            return ''
+        return super().render(record, table, value, bound_column, **kwargs)

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from config.config import EL_ENV
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,8 +23,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "mvyzst83ep^g72ho)29dm+zq&+we8qbg82u8q_(_7$$a=i_@*n"
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if EL_ENV == 'production':
+    DEBUG = False
+else:
+    DEBUG = True
+
 SILK = False
 
 if "ALLOWED_HOSTS" in os.environ:
@@ -68,6 +74,7 @@ INSTALLED_APPS = [
     "boto3",
     # Integration with Boostrap 4
     "bootstrap4",
+    "google_analytics",
     # Local
     "tenant",
     "users",
@@ -75,10 +82,8 @@ INSTALLED_APPS = [
     "interview",
     "api",
     "document",
+    "bulk_interview",
 ]
-
-if not DEBUG:
-    INSTALLED_APPS.append("google_analytics")
 
 if SILK:
     INSTALLED_APPS.append("silk")
@@ -120,7 +125,9 @@ ROOT_URLCONF = "web.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "DIRS": [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -196,7 +203,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-a-scalable-django-app-with-digitalocean-managed-databases-and-spaces
 
-if "USE_DIGITAL_OCEAN_SPACES" in os.environ:
+if "EL_USE_DIGITAL_OCEAN_SPACES" in os.environ:
     # https://www.digitalocean.com/docs/spaces/how-to/manage-access/
     AWS_ACCESS_KEY_ID = "AWNYACZSFSYOBCIOTFOP"
     AWS_SECRET_ACCESS_KEY = "k0GW8r3VnC9GzKD7S6RTdjCP2dVzN3bfOdthVfSCY/g"
@@ -263,7 +270,6 @@ EMAIL_HOST_PASSWORD = "SG.dQQqtKCVT_iLBtg3aHkgHw.H4ELiNpTzfrwupeTrhhD_I_x6ignHzv
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = "sistemas@educalegal.com.br"
-
 
 
 # API Settings
