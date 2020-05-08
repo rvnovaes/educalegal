@@ -83,7 +83,7 @@ if __name__ == "__main__":
         if user == "1":
             # iasmini
             user_id = 4
-            api_key = "OkHYL2fYJApLfjwTeM2gRUZfybEzbqy5"
+            api_key = "i5lRzQWnkPNgK8ez4i9OosSgvwuxzyKg"
         elif user == "2":
             # isabela
             user_id = 9
