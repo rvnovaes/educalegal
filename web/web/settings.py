@@ -75,10 +75,8 @@ INSTALLED_APPS = [
     "interview",
     "api",
     "document",
+    "google_analytics"
 ]
-
-if not DEBUG:
-    INSTALLED_APPS.append("google_analytics")
 
 if SILK:
     INSTALLED_APPS.append("silk")

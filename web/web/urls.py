@@ -32,13 +32,11 @@ urlpatterns = [
     url(r"^school/", include("school.urls")),
     path("v1/", include("api.urls")),
     path("v1/api-auth/", include("rest_framework.urls")),
+    re_path('djga/', include('google_analytics.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if SILK:
     urlpatterns.append(url(r"^silk/", include("silk.urls", namespace="silk")))
-
-if not settings.DEBUG:
-    urlpatterns.append(re_path('djga/', include('google_analytics.urls')))
 
 if settings.DEBUG:
     import debug_toolbar
