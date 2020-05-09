@@ -24,6 +24,7 @@ class DocumentTable(tables.Table):
         model = Document
         order_by = "-created_date"
         template_name = "django_tables2/bootstrap4.html"
+        per_page = 20
         fields = (
             "interview",
             "school",
