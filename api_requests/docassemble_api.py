@@ -52,7 +52,7 @@ if __name__ == "__main__":
         """)
         if user == "1":
             # iasmini
-            api_key = "i5lRzQWnkPNgK8ez4i9OosSgvwuxzyKg"
+            api_key = "Mj2sSatiz4aqqvtJkRkG9l5cCVkbOt1F"
         elif user == "2":
             # isabela
             api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"
@@ -123,4 +123,4 @@ if __name__ == "__main__":
 
     post_to_docassemble(api_key, server_url, brcomeducalegal_questions, "questions", user_id, project)
     post_to_docassemble(api_key, server_url, brcomeducalegal_templates, "templates", user_id, project)
-    # post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", user_id, project)
+    post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", user_id, project)
