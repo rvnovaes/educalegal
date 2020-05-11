@@ -90,7 +90,7 @@ def _dict_from_csv(absolute_file_path, document_type_id):
     if document_type_id == 2:
         variables_list = pd.read_csv(
             absolute_file_path,
-            usecols=["content_document", "selected_school", "unidadeAluno", "nomeAluno", "nacionalidadeAluno", "cpfAluno",
+            usecols=["selected_school", "unidadeAluno", "nomeAluno", "nacionalidadeAluno", "cpfAluno",
                      "rgAluno", "cepAluno", "ruaAluno", "numbAluno", "compleAluno", "bairroAluno", "cidadeAluno",
                      "estadoAluno", "serieAluno", "periodoAluno", "anoLetivo", "valorAnual", "desconto", "obs",
                      "parcelas", "primeiraParcela", "vencimentoParcelas", "signature_local", "signature_date",
@@ -99,13 +99,17 @@ def _dict_from_csv(absolute_file_path, document_type_id):
         contratantes_list = pd.read_csv(
             absolute_file_path,
             usecols=["name.first", "nacionalidade", "estadocivil", "prof", "cpf", "rg", "telefone", "wtt", "email",
-                     "cep", "rua", "numb", "complemento", "bairro", "cidade", "estado", "auto_gather", "gathered",
-                     "_class", "instanceName"]).to_dict(orient='records')
+                     "cep", "rua", "numb", "complemento", "bairro", "cidade", "estado"]).to_dict(orient='records')
 
         # insere na variables a lista de contratantes
         i = 0
         for item in contratantes_list:
+            variables_list[i]['content_document'] = 'contrato-prestacao-servicos-educacionais.docx'
             variables_list[i]['contratantes'] = item
+            variables_list[i]['contratantes']['auto_gather'] = 'False'
+            variables_list[i]['contratantes']['gathered'] = 'True'
+            variables_list[i]['contratantes']['_class'] = 'docassemble.base.core.DAList'
+            variables_list[i]['contratantes']['instanceName'] = 'contratantes'
             i += 1
 
     return variables_list
