@@ -1,13 +1,19 @@
+import logging
+import traceback
+from urllib3.exceptions import NewConnectionError
 import pandas as pd
 
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
 
 from .docassemble_client import DocassembleClient
 from .forms import BulkInterviewForm
 
 from interview.models import Interview, ServerConfig
+
+logger = logging.getLogger(__name__)
 
 
 def bulk_interview(request, interview_id):
@@ -16,6 +22,7 @@ def bulk_interview(request, interview_id):
         form = BulkInterviewForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['file']
+            logger.debug("Carregado o arquivo: " + file.name)
 
             # salva o arquivo inserido pelo usuario na pasta media
             fs = FileSystemStorage()
@@ -29,56 +36,72 @@ def bulk_interview(request, interview_id):
             variables_list = _dict_from_csv(absolute_file_path, interview.document_type.id)
 
             # lê configurações do servidor da plataforma de geração de documentos (Docassemble)
-            server_config = ServerConfig.objects.get(interviews=interview_id)
-            base_url = server_config.base_url
-            user_key = server_config.user_key
-            user_id = server_config.user_id
-            username = server_config.username
-            user_password = server_config.user_password
-            project_name = server_config.project_name
-
-            # cria cliente da api do docassemble
-            dac = DocassembleClient(base_url, user_key)
-
-            # monta nome da entrevista de acordo com especificações do docassemble
-            interview_name = "docassemble.playground{user_id}{project_name}:{interview_name}".format(
-                user_id=user_id, project_name=project_name, interview_name=interview.yaml_name)
-
-            # passa argumentos da url para a entrevista
-            url_args = {'tid': request.user.tenant.pk,
-                        'ut': request.user.auth_token.key,
-                        'intid': interview_id}
-
-            row = 1
             try:
-                secret = dac.secret_read(username, user_password)
-                # gera entrevista para a lista de variáveis
-                for variables in variables_list:
-                    variables['url_args'] = url_args
-                    response, status_code = dac.interview_set_variables(secret, interview_name, variables)
-                    if status_code != 200:
-                        row_errors.append([row, response])
-                    row += 1
-                if row_errors:
-                    raise Exception(list(set(row_errors)))
-                else:
-                    messages.success(request, 'Entrevistas geradas com sucesso!')
-            except:
-                if row_errors:
-                    message = 'Não foi possível gerar as entrevistas! ' \
-                              'Verifique as mensagens de erro geradas de acordo com a linha do arquivo.'
-                else:
-                    message = 'Não foi possível gerar as entrevistas!'
+                server_config = ServerConfig.objects.get(interviews=interview_id)
+                base_url = server_config.base_url
+                user_key = server_config.user_key
+                user_id = server_config.user_id
+                username = server_config.username
+                user_password = server_config.user_password
+                project_name = server_config.project_name
+
+                # cria cliente da api do docassemble
+                try:
+                    dac = DocassembleClient(base_url, user_key)
+                except NewConnectionError:
+                    message = traceback.print_tb()
+                    logger.error(message)
+                    messages.error(request, message)
+
+
+                # monta nome da entrevista de acordo com especificações do docassemble
+                interview_name = "docassemble.playground{user_id}{project_name}:{interview_name}".format(
+                    user_id=user_id, project_name=project_name, interview_name=interview.yaml_name)
+
+                # passa argumentos da url para a entrevista
+                url_args = {'tid': request.user.tenant.pk,
+                            'ut': request.user.auth_token.key,
+                            'intid': interview_id}
+
+                row = 1
+                try:
+                    secret = dac.secret_read(username, user_password)
+                    # gera entrevista para a lista de variáveis
+                    for variables in variables_list:
+                        variables['url_args'] = url_args
+                        response, status_code = dac.interview_set_variables(secret, interview_name, variables)
+                        if status_code != 200:
+                            row_errors.append([row, response])
+                        row += 1
+                    if row_errors:
+                        raise Exception(list(set(row_errors)))
+                    else:
+                        message = 'Entrevistas geradas com sucesso!'
+                        logger.debug(message)
+                        messages.success(request, message)
+                except:
+                    if row_errors:
+                        message = 'Não foi possível gerar as entrevistas! ' \
+                                  'Verifique as mensagens de erro geradas de acordo com a linha do arquivo.'
+                    else:
+                        message = 'Não foi possível gerar as entrevistas!'
+                    logger.error(message)
+                    messages.error(request, message)
+
+                # apaga o arquivo importado da pasta media
+                fs.delete(filename)
+            except ObjectDoesNotExist:
+                message = 'Não foi configurado o servidor para esta entrevista!'
+                logger.error(message)
                 messages.error(request, message)
 
-            # apaga o arquivo importado da pasta media
-            fs.delete(filename)
-    else:
-        form = BulkInterviewForm()
+        else:
+            form = BulkInterviewForm()
 
-    return render(request, 'bulk_interview/bulk_interview.html', {'form': form,
-                                                                  'interview_id': interview_id,
-                                                                  'row_errors': row_errors})
+        return render(request, 'bulk_interview/bulk_interview.html', {'form': form,
+                                                                      'interview_id': interview_id,
+                                                                      'row_errors': row_errors})
+
 
 
 def _dict_from_csv(absolute_file_path, document_type_id):

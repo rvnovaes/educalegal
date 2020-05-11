@@ -71,11 +71,35 @@
     </nav>
 {% endif %}
 <br/>
+{% if messages %}
+    {% for message in messages %}
+        <div id="message-modal" class="modal fade in" style="display: block;">
+            <div class="modal-dialog modal-confirm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Entrevista em lote</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-center">{{ message }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $('#message-modal').modal({show: true});
+        });
+    </script>
+{% endif %}
 {% block body_block %}
 {% endblock %}
 {% load google_analytics_tags %}
 <div style="display:none">
-    <img src="{% google_analytics %}" width="0" height="0" />
+    <img src="{% google_analytics %}" width="0" height="0"/>
 </div>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
         integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm"

@@ -296,7 +296,6 @@ CORS_ORIGIN_WHITELIST = (
     "https://docs.educalegal.com.br",
 )
 
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -306,14 +305,24 @@ LOGGING = {
     },
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "console"},
-        "file": {
+        "debug_file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
             "formatter": "file",
-            "filename": os.path.join(BASE_DIR, "media/info.log"),
+            "filename": os.path.join(BASE_DIR, "media/debug.log"),
         },
+        # "error_file": {
+        #     "level": "ERROR",
+        #     "class": "logging.FileHandler",
+        #     "formatter": "file",
+        #     "filename": os.path.join(BASE_DIR, "media/error.log"),
+        # }
     },
-    "loggers": {"": {"level": "DEBUG", "handlers": ["console", "file"]}},
+    "loggers": {
+        "": {"level": "DEBUG", "handlers": ["console", "debug_file"]},
+        # "error": {"level": "ERROR", "handlers": ["console", "error_file"]}
+
+    },
 }
 
 # Google Analytics django-google-analytics-app
