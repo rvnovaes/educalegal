@@ -53,7 +53,6 @@ def bulk_interview(request, interview_id):
                     logger.error(message)
                     messages.error(request, message)
 
-
                 # monta nome da entrevista de acordo com especificações do docassemble
                 interview_name = "docassemble.playground{user_id}{project_name}:{interview_name}".format(
                     user_id=user_id, project_name=project_name, interview_name=interview.yaml_name)
@@ -94,14 +93,12 @@ def bulk_interview(request, interview_id):
                 message = 'Não foi configurado o servidor para esta entrevista!'
                 logger.error(message)
                 messages.error(request, message)
+    else:
+        form = BulkInterviewForm()
 
-        else:
-            form = BulkInterviewForm()
-
-        return render(request, 'bulk_interview/bulk_interview.html', {'form': form,
-                                                                      'interview_id': interview_id,
-                                                                      'row_errors': row_errors})
-
+    return render(request, 'bulk_interview/bulk_interview.html', {'form': form,
+                                                                  'interview_id': interview_id,
+                                                                  'row_errors': row_errors})
 
 
 def _dict_from_csv(absolute_file_path, document_type_id):
@@ -116,8 +113,8 @@ def _dict_from_csv(absolute_file_path, document_type_id):
             usecols=["selected_school", "unidadeAluno", "nomeAluno", "nacionalidadeAluno", "cpfAluno",
                      "rgAluno", "cepAluno", "ruaAluno", "numbAluno", "compleAluno", "bairroAluno", "cidadeAluno",
                      "estadoAluno", "serieAluno", "periodoAluno", "anoLetivo", "valorAnual", "desconto", "obs",
-                     "parcelas", "primeiraParcela", "vencimentoParcelas", "signature_local", "signature_date",
-                     "city", "state", "valid_contratantes_table", "submit_to_esignature"]).to_dict(orient='records')
+                     "parcelas", "primeiraParcela", "vencimentoParcelas", "signature_local",
+                     "signature_date"]).to_dict(orient='records')
 
         contratantes_list = pd.read_csv(
             absolute_file_path,
@@ -128,6 +125,8 @@ def _dict_from_csv(absolute_file_path, document_type_id):
         i = 0
         for item in contratantes_list:
             variables_list[i]['content_document'] = 'contrato-prestacao-servicos-educacionais.docx'
+            variables_list[i]['valid_contratantes_table'] = 'continue'
+            variables_list[i]['submit_to_esignature'] = 'True'
             variables_list[i]['contratantes'] = item
             variables_list[i]['contratantes']['auto_gather'] = 'False'
             variables_list[i]['contratantes']['gathered'] = 'True'
