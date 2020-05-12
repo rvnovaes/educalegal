@@ -1,4 +1,5 @@
 import logging
+import requests
 import traceback
 from urllib3.exceptions import NewConnectionError
 import pandas as pd
@@ -62,9 +63,15 @@ def bulk_interview(request, interview_id):
                             'ut': request.user.auth_token.key,
                             'intid': interview_id}
 
-                row = 1
                 try:
                     secret = dac.secret_read(username, user_password)
+                except requests.exceptions.ConnectionError:
+                    message = 'Não foi possível conectar com o servidor de geração de documentos.'
+                    logger.error(message)
+                    messages.error(request, message)
+
+                row = 1
+                try:
                     # gera entrevista para a lista de variáveis
                     for variables in variables_list:
                         variables['url_args'] = url_args
@@ -114,12 +121,13 @@ def _dict_from_csv(absolute_file_path, document_type_id):
                      "rgAluno", "cepAluno", "ruaAluno", "numbAluno", "compleAluno", "bairroAluno", "cidadeAluno",
                      "estadoAluno", "serieAluno", "periodoAluno", "anoLetivo", "valorAnual", "desconto", "obs",
                      "parcelas", "primeiraParcela", "vencimentoParcelas", "signature_local",
-                     "signature_date"]).to_dict(orient='records')
+                     "signature_date"], keep_default_na=False).to_dict(orient='records')
 
         contratantes_list = pd.read_csv(
             absolute_file_path,
             usecols=["name.first", "nacionalidade", "estadocivil", "prof", "cpf", "rg", "telefone", "wtt", "email",
-                     "cep", "rua", "numb", "complemento", "bairro", "cidade", "estado"]).to_dict(orient='records')
+                     "cep", "rua", "numb", "complemento", "bairro", "cidade",
+                     "estado"], keep_default_na=False).to_dict(orient='records')
 
         # insere na variables a lista de contratantes
         i = 0
