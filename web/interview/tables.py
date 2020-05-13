@@ -18,5 +18,5 @@ class InterviewTable(tables.Table):
     )
 
     bulk_interview = BulkInterviewColumn(
-        template_name="interview/bulk_button.html", verbose_name="Gerar em lote", orderable=False
+        template_name="interview/bulk_button.html", verbose_name="Em lote", orderable=False
     )
