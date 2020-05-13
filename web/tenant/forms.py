@@ -37,6 +37,7 @@ class EducaLegalSignupForm(SignupForm):
             use_esignature=False,
             use_ged=False,
             eua_agreement=self.cleaned_data.get("eua"),
+            plan=1,
         )
         tenant.save()
         tenant_ged_data = TenantGedData.objects.create(

@@ -1,5 +1,20 @@
 from djmoney.models.fields import MoneyField
 from django.db import models
+from enum import Enum
+
+
+class PlanType(Enum):
+    ESSENTIAL = 'Essential'
+    STANDARD = 'Standard'
+    PREMIUM = 'Premium'
+    CORPORATE = 'Corporate'
+
+    def __str__(self):
+        return str(self.value.lower())
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
 
 
 class Plan(models.Model):
@@ -12,6 +27,12 @@ class Plan(models.Model):
         verbose_name="Valor Mensal",
     )
     document_limit = models.IntegerField(null=True, blank=True, verbose_name="Limite de Documentos")
+    plan_type = models.CharField(
+        verbose_name='Tipo de Plano',
+        max_length=30,
+        choices=PlanType.choices(),
+        default=PlanType.ESSENTIAL
+    )
 
     class Meta:
         ordering = ["name"]
