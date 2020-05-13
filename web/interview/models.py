@@ -36,7 +36,7 @@ class Interview(models.Model):
     name = models.CharField(max_length=512, verbose_name="Nome", unique=True)
     version = models.CharField(max_length=30, verbose_name="Versão")
     date_available = models.DateField(
-        verbose_name="Data de Disponibilização", default=datetime.date.today
+        verbose_name="Disponibilização", default=datetime.date.today
     )
     description = models.TextField(blank=True, verbose_name="Descrição")
     language = models.CharField(max_length=64, default="por", verbose_name="Idioma")
@@ -76,6 +76,9 @@ class Interview(models.Model):
         verbose_name="Servidor de Entrevistas",
         help_text="Configuração do Servidor de Entrevistas usado para montar a URL da entrevista. Esse valor é sobrescrito se o valor URL customizada for preenchido.",
     )
+
+    def __str__(self):
+        return self.name
 
     @property
     def list_tenants(self):
