@@ -4,6 +4,9 @@ from rest_framework.authtoken.models import Token
 from django_tables2 import SingleTableMixin
 from django_filters.views import FilterView
 
+from tenant.models import Tenant
+from document.models import Document
+
 from .models import Interview
 from .tables import InterviewTable
 from .filters import InterviewFilter
@@ -26,4 +29,15 @@ class InterviewListView(LoginRequiredMixin, SingleTableMixin, FilterView):
             token = Token()
             token.user = self.request.user
             token.save()
-        return super().get_context_data(**kwargs)
+
+        # verifica se atingiu o limite de documentos
+        tenant = Tenant.objects.get(pk=self.request.user.tenant.pk)
+        document_count = Document.objects.filter(tenant=tenant).count()
+        reached_document_limit = False
+        if tenant.plan.document_limit:
+            if document_count >= tenant.plan.document_limit:
+                reached_document_limit = True
+
+        context = super().get_context_data(**kwargs)
+        context['reached_document_limit'] = reached_document_limit
+        return context

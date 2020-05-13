@@ -24,13 +24,33 @@
         </div>
     {% endif %}
 
+    {% if reached_document_limit %}
+        <div class="modal fade" id="plan_upgrade_modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Atenção</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Foi atingido o limite de geração de documentos para o plano contratado.</p>
+                        <p>Faça um upgrade do seu plano agora e tenha acesso a documentos ilimitados.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="" class="btn btn-primary">Upgrade</a>
+{#                        <a href="{% url 'tenant:plan-upgrade' %}" class="btn btn-primary">Upgrade</a>#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
   {% if filter %}
       <form action="" method="get" class="form form-inline" style="float: right">
         {% bootstrap_form filter.form layout="inline" %}
         {% bootstrap_button "Buscar" %}
       </form>
   {% endif %}
-    <h2>Modelos</h2>
+  <h2>Modelos</h2>
       {% if interviews %}
           {% render_table table %}
       {% else %}
@@ -45,6 +65,7 @@
         $(window).on('load',function(){
             $('#school_modal').modal({backdrop: 'static', keyboard: false});
             $('#school_modal').modal('show');
+            $('#plan_upgrade_modal').modal('show');
         });
     </script>
 {% endblock %}
