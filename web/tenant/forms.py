@@ -8,6 +8,7 @@ from tenant.models import Tenant
 from tenant.models import TenantGedData
 from tenant.models import TenantESignatureData
 from interview.models import Interview
+from billing.models import Plan
 
 
 class EducaLegalSignupForm(SignupForm):
@@ -31,13 +32,16 @@ class EducaLegalSignupForm(SignupForm):
             return self.cleaned_data
 
     def save(self, request):
+        essential_plan = Plan.objects.get(pk=1)
+
         tenant = Tenant.objects.create(
             name=self.cleaned_data.get("tenant_name"),
             subdomain_prefix=None,
             use_esignature=False,
             use_ged=False,
             eua_agreement=self.cleaned_data.get("eua"),
-            plan=1,
+            plan=essential_plan,
+            auto_enrolled=True,
         )
         tenant.save()
         tenant_ged_data = TenantGedData.objects.create(
