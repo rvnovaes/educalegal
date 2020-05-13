@@ -4,14 +4,14 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def create_freemium_plan(apps, schema_editor):
+def create_essential_plan(apps, schema_editor):
     # apps.get_model("<nome do app>", "<nome do model>")
     Plan = apps.get_model("billing", "Plan")
-    freemium_plan = Plan(
-        name="Freemium",
+    essential_plan = Plan(
+        name="Essential",
         value=0.00,
         document_limit=10)
-    freemium_plan.save()
+    essential_plan.save()
 
 
 class Migration(migrations.Migration):
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_freemium_plan),
+        migrations.RunPython(create_essential_plan),
         migrations.AddField(
             model_name='tenant',
             name='plan',
