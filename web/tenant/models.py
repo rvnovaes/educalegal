@@ -22,6 +22,12 @@ class Tenant(models.Model):
     )
     plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="tenants", verbose_name="Plano", default=1)
 
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
+
+    auto_enrolled = models.BooleanField(
+        default=False, verbose_name="Autoinscrito"
+    )
+
     def __str__(self):
         return self.name
 
