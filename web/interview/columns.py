@@ -2,6 +2,15 @@ from django_tables2 import TemplateColumn
 from urllib.parse import urljoin
 
 
+def build_interview_path(user_id, project_name, yaml_name):
+    path = "interview?i=docassemble.playground{user_id}{project_name}%3A{yaml_name}".format(
+        user_id=user_id,
+        project_name=project_name,
+        yaml_name=yaml_name,
+    )
+    return path
+
+
 class InterviewCustomUrlColumn(TemplateColumn):
     def render(self, record, table, value, bound_column, **kwargs):
 
@@ -14,11 +23,7 @@ class InterviewCustomUrlColumn(TemplateColumn):
             isc = record.interview_server_config
             final_url = urljoin(
                 isc.base_url,
-                "interview?i=docassemble.playground{user_id}{project_name}%3A{yaml_name}".format(
-                    user_id=isc.user_id,
-                    project_name=isc.project_name,
-                    yaml_name=record.yaml_name,
-                ),
+                build_interview_path(isc.user_id, isc.project_name, record.yaml_name),
             )
         # adds access parameters to URL
         if record.is_generic is True:
