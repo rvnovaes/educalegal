@@ -2,12 +2,17 @@ from django_tables2 import TemplateColumn
 from urllib.parse import urljoin
 
 
-def build_interview_path(user_id, project_name, yaml_name):
-    path = "interview?i=docassemble.playground{user_id}{project_name}%3A{yaml_name}".format(
+def build_interview_name(user_id, project_name, yaml_name):
+    name = "docassemble.playground{user_id}{project_name}%3A{yaml_name}".format(
         user_id=user_id,
         project_name=project_name,
         yaml_name=yaml_name,
     )
+    return name
+
+
+def build_interview_path(user_id, project_name, yaml_name):
+    path = "interview?i" + build_interview_name(user_id, project_name, yaml_name)
     return path
 
 
