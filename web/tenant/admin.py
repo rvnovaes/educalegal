@@ -4,8 +4,7 @@ from .models import Tenant, TenantGedData, TenantESignatureData
 
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
-    list_display = ["name"]
-    fields = ["name", "subdomain_prefix", "use_esignature", "use_ged", "eua_agreement"]
+    pass
 
 
 @admin.register(TenantGedData)

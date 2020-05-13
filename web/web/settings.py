@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import moneyed
+from moneyed.localization import _FORMATTER
+from decimal import ROUND_HALF_EVEN
 from config.config import EL_ENV
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -74,6 +77,8 @@ INSTALLED_APPS = [
     "boto3",
     # Integration with Boostrap 4
     "bootstrap4",
+    # Django models currency
+    "djmoney",
     "google_analytics",
     # Local
     "tenant",
@@ -82,6 +87,7 @@ INSTALLED_APPS = [
     "interview",
     "api",
     "document",
+    "billing"
     "bulk_interview",
 ]
 
@@ -324,6 +330,31 @@ LOGGING = {
 
     },
 }
+
+# Adding a new Currency
+BRL = moneyed.add_currency(
+    code='BRL',
+    numeric='986',
+    name='Brazilian Real',
+    countries=('BRAZIL', )
+)
+
+# Currency Formatter will output R$ 2.000,00
+_FORMATTER.add_sign_definition(
+    'default',
+    BRL,
+    prefix=u'R$ '
+)
+
+_FORMATTER.add_formatting_definition(
+    'pt_BR',
+    group_size=3, group_separator=".", decimal_point=",",
+    positive_sign="",  trailing_positive_sign="",
+    negative_sign="-", trailing_negative_sign="",
+    rounding_method=ROUND_HALF_EVEN
+)
+
+CURRENCIES = ('BRL', )
 
 # Google Analytics django-google-analytics-app
 GOOGLE_ANALYTICS = {
