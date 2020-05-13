@@ -8,7 +8,7 @@ retry-requests
 # Formating of forms
 django-crispy-forms~=1.9.0
 # Database Access
-psycopg2-binary~=2.8.4
+psycopg2-binary~=2.8.5
 # Authentication
 django-allauth
 # Used to create tables and filtering
@@ -33,3 +33,5 @@ django-silk~=4.0.1
 pandas~=1.0.3
 # Django models currency
 django-money~=1.1
+# Google Analytics
+django-google-analytics-app

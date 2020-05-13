@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "bootstrap4",
     # Django models currency
     "djmoney",
+    "google_analytics",
     # Local
     "tenant",
     "users",
@@ -80,7 +81,7 @@ INSTALLED_APPS = [
     "interview",
     "api",
     "document",
-    "billing",
+    "billing"
 ]
 
 if SILK:
@@ -337,3 +338,8 @@ _FORMATTER.add_formatting_definition(
 )
 
 CURRENCIES = ('BRL', )
+
+# Google Analytics django-google-analytics-app
+GOOGLE_ANALYTICS = {
+    'google_analytics_id': 'UA-149363385-1',
+}

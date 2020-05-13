@@ -14,9 +14,9 @@
     phone: 31-3223-0227
     site: https://www.colegiobacana.com.br
     email: colegio.bacana@gmail.com
-    city: 1900
-    state: 11
-    country: 1
+    city: 'Belo Horizonte'
+    state: 'MG'
+    country: 'Brasil'
     letterhead: timbrado-colegio-bacana.docx
 - model: school.school
   pk: 2
@@ -34,9 +34,9 @@
     phone: 11-3425-3565
     site: https://www.escoladafamilia.edu
     email: secretaria@escoladafamilia.edu
-    city: 6971
-    state: 26
-    country: 1
+    city: 'São Paulo'
+    state: 'SP'
+    country: 'Brasil'
     letterhead: timbrado-escola-da-familia.docx
 - model: school.school
   pk: 3
@@ -54,9 +54,9 @@
     phone: 21-5689-2356
     site: https://www.escoladalagoa.com.br
     email: contato@escoladalagoa.com.br
-    city: 5242
-    state: 19
-    country: 1
+    city: 'Rio de Janeiro'
+    state: 'RJ'
+    country: 'Brasil'
     letterhead: timbrado-escola-da-lagoa.docx
 - model: school.school
   pk: 4
@@ -74,9 +74,9 @@
     phone: 31-3223-0227
     site: https://www.colegiobacana.com.br
     email: colegio.bacana@gmail.com
-    city: 1900
-    state: 11
-    country: 1
+    city: 'Belo Horizonte'
+    state: 'MG'
+    country: 'Brasil'
     letterhead: timbrado-colegio-bacana.docx
 - model: school.school
   pk: 5
@@ -94,9 +94,9 @@
     phone: 11-3425-3565
     site: https://www.escoladafamilia.edu
     email: secretaria@escoladafamilia.edu
-    city: 6971
-    state: 26
-    country: 1
+    city: 'São Paulo'
+    state: 'SP'
+    country: 'Brasil'
     letterhead: timbrado-escola-da-familia.docx
 - model: school.school
   pk: 6
@@ -114,9 +114,9 @@
     phone: 21-5689-2356
     site: https://www.escoladalagoa.com.br
     email: contato@escoladalagoa.com.br
-    city: 5242
-    state: 19
-    country: 1
+    city: 'Rio de Janeiro'
+    state: 'RJ'
+    country: 'Brasil'
     letterhead: timbrado-escola-da-lagoa.docx
 - model: school.school
   pk: 7
@@ -134,9 +134,9 @@
     phone: 31-3223-0227
     site: https://www.colegiobacana.com.br
     email: colegio.bacana@gmail.com
-    city: 1900
-    state: 11
-    country: 1
+    city: 'Belo Horizonte'
+    state: 'MG'
+    country: 'Brasil'
     letterhead: timbrado-colegio-bacana.docx
 - model: school.school
   pk: 8
@@ -154,9 +154,9 @@
     phone: 11-3425-3565
     site: https://www.escoladafamilia.edu
     email: secretaria@escoladafamilia.edu
-    city: 6971
-    state: 26
-    country: 1
+    city: 'São Paulo'
+    state: 'SP'
+    country: 'Brasil'
     letterhead: timbrado-escola-da-familia.docx
 - model: school.school
   pk: 9
@@ -174,9 +174,9 @@
     phone: 21-5689-2356
     site: https://www.escoladalagoa.com.br
     email: contato@escoladalagoa.com.br
-    city: 5242
-    state: 19
-    country: 1
+    city: 'Rio de Janeiro'
+    state: 'RJ'
+    country: 'Brasil'
     letterhead: timbrado-escola-da-lagoa.docx
 - model: school.schoolunit
   pk: 1
