@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .docassemble_client import DocassembleClient
 from .forms import BulkInterviewForm
 
-from interview.models import Interview, ServerConfig
+from interview.models import Interview, InterviewServerConfig
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ def bulk_interview(request, interview_id):
 
             # lê configurações do servidor da plataforma de geração de documentos (Docassemble)
             try:
-                server_config = ServerConfig.objects.get(interviews=interview_id)
+                server_config = InterviewServerConfig.objects.get(interviews=interview_id)
                 base_url = server_config.base_url
                 user_key = server_config.user_key
                 user_id = server_config.user_id
