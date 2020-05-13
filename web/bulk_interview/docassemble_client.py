@@ -49,7 +49,6 @@ class DocassembleClient:
 
         final_url = self.api_base_url + "/api/session/new"
         payload = {'i': interview_name}
-        response = None
 
         try:
             response = self.session.get(final_url, params=payload).json()
