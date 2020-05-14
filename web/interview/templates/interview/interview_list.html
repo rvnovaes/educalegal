@@ -29,15 +29,14 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Atenção</h5>
+                        <h5 class="modal-title">Faça um upgrade no seu plano!</h5>
                     </div>
                     <div class="modal-body">
-                        <p>Foi atingido o limite de geração de documentos para o plano contratado.</p>
-                        <p>Faça um upgrade do seu plano agora e tenha acesso a documentos ilimitados.</p>
+                        <p>Foi atingido o limite mensal de geração de {{ document_limit }} documentos para o plano contratado.</p>
+                        <p>Entre em contato com nosso setor comercial, faça um upgrade do seu plano agora e tenha acesso a documentos ilimitados.</p>
                     </div>
                     <div class="modal-footer">
-                        <a href="" class="btn btn-primary">Upgrade</a>
-{#                        <a href="{% url 'tenant:plan-upgrade' %}" class="btn btn-primary">Upgrade</a>#}
+                        <a href="https://www.educalegal.com.br/contato/" target="_blank" class="btn btn-primary">Entrar em contato</a>
                     </div>
                 </div>
             </div>
@@ -65,6 +64,7 @@
         $(window).on('load',function(){
             $('#school_modal').modal({backdrop: 'static', keyboard: false});
             $('#school_modal').modal('show');
+            $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
             $('#plan_upgrade_modal').modal('show');
         });
     </script>
