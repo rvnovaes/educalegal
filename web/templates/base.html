@@ -47,7 +47,7 @@
                                             data-placement="bottom"
                                             title="Cadastrar ou editar dados das suas escolas. Esses dados são usados na geração dos documentos e contratos.">Escolas</a>
                     </li>
-                    {% if user.tenant.use_ged %}
+                    {% if user.tenant.plan.use_ged %}
                         <li class="nav-item"><a class="nav-link text-white" href="{{ user.tenant.tenantgeddata.url }}"
                                                 target="_blank" data-toggle="tooltip" data-placement="bottom"
                                                 title="Acesse os documentos armazenados.">GED</a>

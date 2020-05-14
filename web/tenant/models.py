@@ -11,12 +11,6 @@ class Tenant(models.Model):
     subdomain_prefix = models.CharField(
         max_length=100, null=True, blank=True, unique=True
     )
-    use_esignature = models.BooleanField(
-        default=False, verbose_name="Usa assinatura eletrônica"
-    )
-    use_ged = models.BooleanField(
-        default=False, verbose_name="Usa gestão eletrônica de documentos"
-    )
     eua_agreement = models.BooleanField(
         default=True, verbose_name="Concordo com os termos de uso"
     )
