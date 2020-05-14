@@ -1,0 +1,33 @@
+
+{% extends 'base.html' %}
+{% block body_block %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h5>Dados do plano</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Plano: </span>{% if plan.name %}{{ plan.name }}{% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Valor: </span>{% if plan.value %}{{ plan.value }}{% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Limite de documentos: </span>{% if plan.document_limit %}
+                        {{ plan.document_limit }}{% else %}ilimitado{% endif %}</li>
+{#                    <li class="list-group-item">#}
+{#                        <span class="font-weight-bold">Usa GED: </span>{% if plan.use_ged %}Sim{% else %}Não{% endif %}#}
+{#                    </li>#}
+{#                    <li class="list-group-item">#}
+{#                        <span class="font-weight-bold">Usa assinatura eletrônica: </span>{% if plan.use_esignature %}Sim{% else %}Não{% endif %}#}
+{#                    </li>#}
+{#                    <li class="list-group-item">#}
+{#                        <span class="font-weight-bold">Usa geração em lote: </span>{% if plan.use_bulk_interview %}Sim{% else %}Não{% endif %}#}
+{#                    </li>#}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

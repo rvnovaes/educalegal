@@ -38,7 +38,7 @@
                         {{ user.tenant.name }}
                       </a>
                       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'billing:plan-details' %}">Dados do plano</a>
+                        <a class="dropdown-item" href="{% url 'billing:plan-details' user.tenant.plan.pk %}">Dados do plano</a>
                     </li>
                     <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}"
                                             data-toggle="tooltip" data-placement="bottom"

@@ -27,6 +27,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     url(r"^$", LoginView.as_view()),
     url(r"^account/", include("allauth.urls")),
+    url(r"^billing/", include("billing.urls")),
     url(r"^interview/", include("interview.urls")),
     url(r"^document/", include("document.urls")),
     url(r"^school/", include("school.urls")),
