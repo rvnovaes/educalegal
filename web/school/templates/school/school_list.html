@@ -1,25 +1,56 @@
 {% extends 'base.html' %}
 {% load render_table from django_tables2 %}
 {% block body_block %}
-    <div class="container">
-        <h2>Escolas</h2>
-        {% if schools %}
-            {% render_table table %}
-        {% else %}
-            <div class="alert alert-info" role="alert">
-                Você não tem escolas cadastradas.
-            </div>
-        {% endif %}
-        <div class="btn-group">
-            <form action="{% url 'school:school-create' %}">
-                <button type="submit" class="btn btn-success"
-                        data-toggle="tooltip" data-placement="top"
-                        title="Os dados de uma escola são usados no preenchimento de diversos campos dos documentos.
-                               Você deverá cadastrar na Escola os dados da sua organização, que em geral irá figurar
-                               como parte nos contratos, tais como Razão Social, Endereço, e-mail, entre outros.">
-                    Adicionar
-                </button>
-            </form>
+    <h2>Escolas</h2>
+    {% if schools %}
+        {% render_table table %}
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Você não tem escolas cadastradas.
         </div>
+    {% endif %}
+    <div class="btn-group">
+        <form action="{% url 'school:school-create' %}">
+            <button type="submit" class="btn btn-success"
+                    data-toggle="tooltip" data-placement="top"
+                    title="Os dados de uma Escola são usados no preenchimento de diversos campos dos documentos.
+                       Você deverá cadastrar na Escola os dados da sua organização. Sua organização irá figurar
+                       como parte nos contratos. Precisaremos de dados tais como Razão Social, Endereço, e-mail,
+                       entre outros.">
+                Adicionar
+            </button>
+        </form>
     </div>
+<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    {% if user.tenant.school_set.count == 0 %}
+        <div class="modal fade" id="tutorial_modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Crie sua primeira <b>Escola</b></h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Os dados de uma <b>Escola</b> são usados no preenchimento de diversos campos dos contratos e documentos.
+                            Você deverá cadastrar na Escola os dados da sua organização. </p>
+                        <p>Sua organização irá figurar como parte nos documentos: por exemplo, como contratada ou contratante,
+                            como locatária, como notificante, dependendo do tipo de documento.</p>
+                        <p>Precisaremos de dados tais como Razão Social, Endereço, e-mail,
+                           entre outros.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{% url 'school:school-create' %}" class="btn btn-primary btn-block">Criar Escola</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+        $(window).on('load',function(){
+            let school_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
+            school_modal.modal('show');
+        });
+    </script>
 {% endblock %}
