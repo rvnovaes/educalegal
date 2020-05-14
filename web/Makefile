@@ -67,8 +67,8 @@ shell:
 	docker-compose run educalegal bash
 
 # Use the task da_app_remote_to_local to dump production database into local docker container
-db_app_run:
-	docker-compose run --detach --publish 7654:5432 db
+db_app_start:
+	docker-compose start db
 
 db_app_synchronize:
 	./pg_dump_digital_ocean_to_local_educalegal_app.sh
@@ -76,7 +76,7 @@ db_app_synchronize:
 db_app_stop:
 	docker-compose stop db
 
-db_app_remote_to_local: db_app_run db_app_synchronize db_app_stop
+db_app_remote_to_local: db_app_start db_app_synchronize db_app_stop
 
 
 
