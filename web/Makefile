@@ -1,6 +1,5 @@
 build:
 	docker-compose build educalegal
-
 # parametros
 # e=prod - conecta como producao
 # e=nodebug - conecta sem modo de debug (-d: detached mode)
@@ -59,24 +58,25 @@ create_super_user_educa_legal:
 setup_dev: makemigrations migrate loaddata_dev
 	-make create_super_user_educa_legal
 
-# Removes old docassemble image
-# Builds new educa legal image
-# Restarts everything
-# It is still necessary to run make setup_dev
-fresh_install:
-	# https://stackoverflow.com/questions/2670130/make-how-to-continue-after-a-command-fails
-	-docker rmi -f jhpyle/docassemble
-	make build
-	make restart
-
 logs:
 	docker-compose logs --follow
 
 ps:
 	docker-compose ps
-
 shell:
 	docker-compose run educalegal bash
+
+# Use the task da_app_remote_to_local to dump production database into local docker container
+db_app_run:
+	docker-compose run --detach --publish 7654:5432 db
+
+db_app_synchronize:
+	./pg_dump_digital_ocean_to_local_educalegal_app.sh
+
+db_app_stop:
+	docker-compose stop db
+
+db_app_remote_to_local: db_app_run db_app_synchronize db_app_stop
 
 
 
