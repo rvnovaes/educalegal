@@ -4,6 +4,8 @@ actor User
 autonumber
 User -> EducaLegal: Clicks Interview
 EducaLegal -> Docassemble: Link (tid, ut, intid)
+EducaLegal -> Docassemble: GET tenants_read(tid)
+EducaLegal -> Docassemble: GET plans_read(plan_id)
 note right
 element-tenant-school-interview.yml +
 element_educalegal_client.py

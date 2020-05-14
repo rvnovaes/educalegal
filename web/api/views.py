@@ -16,15 +16,18 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 
 from web.settings import BASE_DIR
+
+from billing.models import Plan
 from document.models import Document, DocumentESignatureLog
 from interview.models import Interview
 from school.models import School
 from tenant.models import Tenant, TenantGedData, TenantESignatureData
 
-from .serializers import DocumentSerializer
-from .serializers import InterviewSerializer
-from .serializers import SchoolSerializer
 from .serializers import (
+    DocumentSerializer,
+    InterviewSerializer,
+    PlanSerializer,
+    SchoolSerializer,
     TenantSerializer,
     TenantGedDataSerializer,
     TenantESignatureDataSerializer,
@@ -149,6 +152,7 @@ def docusign_xml_parser(data):
     envelope_data["envelope_all_details_message"] = all_details
     return envelope_data
 
+
 def docusign_pdf_files_saver(data, envelope_dir):
     pdf_documents = list()
     xml = xmltodict.parse(data)["DocuSignEnvelopeInformation"]
@@ -231,7 +235,7 @@ def docusign_webhook_listener(request):
 
     tenant = Tenant.objects.get(pk=document.tenant.pk)
     # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
-    if envelope_status == "completed" and tenant.use_ged:
+    if envelope_status == "completed" and tenant.plan.use_ged:
         try:
             (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
                 data, envelope_dir
@@ -305,6 +309,11 @@ class DocumentViewSet(viewsets.ModelViewSet):
 class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Interview.objects.all()
     serializer_class = InterviewSerializer
+
+
+class PlanViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Plan.objects.all()
+    serializer_class = PlanSerializer
 
 
 class TenantSchoolViewSet(viewsets.ViewSet):
