@@ -4,7 +4,8 @@ from .models import Tenant, TenantGedData, TenantESignatureData
 
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["name", "plan", "auto_enrolled", "created_date"]
+    list_filter = ["auto_enrolled", "plan"]
 
 
 @admin.register(TenantGedData)

@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    bulk_interview,
+    bulk_interview
 )
 
 app_name = "bulk_interview"

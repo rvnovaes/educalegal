@@ -10,14 +10,37 @@ from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 
 from .docassemble_client import DocassembleClient
-from .forms import BulkInterviewForm
-
 from interview.models import Interview, InterviewServerConfig
+
+from .forms import BulkInterviewForm
+from .models import BulkGeneration
+
+
 
 logger = logging.getLogger(__name__)
 
 
 def bulk_interview(request, interview_id):
+    row_errors = []
+    if request.method == "POST":
+        form = BulkInterviewForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES["file"]
+            interview = Interview.objects.get(pk=interview_id)
+            bulk_generation = BulkGeneration(interview=interview, source_file=file)
+            bulk_generation.save()
+    else:
+        form = BulkInterviewForm()
+
+    return render(
+        request,
+        "bulk_interview/bulk_interview.html",
+        {"form": form, "interview_id": interview_id, "row_errors": row_errors},
+    )
+
+
+
+def bulk_interview_old(request, interview_id):
     row_errors = []
     if request.method == "POST":
         form = BulkInterviewForm(request.POST, request.FILES)
