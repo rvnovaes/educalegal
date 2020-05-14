@@ -16,15 +16,21 @@
                     <li class="list-group-item">
                         <span class="font-weight-bold">Limite de documentos: </span>{% if plan.document_limit %}
                         {{ plan.document_limit }}{% else %}ilimitado{% endif %}</li>
-{#                    <li class="list-group-item">#}
-{#                        <span class="font-weight-bold">Usa GED: </span>{% if plan.use_ged %}Sim{% else %}Não{% endif %}#}
-{#                    </li>#}
-{#                    <li class="list-group-item">#}
-{#                        <span class="font-weight-bold">Usa assinatura eletrônica: </span>{% if plan.use_esignature %}Sim{% else %}Não{% endif %}#}
-{#                    </li>#}
-{#                    <li class="list-group-item">#}
-{#                        <span class="font-weight-bold">Usa geração em lote: </span>{% if plan.use_bulk_interview %}Sim{% else %}Não{% endif %}#}
-{#                    </li>#}
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Documentos gerados no mês atual: </span>{% if plan.document_limit %}
+                        {{ plan.document_limit }}{% else %}ilimitado{% endif %}</li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Total de documentos gerados: </span>{% if plan.document_limit %}
+                        {{ plan.document_limit }}{% else %}ilimitado{% endif %}</li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Usa GED: </span>{% if plan.use_ged %}Sim{% else %}Não{% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Usa assinatura eletrônica: </span>{% if plan.use_esignature %}Sim{% else %}Não{% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <span class="font-weight-bold">Usa geração em lote: </span>{% if plan.use_bulk_interview %}Sim{% else %}Não{% endif %}
+                    </li>
                 </ul>
             </div>
         </div>
