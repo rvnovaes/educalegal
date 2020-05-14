@@ -17,11 +17,11 @@
                         <span class="font-weight-bold">Limite de documentos: </span>{% if plan.document_limit %}
                         {{ plan.document_limit }}{% else %}ilimitado{% endif %}</li>
                     <li class="list-group-item">
-                        <span class="font-weight-bold">Documentos gerados no mês atual: </span>{% if plan.document_limit %}
-                        {{ plan.document_limit }}{% else %}ilimitado{% endif %}</li>
+                        <span class="font-weight-bold">Documentos gerados no mês atual: </span>{% if document_count_current_month %}
+                        {{ document_count_current_month }}{% else %}0{% endif %}</li>
                     <li class="list-group-item">
-                        <span class="font-weight-bold">Total de documentos gerados: </span>{% if plan.document_limit %}
-                        {{ plan.document_limit }}{% else %}ilimitado{% endif %}</li>
+                        <span class="font-weight-bold">Total de documentos gerados: </span>{% if total_document_count %}
+                        {{ total_document_count }}{% else %}0{% endif %}</li>
                     <li class="list-group-item">
                         <span class="font-weight-bold">Usa GED: </span>{% if plan.use_ged %}Sim{% else %}Não{% endif %}
                     </li>
