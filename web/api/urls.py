@@ -1,11 +1,17 @@
 from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 from django.urls import path, include
-from .views import DocumentViewSet
-from .views import InterviewViewSet
-from .views import TenantSchoolViewSet
-from .views import TenantViewSet, TenantGedDataViewSet, TenantESignatureDataViewSet
-from .views import docusign_webhook_listener
+
+from .views import (
+    DocumentViewSet,
+    InterviewViewSet,
+    PlanViewSet,
+    TenantSchoolViewSet,
+    TenantViewSet,
+    TenantGedDataViewSet,
+    TenantESignatureDataViewSet,
+    docusign_webhook_listener
+)
 
 API_TITLE = "Educa Legal API"
 API_DESCRIPTION = (
@@ -15,6 +21,7 @@ API_DESCRIPTION = (
 schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
+    path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
     path(
         "documents/",
         DocumentViewSet.as_view({"post": "create", "patch": "partial_update"}),

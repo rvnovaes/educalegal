@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from billing.models import Plan
 from document.models import Document, DocumentESignatureLog
 from interview.models import Interview
 from school.models import School
@@ -21,6 +22,12 @@ class DocumentSerializer(serializers.ModelSerializer):
 class InterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
+        fields = "__all__"
+
+
+class PlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plan
         fields = "__all__"
 
 
