@@ -87,7 +87,7 @@ INSTALLED_APPS = [
     "interview",
     "api",
     "document",
-    "billing"
+    "billing",
     "bulk_interview",
 ]
 
