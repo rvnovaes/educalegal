@@ -37,8 +37,6 @@ class EducaLegalSignupForm(SignupForm):
         tenant = Tenant.objects.create(
             name=self.cleaned_data.get("tenant_name"),
             subdomain_prefix=None,
-            use_esignature=False,
-            use_ged=False,
             eua_agreement=self.cleaned_data.get("eua"),
             plan=essential_plan,
             auto_enrolled=True,
