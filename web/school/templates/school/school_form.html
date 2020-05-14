@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block body_block %}
-    <div class="container">
-        <h2>Escola</h2>
-        <form method="post" enctype="multipart/form-data">{% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" class="btn btn-success">Salvar</button>
-        </form>
-    </div>
+    <h2>Escola</h2>
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">Salvar</button>
+    </form>
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
@@ -17,7 +15,7 @@
         });
 
         $("#id_legal_type").change(function () {
-            var chosen_legal_type =  $("#id_legal_type").val();
+            var chosen_legal_type = $("#id_legal_type").val();
             console.log(chosen_legal_type);
             if (chosen_legal_type === "J") {
                 $('#id_cnpj').mask('00.000.000/0000-00', {reverse: true});

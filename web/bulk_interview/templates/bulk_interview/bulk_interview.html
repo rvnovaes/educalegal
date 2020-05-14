@@ -1,46 +1,44 @@
 {% extends 'base.html' %}
 {% block body_block %}
-    <div class="container">
-        <h2>Entrevista em lote</h2>
-        <br>
-        <label class="control-label">Baixe aqui o </label>
-        <a href="https://atendimento.atlassian.net/wiki/spaces/EL/pages/40468495/Entrevista+em+lote?preview=%2F40468495%2F40501286%2Fcontrato-prestacao-servicos-educacionais.csv">layout
-            do csv de importação (versão 1)</a> do contrato de prestação de serviços educacionais.
-        <form enctype="multipart/form-data" action="{% url 'bulk_interview:bulk_interview' interview_id %}" method="POST">
-            {% csrf_token %}
+    <h2>Entrevista em lote</h2>
+    <br>
+    <label class="control-label">Baixe aqui o </label>
+    <a href="https://atendimento.atlassian.net/wiki/spaces/EL/pages/40468495/Entrevista+em+lote?preview=%2F40468495%2F40501286%2Fcontrato-prestacao-servicos-educacionais.csv">layout
+        do csv de importação (versão 1)</a> do contrato de prestação de serviços educacionais.
+    <form enctype="multipart/form-data" action="{% url 'bulk_interview:bulk_interview' interview_id %}" method="POST">
+        {% csrf_token %}
 
-             {{ form.non_field_errors }}
+        {{ form.non_field_errors }}
 
-            <div class="custom-file">
-                {{ form.file.errors }}
-                <label class="custom-file-label" for="customFile">{{ form.file.label }}</label>
-                {{ form.file }}
-            </div>
-            <br><br>
-            <button type="submit" class="btn btn-success">Importar</button>
-        </form>
-        <br>
-        <br>
-        {% if row_errors %}
-            <label class="control-label">Erros na importação: </label>
-            <table class="table table-striped">
-                <thead>
+        <div class="custom-file">
+            {{ form.file.errors }}
+            <label class="custom-file-label" for="customFile">{{ form.file.label }}</label>
+            {{ form.file }}
+        </div>
+        <br><br>
+        <button type="submit" class="btn btn-success">Importar</button>
+    </form>
+    <br>
+    <br>
+    {% if row_errors %}
+        <label class="control-label">Erros na importação: </label>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Linha</th>
+                <th scope="col">Erro</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in row_errors %}
                 <tr>
-                    <th scope="col">Linha</th>
-                    <th scope="col">Erro</th>
+                    <th scope="row">{{ row.0 }}</th>
+                    <td>{{ row.1 }}</td>
                 </tr>
-                </thead>
-                <tbody>
-                {% for row in row_errors %}
-                    <tr>
-                        <th scope="row">{{ row.0 }}</th>
-                        <td>{{ row.1 }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-    </div>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}
 {% block scripts %}
     <script>

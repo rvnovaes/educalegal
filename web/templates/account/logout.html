@@ -1,14 +1,12 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block body_block %}
-  <div class="container">
-      <h2 class="text-danger">Sair do sistema</h2>
-      <p>Tem certeza que deseja sair?</p>
-        <form method="post">{% csrf_token %}
-          {% if redirect_field_value %}
+    <h2 class="text-danger">Sair do sistema</h2>
+    <p>Tem certeza que deseja sair?</p>
+    <form method="post">{% csrf_token %}
+        {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-          {% endif %}
-            <button class="btn btn-danger" type="submit">Sair</button>
-        </form>
-  </div>
+        {% endif %}
+        <button class="btn btn-danger" type="submit">Sair</button>
+    </form>
 {% endblock %}
