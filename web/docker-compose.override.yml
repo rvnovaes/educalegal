@@ -60,6 +60,7 @@ services:
     volumes:
       - /opt/educalegal/docker_volumes/rabbitmq:/var/lib/rabbitmq
   celery_flower:
+    container_name: celery_flower
     command:
       - run_celery
       - flower
@@ -95,3 +96,14 @@ services:
       - "6543:5432"
     volumes:
       - /opt/educalegal/docker_volumes/postgres_db_ged:/var/lib/postgresql/data
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: educalegal
+      ME_CONFIG_BASICAUTH_PASSWORD: educalegal
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: educalegal
+      ME_CONFIG_MONGODB_ADMINPASSWORD: educalegal
+    ports:
+      - "8081:8081"

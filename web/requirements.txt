@@ -1,4 +1,4 @@
-django~=3.0.5
+django~=3.0.6
 # API
 djangorestframework~=3.11.0
 django-cors-headers~=3.2.1
@@ -6,7 +6,7 @@ coreapi~=2.3.3
 django-rest-auth~=0.9.5
 retry-requests
 # Formating of forms
-django-crispy-forms~=1.9.0
+django-crispy-forms~=1.9.1
 # Database Access
 psycopg2-binary~=2.8.5
 # Authentication
@@ -16,7 +16,7 @@ django-tables2
 django-filter~=2.2.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.12.25
+boto3~=1.13.11
 # Production server
 gunicorn
 # Misc
@@ -35,3 +35,6 @@ pandas~=1.0.3
 django-money~=1.1
 # Google Analytics
 django-google-analytics-app
+# MongoDB
+pymongo~=3.10.1
+mongoengine~=0.20.0

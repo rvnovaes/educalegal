@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   educalegal:
-    image: rvnovaes/educalegal:0.46
+    image: rvnovaes/educalegal:0.47
     container_name: educalegal
     build: .
     command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8000"]
@@ -15,3 +15,18 @@ services:
         target: /code/media
     environment:
       - EL_ENV=development
+  mongo:
+    image: mongo:4.2.6
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: educalegal
+      MONGO_INITDB_ROOT_PASSWORD: educalegal
+      MONGO_INITDB_DATABASE: educalegal
+      MONGO_INITDB_USERNAME: educalegal
+      MONGO_INITDB_PASSWORD: educalegal
+    volumes:
+      - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+      - /opt/educalegal/docker_volumes/mongo_db:/data/db
+    ports:
+      - "27017:27017"
