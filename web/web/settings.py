@@ -15,6 +15,7 @@ import moneyed
 from moneyed.localization import _FORMATTER
 from decimal import ROUND_HALF_EVEN
 from config.config import EL_ENV
+from mongo_util.mongo_util import create_mongo_connection
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,7 +29,7 @@ SECRET_KEY = "mvyzst83ep^g72ho)29dm+zq&+we8qbg82u8q_(_7$$a=i_@*n"
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if EL_ENV == 'production':
+if EL_ENV == "production":
     DEBUG = False
 else:
     DEBUG = True
@@ -131,9 +132,7 @@ ROOT_URLCONF = "web.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            os.path.join(BASE_DIR, 'templates'),
-        ],
+        "DIRS": [os.path.join(BASE_DIR, "templates"),],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -269,10 +268,12 @@ ACCOUNT_FORMS = {"signup": "tenant.forms.EducaLegalSignupForm"}
 
 # E-mail sending Settings
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.sendgrid.net"
 EMAIL_HOST_USER = "apikey"
-EMAIL_HOST_PASSWORD = "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"
+EMAIL_HOST_PASSWORD = (
+    "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"
+)
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = "sistemas@educalegal.com.br"
@@ -327,36 +328,35 @@ LOGGING = {
     "loggers": {
         "": {"level": "DEBUG", "handlers": ["console", "debug_file"]},
         # "error": {"level": "ERROR", "handlers": ["console", "error_file"]}
-
     },
 }
 
 # Adding a new Currency
 BRL = moneyed.add_currency(
-    code='BRL',
-    numeric='986',
-    name='Brazilian Real',
-    countries=('BRAZIL', )
+    code="BRL", numeric="986", name="Brazilian Real", countries=("BRAZIL",)
 )
 
 # Currency Formatter will output R$ 2.000,00
-_FORMATTER.add_sign_definition(
-    'default',
-    BRL,
-    prefix=u'R$ '
-)
+_FORMATTER.add_sign_definition("default", BRL, prefix=u"R$ ")
 
 _FORMATTER.add_formatting_definition(
-    'pt_BR',
-    group_size=3, group_separator=".", decimal_point=",",
-    positive_sign="",  trailing_positive_sign="",
-    negative_sign="-", trailing_negative_sign="",
-    rounding_method=ROUND_HALF_EVEN
+    "pt_BR",
+    group_size=3,
+    group_separator=".",
+    decimal_point=",",
+    positive_sign="",
+    trailing_positive_sign="",
+    negative_sign="-",
+    trailing_negative_sign="",
+    rounding_method=ROUND_HALF_EVEN,
 )
 
-CURRENCIES = ('BRL', )
+CURRENCIES = ("BRL",)
 
 # Google Analytics django-google-analytics-app
 GOOGLE_ANALYTICS = {
-    'google_analytics_id': 'UA-149363385-1',
+    "google_analytics_id": "UA-149363385-1",
 }
+
+# MongoDB Settings
+create_mongo_connection("educalegal", "default", "educalegal", "educalegal", "localhost", 27017)
