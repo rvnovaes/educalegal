@@ -12,7 +12,7 @@ def build_interview_name(user_id, project_name, yaml_name):
 
 
 def build_interview_path(user_id, project_name, yaml_name):
-    path = "interview?i" + build_interview_name(user_id, project_name, yaml_name)
+    path = "interview?i=" + build_interview_name(user_id, project_name, yaml_name)
     return path
 
 
