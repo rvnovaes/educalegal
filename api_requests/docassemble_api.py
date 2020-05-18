@@ -52,13 +52,13 @@ if __name__ == "__main__":
         """)
         if user == "1":
             # iasmini
-            api_key = "Mj2sSatiz4aqqvtJkRkG9l5cCVkbOt1F"
+            api_key = "LVuyhvPfYcaPKwvS5yHqGM7lJKDYQyIb"
         elif user == "2":
             # isabela
             api_key = "YukwjUC4SWUZ0BZrIiLmY2UOQfYKFo4h"
         elif user == "3":
             # luis paim
-            api_key = "FXpI0DXm6FwFLN0jQEhJYoERcmIjIP10"
+            api_key = "FIYcmvLjnBhCS66iw3MWefGyiyrp6Qb2"
         elif user == "4":
             # roberto
             api_key = "upZIFYTRFwMuUYHVKVoinxWHYWHnQTSx"

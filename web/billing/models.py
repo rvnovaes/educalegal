@@ -33,6 +33,15 @@ class Plan(models.Model):
         choices=PlanType.choices(),
         default=PlanType.ESSENTIAL
     )
+    use_esignature = models.BooleanField(
+        default=False, verbose_name="Usa assinatura eletrônica"
+    )
+    use_ged = models.BooleanField(
+        default=False, verbose_name="Usa gestão eletrônica de documentos"
+    )
+    use_bulk_interview = models.BooleanField(
+        default=False, verbose_name="Usa geração em lote"
+    )
 
     class Meta:
         ordering = ["name"]

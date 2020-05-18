@@ -13,11 +13,11 @@ class DocumentTable(tables.Table):
     altered_date = tables.DateTimeColumn(format="d/m/Y H:i")
 
     def before_render(self, request):
-        if not request.user.tenant.use_esignature:
+        if not request.user.tenant.plan.use_esignature:
             self.columns.hide('signing_provider')
-        if not request.user.tenant.use_ged:
+        if not request.user.tenant.plan.use_ged:
             self.columns.hide('ged_link')
-        if not (request.user.tenant.use_ged or request.user.tenant.use_esignature):
+        if not (request.user.tenant.plan.use_ged or request.user.tenant.plan.use_esignature):
             self.columns.hide('altered_date')
 
     class Meta:

@@ -3,49 +3,49 @@
   fields:
     name: Development
     subdomain_prefix: sys
-    use_esignature: true
+    created_date: "2020-05-14T11:00:00-03:00"
 - model: tenant.tenant
   pk: 2
   fields:
     name: Educa Legal
     subdomain_prefix: edu
-    use_esignature: true
+    created_date: "2020-05-14T11:00:00-03:00"
 - model: tenant.tenant
   pk: 3
   fields:
     name: Bahema
     subdomain_prefix: bah
-    use_esignature: true
+    created_date: "2020-05-14T11:00:00-03:00"
 - model: tenant.tenant
   pk: 4
   fields:
     name: Escola Mais
     subdomain_prefix: mais
-    use_esignature: true
+    created_date: "2020-05-14T11:00:00-03:00"
 - model: tenant.tenant
   pk: 5
   fields:
     name: "Bal\xE3o Vermelho"
     subdomain_prefix: balao
-    use_esignature: true
+    created_date: "2020-05-14T11:00:00-03:00"
 - model: tenant.tenant
   pk: 6
   fields:
     name: Camino School
     subdomain_prefix: cam
-    use_esignature: true
+    created_date: "2020-05-14T11:00:00-03:00"
 - model: tenant.tenant
   pk: 7
   fields:
     name: Autotest
     subdomain_prefix: auto
-    use_esignature: true
+    created_date: "2020-05-14T11:00:00-03:00"
 - model: tenant.tenant
   pk: 8
   fields:
     name: "Escola Viva"
     subdomain_prefix: viva
-    use_esignature: true
+    created_date: "2020-05-14T11:00:00-03:00"
 - model: tenant.tenantgeddata
   pk: 1
   fields:
