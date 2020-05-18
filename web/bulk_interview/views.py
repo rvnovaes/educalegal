@@ -1,8 +1,10 @@
+import csv
 import logging
 import requests
 import traceback
 from urllib3.exceptions import NewConnectionError
 import pandas as pd
+from mongoengine import ValidationError
 
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -12,10 +14,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from .docassemble_client import DocassembleClient
 from interview.models import Interview, InterviewServerConfig
 
+from mongo_util.mongo_util import create_dynamic_document_class
+
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -25,32 +27,12 @@ def bulk_interview(request, interview_id):
     if request.method == "POST":
         form = BulkInterviewForm(request.POST, request.FILES)
         if form.is_valid():
-            file = request.FILES["file"]
-            interview = Interview.objects.get(pk=interview_id)
-            bulk_generation = BulkGeneration(interview=interview, source_file=file)
-            bulk_generation.save()
-    else:
-        form = BulkInterviewForm()
-
-    return render(
-        request,
-        "bulk_interview/bulk_interview.html",
-        {"form": form, "interview_id": interview_id, "row_errors": row_errors},
-    )
-
-
-
-def bulk_interview_old(request, interview_id):
-    row_errors = []
-    if request.method == "POST":
-        form = BulkInterviewForm(request.POST, request.FILES)
-        if form.is_valid():
-            file = request.FILES["file"]
-            logger.debug("Carregado o arquivo: " + file.name)
+            source_file = request.FILES["source_file"]
+            logger.debug("Carregado o arquivo: " + source_file.name)
 
             # salva o arquivo inserido pelo usuario na pasta media
             fs = FileSystemStorage()
-            filename = fs.save(file.name, file)
+            filename = fs.save(source_file.name, source_file)
 
             # pega caminho do arquivo para ler o csv com pandas
             absolute_file_path = fs.base_location + "/" + filename
@@ -68,12 +50,16 @@ def bulk_interview_old(request, interview_id):
                 user_key = isc.user_key
                 username = isc.username
                 user_password = isc.user_password
-
+            except ObjectDoesNotExist:
+                message = "Não foi configurado o servidor para esta entrevista!"
+                logger.error(message)
+                messages.error(request, message)
+            else:
                 # cria cliente da api do docassemble
                 try:
                     dac = DocassembleClient(base_url, user_key)
-                except NewConnectionError:
-                    message = traceback.print_tb()
+                except NewConnectionError as e:
+                    message = str(e)
                     logger.error(message)
                     messages.error(request, message)
 
@@ -95,10 +81,9 @@ def bulk_interview_old(request, interview_id):
                     secret = dac.secret_read(username, user_password)
                 except requests.exceptions.ConnectionError:
                     message = "Não foi possível conectar com o servidor de geração de documentos."
-                    logger.error(message)
-                    messages.error(request, message)
-
-                try:
+                    logger.debug(message)
+                    messages.debug(request, message)
+                else:
                     # gera entrevista para a lista de variáveis
                     for row, variable in enumerate(interview_variables_list):
                         logger.debug(
@@ -108,35 +93,22 @@ def bulk_interview_old(request, interview_id):
                             )
                         )
                         variable["url_args"] = url_args
-                        response, status_code = dac.interview_set_variables(
-                            secret, interview_name, variable
-                        )
-                        if status_code != 200:
-                            row_errors.append([row, response])
-                    if row_errors:
-                        raise Exception(list(set(row_errors)))
-                    else:
-                        message = "Entrevistas geradas com sucesso!"
-                        logger.debug(message)
-                        messages.success(request, message)
-                except Exception as e:
-                    print(e)
-                    if row_errors:
-                        message = (
-                            "Não foi possível gerar as entrevistas! "
-                            "Verifique as mensagens de erro geradas de acordo com a linha do arquivo."
-                        )
-                    else:
-                        message = "Não foi possível gerar as entrevistas!"
-                    logger.error(message)
-                    messages.error(request, message)
+                        try:
+                            response, status_code = dac.interview_set_variables(
+                                secret, interview_name, variable
+                            )
+                        except Exception as e:
+                            error_message = str(e)
+                            logger.debug(error_message)
+                            messages.error(request, error_message)
+                        else:
+                            message = "Entrevistas geradas com sucesso!"
+                            logger.debug(message)
+                            messages.success(request, message)
 
                 # apaga o arquivo importado da pasta media
                 fs.delete(filename)
-            except ObjectDoesNotExist:
-                message = "Não foi configurado o servidor para esta entrevista!"
-                logger.error(message)
-                messages.error(request, message)
+
     else:
         form = BulkInterviewForm()
 
