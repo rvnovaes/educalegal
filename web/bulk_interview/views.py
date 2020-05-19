@@ -150,8 +150,8 @@ def bulk_interview(request, interview_id):
                                         logger.debug(message)
                                         messages.success(request, message)
 
-                # apaga o arquivo importado da pasta media
-                fs.delete(filename)
+            # apaga o arquivo importado da pasta media
+            fs.delete(filename)
 
     else:
         form = BulkInterviewForm()
