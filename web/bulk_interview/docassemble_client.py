@@ -17,11 +17,11 @@ class DocassembleClient:
         )
         self.session.headers.update(headers)
 
-    def secret_read(self, key, username, password):
+    def secret_read(self, username, password):
         """ Obtain a decryption key for a user """
 
         final_url = self.api_base_url + "/api/secret"
-        payload = {"key": key, "username": username, "password": password}
+        payload = {"username": username, "password": password}
         response = self.session.get(final_url, params=payload)
 
         return response.json()
@@ -57,6 +57,21 @@ class DocassembleClient:
                 response=response, ex=ex.__str__()
             )
             raise Exception(message).with_traceback(ex.__traceback__)
+
+    def interview_get_variables(self, secret, interview_name, session):
+        final_url = self.api_base_url + "/api/session"
+
+        payload = {
+            "i": interview_name,
+            "session": session,
+            "secret": secret,
+        }
+
+        try:
+            response = self.session.get(final_url, params=payload)
+            return response.json(), response.status_code
+        except Exception as e:
+            print("Erro: ", e.__class__.__name__)
 
     def interview_set_variables(self, secret, interview_name, variables, session):
         """ Set variables in an interview
