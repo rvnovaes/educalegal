@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from django.contrib.messages import constants as message_constants
+
 import moneyed
 from moneyed.localization import _FORMATTER
 from decimal import ROUND_HALF_EVEN
@@ -31,8 +33,10 @@ SECRET_KEY = "mvyzst83ep^g72ho)29dm+zq&+we8qbg82u8q_(_7$$a=i_@*n"
 # SECURITY WARNING: don't run with debug turned on in production!
 if EL_ENV == "production":
     DEBUG = False
+
 else:
     DEBUG = True
+    MESSAGE_LEVEL = message_constants.DEBUG
 
 SILK = False
 
