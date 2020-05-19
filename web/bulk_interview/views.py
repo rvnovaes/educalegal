@@ -1,10 +1,7 @@
-import csv
 import logging
 import requests
-import traceback
 from urllib3.exceptions import NewConnectionError
 import pandas as pd
-from mongoengine import ValidationError
 
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -13,8 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from .docassemble_client import DocassembleClient
 from interview.models import Interview, InterviewServerConfig
-
-from mongo_util.mongo_util import create_dynamic_document_class
+from interview.util import build_interview_full_name
 
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
@@ -47,7 +43,7 @@ def bulk_interview(request, interview_id):
                 # lê configurações do servidor da plataforma de geração de documentos (Docassemble)
                 isc = InterviewServerConfig.objects.get(interviews=interview_id)
                 base_url = isc.base_url
-                user_key = isc.user_key
+                api_key = isc.user_key
                 username = isc.username
                 user_password = isc.user_password
             except ObjectDoesNotExist:
@@ -57,56 +53,67 @@ def bulk_interview(request, interview_id):
             else:
                 # cria cliente da api do docassemble
                 try:
-                    dac = DocassembleClient(base_url, user_key)
+                    dac = DocassembleClient(base_url, api_key)
                 except NewConnectionError as e:
-                    message = str(e)
+                    message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(e=str(e))
                     logger.error(message)
                     messages.error(request, message)
-
-                # monta nome da entrevista de acordo com especificações do docassemble
-                interview_name = "docassemble.playground{user_id}{project_name}:{interview_name}".format(
-                    user_id=isc.user_id,
-                    project_name=isc.project_name,
-                    interview_name=interview.yaml_name,
-                )
-
-                # passa argumentos da url para a entrevista
-                url_args = {
-                    "tid": request.user.tenant.pk,
-                    "ut": request.user.auth_token.key,
-                    "intid": interview_id,
-                }
-
-                try:
-                    secret = dac.secret_read(username, user_password)
-                except requests.exceptions.ConnectionError:
-                    message = "Não foi possível conectar com o servidor de geração de documentos."
-                    logger.debug(message)
-                    messages.debug(request, message)
                 else:
-                    # gera entrevista para a lista de variáveis
-                    for row, variable in enumerate(interview_variables_list):
-                        logger.debug(
-                            "Gerando documento {document_number} de {bulk_list_lenght}".format(
-                                document_number=str(row + 1),
-                                bulk_list_lenght=str(len(interview_variables_list)),
-                            )
-                        )
-                        variable["url_args"] = url_args
-                        try:
-                            response, status_code = dac.interview_set_variables(
-                                secret, interview_name, variable
-                            )
-                        except Exception as e:
-                            error_message = str(e)
-                            logger.debug(error_message)
-                            messages.error(request, error_message)
-                        else:
-                            message = "Entrevistas geradas com sucesso!"
-                            logger.debug(message)
-                            messages.success(request, message)
+                    # monta nome da entrevista de acordo com especificações do docassemble
+                    interview_full_name = build_interview_full_name(isc.user_id, isc.project_name, interview.yaml_name, "interview_filename")
 
-                # apaga o arquivo importado da pasta media
+                    # passa argumentos da url para a entrevista
+                    url_args = {
+                        "tid": request.user.tenant.pk,
+                        "ut": request.user.auth_token.key,
+                        "intid": interview_id,
+                    }
+
+                    try:
+                        secret = dac.secret_read(api_key, username, user_password)
+                    except requests.exceptions.ConnectionError as e:
+                        message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(e=str(e))
+                        logger.debug(message)
+                        messages.error(request, message)
+                    else:
+                        for row, interview_variables in enumerate(interview_variables_list):
+                            try:
+                                new_interview_session = dac.start_interview(interview_full_name, secret)
+                            except requests.exceptions.ConnectionError:
+                                message = "Não foi possível iniciar nova sessão de entrevista. | {e}".format(e=str(e))
+                                logger.debug(message)
+                                messages.error(request, message)
+                            else:
+                                # gera entrevista para a lista de variáveis
+                                logger.debug(
+                                    "Gerando documento {document_number} de {bulk_list_lenght}".format(
+                                        document_number=str(row + 1),
+                                        bulk_list_lenght=str(len(interview_variables_list)),
+                                    )
+                                )
+                                interview_variables["url_args"] = url_args
+                                try:
+                                    response, status_code = dac.interview_set_variables(
+                                        secret, interview_full_name, interview_variables, new_interview_session
+                                    )
+                                except Exception as e:
+                                    error_message = str(e)
+                                    logger.debug(error_message)
+                                    messages.error(request, error_message)
+                                else:
+                                    if status_code != 200:
+                                        error_message = "Status Code: {status_code} | Response: {response}".format(status_code=status_code, response=response)
+                                        logger.debug(error_message)
+                                        messages.error(request, error_message)
+                                    else:
+                                        if interview_variables["submit_to_esignature"]:
+                                            status_code = dac.interview_run_action(secret, interview_full_name, new_interview_session, "submit_to_esignature", None)
+                                            logger.debug(status_code)
+                                        message = "Status Code: {status_code} | Response: {response}".format(status_code=status_code, response=response)
+                                        logger.debug(message)
+                                        messages.success(request, message)
+
+                        # apaga o arquivo importado da pasta media
                 fs.delete(filename)
 
     else:
@@ -155,7 +162,12 @@ def _dict_from_csv(absolute_file_path, document_type_id):
                 "signature_date",
             ],
             keep_default_na=False,
-        ).to_dict(orient="records")
+        )
+
+        interview_variables_list["anoLetivo"] = interview_variables_list["anoLetivo"].astype(int)
+        interview_variables_list["valorAnual"] = interview_variables_list["valorAnual"].astype(float)
+
+        interview_variables_list = interview_variables_list.to_dict(orient="records")
 
         contratantes_list = pd.read_csv(
             absolute_file_path,
