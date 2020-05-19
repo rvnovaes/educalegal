@@ -1,5 +1,4 @@
 from django_tables2 import TemplateColumn
-from urllib.parse import urljoin
 
 from .util import get_interview_link
 
