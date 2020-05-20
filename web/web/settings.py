@@ -363,4 +363,14 @@ GOOGLE_ANALYTICS = {
 }
 
 # MongoDB Settings
-create_mongo_connection("educalegal", "default", "educalegal", "educalegal", "localhost", 27017)
+MONGO_DB = "educalegal"
+MONGO_ALIAS = "default"
+MONGO_USERNAME = "educalegal"
+MONGO_PASSWORD = "educalegal"
+MONGO_HOST = "localhost"
+MONGO_PORT = 27017
+
+# mongoengine
+create_mongo_connection(MONGO_DB, MONGO_ALIAS, MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT)
+
+
