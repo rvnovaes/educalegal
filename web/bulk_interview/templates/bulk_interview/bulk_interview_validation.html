@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
 {% block body_block %}
-    <h2>Entrevista em lote</h2>
+    <h2>Geração de documentos em lote</h2>
     <br>
-    <label class="control-label">Baixe aqui o </label>
+    {% if csv_valid %}
+        <p>O arquivo foi validado. Clique no botão para gerar os documentos.</p>
+            <button type="submit" class="btn btn-success">Gerar Lote</button>
+    {% else %}
+        <label class="control-label">Baixe aqui o </label>
     <a href="https://atendimento.atlassian.net/wiki/spaces/EL/pages/40468495/Entrevista+em+lote?preview=%2F40468495%2F40501286%2Fcontrato-prestacao-servicos-educacionais.csv">layout
         do csv de importação (versão 1)</a> do contrato de prestação de serviços educacionais.
-    <form enctype="multipart/form-data" action="{% url 'bulk_interview:bulk_interview' interview_id %}" method="POST">
+    <form enctype="multipart/form-data" action="{% url 'bulk_interview:bulk_interview_validate' interview_id %}" method="POST">
         {% csrf_token %}
         {{ form.non_field_errors }}
         <div class="custom-file">
@@ -14,7 +18,8 @@
             {{ form.source_file }}
         </div>
         <br><br>
-        <button type="submit" class="btn btn-success">Importar</button>
+            <button type="submit" class="btn btn-success">Validar</button>
+        {% endif %}
     </form>
     <br>
     <br>
