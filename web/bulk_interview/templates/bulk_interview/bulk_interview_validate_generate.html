@@ -4,12 +4,13 @@
     <br>
     {% if csv_valid %}
         <p>O arquivo foi validado. Clique no botão para gerar os documentos.</p>
-            <button type="submit" class="btn btn-success">Gerar Lote</button>
+        <a href="{% url 'bulk_interview:bulk_interview_generation_result' bulk_generation_id %}" class="btn btn-success" >Gerar Lote</a>
     {% else %}
         <label class="control-label">Baixe aqui o </label>
-    <a href="https://atendimento.atlassian.net/wiki/spaces/EL/pages/40468495/Entrevista+em+lote?preview=%2F40468495%2F40501286%2Fcontrato-prestacao-servicos-educacionais.csv">layout
-        do csv de importação (versão 1)</a> do contrato de prestação de serviços educacionais.
-    <form enctype="multipart/form-data" action="{% url 'bulk_interview:bulk_interview_validate' interview_id %}" method="POST">
+        <a href="https://atendimento.atlassian.net/wiki/spaces/EL/pages/40468495/Entrevista+em+lote?preview=%2F40468495%2F40501286%2Fcontrato-prestacao-servicos-educacionais.csv">layout
+            do csv de importação (versão 1)</a> do contrato de prestação de serviços educacionais.
+        <form enctype="multipart/form-data" action="{% url 'bulk_interview:bulk_interview_validate_generate' interview_id %}"
+              method="POST">
         {% csrf_token %}
         {{ form.non_field_errors }}
         <div class="custom-file">
@@ -18,12 +19,12 @@
             {{ form.source_file }}
         </div>
         <br><br>
-            <button type="submit" class="btn btn-success">Validar</button>
-        {% endif %}
-    </form>
+        <button type="submit" class="btn btn-success">Validar</button>
+    {% endif %}
+        </form>
     <br>
     <br>
-<!-- -------------------------------------------------- Messages -------------------------------------------------- -->
+    <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% if messages %}
         {% for message in messages %}
             {% if message.level <= 20 %}
@@ -35,13 +36,13 @@
             {% elif message.level == 40 %}
                 <div class="alert alert-danger alert-dismissable fade show" role="alert">
             {% endif %}
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                </div>
-            {% endfor %}
-    <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        {% endfor %}
+        <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% endif %}
 {% endblock %}
 {% block scripts %}
