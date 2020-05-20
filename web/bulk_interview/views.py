@@ -1,16 +1,25 @@
+import csv
 import logging
 import requests
+import uuid
 from urllib3.exceptions import NewConnectionError
 import pandas as pd
 
 from django.contrib import messages
+from django.contrib.messages import get_messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
-from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render
+from django.views import View
+from mongoengine import ValidationError
+
 
 from .docassemble_client import DocassembleClient
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
+from mongo_util.mongo_util import create_dynamic_document_class
 
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
@@ -18,6 +27,98 @@ from .models import BulkGeneration
 logger = logging.getLogger(__name__)
 
 
+class ValidadeCSVFile(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        form = BulkInterviewForm()
+        interview = Interview.objects.get(pk=self.kwargs["interview_id"])
+        return render(
+            request,
+            "bulk_interview/bulk_interview_validation.html",
+            {"form": form, "interview_id": interview.pk},
+        )
+
+    def post(self, request, *args, **kwargs):
+        form = BulkInterviewForm(request.POST, request.FILES)
+        interview = Interview.objects.get(pk=self.kwargs["interview_id"])
+        if form.is_valid():
+            source_file = request.FILES["source_file"]
+            logger.debug("Carregado o arquivo: " + source_file.name)
+
+            # salva o arquivo inserido pelo usuario na pasta media
+            fs = FileSystemStorage()
+            filename = fs.save(source_file.name, source_file)
+
+            # pega caminho do arquivo para ler o csv com pandas
+            absolute_file_path = fs.base_location + "/" + filename
+
+            with open(absolute_file_path) as csvfile:
+                reader = csv.DictReader(csvfile, delimiter=";")
+                rows = [r for r in reader]
+
+            # O zeresimo elemento representa os tipos dos campos
+            # O primeiro elemento representa se o campo e required (true / false)
+            # serão usados na classe dinamica
+            dynamic_document_class_name = interview.custom_file_name + "_bulk_" + str(uuid.uuid1())
+            DynamicDocumentClass = create_dynamic_document_class(
+                dynamic_document_class_name,
+                rows[0],
+                rows[1],
+            )
+
+            # Grava cada uma das linhas
+            normalized_headers_row = dict()
+            # Gera uma lista com todos os cabecalhos
+            normalized_headers_row_headers_list = list()
+            csv_valid = False
+            for i, row in enumerate(rows[4:]):
+                for key, value in row.items():
+                    key = key.replace(".", "_")
+                    # Substitui "" por None para gerar erro de campo obrigatorio
+                    normalized_headers_row_headers_list.append(key)
+                    if len(value) == 0:
+                        value = None
+                    normalized_headers_row[key] = value
+                dynamic_document = DynamicDocumentClass(**normalized_headers_row)
+                try:
+                    dynamic_document.save()
+                    row = list(row.values())
+                    message = "Registro validado com sucesso " + str(i + 1)
+                    for i, value in enumerate(row):
+                        message += " | " + str(row[i])
+                    logger.debug(message)
+                    messages.success(request, message)
+                except ValidationError as e:
+                    row = list(row.values())
+                    message = "Erro ao validar o registro " + str(i + 1) + ": " + str(e)
+                    for i, value in enumerate(row):
+                        message += " | " + str(row[i])
+                    logger.debug(message)
+                    messages.error(request, message)
+                finally:
+                    storage = get_messages(request)
+                    for message in storage:
+                        if not message.level_tag == "error":
+                            csv_valid = True
+            if csv_valid:
+                bulk_generation = BulkGeneration(interview=interview,
+                                                     mongo_db_collection_name=dynamic_document_class_name)
+                bulk_generation.save()
+            else:
+                # Apaga a colecao do banco
+                dynamic_document.drop_collection()
+
+            return render(
+                request,
+                "bulk_interview/bulk_interview_validation.html",
+                {"form": form, "interview_id": interview.pk, "csv_valid": csv_valid},
+            )
+
+
+# @login_required
+# def generate_bulk_documents(request, bulk_generation_id):
+
+
+@login_required
 def bulk_interview(request, interview_id):
     row_errors = []
     if request.method == "POST":
@@ -104,7 +205,9 @@ def bulk_interview(request, interview_id):
                                 logger.debug(
                                     "Gerando documento {document_number} de {bulk_list_lenght}".format(
                                         document_number=str(i + 1),
-                                        bulk_list_lenght=str(len(interview_variables_list)),
+                                        bulk_list_lenght=str(
+                                            len(interview_variables_list)
+                                        ),
                                     )
                                 )
                                 interview_variables["url_args"] = url_args
@@ -134,7 +237,9 @@ def bulk_interview(request, interview_id):
                                         messages.error(request, error_message)
                                     else:
                                         # Dispara a action de envio para assinatura eletronica
-                                        logger.debug("Enviando entrevista para assinatura eletronica")
+                                        logger.debug(
+                                            "Enviando entrevista para assinatura eletronica"
+                                        )
                                         if interview_variables["submit_to_esignature"]:
                                             status_code = dac.interview_run_action(
                                                 secret,
@@ -246,7 +351,7 @@ def _dict_from_csv(absolute_file_path, document_type_id):
             item["name"]["_class"] = "docassemble.base.util.IndividualName"
             item["name"]["uses_parts"] = True
             # # TODO alteracao do indice para mais de um contratante
-            item["name"]["instanceName"] = "contratantes[0].name" # <-- Isso?
+            item["name"]["instanceName"] = "contratantes[0].name"  # <-- Isso?
             item["instanceName"] = "contratantes[0]"
             item.pop("name.first")
             item["_class"] = "docassemble.base.util.Individual"
