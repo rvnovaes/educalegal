@@ -12,7 +12,6 @@ class BulkGeneration(TenantAwareModel):
     interview = models.ForeignKey(
         Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"
     )
-    interview_fields = JSONField(
-        null=True, verbose_name="Campos e Tipos de Campo do Documento"
+    mongo_db_collection_name = models.CharField(
+        max_length=1024, null=False, verbose_name="Coleção de Documentos no Mongo"
     )
-    source_file = models.FileField()
