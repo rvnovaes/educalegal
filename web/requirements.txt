@@ -1,7 +1,7 @@
 django~=3.0.6
 # API
 djangorestframework~=3.11.0
-django-cors-headers~=3.2.1
+django-cors-headers~=3.3.0
 coreapi~=2.3.3
 django-rest-auth~=0.9.5
 retry-requests
@@ -16,11 +16,11 @@ django-tables2
 django-filter~=2.2.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.13.11
+boto3~=1.13.13
 # Production server
 gunicorn
 # Misc
-lxml~=4.5.0
+lxml~=4.5.1
 xmltodict~=0.12.0
 Pillow
 pyyaml~=5.3.1
@@ -29,7 +29,7 @@ django-bootstrap4~=1.1.1
 django-debug-toolbar~=2.2
 # API Debugging
 django-silk~=4.0.1
-# Read csv, excel
+# Read csv
 pandas~=1.0.3
 # Django models currency
 django-money~=1.1
