@@ -39,12 +39,33 @@
         </div>
     {% endif %}
 <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    {% if reached_document_limit %}
+        <div class="modal fade" id="plan_upgrade_modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Faça um upgrade no seu plano!</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Foi atingido o limite mensal de geração de {{ document_limit }} documentos para o plano contratado.</p>
+                        <p>Entre em contato com nosso setor comercial, e faça um upgrade do seu plano.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="https://www.educalegal.com.br/contato/" target="_blank" class="btn btn-primary">Entrar em contato</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
         $(window).on('load',function(){
             let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
             tutorial_modal.modal('show');
+            let plan_upgrade_modal = $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
+            plan_upgrade_modal.modal('show');
         });
     </script>
 {% endblock %}
