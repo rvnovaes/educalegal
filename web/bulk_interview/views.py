@@ -4,6 +4,7 @@ import uuid
 from urllib3.exceptions import NewConnectionError
 import pandas as pd
 import numpy as np
+from mongoengine import ValidationError
 
 from django.contrib import messages
 from django.contrib.messages import get_messages
@@ -13,16 +14,16 @@ from django.core.files.storage import FileSystemStorage
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.views import View
-from mongoengine import ValidationError
 
-
-from .docassemble_client import DocassembleClient
+from tenant.models import Tenant
+from school.models import School, SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
 from mongo_util.mongo_util import create_dynamic_document_class, mongo_to_dict
 
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
+from .docassemble_client import DocassembleClient
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +40,23 @@ class ValidadeCSVFile(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = BulkInterviewForm(request.POST, request.FILES)
-        interview = Interview.objects.get(pk=self.kwargs["interview_id"])
-        tenant = Interview.objects.get(pk=self.request.user.tenant_id)
         if form.is_valid():
+            # Consulta dados do aplicativo necessarios as validacoes
+            interview = Interview.objects.get(pk=self.kwargs["interview_id"])
+            tenant = Tenant.objects.get(pk=self.request.user.tenant_id)
+            schools = School.objects.filter(tenant=tenant)
+            # Monta os conjuntos de nomes de escolas e de unidades escolares para validacao
+            school_units_names_set = set()
+            for school in schools:
+                school_units = SchoolUnit.objects.filter(school=school).values_list(
+                    "name", flat=True
+                )
+                for school_unit in school_units:
+                    school_units_names_set.add(school_unit)
+            school_names_set = set(schools.values_list("name", flat=True))
+            # Adiciona como elemento valido "---" para ausencia de unidade escolar
+            school_units_names_set.add("---")
+
             source_file = request.FILES["source_file"]
             logger.debug("Carregado o arquivo: " + source_file.name)
 
@@ -69,21 +84,30 @@ class ValidadeCSVFile(LoginRequiredMixin, View):
             )
             # Cria a classe do tipo Document (mongoengine) dinamicamente
             DynamicDocumentClass = create_dynamic_document_class(
-                dynamic_document_class_name, field_types_dict, required_fields_dict,
+                dynamic_document_class_name,
+                field_types_dict,
+                required_fields_dict,
+                school_names_set=school_names_set,
+                school_units_names_set=school_units_names_set,
             )
-            # Estabelece, por padrao que o CSV tem registros invalidos. Se nao houve nenhum registro
-            # invalido, esta variavel sera definida como True.
-            # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
-            # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
-            # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
-            csv_valid = False
-
             # Cria novo df apenas com os dados, sem as linhas de tipo, required e labels para usuário final
             # Lembre-se que a linha de header do df se mantem
             bulk_data_content = bulk_data.drop(bulk_data.index[range(0, 4)])
 
+            # Substitui os campos de unidade escolar vazions, aos quais o Pandas havia atribuido nan, por ---
+            bulk_data_content["unidadeAluno"] = bulk_data_content[
+                "unidadeAluno"
+            ].replace({np.nan: "---"})
+
             # Substitui os campos vazios, aos quais o Pandas havia atribuido nan, por None
             bulk_data_content = bulk_data_content.replace({np.nan: None})
+
+            # Se houver registro invalido, esta variavel sera definida como False ao final da funcao.
+            # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
+            # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
+            # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
+            csv_valid = True
+
 
             # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
             # no Mongo
@@ -123,17 +147,20 @@ class ValidadeCSVFile(LoginRequiredMixin, View):
                     fs.delete(filename)
                     # Recupera a lista de mensagens criara
                     # Se nao houver nenhuma mensagem de erro, define o csv como válido
-                    storage = get_messages(request)
-                    for message in storage:
-                        if not message.level_tag == "error":
-                            csv_valid = True
+
+            storage = get_messages(request)
+            for message in storage:
+                if message.level_tag == "error":
+                    csv_valid = False
+                    break
+
             if csv_valid:
                 bulk_generation = BulkGeneration(
                     tenant=request.user.tenant,
                     interview=interview,
                     mongo_db_collection_name=dynamic_document_class_name,
                     field_types_dict=field_types_dict,
-                    required_fields_dict=required_fields_dict
+                    required_fields_dict=required_fields_dict,
                 )
                 bulk_generation.save()
 
@@ -157,6 +184,7 @@ class ValidadeCSVFile(LoginRequiredMixin, View):
                     {
                         "form": form,
                         "interview_id": interview.pk,
+                        "validation_error": True,
                         "csv_valid": csv_valid,
                     },
                 )
@@ -167,16 +195,20 @@ def generate_bulk_documents(request, bulk_generation_id):
     bulk_generation = BulkGeneration.objects.get(pk=bulk_generation_id)
     interview = Interview.objects.get(pk=bulk_generation.interview.pk)
     DynamicDocumentClass = create_dynamic_document_class(
-        bulk_generation.mongo_db_collection_name, bulk_generation.field_types_dict, bulk_generation.required_fields_dict,
+        bulk_generation.mongo_db_collection_name,
+        bulk_generation.field_types_dict,
+        bulk_generation.required_fields_dict,
     )
     documents_collection = DynamicDocumentClass.objects
 
     # collection_name = bulk_generation.mongo_db_collection_name
     # db = pymongo_client.educalegal
     # documents_collection = db[collection_name]
-    interview_variables_list = _dict_from_documents(
-        documents_collection, interview.pk
-    )
+    interview_variables_list = _dict_from_documents(documents_collection, interview.pk)
+
+    # Se houver geracao com erro, esta variavel sera definida como False ao final da funcao.
+    # Esta variavel ira modifica a logica de exibicao das telas ao usuario
+    all_interviews_generated_success = True
 
     try:
         # lê configurações do servidor da plataforma de geração de documentos (Docassemble)
@@ -224,11 +256,9 @@ def generate_bulk_documents(request, bulk_generation_id):
                 logger.debug(message)
                 messages.error(request, message)
             else:
-                # gera uma nova entrevista para a cada dicionário de variáveis de entrevista na lista de
-                # variáveis de entrevista
-                for i, interview_variables in enumerate(
-                    interview_variables_list
-                ):
+                # gera uma nova entrevista para a cada dicionário de variáveis de entrevista
+                # na lista de  variáveis de entrevista
+                for i, interview_variables in enumerate(interview_variables_list):
                     # Uma nova sessão deve ser criada para cada entrevista
                     try:
                         interview_session = dac.start_interview(
@@ -244,9 +274,7 @@ def generate_bulk_documents(request, bulk_generation_id):
                         logger.debug(
                             "Gerando documento {document_number} de {bulk_list_lenght}".format(
                                 document_number=str(i + 1),
-                                bulk_list_lenght=str(
-                                    len(interview_variables_list)
-                                ),
+                                bulk_list_lenght=str(len(interview_variables_list)),
                             )
                         )
                         interview_variables["url_args"] = url_args
@@ -293,10 +321,17 @@ def generate_bulk_documents(request, bulk_generation_id):
                                 )
                                 logger.debug(message)
                                 messages.success(request, message)
+
+    storage = get_messages(request)
+    for message in storage:
+        if message.level_tag == "error":
+            all_interviews_generated_success = False
+            break
+
     return render(
         request,
         "bulk_interview/bulk_interview_generation_result.html",
-        {"successful": "successful"},
+        {"all_interviews_generated_success": all_interviews_generated_success},
     )
 
 
@@ -309,30 +344,31 @@ def _dict_from_documents(documents_collection, interview_type_id):
 
         for i, document in enumerate(documents_collection):
             logger.debug(
-                "Gerando lista de variáveis para o objeto {object_id}".format(object_id=str(document.id))
+                "Gerando lista de variáveis para o objeto {object_id}".format(
+                    object_id=str(document.id)
+                )
             )
 
             document = mongo_to_dict(document, [])
 
-
             contratante = dict()
             contratante_attributes = [
-                    "nacionalidade",
-                    "estadocivil",
-                    "prof",
-                    "cpf",
-                    "rg",
-                    "telefone",
-                    "wtt",
-                    "email",
-                    "cep",
-                    "rua",
-                    "numb",
-                    "complemento",
-                    "bairro",
-                    "cidade",
-                    "estado",
-                ]
+                "nacionalidade",
+                "estadocivil",
+                "prof",
+                "cpf",
+                "rg",
+                "telefone",
+                "wtt",
+                "email",
+                "cep",
+                "rua",
+                "numb",
+                "complemento",
+                "bairro",
+                "cidade",
+                "estado",
+            ]
             for attribute in contratante_attributes:
                 # Se não houver o atributo no documento, ele estava em branco na planilha
                 try:
@@ -359,7 +395,9 @@ def _dict_from_documents(documents_collection, interview_type_id):
             document["contratantes"]["_class"] = "docassemble.base.core.DAList"
             document["contratantes"]["instanceName"] = "contratantes"
 
-            document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
+            document[
+                "content_document"
+            ] = "contrato-prestacao-servicos-educacionais.docx"
             document["valid_contratantes_table"] = "continue"
             document["submit_to_esignature"] = "True"
 
