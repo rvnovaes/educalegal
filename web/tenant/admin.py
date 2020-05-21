@@ -4,7 +4,10 @@ from .models import Tenant, TenantGedData, TenantESignatureData
 
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["name", "plan"]
+    list_editable = ["plan"]
+    list_filter = ["plan"]
+    search_fields = ["name"]
 
 
 @admin.register(TenantGedData)
