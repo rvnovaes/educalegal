@@ -1,6 +1,7 @@
 from djmoney.models.fields import MoneyField
 from django.db import models
 from enum import Enum
+from tenant.models import Tenant
 
 
 class PlanType(Enum):
@@ -42,6 +43,8 @@ class Plan(models.Model):
     use_bulk_interview = models.BooleanField(
         default=False, verbose_name="Usa geração em lote"
     )
+    tenant = models.ForeignKey(Tenant, on_delete=models.PROTECT, related_name="plans", verbose_name="Tenants")
+
 
     class Meta:
         ordering = ["name"]
@@ -50,3 +53,10 @@ class Plan(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def list_tenants(self):
+        list_tenants = [x.__str__() for x in self.tenants.all().order_by("name")]
+        return list_tenants
+
+    list_tenants.fget.short_description = "Instâncias"
