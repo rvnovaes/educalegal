@@ -47,16 +47,9 @@ class DocassembleClient:
         final_url = self.api_base_url + "/api/session/new"
         payload = {"i": interview_name, "secret": secret}
 
-        try:
-            response = self.session.get(final_url, params=payload).json()
-            session = response["session"]
-            return session
-        except Exception:
-            extype, ex, tb = sys.exc_info()
-            message = "Erro ao criar nova sessão. Response: {response}. Exception: {ex}".format(
-                response=response, ex=ex.__str__()
-            )
-            raise Exception(message).with_traceback(ex.__traceback__)
+        response = self.session.get(final_url, params=payload).json()
+        session = response["session"]
+        return session
 
     def interview_get_variables(self, secret, interview_name, session):
         final_url = self.api_base_url + "/api/session"
@@ -67,11 +60,8 @@ class DocassembleClient:
             "secret": secret,
         }
 
-        try:
-            response = self.session.get(final_url, params=payload)
-            return response.json(), response.status_code
-        except Exception as e:
-            print("Erro: ", e.__class__.__name__)
+        response = self.session.get(final_url, params=payload)
+        return response.json(), response.status_code
 
     def interview_set_variables(self, secret, interview_name, variables, session):
         """ Set variables in an interview
@@ -87,11 +77,9 @@ class DocassembleClient:
             "variables": json.dumps(variables),
         }
 
-        try:
-            response = self.session.post(final_url, data=payload)
-            return response.json(), response.status_code
-        except Exception as e:
-            print("Erro: ", e.__class__.__name__)
+
+        response = self.session.post(final_url, data=payload)
+        return response.json(), response.status_code
 
     def interview_run_action(
         self, secret, interview_name, session, action, action_arguments=None
@@ -106,8 +94,5 @@ class DocassembleClient:
             action_arguments: action_arguments,
         }
 
-        try:
-            response = self.session.post(final_url, data=payload)
-            return response.status_code
-        except Exception as e:
-            print("Erro: ", e.__class__.__name__)
+        response = self.session.post(final_url, data=payload)
+        return response.status_code

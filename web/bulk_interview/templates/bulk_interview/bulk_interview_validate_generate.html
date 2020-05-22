@@ -44,6 +44,28 @@
         {% endfor %}
         <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% endif %}
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    {% if validation_error %}
+        <div class="modal fade" id="validation_error_modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Erros de Validação</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Houve erros de validação dos registros.</p>
+                        <p>Verifique as mensagens.</p>
+                        <p>Corrija os erros no <b>arquivo</b> e carregue-o novamente.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-hidden="true">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+
 {% endblock %}
 {% block scripts %}
     <script>
@@ -51,6 +73,16 @@
         $(".custom-file-input").on("change", function () {
             var fileName = $(this).val().split("\\").pop();
             $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+        <script type="text/javascript">
+        $(window).on('load',function(){
+            let validation_error_modal = $('#validation_error_modal').modal({backdrop: 'static', keyboard: false});
+            validation_error_modal.modal('show');
+        });
+
+        $(function () {
+            $('#validation_error_modal').modal('toggle');
         });
     </script>
 {% endblock %}
