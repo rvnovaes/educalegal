@@ -19,7 +19,7 @@ class Interview(models.Model):
     description = models.TextField(blank=True, verbose_name="Descrição")
     language = models.CharField(max_length=64, default="por", verbose_name="Idioma")
     custom_file_name = models.CharField(
-        max_length=64, verbose_name="Nome do arquivo a ser gerado"
+        max_length=255, verbose_name="Nome do arquivo a ser gerado"
     )
     base_url = models.URLField(max_length=512, verbose_name="URL Base")
     is_generic = models.BooleanField(default=True, verbose_name="É Genérica?")
