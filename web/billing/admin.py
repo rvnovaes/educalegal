@@ -7,6 +7,7 @@ class PlanAdmin(admin.ModelAdmin):
     search_fields = ["name"]
     list_display = [
         "name",
+        "plan_type",
         "value",
         "use_esignature",
         "use_ged",
@@ -17,15 +18,15 @@ class PlanAdmin(admin.ModelAdmin):
         "use_ged",
         "use_bulk_interview"
     ]
-
     fields = [
         "name",
         "value",
-        "use_esignature",
         "document_limit",
         "plan_type",
         "use_esignature",
         "use_ged",
-        "use_bulk_interview"
+        "use_bulk_interview",
+        "list_tenants",
     ]
+
 
