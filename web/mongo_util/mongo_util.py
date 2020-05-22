@@ -1,3 +1,4 @@
+from datetime import datetime
 from mongoengine import *
 
 
@@ -27,7 +28,12 @@ def get_field(field_type, required):
     return field
 
 
-def create_dynamic_document_class(class_name: str, field_properties_dict: dict, required_properties_dict: dict):
+def create_dynamic_document_class(
+    class_name: str,
+    field_properties_dict: dict,
+    required_properties_dict: dict,
+    **kwargs
+):
     # Cria o dicionario de atributos que será usado na classe dinamica
     custom_attributes = dict()
     for key, value in field_properties_dict.items():
@@ -37,8 +43,21 @@ def create_dynamic_document_class(class_name: str, field_properties_dict: dict, 
         else:
             required = False
         # Os nomes de coluna no Mongo nao podem ter pontos.
-        key = key.replace('.', '_')
+        key = key.replace(".", "_")
         custom_attributes[key] = get_field(value, required)
+
+    try:
+        custom_attributes["selected_school"].choices = kwargs["school_names_set"]
+    except KeyError:
+        pass
+    try:
+        custom_attributes["unidadeAluno"].choices = kwargs["school_units_names_set"]
+    except KeyError:
+        pass
+
+    # Adiciona campo de data de criacao
+    custom_attributes["created"] = DateTimeField(default=datetime.now())
+
     # Cria a classe de documento dinamica
     DynamicDocumentClass = type(class_name, (Document,), custom_attributes)
 
@@ -72,7 +91,9 @@ def mongo_to_dict(obj, exclude_fields):
         elif isinstance(obj._fields[field_name], DictField):
             return_data.append((field_name, data))
         else:
-            return_data.append((field_name, mongo_to_python_type(obj._fields[field_name], data)))
+            return_data.append(
+                (field_name, mongo_to_python_type(obj._fields[field_name], data))
+            )
 
     return dict(return_data)
 
