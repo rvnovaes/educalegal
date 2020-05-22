@@ -1,7 +1,6 @@
 from djmoney.models.fields import MoneyField
 from django.db import models
 from enum import Enum
-from tenant.models import Tenant
 
 
 class PlanType(Enum):
@@ -43,8 +42,6 @@ class Plan(models.Model):
     use_bulk_interview = models.BooleanField(
         default=False, verbose_name="Usa geração em lote"
     )
-    tenant = models.ForeignKey(Tenant, on_delete=models.PROTECT, related_name="plans", verbose_name="Tenants")
-
 
     class Meta:
         ordering = ["name"]
