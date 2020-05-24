@@ -16,7 +16,7 @@ from django.contrib.messages import constants as message_constants
 import moneyed
 from moneyed.localization import _FORMATTER
 from decimal import ROUND_HALF_EVEN
-from config.config import EL_ENV
+from config.config import *
 from mongo_util.mongo_util import create_mongo_connection
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -74,6 +74,8 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     # Endpoints for authentication on Rest Framework
     "rest_auth",
+    # Swagger -> https://github.com/axnsan12/drf-yasg
+    "drf_yasg",
     # Not sure yet what it does...
     "corsheaders",
     # Alternative storage for files in Django
@@ -291,7 +293,6 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
-    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
     # https://www.django-rest-framework.org/api-guide/throttling/
     # "DEFAULT_THROTTLE_CLASSES": [
     #     "rest_framework.throttling.AnonRateThrottle",
@@ -368,6 +369,7 @@ MONGO_ALIAS = "default"
 MONGO_USERNAME = "educalegal"
 MONGO_PASSWORD = "educalegal"
 MONGO_HOST = "localhost"
+# MONGO_HOST = "mongo"
 MONGO_PORT = 27017
 
 # mongoengine

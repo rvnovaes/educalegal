@@ -2,7 +2,7 @@ django~=3.0.6
 # API
 djangorestframework~=3.11.0
 django-cors-headers~=3.3.0
-coreapi~=2.3.3
+drf-yasg~=1.17.1
 django-rest-auth~=0.9.5
 retry-requests
 # Formating of forms
@@ -38,3 +38,5 @@ django-google-analytics-app
 # MongoDB
 pymongo~=3.10.1
 mongoengine~=0.20.0
+# Used to test docusign requests
+pyjwt
