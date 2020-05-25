@@ -136,3 +136,4 @@ dmypy.json
 /web/static/rest_framework/
 /web/static/debug_toolbar/
 /web/static/django_tables2/
+/docker_volumes/mongo_db/
