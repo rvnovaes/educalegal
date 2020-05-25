@@ -28,7 +28,7 @@ from .docassemble_client import DocassembleClient
 logger = logging.getLogger(__name__)
 
 
-class ValidadeCSVFile(LoginRequiredMixin, View):
+class ValidateCSVFile(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form = BulkInterviewForm()
         interview = Interview.objects.get(pk=self.kwargs["interview_id"])
