@@ -248,7 +248,8 @@ def generate_bulk_documents(request, bulk_generation_id):
             }
 
             try:
-                secret = dac.secret_read(username, user_password)
+                response_json, status_code = dac.secret_read(username, user_password)
+                secret = response_json
             except requests.exceptions.ConnectionError as e:
                 message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
                     e=str(e)
@@ -256,71 +257,85 @@ def generate_bulk_documents(request, bulk_generation_id):
                 logger.debug(message)
                 messages.error(request, message)
             else:
-                # gera uma nova entrevista para a cada dicionário de variáveis de entrevista
-                # na lista de  variáveis de entrevista
-                for i, interview_variables in enumerate(interview_variables_list):
-                    # Uma nova sessão deve ser criada para cada entrevista
-                    try:
-                        interview_session = dac.start_interview(
-                            interview_full_name, secret
-                        )
-                    except requests.exceptions.ConnectionError as e:
-                        message = "Não foi possível iniciar nova sessão de entrevista. | {e}".format(
-                            e=str(e)
-                        )
-                        logger.debug(message)
-                        messages.error(request, message)
-                    else:
-                        logger.debug(
-                            "Gerando documento {document_number} de {bulk_list_lenght}".format(
-                                document_number=str(i + 1),
-                                bulk_list_lenght=str(len(interview_variables_list)),
-                            )
-                        )
-                        interview_variables["url_args"] = url_args
+                if status_code != 200:
+                    error_message = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(
+                        status_code=status_code, response=response_json
+                    )
+                    logger.debug(error_message)
+                    messages.error(request, error_message)
+                else:
+                    # gera uma nova entrevista para a cada dicionário de variáveis de entrevista
+                    # na lista de  variáveis de entrevista
+                    for i, interview_variables in enumerate(interview_variables_list):
+                        # Uma nova sessão deve ser criada para cada entrevista
                         try:
-                            logger.debug(
-                                "Tentando gerar entrevista {interview_full_name} com os dados {interview_variables}".format(
-                                    interview_full_name=interview_full_name,
-                                    interview_variables=interview_variables,
-                                )
+                            interview_session, response_json, status_code = dac.start_interview(
+                                interview_full_name, secret
                             )
-                            response, status_code = dac.interview_set_variables(
-                                secret,
-                                interview_full_name,
-                                interview_variables,
-                                interview_session,
+                        except requests.exceptions.ConnectionError as e:
+                            message = "Não foi possível iniciar nova sessão de entrevista. | {e}".format(
+                                e=str(e)
                             )
-                        except Exception as e:
-                            error_message = str(e)
-                            logger.debug(error_message)
-                            messages.error(request, error_message)
+                            logger.debug(message)
+                            messages.error(request, message)
                         else:
                             if status_code != 200:
-                                error_message = "Status Code: {status_code} | Response: {response}".format(
-                                    status_code=status_code, response=response
+                                error_message = "Erro ao iniciar nova sessão | Status Code: {status_code} | Response: {response}".format(
+                                    status_code=status_code, response=response_json
                                 )
                                 logger.debug(error_message)
                                 messages.error(request, error_message)
                             else:
-                                # Dispara a action de envio para assinatura eletronica
                                 logger.debug(
-                                    "Enviando entrevista para assinatura eletronica"
+                                    "Gerando documento {document_number} de {bulk_list_lenght}".format(
+                                        document_number=str(i + 1),
+                                        bulk_list_lenght=str(len(interview_variables_list)),
+                                    )
                                 )
-                                if interview_variables["submit_to_esignature"]:
-                                    status_code = dac.interview_run_action(
+                                interview_variables["url_args"] = url_args
+                                try:
+                                    logger.debug(
+                                        "Tentando gerar entrevista {interview_full_name} com os dados {interview_variables}".format(
+                                            interview_full_name=interview_full_name,
+                                            interview_variables=interview_variables,
+                                        )
+                                    )
+                                    response, status_code = dac.interview_set_variables(
                                         secret,
                                         interview_full_name,
+                                        interview_variables,
                                         interview_session,
-                                        "submit_to_esignature",
-                                        None,
                                     )
-                                    logger.debug(status_code)
-                                message = "Status Code: {status_code} | Response: {response}".format(
-                                    status_code=status_code, response=response
-                                )
-                                logger.debug(message)
-                                messages.success(request, message)
+                                except Exception as e:
+                                    error_message = str(e)
+                                    logger.debug(error_message)
+                                    messages.error(request, error_message)
+                                else:
+                                    if status_code != 200:
+                                        error_message = "Erro ao gerar entrevista | Status Code: {status_code} | Response: {response}".format(
+                                            status_code=status_code, response=response
+                                        )
+                                        logger.debug(error_message)
+                                        messages.error(request, error_message)
+                                    else:
+                                        # Dispara a action de envio para assinatura eletronica
+                                        logger.debug(
+                                            "Enviando entrevista para assinatura eletronica"
+                                        )
+                                        if interview_variables["submit_to_esignature"]:
+                                            status_code = dac.interview_run_action(
+                                                secret,
+                                                interview_full_name,
+                                                interview_session,
+                                                "submit_to_esignature",
+                                                None,
+                                            )
+                                            logger.debug(status_code)
+                                        message = "Status Code: {status_code} | Response: {response}".format(
+                                            status_code=status_code, response=response
+                                        )
+                                        logger.debug(message)
+                                        messages.success(request, message)
 
     storage = get_messages(request)
     for message in storage:
