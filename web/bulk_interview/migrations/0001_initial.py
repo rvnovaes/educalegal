@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('interview', '0007_auto_20200514_1100'),
+        ('interview', '0008_auto_20200514_1100'),
         ('tenant', '0004_auto_20200513_1705'),
     ]
 

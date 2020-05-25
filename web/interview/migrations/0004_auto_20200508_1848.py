@@ -21,7 +21,7 @@ def create_default_server_config(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('interview', '0002_auto_20200421_2002'),
+        ('interview', '0003_auto_20200521_1815'),
     ]
 
     operations = [
