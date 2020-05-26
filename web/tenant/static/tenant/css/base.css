@@ -1,17 +1,19 @@
 html {
+    /* usado para posicionar footer no pé da página mesmo com scroll */
     height: 100%;
 }
 
 body {
     margin-bottom: 2rem;
 
+    /* usado para posicionar footer no pé da página mesmo com scroll */
     min-height: 100%;
-
     display: flex;
     flex-direction: column;
 }
 
 footer{
+    /* usado para posicionar footer no pé da página mesmo com scroll */
     padding: 3em;
     margin-top: auto;
 }
