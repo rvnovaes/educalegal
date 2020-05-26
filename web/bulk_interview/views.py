@@ -77,7 +77,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             required_fields_dict = bulk_data.loc[1].to_dict()
 
             # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
-            # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo]
+            # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
             # uuid4 gera um UUID aleatorio
             dynamic_document_class_name = (
                 interview.custom_file_name + "_bulk_" + str(uuid.uuid4())
@@ -123,7 +123,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
                     # mensagem de sucesso
                     row_values = list(row_dict.values())
-                    message = "Registro validado com sucesso " + str(register_index + 1)
+                    message = "Registro {register_index} validado com sucesso".format(
+                        register_index=str(register_index + 1))
                     for value_index, value in enumerate(row_values):
                         message += " | " + str(row_values[value_index])
                     logger.debug(message)
@@ -145,7 +146,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 finally:
                     # Apaga o arquivo csv carregado
                     fs.delete(filename)
-                    # Recupera a lista de mensagens criara
+                    # Recupera a lista de mensagens criada
                     # Se nao houver nenhuma mensagem de erro, define o csv como válido
 
             storage = get_messages(request)
