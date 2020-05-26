@@ -54,6 +54,91 @@
   pk: 14
   fields:
     name: Contrato de comodato de imóvel
-
-
-
+- model: interview.InterviewDocumentType
+  pk: 15
+  fields:
+    name: Proposta de Renegociação - Valor do Contrato de Locação
+- model: interview.InterviewDocumentType
+  pk: 16
+  fields:
+    name: Proposta de Renegociação - Desconto no Valor Devido pela Escola
+- model: interview.InterviewDocumentType
+  pk: 17
+  fields:
+    name: Proposta de Renegociação - Postergação do Fluxo de Pagamento
+- model: interview.InterviewDocumentType
+  pk: 18
+  fields:
+    name: Termo para Mudança de Regime para Home Office e Cessão do Direito Autoral
+- model: interview.InterviewDocumentType
+  pk: 19
+  fields:
+    name: Apólice de Seguro
+- model: interview.InterviewDocumentType
+  pk: 20
+  fields:
+    name: Termo de Acordo Individual para Banco de Horas MP 927-2020
+- model: interview.InterviewDocumentType
+  pk: 21
+  fields:
+    name: Acordo Individual de Trabalho - Redução de Jornada/Redução Salarial MP 936-2020
+- model: interview.InterviewDocumentType
+  pk: 22
+  fields:
+    name: Termo de Uso e Responsabilidade
+- model: interview.InterviewDocumentType
+  pk: 23
+  fields:
+    name: Balancete
+- model: interview.InterviewDocumentType
+  pk: 24
+  fields:
+    name: Balanço patrimonial
+- model: interview.InterviewDocumentType
+  pk: 25
+  fields:
+    name: Contrato social
+- model: interview.InterviewDocumentType
+  pk: 26
+  fields:
+    name: Contrato de licença
+- model: interview.InterviewDocumentType
+  pk: 27
+  fields:
+    name: Contrato de comodato de bem móvel
+- model: interview.InterviewDocumentType
+  pk: 28
+  fields:
+    name: Contrato de locação de bem móvel
+- model: interview.InterviewDocumentType
+  pk: 29
+  fields:
+    name: Contrato de financiamento
+- model: interview.InterviewDocumentType
+  pk: 30
+  fields:
+    name: Alteração contratual
+- model: interview.InterviewDocumentType
+  pk: 31
+  fields:
+    name: Comprovante bancário
+- model: interview.InterviewDocumentType
+  pk: 32
+  fields:
+    name: Certidão municipal
+- model: interview.InterviewDocumentType
+  pk: 33
+  fields:
+    name: Certidão estadual
+- model: interview.InterviewDocumentType
+  pk: 34
+  fields:
+    name: Certidão de cadastro
+- model: interview.InterviewDocumentType
+  pk: 35
+  fields:
+    name: Cartão CNPJ
+- model: interview.InterviewDocumentType
+  pk: 36
+  fields:
+    name: Ficha de dados cadastrais

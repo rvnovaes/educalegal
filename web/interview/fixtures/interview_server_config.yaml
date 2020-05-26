@@ -1,0 +1,10 @@
+- model: interview.InterviewServerConfig
+  pk: 2
+  fields:
+    name: Development - docker
+    base_url: http://docassemble
+    user_id: 1
+    username: admin@admin.com
+    user_key: user_key
+    user_password: Silex2109
+    project_name: Development
