@@ -1,12 +1,10 @@
 import json
-import sys
-
-from django.http import JsonResponse
+import logging
 from requests import Session
-
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
+logger = logging.getLogger(__name__)
 
 class DocassembleClient:
     def __init__(self, base_url, admin_key):
@@ -74,6 +72,7 @@ class DocassembleClient:
         """
 
         final_url = self.api_base_url + "/api/session"
+        logger.debug("Final URL em interview_set_variables: " + final_url)
 
         payload = {
             "i": interview_name,
@@ -81,7 +80,7 @@ class DocassembleClient:
             "secret": secret,
             "variables": json.dumps(variables),
         }
-
+        logger.debug("Payload em interview_set_variables: " + str(payload))
 
         response = self.session.post(final_url, data=payload)
         return response.json(), response.status_code
