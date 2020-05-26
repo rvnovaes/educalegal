@@ -128,12 +128,16 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /.idea/
+
+# docker volumes
 /docker_volumes/mayan/
 /docker_volumes/rabbitmq/
+/docker_volumes/mongo_db/
 
 /web/media/dump.yaml
 /web/static/admin/
 /web/static/rest_framework/
 /web/static/debug_toolbar/
 /web/static/django_tables2/
-/docker_volumes/mongo_db/
+/web/static/drf-yasg/
+/web/static/tenant/
