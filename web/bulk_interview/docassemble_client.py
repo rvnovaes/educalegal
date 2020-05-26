@@ -24,7 +24,7 @@ class DocassembleClient:
         payload = {"username": username, "password": password}
         response = self.session.get(final_url, params=payload)
 
-        return response.json()
+        return response.json(), response.status_code
 
     def config_read(self):
         """ Get the server configuration """
@@ -47,9 +47,14 @@ class DocassembleClient:
         final_url = self.api_base_url + "/api/session/new"
         payload = {"i": interview_name, "secret": secret}
 
-        response = self.session.get(final_url, params=payload).json()
-        session = response["session"]
-        return session
+        response = self.session.get(final_url, params=payload)
+        response_json = response.json()
+        try:
+            session = response_json["session"]
+        except:
+            session = None
+
+        return session, response_json, response.status_code
 
     def interview_get_variables(self, secret, interview_name, session):
         final_url = self.api_base_url + "/api/session"

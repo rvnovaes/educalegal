@@ -1,0 +1,33 @@
+html {
+    /* usado para posicionar footer no pé da página mesmo com scroll */
+    height: 100%;
+}
+
+body {
+    margin-bottom: 2rem;
+
+    /* usado para posicionar footer no pé da página mesmo com scroll */
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+footer{
+    /* usado para posicionar footer no pé da página mesmo com scroll */
+    padding: 3em;
+    margin-top: auto;
+}
+
+.btn-group {
+    padding-top: 1.5rem;
+}
+
+.btn {
+    margin-left: 0.2rem;
+    min-width: 70px;
+}
+
+.docassemble-line-height {
+    line-height: 1.2 !important;
+
+}
