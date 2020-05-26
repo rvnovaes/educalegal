@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tenant, TenantGedData, TenantESignatureData
+from .models import Tenant, TenantGedData, TenantESignatureData, TenantESignatureApp
 
 
 @admin.register(Tenant)
@@ -18,3 +18,9 @@ class TenantGedDataAdmin(admin.ModelAdmin):
 @admin.register(TenantESignatureData)
 class TenantESignatureDataAdmin(admin.ModelAdmin):
     list_display = ["tenant", "provider"]
+
+
+@admin.register(TenantESignatureApp)
+class TenantESignatureAppAdmin(admin.ModelAdmin):
+    list_display = ["app_name", "provider", "test_mode"]
+

@@ -6,6 +6,32 @@ from billing.models import Plan
 # https://books.agiliq.com/projects/django-multi-tenant/en/latest/
 
 
+class TenantESignatureApp(models.Model):
+    provider = models.CharField(
+        max_length=255, default="Docusign", verbose_name="Fornecedor",
+    )
+    app_name = models.CharField(
+        max_length=255, default="Educa Legal Development", verbose_name="Nome da Aplicação Cliente",
+    )
+    private_key = models.TextField(verbose_name="Private Key")
+    client_id = models.CharField(
+        max_length=255, verbose_name="Client ID", help_text="AKA Integration Key"
+    )
+    impersonated_user_guid = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Impersonated User",
+        help_text="AKA API Username",
+    )
+    notes = models.TextField(null=True, blank=True, verbose_name="Observações")
+
+    test_mode = models.BooleanField(default=True, verbose_name="Test Mode")
+
+    def __str__(self):
+        return self.provider
+
+
+
 class Tenant(models.Model):
     name = models.CharField(max_length=255, unique=True)
     subdomain_prefix = models.CharField(
@@ -21,6 +47,8 @@ class Tenant(models.Model):
     auto_enrolled = models.BooleanField(
         default=False, verbose_name="Autoinscrito"
     )
+
+    esignature_app = models.ForeignKey(TenantESignatureApp, null=True, blank=True, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name

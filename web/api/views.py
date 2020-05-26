@@ -21,7 +21,7 @@ from billing.models import Plan
 from document.models import Document, DocumentESignatureLog
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData, TenantESignatureData
+from tenant.models import Tenant, TenantGedData, TenantESignatureData, TenantESignatureApp
 
 from .serializers import (
     DocumentSerializer,
@@ -31,6 +31,7 @@ from .serializers import (
     TenantSerializer,
     TenantGedDataSerializer,
     TenantESignatureDataSerializer,
+    TenantESignatureAppSerializer
 )
 from .docusign_translations import envelope_statuses, recipient_statuses_dict, recipient_types_dict
 
@@ -352,3 +353,10 @@ class TenantESignatureDataViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return TenantESignatureData.objects.filter(tenant=self.kwargs["pk"])
+
+
+class TenantESignatureAppViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = TenantESignatureAppSerializer
+
+    def get_queryset(self):
+        return TenantESignatureApp.objects.filter(tenant=self.kwargs["pk"])

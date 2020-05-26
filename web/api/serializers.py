@@ -4,7 +4,7 @@ from billing.models import Plan
 from document.models import Document, DocumentESignatureLog
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData, TenantESignatureData
+from tenant.models import Tenant, TenantGedData, TenantESignatureData, TenantESignatureApp
 
 
 class DocumentESignatureLogSerializer(serializers.ModelSerializer):
@@ -57,4 +57,10 @@ class TenantGedDataSerializer(serializers.ModelSerializer):
 class TenantESignatureDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantESignatureData
+        fields = "__all__"
+
+
+class TenantESignatureAppSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenantESignatureApp
         fields = "__all__"
