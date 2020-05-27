@@ -108,7 +108,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
             csv_valid = True
 
-
             # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
             # no Mongo
             for register_index, row in enumerate(
@@ -124,7 +123,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     # mensagem de sucesso
                     row_values = list(row_dict.values())
                     message = "Registro {register_index} validado com sucesso".format(
-                        register_index=str(register_index + 1))
+                        register_index=str(register_index + 1)
+                    )
                     for value_index, value in enumerate(row_values):
                         message += " | " + str(row_values[value_index])
                     logger.info(message)
@@ -226,6 +226,11 @@ def generate_bulk_documents(request, bulk_generation_id):
         # cria cliente da api do docassemble
         try:
             dac = DocassembleClient(base_url, api_key)
+            logger.info(
+                "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
+                    base_url=base_url, api_key=api_key
+                )
+            )
         except NewConnectionError as e:
             message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
                 e=str(e)
@@ -241,6 +246,12 @@ def generate_bulk_documents(request, bulk_generation_id):
                 "interview_filename",
             )
 
+            logger.info(
+                "Nome da entrevista: {interview_full_name} ".format(
+                    interview_full_name=interview_full_name
+                )
+            )
+
             # passa argumentos da url para a entrevista
             url_args = {
                 "tid": request.user.tenant.pk,
@@ -251,6 +262,11 @@ def generate_bulk_documents(request, bulk_generation_id):
             try:
                 response_json, status_code = dac.secret_read(username, user_password)
                 secret = response_json
+                logger.info(
+                    "Secret obtido do servidor de geração de documentos: {secret}".format(
+                        secret=secret
+                    )
+                )
             except requests.exceptions.ConnectionError as e:
                 message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
                     e=str(e)
@@ -270,8 +286,15 @@ def generate_bulk_documents(request, bulk_generation_id):
                     for i, interview_variables in enumerate(interview_variables_list):
                         # Uma nova sessão deve ser criada para cada entrevista
                         try:
-                            interview_session, response_json, status_code = dac.start_interview(
-                                interview_full_name, secret
+                            (
+                                interview_session,
+                                response_json,
+                                status_code,
+                            ) = dac.start_interview(interview_full_name, secret)
+                            logger.info(
+                                "Sessão da entrevista gerada com sucesso: {interview_session}".format(
+                                    interview_session=interview_session
+                                )
                             )
                         except requests.exceptions.ConnectionError as e:
                             message = "Não foi possível iniciar nova sessão de entrevista. | {e}".format(
@@ -290,7 +313,9 @@ def generate_bulk_documents(request, bulk_generation_id):
                                 logger.info(
                                     "Gerando documento {document_number} de {bulk_list_lenght}".format(
                                         document_number=str(i + 1),
-                                        bulk_list_lenght=str(len(interview_variables_list)),
+                                        bulk_list_lenght=str(
+                                            len(interview_variables_list)
+                                        ),
                                     )
                                 )
                                 interview_variables["url_args"] = url_args
@@ -323,7 +348,7 @@ def generate_bulk_documents(request, bulk_generation_id):
                                         logger.info(
                                             "Enviando entrevista para assinatura eletronica"
                                         )
-                                        #TODO colocar opcao na interface do usuario para escolher se deseja mandar para esignature em lote
+                                        # TODO colocar opcao na interface do usuario para escolher se deseja mandar para esignature em lote
                                         if interview_variables["submit_to_esignature"]:
                                             status_code = dac.interview_run_action(
                                                 secret,
