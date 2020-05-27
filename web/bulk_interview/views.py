@@ -402,7 +402,6 @@ def _dict_from_documents(documents_collection, interview_type_id):
             contratante["name"]["uses_parts"] = True
             # TODO alteracao do indice para mais de um contratante ??
             contratante["name"]["instanceName"] = "contratantes[0].name"
-            contratante["instanceName"] = "contratantes[0]"
             document["contratantes"] = dict()
             document["contratantes"]["elements"] = list()
             document["contratantes"]["elements"].append(contratante)
@@ -426,3 +425,46 @@ def _dict_from_documents(documents_collection, interview_type_id):
     )
 
     return interview_variables_list
+
+
+def _create_person(document, person_type, person_legal_type, index):
+    """ Cria a representação da pessoa como objeto do Docassemble
+        document
+        person_type: F  - física
+                     J  - jurídica
+                     FJ - ambos
+        person_legal_type - indica o tipo da parte: contratante, contratada, locatária, locadora, etc.
+        index - índice do elemento que está sendo convertido
+    """
+    person = dict()
+
+    person["name"] = dict()
+
+    if person_type == 'FJ':
+        person["_class"] = "docassemble.base.util.Person"
+        person["name"]["_class"] = "docassemble.base.util.Name"
+    elif person_type == 'F':
+        person["_class"] = "docassemble.base.util.Individual"
+        person["name"]["_class"] = "docassemble.base.util.IndividualName"
+
+        person["name"]["first"] = document["name_first"]
+        person["name"]["uses_parts"] = True
+        document.pop("name_first")
+    else:
+        person["_class"] = "docassemble.base.util.Organization"
+        person["name"]["_class"] = "docassemble.base.util.Name"
+
+    person["instanceName"] = person_legal_type + '[' + str(index) + ']'
+
+    person["name"]["instanceName"] = person_legal_type + '[' + str(index) + '].name'
+    
+    document[person_legal_type] = dict()
+    document[person_legal_type]["elements"] = list()
+    document[person_legal_type]["elements"].append(person)
+    document[person_legal_type]["auto_gather"] = "False"
+    document[person_legal_type]["gathered"] = "True"
+    document[person_legal_type]["_class"] = "docassemble.base.core.DAList"
+    document[person_legal_type]["instanceName"] = person_legal_type
+    document["valid_" + person_legal_type + "_table"] = "continue"
+
+

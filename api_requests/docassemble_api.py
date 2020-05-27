@@ -109,8 +109,6 @@ if __name__ == "__main__":
         user_id = 1
         api_key = "C3vAIRNnr3BnJpKCdqlsXSV2fLWPKI0K"
 
-
-
     brcomeducalegal_questions = (
         "/opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data/questions"
     )
