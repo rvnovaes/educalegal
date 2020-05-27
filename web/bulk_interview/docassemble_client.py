@@ -72,7 +72,7 @@ class DocassembleClient:
         """
 
         final_url = self.api_base_url + "/api/session"
-        logger.debug("Final URL em interview_set_variables: " + final_url)
+        logger.info("Final URL em interview_set_variables: " + final_url)
 
         payload = {
             "i": interview_name,
@@ -80,7 +80,7 @@ class DocassembleClient:
             "secret": secret,
             "variables": json.dumps(variables),
         }
-        logger.debug("Payload em interview_set_variables: " + str(payload))
+        logger.info("Payload em interview_set_variables: " + str(payload))
 
         response = self.session.post(final_url, data=payload)
         return response.json(), response.status_code
