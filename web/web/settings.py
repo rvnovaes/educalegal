@@ -369,8 +369,8 @@ MONGO_DB = "educalegal"
 MONGO_ALIAS = "default"
 MONGO_USERNAME = "educalegal"
 MONGO_PASSWORD = "educalegal"
-MONGO_HOST = "localhost"
-# MONGO_HOST = "mongo"
+# MONGO_HOST = "localhost"
+MONGO_HOST = "mongo"
 MONGO_PORT = 27017
 
 # mongoengine
