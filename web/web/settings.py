@@ -324,15 +324,15 @@ LOGGING = {
             "formatter": "file",
             "filename": os.path.join(BASE_DIR, "media/debug.log"),
         },
-        "error_file": {
-            "level": "ERROR",
+        "info_log": {
+            "level": "INFO",
             "class": "logging.FileHandler",
             "formatter": "file",
-            "filename": os.path.join(BASE_DIR, "media/error.log"),
+            "filename": os.path.join(BASE_DIR, "media/info.log"),
         }
     },
     "loggers": {
-        "": {"level": "ERROR", "handlers": ["console", "error_file"]},
+        "": {"level": "INFO", "handlers": ["console", "info_log"]},
         "django": {"level": "DEBUG", "handlers": ["console", "debug_file"]},
     },
 }

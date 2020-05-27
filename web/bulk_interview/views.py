@@ -58,7 +58,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             school_units_names_set.add("---")
 
             source_file = request.FILES["source_file"]
-            logger.debug("Carregado o arquivo: " + source_file.name)
+            logger.info("Carregado o arquivo: " + source_file.name)
 
             # salva o arquivo inserido pelo usuario na pasta media
             fs = FileSystemStorage()
@@ -127,7 +127,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         register_index=str(register_index + 1))
                     for value_index, value in enumerate(row_values):
                         message += " | " + str(row_values[value_index])
-                    logger.debug(message)
+                    logger.info(message)
                     messages.success(request, message)
                 except ValidationError as e:
                     # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
@@ -141,7 +141,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     )
                     for value_index, value in enumerate(row_values):
                         message += " | " + str(row_values[value_index])
-                    logger.debug(message)
+                    logger.info(message)
                     messages.error(request, message)
                 finally:
                     # Apaga o arquivo csv carregado
@@ -287,7 +287,7 @@ def generate_bulk_documents(request, bulk_generation_id):
                                 logger.error(error_message)
                                 messages.error(request, error_message)
                             else:
-                                logger.debug(
+                                logger.info(
                                     "Gerando documento {document_number} de {bulk_list_lenght}".format(
                                         document_number=str(i + 1),
                                         bulk_list_lenght=str(len(interview_variables_list)),
@@ -295,7 +295,7 @@ def generate_bulk_documents(request, bulk_generation_id):
                                 )
                                 interview_variables["url_args"] = url_args
                                 try:
-                                    logger.debug(
+                                    logger.info(
                                         "Tentando gerar entrevista {interview_full_name} com os dados {interview_variables}".format(
                                             interview_full_name=interview_full_name,
                                             interview_variables=interview_variables,
@@ -320,7 +320,7 @@ def generate_bulk_documents(request, bulk_generation_id):
                                         messages.error(request, error_message)
                                     else:
                                         # Dispara a action de envio para assinatura eletronica
-                                        logger.debug(
+                                        logger.info(
                                             "Enviando entrevista para assinatura eletronica"
                                         )
                                         #TODO colocar opcao na interface do usuario para escolher se deseja mandar para esignature em lote
@@ -332,11 +332,11 @@ def generate_bulk_documents(request, bulk_generation_id):
                                                 "submit_to_esignature",
                                                 None,
                                             )
-                                            logger.debug(status_code)
+                                            logger.info(status_code)
                                         message = "Status Code: {status_code} | Response: {response}".format(
                                             status_code=status_code, response=response
                                         )
-                                        logger.debug(message)
+                                        logger.info(message)
                                         messages.success(request, message)
 
     storage = get_messages(request)
@@ -360,7 +360,7 @@ def _dict_from_documents(documents_collection, interview_type_id):
         # e os remove do documento
 
         for i, document in enumerate(documents_collection):
-            logger.debug(
+            logger.info(
                 "Gerando lista de variáveis para o objeto {object_id}".format(
                     object_id=str(document.id)
                 )
@@ -420,7 +420,7 @@ def _dict_from_documents(documents_collection, interview_type_id):
 
             interview_variables_list.append(document)
 
-    logger.debug(
+    logger.info(
         "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
             size=len(interview_variables_list)
         )
