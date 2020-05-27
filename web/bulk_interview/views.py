@@ -255,14 +255,14 @@ def generate_bulk_documents(request, bulk_generation_id):
                 message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
                     e=str(e)
                 )
-                logger.debug(message)
+                logger.error(message)
                 messages.error(request, message)
             else:
                 if status_code != 200:
                     error_message = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(
                         status_code=status_code, response=response_json
                     )
-                    logger.debug(error_message)
+                    logger.error(error_message)
                     messages.error(request, error_message)
                 else:
                     # gera uma nova entrevista para a cada dicionário de variáveis de entrevista
@@ -277,14 +277,14 @@ def generate_bulk_documents(request, bulk_generation_id):
                             message = "Não foi possível iniciar nova sessão de entrevista. | {e}".format(
                                 e=str(e)
                             )
-                            logger.debug(message)
+                            logger.error(message)
                             messages.error(request, message)
                         else:
                             if status_code != 200:
                                 error_message = "Erro ao iniciar nova sessão | Status Code: {status_code} | Response: {response}".format(
                                     status_code=status_code, response=response_json
                                 )
-                                logger.debug(error_message)
+                                logger.error(error_message)
                                 messages.error(request, error_message)
                             else:
                                 logger.debug(
@@ -309,20 +309,21 @@ def generate_bulk_documents(request, bulk_generation_id):
                                     )
                                 except Exception as e:
                                     error_message = str(e)
-                                    logger.debug(error_message)
+                                    logger.error(error_message)
                                     messages.error(request, error_message)
                                 else:
                                     if status_code != 200:
                                         error_message = "Erro ao gerar entrevista | Status Code: {status_code} | Response: {response}".format(
                                             status_code=status_code, response=response
                                         )
-                                        logger.debug(error_message)
+                                        logger.error(error_message)
                                         messages.error(request, error_message)
                                     else:
                                         # Dispara a action de envio para assinatura eletronica
                                         logger.debug(
                                             "Enviando entrevista para assinatura eletronica"
                                         )
+                                        #TODO colocar opcao na interface do usuario para escolher se deseja mandar para esignature em lote
                                         if interview_variables["submit_to_esignature"]:
                                             status_code = dac.interview_run_action(
                                                 secret,
