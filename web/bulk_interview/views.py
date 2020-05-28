@@ -363,35 +363,6 @@ def generate_bulk_documents(request, bulk_generation_id):
                                         logger.error(error_message)
                                         messages.error(request, error_message)
                                     else:
-
-                                        try:
-                                            logger.info(
-                                                "Tentando recuperar dados da entrevista {interview_full_name}".format(
-                                                    interview_full_name=interview_full_name
-                                                )
-                                            )
-
-                                            (
-                                                response,
-                                                status_code,
-                                            ) = dac.interview_get_variables(
-                                                secret,
-                                                interview_full_name,
-                                                interview_session,
-                                            )
-
-                                            logger.info(
-                                                "Variáveis da entrevista: {response} | {status_code}".format(
-                                                    response=response,
-                                                    status_code=status_code,
-                                                )
-                                            )
-
-                                        except Exception as e:
-                                            error_message = str(e)
-                                            logger.error(error_message)
-                                            messages.error(request, error_message)
-
                                         # Dispara a action de envio para assinatura eletronica
                                         logger.info(
                                             "Enviando entrevista para assinatura eletronica"
