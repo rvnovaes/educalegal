@@ -1,0 +1,11 @@
+selected_school,unidadeAluno,nomeAluno
+StringField,StringField,StringField
+true,true,true
+Escola,,Dados do aluno
+Escola,Unidade,Nome
+Colégio Bacana,Super Bacana,Platão de Atenas
+Colégio Bacana,Super Bacana,Aristóteles de Estagira
+Colégio Bacana,Super Bacana,Immanuel Kant
+Colégio Bacana,Super Bacana,Friedrich Nietzsche
+Colégio Bacana,Super Bacana,Gustav Mahler
+Colégio Bacana,Super Bacana,Dmitri Shostakovich
