@@ -356,7 +356,7 @@ def generate_bulk_documents(request, bulk_generation_id):
                                 else:
                                     if status_code != 200:
                                         error_message = "Erro ao gerar entrevista | Status Code: {status_code} | Response: {response}".format(
-                                            status_code=status_code, response=response
+                                            status_code=status_code, response=str(response)
                                         )
                                         logger.error(error_message)
                                         messages.error(request, error_message)
