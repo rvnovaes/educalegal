@@ -14,3 +14,10 @@ services:
       - EL_ENV=production
     ports:
       - "8000:8000"
+  docassemble-local:
+    container_name: docassemble
+    image: rvnovaes/docassemble:0.3
+    environment:
+      - DAPYTHONVERSION=3
+    ports:
+      - "8888:80"
