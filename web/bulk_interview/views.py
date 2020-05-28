@@ -376,7 +376,7 @@ def generate_bulk_documents(request, bulk_generation_id):
                                             )
                                             logger.info(status_code)
                                         message = "Status Code: {status_code} | Response: {response}".format(
-                                            status_code=status_code, response=response
+                                            status_code=status_code, response=str(response.text)
                                         )
                                         logger.info(message)
                                         messages.success(request, message)

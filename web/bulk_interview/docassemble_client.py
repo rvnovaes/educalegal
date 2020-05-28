@@ -78,11 +78,11 @@ class DocassembleClient:
             "i": interview_name,
             "session": session,
             "secret": secret,
-            "variables": json.dumps(variables),
+            "variables": variables,
         }
         logger.info("Payload em interview_set_variables: " + str(payload))
 
-        response = self.session.post(final_url, data=payload)
+        response = self.session.post(final_url, json=payload)
         return response, response.status_code
 
     def interview_run_action(
