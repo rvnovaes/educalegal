@@ -1,10 +1,12 @@
 import json
 import logging
 from requests import Session
+
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
 logger = logging.getLogger(__name__)
+
 
 class DocassembleClient:
     def __init__(self, base_url, admin_key):
@@ -74,6 +76,13 @@ class DocassembleClient:
         final_url = self.api_base_url + "/api/session"
         logger.info("Final URL em interview_set_variables: " + final_url)
 
+        variables = json.dumps(variables)
+        logger.info(
+            "Json com as variaveis a ser enviado para o Servidor de Entrevistas {variables}".format(
+                variables=str(variables)
+            )
+        )
+
         payload = {
             "i": interview_name,
             "session": session,
@@ -82,7 +91,8 @@ class DocassembleClient:
         }
         logger.info("Payload em interview_set_variables: " + str(payload))
 
-        response = self.session.post(final_url, json=payload)
+        # response = self.session.post(final_url, json=payload)
+        response = self.session.post(final_url, data=payload)
         return response, response.status_code
 
     def interview_run_action(
