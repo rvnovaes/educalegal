@@ -31,12 +31,15 @@ logger = logging.getLogger(__name__)
 
 class ValidateCSVFile(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        # Esses campos sao usados apenas no post, mas como o template e o mesmo, passamos para evitar erros
+        csv_valid = False
+        validation_error = False,
         form = BulkInterviewForm()
         interview = Interview.objects.get(pk=self.kwargs["interview_id"])
         return render(
             request,
             "bulk_interview/bulk_interview_validate_generate.html",
-            {"form": form, "interview_id": interview.pk},
+            {"form": form, "interview_id": interview.pk, "csv_valid": csv_valid, validation_error: False},
         )
 
     def post(self, request, *args, **kwargs):
@@ -164,7 +167,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     field_types_dict=field_types_dict,
                     required_fields_dict=required_fields_dict,
                     school_names_set=list(school_names_set),
-                    school_units_names_set=list(school_units_names_set)
+                    school_units_names_set=list(school_units_names_set),
                 )
                 bulk_generation.save()
                 logger.info(
@@ -213,13 +216,14 @@ def generate_bulk_documents(request, bulk_generation_id):
         bulk_generation.field_types_dict,
         bulk_generation.required_fields_dict,
         school_names_set=list(bulk_generation.school_names_set),
-        school_units_names_set=list(bulk_generation.school_units_names_set)
+        school_units_names_set=list(bulk_generation.school_units_names_set),
     )
 
     documents_collection = DynamicDocumentClass.objects
     documents_collection = list(documents_collection)
-    logger.info("Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection)))
-
+    logger.info(
+        "Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection))
+    )
 
     interview_variables_list = _dict_from_documents(documents_collection, interview.pk)
 
@@ -356,7 +360,8 @@ def generate_bulk_documents(request, bulk_generation_id):
                                 else:
                                     if status_code != 200:
                                         error_message = "Erro ao gerar entrevista | Status Code: {status_code} | Response: {response}".format(
-                                            status_code=status_code, response=str(response.text)
+                                            status_code=status_code,
+                                            response=str(response.text),
                                         )
                                         logger.error(error_message)
                                         messages.error(request, error_message)
@@ -369,15 +374,19 @@ def generate_bulk_documents(request, bulk_generation_id):
                                                 )
                                             )
 
-                                            response, status_code = dac.interview_get_variables(
+                                            (
+                                                response,
+                                                status_code,
+                                            ) = dac.interview_get_variables(
                                                 secret,
                                                 interview_full_name,
-                                                interview_session
+                                                interview_session,
                                             )
 
                                             logger.info(
                                                 "Variáveis da entrevista: {response} | {status_code}".format(
-                                                    response=response, status_code=status_code
+                                                    response=response,
+                                                    status_code=status_code,
                                                 )
                                             )
 
@@ -401,7 +410,8 @@ def generate_bulk_documents(request, bulk_generation_id):
                                             )
                                             logger.info(status_code)
                                         message = "Status Code: {status_code} | Response: {response}".format(
-                                            status_code=status_code, response=str(response)
+                                            status_code=status_code,
+                                            response=str(response),
                                         )
                                         logger.info(message)
                                         messages.success(request, message)
