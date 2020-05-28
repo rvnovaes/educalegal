@@ -4,6 +4,7 @@ import uuid
 from urllib3.exceptions import NewConnectionError
 import pandas as pd
 import numpy as np
+import time
 from mongoengine import ValidationError
 
 from django.contrib import messages
@@ -164,6 +165,11 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     required_fields_dict=required_fields_dict,
                 )
                 bulk_generation.save()
+                logger.info(
+                    "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
+                        dynamic_document_class_name=dynamic_document_class_name
+                    )
+                )
 
                 return render(
                     request,
@@ -194,6 +200,11 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 @login_required
 def generate_bulk_documents(request, bulk_generation_id):
     bulk_generation = BulkGeneration.objects.get(pk=bulk_generation_id)
+    logger.info(
+        "Usando a classe bulk_generation: {dynamic_document_class_name}".format(
+            dynamic_document_class_name=bulk_generation.mongo_db_collection_name
+        )
+    )
     interview = Interview.objects.get(pk=bulk_generation.interview.pk)
     DynamicDocumentClass = create_dynamic_document_class(
         bulk_generation.mongo_db_collection_name,
@@ -202,9 +213,6 @@ def generate_bulk_documents(request, bulk_generation_id):
     )
     documents_collection = DynamicDocumentClass.objects
 
-    # collection_name = bulk_generation.mongo_db_collection_name
-    # db = pymongo_client.educalegal
-    # documents_collection = db[collection_name]
     interview_variables_list = _dict_from_documents(documents_collection, interview.pk)
 
     # Se houver geracao com erro, esta variavel sera definida como False ao final da funcao.
@@ -326,6 +334,7 @@ def generate_bulk_documents(request, bulk_generation_id):
                                             interview_variables=interview_variables,
                                         )
                                     )
+
                                     response, status_code = dac.interview_set_variables(
                                         secret,
                                         interview_full_name,
