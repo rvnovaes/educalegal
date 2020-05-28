@@ -361,6 +361,31 @@ def generate_bulk_documents(request, bulk_generation_id):
                                         logger.error(error_message)
                                         messages.error(request, error_message)
                                     else:
+
+                                        try:
+                                            logger.info(
+                                                "Tentando recuperar dados da entrevista {interview_full_name}".format(
+                                                    interview_full_name=interview_full_name
+                                                )
+                                            )
+
+                                            response, status_code = dac.interview_get_variables(
+                                                secret,
+                                                interview_full_name,
+                                                interview_session
+                                            )
+
+                                            logger.info(
+                                                "Variáveis da entrevista: {response} | {status_code}".format(
+                                                    response=response, status_code=status_code
+                                                )
+                                            )
+
+                                        except Exception as e:
+                                            error_message = str(e)
+                                            logger.error(error_message)
+                                            messages.error(request, error_message)
+
                                         # Dispara a action de envio para assinatura eletronica
                                         logger.info(
                                             "Enviando entrevista para assinatura eletronica"
@@ -376,7 +401,7 @@ def generate_bulk_documents(request, bulk_generation_id):
                                             )
                                             logger.info(status_code)
                                         message = "Status Code: {status_code} | Response: {response}".format(
-                                            status_code=status_code, response=str(response.text)
+                                            status_code=status_code, response=str(response)
                                         )
                                         logger.info(message)
                                         messages.success(request, message)
@@ -407,7 +432,7 @@ def _dict_from_documents(documents_collection, interview_type_id):
         )
 
         document = mongo_to_dict(document, [])
-        document["submit_to_esignature"] = "True"
+        document["submit_to_esignature"] = "False"
 
         interview_variables_list.append(document)
 
