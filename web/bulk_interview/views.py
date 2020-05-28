@@ -31,15 +31,12 @@ logger = logging.getLogger(__name__)
 
 class ValidateCSVFile(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        # Esses campos sao usados apenas no post, mas como o template e o mesmo, passamos para evitar erros
-        csv_valid = False
-        validation_error = False,
         form = BulkInterviewForm()
         interview = Interview.objects.get(pk=self.kwargs["interview_id"])
         return render(
             request,
             "bulk_interview/bulk_interview_validate_generate.html",
-            {"form": form, "interview_id": interview.pk, "csv_valid": csv_valid, validation_error: False},
+            {"form": form, "interview_id": interview.pk, "csv_valid": False, "validation_error": False},
         )
 
     def post(self, request, *args, **kwargs):
