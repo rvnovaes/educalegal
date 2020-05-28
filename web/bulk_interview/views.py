@@ -163,6 +163,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     mongo_db_collection_name=dynamic_document_class_name,
                     field_types_dict=field_types_dict,
                     required_fields_dict=required_fields_dict,
+                    school_names_set=list(school_names_set),
+                    school_units_names_set=list(school_units_names_set)
                 )
                 bulk_generation.save()
                 logger.info(
@@ -210,7 +212,10 @@ def generate_bulk_documents(request, bulk_generation_id):
         bulk_generation.mongo_db_collection_name,
         bulk_generation.field_types_dict,
         bulk_generation.required_fields_dict,
+        school_names_set=list(bulk_generation.school_names_set),
+        school_units_names_set=list(bulk_generation.school_units_names_set)
     )
+
     documents_collection = DynamicDocumentClass.objects
 
     interview_variables_list = _dict_from_documents(documents_collection, interview.pk)
