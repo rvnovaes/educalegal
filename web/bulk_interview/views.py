@@ -217,6 +217,9 @@ def generate_bulk_documents(request, bulk_generation_id):
     )
 
     documents_collection = DynamicDocumentClass.objects
+    documents_collection = list(documents_collection)
+    logger.info("Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection)))
+
 
     interview_variables_list = _dict_from_documents(documents_collection, interview.pk)
 
