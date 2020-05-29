@@ -4,7 +4,6 @@ import uuid
 from urllib3.exceptions import NewConnectionError
 import pandas as pd
 import numpy as np
-import time
 from mongoengine import ValidationError
 
 from django.contrib import messages
@@ -20,7 +19,11 @@ from tenant.models import Tenant
 from school.models import School, SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
-from mongo_util.mongo_util import create_dynamic_document_class, mongo_to_dict
+from mongo_util.mongo_util import (
+    create_dynamic_document_class,
+    mongo_to_dict,
+    is_acceptable_field_type
+)
 
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
@@ -36,7 +39,12 @@ class ValidateCSVFile(LoginRequiredMixin, View):
         return render(
             request,
             "bulk_interview/bulk_interview_validate_generate.html",
-            {"form": form, "interview_id": interview.pk, "csv_valid": False, "validation_error": False},
+            {
+                "form": form,
+                "interview_id": interview.pk,
+                "csv_valid": False,
+                "validation_error": False,
+            },
         )
 
     def post(self, request, *args, **kwargs):
@@ -69,7 +77,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             absolute_file_path = fs.base_location + "/" + filename
 
             with open(absolute_file_path) as csvfile:
-                bulk_data = pd.read_csv(csvfile, sep=";")
+                bulk_data = pd.read_csv(csvfile, sep="#")
 
             # A zeresima linha representa os tipos dos campos
             # A primeira linha representa se o campo e required (true / false) como string
@@ -77,9 +85,27 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             field_types_dict = bulk_data.loc[0].to_dict()
             required_fields_dict = bulk_data.loc[1].to_dict()
 
-            field_types_set = set(bulk_data.loc[0].to_list())
+            # Testa se os tipos de campos estão todos preenchidos e pertencem à lista BooleanField,
+            # DateTimeField, EmailField, FloatField, IntField, LongField ou StringField
+            for k, v in field_types_dict.items():
+                try:
+                    is_acceptable_field_type(k, v)
+                except ValueError as e:
+                    message = str(type(e).__name__) + " : " + str(e)
+                    csv_valid = False
+                    messages.error(request, message)
+                    logger.error(message)
 
-            # valid_field_types
+                    return render(
+                        request,
+                        "bulk_interview/bulk_interview_validate_generate.html",
+                        {
+                            "form": form,
+                            "interview_id": interview.pk,
+                            "validation_error": True,
+                            "csv_valid": csv_valid,
+                        },
+                    )
 
             # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
             # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
@@ -226,7 +252,9 @@ def generate_bulk_documents(request, bulk_generation_id):
         "Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection))
     )
 
-    interview_variables_list = _dict_from_documents(documents_collection, interview.document_type.pk)
+    interview_variables_list = _dict_from_documents(
+        documents_collection, interview.document_type.pk
+    )
 
     # Se houver geracao com erro, esta variavel sera definida como False ao final da funcao.
     # Esta variavel ira modifica a logica de exibicao das telas ao usuario
@@ -507,13 +535,13 @@ def _dict_from_documents(documents_collection, interview_type_id):
 
             worker = dict()
             worker_attributes = [
-            "cpf",
-            "rg",
-            "nationality",
-            "marital_status",
-            "ctps",
-            "serie",
-            "email",
+                "cpf",
+                "rg",
+                "nationality",
+                "marital_status",
+                "ctps",
+                "serie",
+                "email",
             ]
 
             for attribute in worker_attributes:
@@ -540,7 +568,7 @@ def _dict_from_documents(documents_collection, interview_type_id):
                 "complement",
                 "neighborhood",
                 "city",
-                "state"
+                "state",
             ]
 
             for attribute in address_attributes:
@@ -572,22 +600,31 @@ def _dict_from_documents(documents_collection, interview_type_id):
 
             document["documents_list"]["elements"] = dict()
             if document["docmp9362020"] == "s":
-                document["documents_list"]["elements"]["acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx"] = True
+                document["documents_list"]["elements"][
+                    "acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx"
+                ] = True
             else:
-                document["documents_list"]["elements"]["acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx"] = False
+                document["documents_list"]["elements"][
+                    "acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx"
+                ] = False
 
             if document["docmp9272020"] == "s":
                 document["documents_list"]["elements"][
-                    "termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx"] = True
+                    "termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx"
+                ] = True
             else:
                 document["documents_list"]["elements"][
-                    "termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx"] = False
+                    "termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx"
+                ] = False
 
             if document["docdireitoautoral"] == "s":
-                document["documents_list"]["elements"]["termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx"] = True
+                document["documents_list"]["elements"][
+                    "termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx"
+                ] = True
             else:
                 document["documents_list"]["elements"][
-                    "termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx"] = False
+                    "termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx"
+                ] = False
 
             document["documents_list"]["gathered"] = True
             document["documents_list"]["instanceName"] = "documents_list"
