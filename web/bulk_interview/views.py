@@ -69,13 +69,17 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             absolute_file_path = fs.base_location + "/" + filename
 
             with open(absolute_file_path) as csvfile:
-                bulk_data = pd.read_csv(csvfile)
+                bulk_data = pd.read_csv(csvfile, sep=";")
 
             # A zeresima linha representa os tipos dos campos
             # A primeira linha representa se o campo e required (true / false) como string
             # Ambos são usados para criar a classe dinamica
             field_types_dict = bulk_data.loc[0].to_dict()
             required_fields_dict = bulk_data.loc[1].to_dict()
+
+            field_types_set = set(bulk_data.loc[0].to_list())
+
+            # valid_field_types
 
             # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
             # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
