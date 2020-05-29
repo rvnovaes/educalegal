@@ -95,9 +95,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             bulk_data_content = bulk_data.drop(bulk_data.index[range(0, 4)])
 
             # Substitui os campos de unidade escolar vazions, aos quais o Pandas havia atribuido nan, por ---
-            bulk_data_content["unidadeAluno"] = bulk_data_content[
-                "unidadeAluno"
-            ].replace({np.nan: "---"})
+            bulk_data_content["unidadeAluno"] = bulk_data_content["unidadeAluno"].replace({np.nan: "---"})
 
             # Substitui os campos vazios, aos quais o Pandas havia atribuido nan, por None
             bulk_data_content = bulk_data_content.replace({np.nan: None})
@@ -392,29 +390,31 @@ def _dict_from_documents(documents_collection, interview_type_id):
                     document.pop(attribute)
                 except KeyError:
                     contratante[attribute] = ""
-            # Cria a representacao do objeto IndividualName dentro de contratante
-            contratante["name"] = dict()
-            contratante["name"]["first"] = document["name_first"]
-            document.pop("name_first")
-            contratante["instanceName"] = "contratantes[0]"
-            contratante["_class"] = "docassemble.base.util.Individual"
-            contratante["name"]["_class"] = "docassemble.base.util.IndividualName"
-            contratante["name"]["uses_parts"] = True
-            # TODO alteracao do indice para mais de um contratante ??
-            contratante["name"]["instanceName"] = "contratantes[0].name"
-            document["contratantes"] = dict()
-            document["contratantes"]["elements"] = list()
-            document["contratantes"]["elements"].append(contratante)
-            document["contratantes"]["auto_gather"] = "False"
-            document["contratantes"]["gathered"] = "True"
-            document["contratantes"]["_class"] = "docassemble.base.core.DAList"
-            document["contratantes"]["instanceName"] = "contratantes"
 
-            document[
-                "content_document"
-            ] = "contrato-prestacao-servicos-educacionais.docx"
-            document["valid_contratantes_table"] = "continue"
-            document["submit_to_esignature"] = "True"
+            _create_person(document, 'f', 'contratantes', 0)
+            # # Cria a representacao do objeto IndividualName dentro de contratante
+            # contratante["name"] = dict()
+            # contratante["name"]["first"] = document["name_first"]
+            # document.pop("name_first")
+            # contratante["instanceName"] = "contratantes[0]"
+            # contratante["_class"] = "docassemble.base.util.Individual"
+            # contratante["name"]["_class"] = "docassemble.base.util.IndividualName"
+            # contratante["name"]["uses_parts"] = True
+            # # TODO alteracao do indice para mais de um contratante ??
+            # contratante["name"]["instanceName"] = "contratantes[0].name"
+            # document["contratantes"] = dict()
+            # document["contratantes"]["elements"] = list()
+            # document["contratantes"]["elements"].append(contratante)
+            # document["contratantes"]["auto_gather"] = "False"
+            # document["contratantes"]["gathered"] = "True"
+            # document["contratantes"]["_class"] = "docassemble.base.core.DAList"
+            # document["contratantes"]["instanceName"] = "contratantes"
+            #
+            # document[
+            #     "content_document"
+            # ] = "contrato-prestacao-servicos-educacionais.docx"
+            # document["valid_contratantes_table"] = "continue"
+            # document["submit_to_esignature"] = "True"
 
             interview_variables_list.append(document)
 
@@ -430,9 +430,9 @@ def _dict_from_documents(documents_collection, interview_type_id):
 def _create_person(document, person_type, person_legal_type, index):
     """ Cria a representação da pessoa como objeto do Docassemble
         document
-        person_type: F  - física
-                     J  - jurídica
-                     FJ - ambos
+        person_type: f  - física
+                     j  - jurídica
+                     fj - ambos
         person_legal_type - indica o tipo da parte: contratante, contratada, locatária, locadora, etc.
         index - índice do elemento que está sendo convertido
     """
@@ -440,14 +440,14 @@ def _create_person(document, person_type, person_legal_type, index):
 
     person["name"] = dict()
 
-    if person_type == 'FJ':
+    if person_type == 'fj':
         person["_class"] = "docassemble.base.util.Person"
         person["name"]["_class"] = "docassemble.base.util.Name"
-    elif person_type == 'F':
+    elif person_type == 'f':
         person["_class"] = "docassemble.base.util.Individual"
         person["name"]["_class"] = "docassemble.base.util.IndividualName"
 
-        person["name"]["first"] = document["name_first"]
+        person["name"]["text"] = document["name_first"]
         person["name"]["uses_parts"] = True
         document.pop("name_first")
     else:
@@ -467,4 +467,6 @@ def _create_person(document, person_type, person_legal_type, index):
     document[person_legal_type]["instanceName"] = person_legal_type
     document["valid_" + person_legal_type + "_table"] = "continue"
 
+    document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
+    document["submit_to_esignature"] = "True"
 
