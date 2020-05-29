@@ -77,11 +77,6 @@ class DocassembleClient:
         logger.info("Final URL em interview_set_variables: " + final_url)
 
         variables = json.dumps(variables)
-        logger.info(
-            "Json com as variaveis a ser enviado para o Servidor de Entrevistas {variables}".format(
-                variables=str(variables)
-            )
-        )
 
         payload = {
             "i": interview_name,
