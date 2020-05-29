@@ -141,3 +141,7 @@ dmypy.json
 /web/static/django_tables2/
 /web/static/drf-yasg/
 /web/static/tenant/
+
+# Direvn
+/web/.direnv/*
+
