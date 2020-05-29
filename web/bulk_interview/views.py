@@ -402,23 +402,23 @@ def _dict_from_documents(documents_collection, interview_type_id):
     if interview_type_id == 1:
         logger.info("Debug interview")
 
-    for i, document in enumerate(documents_collection):
+        for i, document in enumerate(documents_collection):
+            logger.info(
+                "Gerando lista de variáveis para o objeto {object_id}".format(
+                    object_id=str(document.id)
+                )
+            )
+
+            document = mongo_to_dict(document, [])
+            document["submit_to_esignature"] = "False"
+
+            interview_variables_list.append(document)
+
         logger.info(
-            "Gerando lista de variáveis para o objeto {object_id}".format(
-                object_id=str(document.id)
+            "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
+                size=len(interview_variables_list)
             )
         )
-
-        document = mongo_to_dict(document, [])
-        document["submit_to_esignature"] = "False"
-
-        interview_variables_list.append(document)
-
-    logger.info(
-        "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
-            size=len(interview_variables_list)
-        )
-    )
 
     if interview_type_id == 2:
         # cursor = documents_collection.find({})
