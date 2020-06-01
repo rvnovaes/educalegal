@@ -19,7 +19,11 @@ from tenant.models import Tenant
 from school.models import School, SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
-from mongo_util.mongo_util import create_dynamic_document_class, mongo_to_dict
+from mongo_util.mongo_util import (
+    create_dynamic_document_class,
+    mongo_to_dict,
+    is_acceptable_field_type
+)
 
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
@@ -35,7 +39,12 @@ class ValidateCSVFile(LoginRequiredMixin, View):
         return render(
             request,
             "bulk_interview/bulk_interview_validate_generate.html",
-            {"form": form, "interview_id": interview.pk},
+            {
+                "form": form,
+                "interview_id": interview.pk,
+                "csv_valid": False,
+                "validation_error": False,
+            },
         )
 
     def post(self, request, *args, **kwargs):
@@ -58,7 +67,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             school_units_names_set.add("---")
 
             source_file = request.FILES["source_file"]
-            logger.debug("Carregado o arquivo: " + source_file.name)
+            logger.info("Carregado o arquivo: " + source_file.name)
 
             # salva o arquivo inserido pelo usuario na pasta media
             fs = FileSystemStorage()
@@ -68,13 +77,35 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             absolute_file_path = fs.base_location + "/" + filename
 
             with open(absolute_file_path) as csvfile:
-                bulk_data = pd.read_csv(csvfile)
+                bulk_data = pd.read_csv(csvfile, sep="#")
 
             # A zeresima linha representa os tipos dos campos
             # A primeira linha representa se o campo e required (true / false) como string
             # Ambos são usados para criar a classe dinamica
             field_types_dict = bulk_data.loc[0].to_dict()
             required_fields_dict = bulk_data.loc[1].to_dict()
+
+            # Testa se os tipos de campos estão todos preenchidos e pertencem à lista BooleanField,
+            # DateTimeField, EmailField, FloatField, IntField, LongField ou StringField
+            for k, v in field_types_dict.items():
+                try:
+                    is_acceptable_field_type(k, v)
+                except ValueError as e:
+                    message = str(type(e).__name__) + " : " + str(e)
+                    csv_valid = False
+                    messages.error(request, message)
+                    logger.error(message)
+
+                    return render(
+                        request,
+                        "bulk_interview/bulk_interview_validate_generate.html",
+                        {
+                            "form": form,
+                            "interview_id": interview.pk,
+                            "validation_error": True,
+                            "csv_valid": csv_valid,
+                        },
+                    )
 
             # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
             # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
@@ -94,7 +125,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Lembre-se que a linha de header do df se mantem
             bulk_data_content = bulk_data.drop(bulk_data.index[range(0, 4)])
 
-            # Substitui os campos de unidade escolar vazions, aos quais o Pandas havia atribuido nan, por ---
+            # Substitui os campos de unidade escolar vazios, aos quais o Pandas havia atribuido nan, por ---
             bulk_data_content["unidadeAluno"] = bulk_data_content["unidadeAluno"].replace({np.nan: "---"})
 
             # Substitui os campos vazios, aos quais o Pandas havia atribuido nan, por None
@@ -105,7 +136,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
             # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
             csv_valid = True
-
 
             # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
             # no Mongo
@@ -122,10 +152,11 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     # mensagem de sucesso
                     row_values = list(row_dict.values())
                     message = "Registro {register_index} validado com sucesso".format(
-                        register_index=str(register_index + 1))
+                        register_index=str(register_index + 1)
+                    )
                     for value_index, value in enumerate(row_values):
                         message += " | " + str(row_values[value_index])
-                    logger.debug(message)
+                    logger.info(message)
                     messages.success(request, message)
                 except ValidationError as e:
                     # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
@@ -139,7 +170,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     )
                     for value_index, value in enumerate(row_values):
                         message += " | " + str(row_values[value_index])
-                    logger.debug(message)
+                    logger.info(message)
                     messages.error(request, message)
                 finally:
                     # Apaga o arquivo csv carregado
@@ -160,8 +191,15 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     mongo_db_collection_name=dynamic_document_class_name,
                     field_types_dict=field_types_dict,
                     required_fields_dict=required_fields_dict,
+                    school_names_set=list(school_names_set),
+                    school_units_names_set=list(school_units_names_set),
                 )
                 bulk_generation.save()
+                logger.info(
+                    "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
+                        dynamic_document_class_name=dynamic_document_class_name
+                    )
+                )
 
                 return render(
                     request,
@@ -192,18 +230,29 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 @login_required
 def generate_bulk_documents(request, bulk_generation_id):
     bulk_generation = BulkGeneration.objects.get(pk=bulk_generation_id)
+    logger.info(
+        "Usando a classe bulk_generation: {dynamic_document_class_name}".format(
+            dynamic_document_class_name=bulk_generation.mongo_db_collection_name
+        )
+    )
     interview = Interview.objects.get(pk=bulk_generation.interview.pk)
     DynamicDocumentClass = create_dynamic_document_class(
         bulk_generation.mongo_db_collection_name,
         bulk_generation.field_types_dict,
         bulk_generation.required_fields_dict,
+        school_names_set=list(bulk_generation.school_names_set),
+        school_units_names_set=list(bulk_generation.school_units_names_set),
     )
-    documents_collection = DynamicDocumentClass.objects
 
-    # collection_name = bulk_generation.mongo_db_collection_name
-    # db = pymongo_client.educalegal
-    # documents_collection = db[collection_name]
-    interview_variables_list = _dict_from_documents(documents_collection, interview.pk)
+    documents_collection = DynamicDocumentClass.objects
+    documents_collection = list(documents_collection)
+    logger.info(
+        "Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection))
+    )
+
+    interview_variables_list = _dict_from_documents(
+        documents_collection, interview.document_type.pk
+    )
 
     # Se houver geracao com erro, esta variavel sera definida como False ao final da funcao.
     # Esta variavel ira modifica a logica de exibicao das telas ao usuario
@@ -224,6 +273,11 @@ def generate_bulk_documents(request, bulk_generation_id):
         # cria cliente da api do docassemble
         try:
             dac = DocassembleClient(base_url, api_key)
+            logger.info(
+                "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
+                    base_url=base_url, api_key=api_key
+                )
+            )
         except NewConnectionError as e:
             message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
                 e=str(e)
@@ -239,6 +293,12 @@ def generate_bulk_documents(request, bulk_generation_id):
                 "interview_filename",
             )
 
+            logger.info(
+                "Nome da entrevista: {interview_full_name} ".format(
+                    interview_full_name=interview_full_name
+                )
+            )
+
             # passa argumentos da url para a entrevista
             url_args = {
                 "tid": request.user.tenant.pk,
@@ -249,18 +309,23 @@ def generate_bulk_documents(request, bulk_generation_id):
             try:
                 response_json, status_code = dac.secret_read(username, user_password)
                 secret = response_json
+                logger.info(
+                    "Secret obtido do servidor de geração de documentos: {secret}".format(
+                        secret=secret
+                    )
+                )
             except requests.exceptions.ConnectionError as e:
                 message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
                     e=str(e)
                 )
-                logger.debug(message)
+                logger.error(message)
                 messages.error(request, message)
             else:
                 if status_code != 200:
                     error_message = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(
                         status_code=status_code, response=response_json
                     )
-                    logger.debug(error_message)
+                    logger.error(error_message)
                     messages.error(request, error_message)
                 else:
                     # gera uma nova entrevista para a cada dicionário de variáveis de entrevista
@@ -268,37 +333,47 @@ def generate_bulk_documents(request, bulk_generation_id):
                     for i, interview_variables in enumerate(interview_variables_list):
                         # Uma nova sessão deve ser criada para cada entrevista
                         try:
-                            interview_session, response_json, status_code = dac.start_interview(
-                                interview_full_name, secret
+                            (
+                                interview_session,
+                                response_json,
+                                status_code,
+                            ) = dac.start_interview(interview_full_name, secret)
+                            logger.info(
+                                "Sessão da entrevista gerada com sucesso: {interview_session}".format(
+                                    interview_session=interview_session
+                                )
                             )
                         except requests.exceptions.ConnectionError as e:
                             message = "Não foi possível iniciar nova sessão de entrevista. | {e}".format(
                                 e=str(e)
                             )
-                            logger.debug(message)
+                            logger.error(message)
                             messages.error(request, message)
                         else:
                             if status_code != 200:
                                 error_message = "Erro ao iniciar nova sessão | Status Code: {status_code} | Response: {response}".format(
                                     status_code=status_code, response=response_json
                                 )
-                                logger.debug(error_message)
+                                logger.error(error_message)
                                 messages.error(request, error_message)
                             else:
-                                logger.debug(
+                                logger.info(
                                     "Gerando documento {document_number} de {bulk_list_lenght}".format(
                                         document_number=str(i + 1),
-                                        bulk_list_lenght=str(len(interview_variables_list)),
+                                        bulk_list_lenght=str(
+                                            len(interview_variables_list)
+                                        ),
                                     )
                                 )
                                 interview_variables["url_args"] = url_args
                                 try:
-                                    logger.debug(
+                                    logger.info(
                                         "Tentando gerar entrevista {interview_full_name} com os dados {interview_variables}".format(
                                             interview_full_name=interview_full_name,
                                             interview_variables=interview_variables,
                                         )
                                     )
+
                                     response, status_code = dac.interview_set_variables(
                                         secret,
                                         interview_full_name,
@@ -307,20 +382,22 @@ def generate_bulk_documents(request, bulk_generation_id):
                                     )
                                 except Exception as e:
                                     error_message = str(e)
-                                    logger.debug(error_message)
+                                    logger.error(error_message)
                                     messages.error(request, error_message)
                                 else:
                                     if status_code != 200:
                                         error_message = "Erro ao gerar entrevista | Status Code: {status_code} | Response: {response}".format(
-                                            status_code=status_code, response=response
+                                            status_code=status_code,
+                                            response=str(response.text),
                                         )
-                                        logger.debug(error_message)
+                                        logger.error(error_message)
                                         messages.error(request, error_message)
                                     else:
                                         # Dispara a action de envio para assinatura eletronica
-                                        logger.debug(
+                                        logger.info(
                                             "Enviando entrevista para assinatura eletronica"
                                         )
+                                        # TODO colocar opcao na interface do usuario para escolher se deseja mandar para esignature em lote
                                         if interview_variables["submit_to_esignature"]:
                                             status_code = dac.interview_run_action(
                                                 secret,
@@ -329,11 +406,12 @@ def generate_bulk_documents(request, bulk_generation_id):
                                                 "submit_to_esignature",
                                                 None,
                                             )
-                                            logger.debug(status_code)
+                                            logger.info(status_code)
                                         message = "Status Code: {status_code} | Response: {response}".format(
-                                            status_code=status_code, response=response
+                                            status_code=status_code,
+                                            response=str(response),
                                         )
-                                        logger.debug(message)
+                                        logger.info(message)
                                         messages.success(request, message)
 
     storage = get_messages(request)
@@ -350,14 +428,33 @@ def generate_bulk_documents(request, bulk_generation_id):
 
 
 def _dict_from_documents(documents_collection, interview_type_id):
+
     interview_variables_list = list()
-    if interview_type_id == 2:
-        # cursor = documents_collection.find({})
-        # Passa os atributos do documento para o contratante
-        # e os remove do documento
+
+    if interview_type_id == 1:
 
         for i, document in enumerate(documents_collection):
-            logger.debug(
+            logger.info(
+                "Gerando lista de variáveis para o objeto {object_id}".format(
+                    object_id=str(document.id)
+                )
+            )
+
+            document = mongo_to_dict(document, [])
+            document["submit_to_esignature"] = "False"
+
+            interview_variables_list.append(document)
+
+        logger.info(
+            "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
+                size=len(interview_variables_list)
+            )
+        )
+
+    if interview_type_id == 2:
+
+        for i, document in enumerate(documents_collection):
+            logger.info(
                 "Gerando lista de variáveis para o objeto {object_id}".format(
                     object_id=str(document.id)
                 )
@@ -390,39 +487,162 @@ def _dict_from_documents(documents_collection, interview_type_id):
                     document.pop(attribute)
                 except KeyError:
                     contratante[attribute] = ""
+            # Cria a representacao do objeto IndividualName dentro de contratante
+            contratante["name"] = dict()
+            contratante["name"]["first"] = document["name_first"]
+            document.pop("name_first")
+            contratante["instanceName"] = "contratantes[0]"
+            contratante["_class"] = "docassemble.base.util.Individual"
+            contratante["name"]["_class"] = "docassemble.base.util.IndividualName"
+            contratante["name"]["uses_parts"] = True
+            # TODO alteracao do indice para mais de um contratante ??
+            contratante["name"]["instanceName"] = "contratantes[0].name"
+            contratante["instanceName"] = "contratantes[0]"
+            document["contratantes"] = dict()
+            document["contratantes"]["elements"] = list()
+            document["contratantes"]["elements"].append(contratante)
+            document["contratantes"]["auto_gather"] = "False"
+            document["contratantes"]["gathered"] = "True"
+            document["contratantes"]["_class"] = "docassemble.base.core.DAList"
+            document["contratantes"]["instanceName"] = "contratantes"
 
-            _create_person(document, 'f', 'contratantes', 0)
-            # # Cria a representacao do objeto IndividualName dentro de contratante
-            # contratante["name"] = dict()
-            # contratante["name"]["first"] = document["name_first"]
-            # document.pop("name_first")
-            # contratante["instanceName"] = "contratantes[0]"
-            # contratante["_class"] = "docassemble.base.util.Individual"
-            # contratante["name"]["_class"] = "docassemble.base.util.IndividualName"
-            # contratante["name"]["uses_parts"] = True
-            # # TODO alteracao do indice para mais de um contratante ??
-            # contratante["name"]["instanceName"] = "contratantes[0].name"
-            # document["contratantes"] = dict()
-            # document["contratantes"]["elements"] = list()
-            # document["contratantes"]["elements"].append(contratante)
-            # document["contratantes"]["auto_gather"] = "False"
-            # document["contratantes"]["gathered"] = "True"
-            # document["contratantes"]["_class"] = "docassemble.base.core.DAList"
-            # document["contratantes"]["instanceName"] = "contratantes"
-            #
-            # document[
-            #     "content_document"
-            # ] = "contrato-prestacao-servicos-educacionais.docx"
-            # document["valid_contratantes_table"] = "continue"
-            # document["submit_to_esignature"] = "True"
+            document[
+                "content_document"
+            ] = "contrato-prestacao-servicos-educacionais.docx"
+            document["valid_contratantes_table"] = "continue"
+            document["submit_to_esignature"] = "True"
 
             interview_variables_list.append(document)
 
-    logger.debug(
-        "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
-            size=len(interview_variables_list)
+        logger.info(
+            "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
+                size=len(interview_variables_list)
+            )
         )
-    )
+
+    if interview_type_id == 37:
+
+        for i, document in enumerate(documents_collection):
+            logger.info(
+                "Gerando lista de variáveis para o objeto {object_id}".format(
+                    object_id=str(document.id)
+                )
+            )
+
+            document = mongo_to_dict(document, [])
+
+            worker = dict()
+            worker_attributes = [
+                "cpf",
+                "rg",
+                "nationality",
+                "marital_status",
+                "ctps",
+                "serie",
+                "email",
+            ]
+
+            for attribute in worker_attributes:
+                # Se não houver o atributo no documento, ele estava em branco na planilha
+                try:
+                    worker[attribute] = document[attribute]
+                    document.pop(attribute)
+                except KeyError:
+                    worker[attribute] = ""
+
+            worker["instanceName"] = "workers[0]"
+            worker["_class"] = "docassemble.base.util.Person"
+            worker["name"] = dict()
+            worker["name"]["_class"] = "docassemble.base.util.Name"
+            worker["name"]["text"] = document["name_text"]
+            worker["name"]["instanceName"] = "workers[0].name"
+            document.pop("name_text")
+
+            address = dict()
+            address_attributes = [
+                "zip",
+                "street_name",
+                "street_number",
+                "complement",
+                "neighborhood",
+                "city",
+                "state",
+            ]
+
+            for attribute in address_attributes:
+                # Se não houver o atributo no documento, ele estava em branco na planilha
+                try:
+                    address[attribute] = document[attribute]
+                    document.pop(attribute)
+                except KeyError:
+                    address[attribute] = ""
+
+            worker["address"] = address
+            worker["address"]["instanceName"] = "workers[0].address"
+            worker["address"]["_class"] = "docassemble.base.util.Address"
+
+            document["workers"] = dict()
+            document["workers"]["elements"] = list()
+            document["workers"]["elements"].append(worker)
+            document["workers"]["auto_gather"] = "False"
+            document["workers"]["gathered"] = "True"
+            document["workers"]["_class"] = "docassemble.base.core.DAList"
+            document["workers"]["instanceName"] = "workers"
+
+            document["documents_list"] = dict()
+            document["documents_list"]["_class"] = "docassemble.base.core.DADict"
+            document["documents_list"]["ask_number"] = False
+            document["documents_list"]["ask_object_type"] = False
+            document["documents_list"]["auto_gather"] = False
+            # document["documents_list"]["complete_attribute"] =  null,
+
+            document["documents_list"]["elements"] = dict()
+            if document["docmp9362020"] == "s":
+                document["documents_list"]["elements"][
+                    "acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx"
+                ] = True
+            else:
+                document["documents_list"]["elements"][
+                    "acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx"
+                ] = False
+
+            if document["docmp9272020"] == "s":
+                document["documents_list"]["elements"][
+                    "termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx"
+                ] = True
+            else:
+                document["documents_list"]["elements"][
+                    "termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx"
+                ] = False
+
+            if document["docdireitoautoral"] == "s":
+                document["documents_list"]["elements"][
+                    "termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx"
+                ] = True
+            else:
+                document["documents_list"]["elements"][
+                    "termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx"
+                ] = False
+
+            document["documents_list"]["gathered"] = True
+            document["documents_list"]["instanceName"] = "documents_list"
+            # document["documents_list"]["minimum_number"]: null,
+            # document["documents_list"]["object_type"]: null,
+            # document["documents_list"]["object_type_parameters"]: {}
+
+            document[
+                "content_document"
+            ] = "acordos-individuais-trabalhistas-coronavirus.docx"
+            document["valid_workers_table"] = "continue"
+            document["submit_to_esignature"] = "False"
+
+            interview_variables_list.append(document)
+
+        logger.info(
+            "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
+                size=len(interview_variables_list)
+            )
+        )
 
     return interview_variables_list
 
@@ -457,7 +677,7 @@ def _create_person(document, person_type, person_legal_type, index):
     person["instanceName"] = person_legal_type + '[' + str(index) + ']'
 
     person["name"]["instanceName"] = person_legal_type + '[' + str(index) + '].name'
-    
+
     document[person_legal_type] = dict()
     document[person_legal_type]["elements"] = list()
     document[person_legal_type]["elements"].append(person)

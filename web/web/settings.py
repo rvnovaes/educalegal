@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
+import logging
 import os
 from django.contrib.messages import constants as message_constants
 
@@ -18,6 +18,7 @@ from moneyed.localization import _FORMATTER
 from decimal import ROUND_HALF_EVEN
 from config.config import *
 from mongo_util.mongo_util import create_mongo_connection
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -323,16 +324,16 @@ LOGGING = {
             "formatter": "file",
             "filename": os.path.join(BASE_DIR, "media/debug.log"),
         },
-        # "error_file": {
-        #     "level": "ERROR",
-        #     "class": "logging.FileHandler",
-        #     "formatter": "file",
-        #     "filename": os.path.join(BASE_DIR, "media/error.log"),
-        # }
+        "info_log": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "file",
+            "filename": os.path.join(BASE_DIR, "media/info.log"),
+        }
     },
     "loggers": {
-        "": {"level": "DEBUG", "handlers": ["console", "debug_file"]},
-        # "error": {"level": "ERROR", "handlers": ["console", "error_file"]}
+        "": {"level": "INFO", "handlers": ["console", "info_log"]},
+        "django": {"level": "DEBUG", "handlers": ["console", "debug_file"]},
     },
 }
 
@@ -373,6 +374,6 @@ MONGO_HOST = "mongo"
 MONGO_PORT = 27017
 
 # mongoengine
-create_mongo_connection(MONGO_DB, MONGO_ALIAS, MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT)
-
-
+create_mongo_connection(
+    MONGO_DB, MONGO_ALIAS, MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT
+)

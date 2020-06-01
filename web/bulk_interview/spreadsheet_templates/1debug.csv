@@ -1,0 +1,6 @@
+selected_school,unidadeAluno,nomeAluno
+StringField,StringField,StringField
+true,true,true
+Escola,,Dados do aluno
+Escola,Unidade,Nome
+Colégio Bacana,Super Bacana,Platão de Atenas

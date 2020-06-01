@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   educalegal:
-    command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4
+    command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
     environment:
       - ALLOWED_HOSTS=app.educalegal.com.br,167.71.161.48
       - DATABASE_NAME=educa-legal-app
