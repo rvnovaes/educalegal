@@ -2,15 +2,14 @@ import logging
 import requests
 import uuid
 from urllib3.exceptions import NewConnectionError
-import pandas as pd
 import numpy as np
 from mongoengine import ValidationError
+import pandas as pd
 
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.core.files.storage import FileSystemStorage
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.views import View
@@ -19,11 +18,12 @@ from tenant.models import Tenant
 from school.models import School, SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
-from mongo_util.mongo_util import (
+from bulk_import_util.mongo_util import (
     create_dynamic_document_class,
     mongo_to_dict,
-    is_acceptable_field_type
 )
+
+from bulk_import_util.file_import import is_csv_metadata_valid
 
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
@@ -67,45 +67,36 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             school_units_names_set.add("---")
 
             source_file = request.FILES["source_file"]
+
             logger.info("Carregado o arquivo: " + source_file.name)
 
-            # salva o arquivo inserido pelo usuario na pasta media
-            fs = FileSystemStorage()
-            filename = fs.save(source_file.name, source_file)
+            # Transforma o arquivo CSV em um dataframe
+            bulk_data = pd.read_csv(source_file, sep="#")
 
-            # pega caminho do arquivo para ler o csv com pandas
-            absolute_file_path = fs.base_location + "/" + filename
+            # Valida os metadados do CSV (timpos de campos e flags booleanas)
+            try:
+                is_csv_metadata_valid(bulk_data)
+            except ValueError as e:
+                message = str(type(e).__name__) + " : " + str(e)
+                messages.error(request, message)
+                logger.error(message)
 
-            with open(absolute_file_path) as csvfile:
-                bulk_data = pd.read_csv(csvfile, sep="#")
+                return render(
+                    request,
+                    "bulk_interview/bulk_interview_validate_generate.html",
+                    {
+                        "form": form,
+                        "interview_id": interview.pk,
+                        "validation_error": True,
+                        "csv_valid": False,
+                    },
+                )
 
             # A zeresima linha representa os tipos dos campos
             # A primeira linha representa se o campo e required (true / false) como string
             # Ambos são usados para criar a classe dinamica
             field_types_dict = bulk_data.loc[0].to_dict()
             required_fields_dict = bulk_data.loc[1].to_dict()
-
-            # Testa se os tipos de campos estão todos preenchidos e pertencem à lista BooleanField,
-            # DateTimeField, EmailField, FloatField, IntField, LongField ou StringField
-            for k, v in field_types_dict.items():
-                try:
-                    is_acceptable_field_type(k, v)
-                except ValueError as e:
-                    message = str(type(e).__name__) + " : " + str(e)
-                    csv_valid = False
-                    messages.error(request, message)
-                    logger.error(message)
-
-                    return render(
-                        request,
-                        "bulk_interview/bulk_interview_validate_generate.html",
-                        {
-                            "form": form,
-                            "interview_id": interview.pk,
-                            "validation_error": True,
-                            "csv_valid": csv_valid,
-                        },
-                    )
 
             # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
             # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo

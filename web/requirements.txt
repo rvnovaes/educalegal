@@ -42,3 +42,5 @@ mongoengine~=0.20.0
 pyjwt
 # Validations
 validator-collection~=1.4.1
+# Tests
+pytest~=5.4.2
