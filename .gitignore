@@ -145,3 +145,4 @@ dmypy.json
 # Direvn
 /web/.direnv/*
 
+/web/.envrc
