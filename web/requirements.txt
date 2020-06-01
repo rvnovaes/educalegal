@@ -16,7 +16,7 @@ django-tables2
 django-filter~=2.2.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.13.13
+boto3~=1.13.19
 # Production server
 gunicorn
 # Misc
@@ -30,7 +30,7 @@ django-debug-toolbar~=2.2
 # API Debugging
 django-silk~=4.0.1
 # Read csv
-pandas~=1.0.3
+pandas~=1.0.4
 # Django models currency
 django-money~=1.1
 # Google Analytics
@@ -40,3 +40,5 @@ pymongo~=3.10.1
 mongoengine~=0.20.0
 # Used to test docusign requests
 pyjwt
+# Validations
+validator-collection~=1.4.1
