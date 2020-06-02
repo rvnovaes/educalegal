@@ -9,8 +9,7 @@ from .views import (
     TenantSchoolViewSet,
     TenantViewSet,
     TenantGedDataViewSet,
-    TenantESignatureDataViewSet,
-    TenantESignatureAppViewSet,
+    ESignatureAppViewSet,
     docusign_webhook_listener
 )
 
@@ -23,27 +22,14 @@ schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
     path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
-    path(
-        "documents/",
-        DocumentViewSet.as_view({"post": "create", "patch": "partial_update"}),
-    ),
+    path("documents/", DocumentViewSet.as_view({"post": "create", "patch": "partial_update"}),),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
     path("tenants/", TenantViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>", TenantViewSet.as_view({"get": "retrieve"})),
     path("tenants/<int:pk>/schools/", TenantSchoolViewSet.as_view({"get": "list"})),
-    path(
-        "tenants/<int:pk>/schools/<int:spk>",
-        TenantSchoolViewSet.as_view({"get": "retrieve"}),
-    ),
+    path("tenants/<int:pk>/schools/<int:spk>", TenantSchoolViewSet.as_view({"get": "retrieve"})),
     path("tenants/<int:pk>/ged/", TenantGedDataViewSet.as_view({"get": "retrieve"})),
-    path(
-        "tenants/<int:pk>/esignature/",
-        TenantESignatureDataViewSet.as_view({"get": "retrieve"}),
-    ),
-    path(
-        "tenants/<int:pk>/esignatureapp/",
-        TenantESignatureAppViewSet.as_view({"get": "retrieve"}),
-    ),
+    path("tenants/<int:pk>/esignature/", ESignatureAppViewSet.as_view({"get": "retrieve"})),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
     path("docs/", include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),

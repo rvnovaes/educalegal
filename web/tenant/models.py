@@ -6,12 +6,12 @@ from billing.models import Plan
 # https://books.agiliq.com/projects/django-multi-tenant/en/latest/
 
 
-class TenantESignatureApp(models.Model):
+class ESignatureApp(models.Model):
+    name = models.CharField(
+        max_length=255, default="Educa Legal Development", verbose_name="Nome da Aplicação Cliente",
+    )
     provider = models.CharField(
         max_length=255, default="Docusign", verbose_name="Fornecedor",
-    )
-    app_name = models.CharField(
-        max_length=255, default="Educa Legal Development", verbose_name="Nome da Aplicação Cliente",
     )
     private_key = models.TextField(verbose_name="Private Key")
     client_id = models.CharField(
@@ -27,9 +27,13 @@ class TenantESignatureApp(models.Model):
 
     test_mode = models.BooleanField(default=True, verbose_name="Test Mode")
 
-    def __str__(self):
-        return self.provider
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Aplicativo de assinatura eletrônica"
+        verbose_name_plural = "Aplicativos de assinatura eletrônica"
 
+    def __str__(self):
+        return self.name
 
 
 class Tenant(models.Model):
@@ -48,7 +52,12 @@ class Tenant(models.Model):
         default=False, verbose_name="Autoinscrito"
     )
 
-    esignature_app = models.ForeignKey(TenantESignatureApp, null=True, blank=True, on_delete=models.PROTECT)
+    esignature_app = models.ForeignKey(ESignatureApp, null=True, blank=True, on_delete=models.PROTECT, default=1)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Instância"
+        verbose_name_plural = "Instâncias"
 
     def __str__(self):
         return self.name
@@ -101,26 +110,10 @@ class TenantGedData(models.Model):
     )
     storage_region_name = models.CharField(max_length=255, verbose_name="Região")
 
+    class Meta:
+        ordering = ["tenant"]
+        verbose_name = "Configuração do GED"
+        verbose_name_plural = "Configurações do GED"
+
     def __str__(self):
         return self.url
-
-
-class TenantESignatureData(models.Model):
-    tenant = models.OneToOneField(Tenant, on_delete=models.CASCADE, primary_key=True)
-    provider = models.CharField(
-        max_length=255, default="Docusign", verbose_name="Fornecedor",
-    )
-    private_key = models.TextField(verbose_name="Private Key")
-    client_id = models.CharField(
-        max_length=255, verbose_name="Client ID", help_text="AKA Integration Key"
-    )
-    impersonated_user_guid = models.CharField(
-        max_length=255,
-        blank=True,
-        verbose_name="Impersonated User",
-        help_text="AKA API Username",
-    )
-    test_mode = models.BooleanField(default=True, verbose_name="Test Mode")
-
-    def __str__(self):
-        return self.provider
