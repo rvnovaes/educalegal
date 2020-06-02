@@ -67,14 +67,18 @@ db_app_start:
 	docker-compose start db
 
 db_app_synchronize:
-	./pg_dump_digital_ocean_to_local_educalegal_app.sh
+	./scripts/pg_dump_digital_ocean_to_local_educalegal_app.sh
 
 db_app_stop:
 	docker-compose stop db
 
 db_app_remote_to_local: db_app_start db_app_synchronize db_app_stop
 
+make_bkp_local:
+	./scripts/make_bkp_local.sh
 
+restore_bkp_local:
+	./scripts/restore_bkp_local.sh
 
 
 # https://docs.docker.com/compose/extends/
