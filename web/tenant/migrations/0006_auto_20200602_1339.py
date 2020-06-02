@@ -86,10 +86,12 @@ def alter_tenant_bahema(apps, schema_editor):
     e_signature_bahema_app = ESignatureApp.objects.get(pk=2)
 
     Tenant = apps.get_model("tenant", "Tenant")
-    tenant_bahema = Tenant.objects.get(name="Bahema")
-
-    tenant_bahema.esignature_app = e_signature_bahema_app
-    tenant_bahema.save(update_fields=['esignature_app'])
+    try:
+        tenant_bahema = Tenant.objects.get(name="Bahema")
+        tenant_bahema.esignature_app = e_signature_bahema_app
+        tenant_bahema.save(update_fields=['esignature_app'])
+    except Tenant.DoesNotExist:
+        pass
 
 
 class Migration(migrations.Migration):
