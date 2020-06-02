@@ -4,6 +4,7 @@ import numbers
 import re
 import pandas as pd
 from validator_collection import validators, checkers, errors
+import numpy as np
 
 
 from .constants import VALID_FIELD_TYPES
@@ -60,5 +61,29 @@ def is_csv_metadata_valid(bulk_data: pd.DataFrame):
     required_fields_dict = bulk_data.loc[1].to_dict()
     for k, v in required_fields_dict.items():
         is_boolean_flag_valid(k, v)
-    return True
+    return field_types_dict, required_fields_dict,  True
+
+
+def is_csv_content_valid(bulk_data: pd.DataFrame):
+    # Cria novo df apenas com os dados, sem as linhas de tipo, required e labels para usuário final
+    # Lembre-se que a linha de header do df se mantem
+    if not isinstance(bulk_data, pd.DataFrame):
+        raise ValueError("O valor não é um Dataframe Pandas")
+
+    bulk_data_content = bulk_data.drop(bulk_data.index[range(0, 4)])
+
+    is_dataframe_empty(bulk_data_content)
+
+    if "school_name" not in bulk_data_content.columns:
+        raise ValueError("Não existe a coluna school_name. Ela é obrigatória.")
+
+    if "unidadeAluno" not in bulk_data_content.columns:
+        raise ValueError("Não existe a coluna unidadeAluno. Ela é obrigatória.")
+
+    # Substitui os campos de unidade escolar vazios, aos quais o Pandas havia atribuido nan, por ---
+    bulk_data_content["unidadeAluno"] = bulk_data_content["unidadeAluno"].replace({np.nan: "---"})
+    # Substitui os campos vazios, aos quais o Pandas havia atribuido nan, por None
+    bulk_data_content = bulk_data_content.replace({np.nan: None})
+
+    return bulk_data_content, True
 

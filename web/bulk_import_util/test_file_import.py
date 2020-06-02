@@ -26,7 +26,6 @@ def metadata_fixture():
         metadata_fixture = pd.read_csv(csvfile, sep="#")
     return metadata_fixture
 
-
 def test_empty_data_frame(empty_csv_to_dataframe):
     with pytest.raises(ValueError):
         is_dataframe_empty(empty_csv_to_dataframe)
@@ -63,6 +62,11 @@ def test_valid_csv_metadata(valid_csv_to_dataframe):
 def test_invalid_csv_metadata(empty_csv_to_dataframe):
     with pytest.raises(ValueError):
         is_csv_metadata_valid(empty_csv_to_dataframe)
+
+
+
+
+
 
 
 

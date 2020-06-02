@@ -57,7 +57,6 @@ services:
       RABBITMQ_DEFAULT_USER: mayan
       RABBITMQ_DEFAULT_PASS: mayanrabbitpass
       RABBITMQ_DEFAULT_VHOST: mayan
-    restart: unless-stopped
     volumes:
       - /opt/educalegal/docker_volumes/rabbitmq:/var/lib/rabbitmq
   celery_flower:
@@ -74,7 +73,6 @@ services:
     image: mayanedms/mayanedms:3
     ports:
       - "5555:5555"
-    restart: unless-stopped
   db:
     container_name: db
     image: postgres:11-alpine

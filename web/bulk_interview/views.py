@@ -23,7 +23,7 @@ from bulk_import_util.mongo_util import (
     mongo_to_dict,
 )
 
-from bulk_import_util.file_import import is_csv_metadata_valid
+from bulk_import_util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
@@ -73,9 +73,17 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Transforma o arquivo CSV em um dataframe
             bulk_data = pd.read_csv(source_file, sep="#")
 
-            # Valida os metadados do CSV (timpos de campos e flags booleanas)
             try:
-                is_csv_metadata_valid(bulk_data)
+                # Valida os metadados do CSV (timpos de campos e flags booleanas)
+                # Se os dados forem validos, retorna dois dicionarios: o de tipos de campos e
+                # os de obrigatoriedade dos registros
+                # Ambos são usados para criar a classe dinamica
+                field_types_dict, required_fields_dict, valid_csv_metadata = is_csv_metadata_valid(bulk_data)
+                # Valida o conteudo dos campos de acordo com seus tipos de dados e sua obrigadoriedade
+                # Usando validators collection
+                # trata os registros para valores aceitáveis pelos documentos
+                # StringField: se vazio e não obrigatório --> ""
+                bulk_data_content, valid_csv_content = is_csv_content_valid(bulk_data)
             except ValueError as e:
                 message = str(type(e).__name__) + " : " + str(e)
                 messages.error(request, message)
@@ -92,11 +100,11 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     },
                 )
 
-            # A zeresima linha representa os tipos dos campos
-            # A primeira linha representa se o campo e required (true / false) como string
-            # Ambos são usados para criar a classe dinamica
-            field_types_dict = bulk_data.loc[0].to_dict()
-            required_fields_dict = bulk_data.loc[1].to_dict()
+            # Se houver registro invalido, esta variavel sera definida como False ao final da funcao.
+            # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
+            # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
+            # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
+            csv_valid = valid_csv_metadata and valid_csv_content
 
             # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
             # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
@@ -104,6 +112,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             dynamic_document_class_name = (
                 interview.custom_file_name + "_bulk_" + str(uuid.uuid4())
             )
+
             # Cria a classe do tipo Document (mongoengine) dinamicamente
             DynamicDocumentClass = create_dynamic_document_class(
                 dynamic_document_class_name,
@@ -112,21 +121,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 school_names_set=school_names_set,
                 school_units_names_set=school_units_names_set,
             )
-            # Cria novo df apenas com os dados, sem as linhas de tipo, required e labels para usuário final
-            # Lembre-se que a linha de header do df se mantem
-            bulk_data_content = bulk_data.drop(bulk_data.index[range(0, 4)])
-
-            # Substitui os campos de unidade escolar vazios, aos quais o Pandas havia atribuido nan, por ---
-            bulk_data_content["unidadeAluno"] = bulk_data_content["unidadeAluno"].replace({np.nan: "---"})
-
-            # Substitui os campos vazios, aos quais o Pandas havia atribuido nan, por None
-            bulk_data_content = bulk_data_content.replace({np.nan: None})
-
-            # Se houver registro invalido, esta variavel sera definida como False ao final da funcao.
-            # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
-            # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
-            # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
-            csv_valid = True
 
             # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
             # no Mongo
@@ -150,8 +144,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     logger.info(message)
                     messages.success(request, message)
                 except ValidationError as e:
-                    # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
-                    # mensagem de sucesso
+                    # Se a operacao for mal sucedida, itera sobre a lista de valores para gerar a
+                    # mensagem de erro
                     row_values = list(row_dict.values())
                     message = (
                         "Erro ao validar o registro "
@@ -163,11 +157,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         message += " | " + str(row_values[value_index])
                     logger.info(message)
                     messages.error(request, message)
-                finally:
-                    # Apaga o arquivo csv carregado
-                    fs.delete(filename)
-                    # Recupera a lista de mensagens criada
-                    # Se nao houver nenhuma mensagem de erro, define o csv como válido
 
             storage = get_messages(request)
             for message in storage:
