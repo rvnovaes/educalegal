@@ -1,7 +1,5 @@
 pipeline {
-
    agent any
-
    stages {
        stage('update_code') {
            steps {
