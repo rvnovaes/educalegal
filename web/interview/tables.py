@@ -23,5 +23,3 @@ class InterviewTable(tables.Table):
         order_by = "name"
         template_name = "django_tables2/bootstrap4.html"
         fields = ("name", "description", "version", "date_available", "base_url")
-
-

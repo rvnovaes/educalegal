@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   educalegal:
-    image: rvnovaes/educalegal:0.50
+    image: rvnovaes/educalegal:0.51
     container_name: educalegal
     build: .
     command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8000"]
@@ -30,3 +30,14 @@ services:
       - /opt/educalegal/docker_volumes/mongo_db:/data/db
     ports:
       - "27017:27017"
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: educalegal
+      ME_CONFIG_BASICAUTH_PASSWORD: educalegal
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: educalegal
+      ME_CONFIG_MONGODB_ADMINPASSWORD: educalegal
+    ports:
+      - "8081:8081"
