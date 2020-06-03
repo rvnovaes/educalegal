@@ -1,35 +1,11 @@
 from datetime import datetime
 from mongoengine import *
-import math
-import numbers
-import re
 
-VALID_FIELD_TYPES = [
-    "BooleanField",
-    "DateTimeField",
-    "EmailField",
-    "FloatField",
-    "IntField",
-    "LongField",
-    "StringField",
-]
+from .constants import VALID_FIELD_TYPES
+
 
 def create_mongo_connection(db, alias, username, password, host, port):
     connect(db, alias, username=username, password=password, host=host, port=port)
-
-
-def is_acceptable_field_type(field_name, field_type_name):
-    empty_spaces = re.compile(' +')
-    if field_type_name is None:
-        raise ValueError("O tipo de campo para {field_name} não pode ser vazio.".format(field_name=field_name))
-    if re.match(empty_spaces, str(field_type_name)):
-        raise ValueError("O tipo de campo para {field_name} não pode ser vazio.".format(field_name=field_name))
-    # Testa se é número, pois nan é número
-    if isinstance(field_type_name, numbers.Number):
-        raise ValueError("O tipo de campo para {field_name} não pode ser vazio.".format(field_name=field_name))
-
-    if field_type_name not in VALID_FIELD_TYPES:
-        raise ValueError("O tipo de campo para {field_name} não pode ser {field_type_name}. Deve ser um dos seguintes: BooleanField, DateTimeField, EmailField, FloatField, IntField, LongField ou StringField".format(field_name=field_name, field_type_name=field_type_name))
 
 
 def get_field(field_type, required):
@@ -44,8 +20,6 @@ def get_field(field_type, required):
         field = FloatField()
     if field_type == "IntField":
         field = IntField()
-    if field_type == "LongField":
-        field = LongField()
     if field_type == "StringField":
         field = StringField()
     if required:

@@ -17,7 +17,7 @@ import moneyed
 from moneyed.localization import _FORMATTER
 from decimal import ROUND_HALF_EVEN
 from config.config import *
-from mongo_util.mongo_util import create_mongo_connection
+from bulk_import_util.mongo_util import create_mongo_connection
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -116,6 +116,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+FILE_UPLOAD_HANDLERS = (
+    "django.core.files.uploadhandler.MemoryFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+)
+
+FILE_UPLOAD_TEMP_DIR = "/upload_temp_dir"
 
 
 # The middleware placement is sensitive. If the middleware before silk.middleware.SilkyMiddleware returns from process_
@@ -318,7 +325,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "console"},
-        "debug_file": {
+        "django_file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
             "formatter": "file",
@@ -329,11 +336,21 @@ LOGGING = {
             "class": "logging.FileHandler",
             "formatter": "file",
             "filename": os.path.join(BASE_DIR, "media/info.log"),
-        }
+        },
     },
     "loggers": {
         "": {"level": "INFO", "handlers": ["console", "info_log"]},
-        "django": {"level": "DEBUG", "handlers": ["console", "debug_file"]},
+        "django": {
+            "level": "INFO",
+            "handlers": ["console", "django_file"],
+            "propagate": False,
+        },
+        # O Log de autoreload pode ser super verboso.
+        "django.utils.autoreload": {
+            "level": "INFO",
+            "handlers": ["django_file"],
+            "propagate": False,
+        },
     },
 }
 

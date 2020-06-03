@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def is_dataframe_empty(bulk_data: pd.DataFrame):
     if bulk_data.empty:
-        raise ValueError("O arquivo CSV está vazio")
+        raise ValueError("O arquivo CSV está vazio ou contém apenas linhas de cabeçalho, sem nenhum dado.\n")
     else:
         return False
 
@@ -21,14 +21,14 @@ def is_dataframe_empty(bulk_data: pd.DataFrame):
 def is_field_empty(field_name, field_type_name):
     if not checkers.is_not_empty(field_type_name):
         raise ValueError(
-            "O tipo de campo para {field_name} não pode ser vazio.".format(
+            "O tipo de campo para {field_name} não pode ser vazio.\n".format(
                 field_name=field_name
             )
         )
     # Testa se é número, pois nan é número
     elif isinstance(field_type_name, numbers.Number):
         raise ValueError(
-            "O tipo de campo para {field_name} não pode ser vazio.".format(
+            "O tipo de campo para {field_name} não pode ser vazio.\n".format(
                 field_name=field_name
             )
         )
@@ -40,7 +40,7 @@ def is_field_type_metadata_valid(field_name, field_type_name):
     is_field_empty(field_name, field_type_name)
     if field_type_name not in VALID_FIELD_TYPES:
         raise ValueError(
-            "O tipo de campo para {field_name} não pode ser {field_type_name}. Deve ser um dos seguintes: BooleanField, DateTimeField, EmailField, FloatField, IntField, LongField ou StringField".format(
+            "O tipo de campo para {field_name} não pode ser {field_type_name}. Deve ser um dos seguintes: BooleanField, DateTimeField, EmailField, FloatField, IntField ou StringField.\n".format(
                 field_name=field_name, field_type_name=field_type_name
             )
         )
@@ -53,7 +53,7 @@ def is_boolean_flag_valid(field_name, field_boolean_name):
     field_boolean_name = field_boolean_name.lower()
     if field_boolean_name not in ["true", "false"]:
         raise ValueError(
-            "O valor de verdadeiro ou false para {field_name} não pode ser {field_boolean_name}. Deve ser true ou false.".format(
+            "O valor de verdadeiro ou false para {field_name} não pode ser {field_boolean_name}. Deve ser true ou false.\n".format(
                 field_name=field_name, field_boolean_name=field_boolean_name
             )
         )
@@ -63,11 +63,11 @@ def is_boolean_flag_valid(field_name, field_boolean_name):
 
 def is_csv_metadata_valid(bulk_data: pd.DataFrame):
     if not isinstance(bulk_data, pd.DataFrame):
-        raise ValueError("O valor não é um Dataframe Pandas")
+        raise ValueError("O valor não é um Dataframe Pandas.\n")
     is_dataframe_empty(bulk_data)
     # A zeresima linha representa os tipos dos campos
-    # Testa se os tipos de campos estão todos preenchidos e pertencem à lista BooleanField,
-    # DateTimeField, EmailField, FloatField, IntField, LongField ou StringField
+    # Testa se os tipos de campos estão todos preenchidos e pertencem à lista
+    # BooleanField, DateTimeField, EmailField, FloatField, IntField ou StringField
     field_types_dict = bulk_data.loc[0].to_dict()
     for k, v in field_types_dict.items():
         is_field_type_metadata_valid(k, v)
@@ -81,18 +81,18 @@ def is_csv_metadata_valid(bulk_data: pd.DataFrame):
 
 def is_csv_content_valid(bulk_data: pd.DataFrame):
     if not isinstance(bulk_data, pd.DataFrame):
-        raise ValueError("O valor não é um Dataframe Pandas")
+        raise ValueError("O valor não é um Dataframe Pandas.\n")
 
     # Corta o df apenas nos os dados, sem as linhas: de tipo, required e labels para usuário final
     # para testar se os dados estão vazios
     # Lembre-se que a linha de header do df se mantem
-    is_dataframe_empty(bulk_data.index[range(0, 4)])
+    is_dataframe_empty(bulk_data.drop(bulk_data.index[range(0, 4)]))
 
     if "school_name" not in bulk_data.columns:
-        raise ValueError("Não existe a coluna school_name. Ela é obrigatória.")
+        raise ValueError("Não existe a coluna school_name. Ela é obrigatória.\n")
 
     if "unidadeAluno" not in bulk_data.columns:
-        raise ValueError("Não existe a coluna unidadeAluno. Ela é obrigatória.")
+        raise ValueError("Não existe a coluna unidadeAluno. Ela é obrigatória.\n")
 
     # Substitui os campos de unidade escolar vazios, aos quais o Pandas havia atribuido nan, por ---
     bulk_data["unidadeAluno"] = bulk_data["unidadeAluno"].replace({np.nan: "---"})
@@ -111,15 +111,15 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
             field_required = False
         for row_index, row_value in column[4:].items():
             try:
-                validated_field_value = validate_field(
+                validated_field_value, is_field_valid = validate_field(
                     column_name, row_index, field_type_name, field_required, row_value
                 )
             except ValueError as e:
                 message = (
                         str(type(e).__name__)
                         + " : "
-                        + "Não foi possível validar ou converter o valor {row_value} de {column_name} - {row_index} em um campo tipo {field_type_name} - {field_required}.".format(
-                    row_value=row_value, column_name=column_name, row_index=row_index, field_type_name=field_type_name, field_required=field_required
+                        + "Não foi possível validar ou converter o valor {row_value} de {column_name} - linha: {row_index} em um campo tipo {field_type_name} - {field_required}.\n".format(
+                    row_value=row_value, column_name=column_name, row_index=str(row_index + 2), field_type_name=field_type_name, field_required=field_required
                 )
                         + str(e)
                 )
@@ -137,10 +137,11 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
     # Como foram removidas as linhas de cabeçalho, a orientação em relação ao número correto da linha soma-se 4
     row_index = row_index + 2
     if field_required is False and value is None:
-        return value
+        return value, True
     if field_required is True and value is None:
         raise errors.EmptyValueError(
-            "Erro na coluna {column_name}, linha {row_index}: o campo {field_type_name} não pode ser vazio".format(
+            "Erro na coluna {column_name} de tipo {field_type_name}, linha {row_index}: o campo não "
+            "pode ser vazio\n".format(
                 column_name=column_name,
                 row_index=row_index,
                 value=value,
@@ -154,7 +155,7 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
             value = validators.string(value, coerce_value=True)
         elif not is_valid:
             raise ValueError(
-                "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido".format(
+                "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido.\n".format(
                     column_name=column_name,
                     row_index=row_index,
                     value=value,
@@ -169,7 +170,7 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                 value = False
             else:
                 raise ValueError(
-                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido".format(
+                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido.\n".format(
                         column_name=column_name,
                         row_index=row_index,
                         value=value,
@@ -177,7 +178,7 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                     )
                 )
 
-            return value
+            return value, True
 
         if field_type_name == "DateTimeField":
 
@@ -189,13 +190,15 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                 value = validators.datetime(value, coerce_value=True)
             elif not is_valid:
                 raise ValueError(
-                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido".format(
+                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido.\n".format(
                         column_name=column_name,
                         row_index=row_index,
                         value=value,
                         field_type_name=field_type_name,
                     )
                 )
+
+            return value, True
 
         if field_type_name == "EmailField":
 
@@ -205,13 +208,15 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                 value = validators.email(value, coerce_value=True)
             elif not is_valid:
                 raise ValueError(
-                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido".format(
+                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido.\n".format(
                         column_name=column_name,
                         row_index=row_index,
                         value=value,
                         field_type_name=field_type_name,
                     )
                 )
+
+            return value, True
 
         if field_type_name == "FloatField":
             is_valid = checkers.is_float(value, coerce_value=False)
@@ -220,13 +225,15 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                 value = validators.float(value, coerce_value=True)
             elif not is_valid:
                 raise ValueError(
-                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido".format(
+                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido.\n".format(
                         column_name=column_name,
                         row_index=row_index,
                         value=value,
                         field_type_name=field_type_name,
                     )
                 )
+
+            return value, True
 
         if field_type_name == "IntField":
             is_valid = checkers.is_integer(value, coerce_value=False)
@@ -235,7 +242,7 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                 value = validators.integer(value, coerce_value=True)
             elif not is_valid:
                 raise ValueError(
-                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido".format(
+                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido.\n".format(
                         column_name=column_name,
                         row_index=row_index,
                         value=value,
@@ -243,7 +250,7 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                     )
                 )
 
-        return value
+        return value, True
 
 
 def string_date_format(value: str) -> datetime:
@@ -256,7 +263,7 @@ def string_date_format(value: str) -> datetime:
     date_components = re.findall(r"[\d]+", value)
     if len(date_components) != 3:
         raise ValueError(
-            "O formato de data deve ser dd/mm/aaaa. Não foi possível dividir o valor {value} em seus componentes numéricos.".format(
+            "O formato de data deve ser dd/mm/aaaa. Não foi possível dividir o valor {value} em seus componentes numéricos.\n".format(
                 value=value
             )
         )
@@ -269,7 +276,7 @@ def string_date_format(value: str) -> datetime:
             message = (
                 str(type(e).__name__)
                 + " : "
-                + "Não foi possível converter o valor {day} de {value} em um inteiro.".format(
+                + "Não foi possível converter o valor {day} de {value} em um inteiro.\n".format(
                     day=str(day), value=value
                 )
                 + str(e)
@@ -279,7 +286,7 @@ def string_date_format(value: str) -> datetime:
         else:
             if day > 31 or day == 0:
                 raise ValueError(
-                    "O dia do mês {day} é > 31 ou igual a zero em {value}. O formato de data deve ser dd/mm/aaaa.".format(
+                    "O dia do mês {day} é > 31 ou igual a zero em {value}. O formato de data deve ser dd/mm/aaaa.\n".format(
                         day=str(day), value=value
                     )
                 )
@@ -294,7 +301,7 @@ def string_date_format(value: str) -> datetime:
             message = (
                 str(type(e).__name__)
                 + " : "
-                + "Não foi possível converter o valor {month} de {value} em um inteiro.".format(
+                + "Não foi possível converter o valor {month} de {value} em um inteiro.\n".format(
                     month=month, value=value
                 )
                 + str(e)
@@ -304,7 +311,7 @@ def string_date_format(value: str) -> datetime:
         else:
             if month > 12 or month == 0:
                 raise ValueError(
-                    "O mês {month} é > 12 ou igual a zero em {value}. O formato de data deve ser dd/mm/aaaa.".format(
+                    "O mês {month} é > 12 ou igual a zero em {value}. O formato de data deve ser dd/mm/aaaa.\n".format(
                         month=str(month), value=value
                     )
                 )
@@ -319,7 +326,7 @@ def string_date_format(value: str) -> datetime:
             message = (
                 str(type(e).__name__)
                 + " : "
-                + "Não foi possível converter o valor {year} de {value} em um inteiro.".format(
+                + "Não foi possível converter o valor {year} de {value} em um inteiro.\n".format(
                     year=str(year), value=value
                 )
                 + str(e)
@@ -330,7 +337,7 @@ def string_date_format(value: str) -> datetime:
             # Compara o valor do ano com zero e o comprimento da string do ano que deve ter 4 digitos
             if year == 0 or len(date_components[2]) < 4:
                 raise ValueError(
-                    "O ano deve possuir 4 dígitos e não pode ser igual a zero. O valor {year} em {value} não é válido.".format(
+                    "O ano deve possuir 4 dígitos e não pode ser igual a zero. O valor {year} em {value} não é válido.\n".format(
                         year=str(year), value=value
                     )
                 )
@@ -343,37 +350,10 @@ def string_date_format(value: str) -> datetime:
             message = (
                 str(type(e).__name__)
                 + " : "
-                + "Não foi possível converter {value} em uma data.".format(value=value)
+                + "Não foi possível converter {value} em uma data.\n".format(value=value)
                 + str(e)
             )
             logger.error(message)
             raise ValueError(message)
 
     return value
-
-
-# if __name__ == "__main__":
-    # print(string_date_format("1/1/2020"))
-    # print(string_date_format("01/01/2020"))
-    # print(string_date_format("01-01-2020"))
-    # print(string_date_format("1|1|2020"))
-    # # print(string_date_format("1|1|1"))
-    # print(string_date_format("16|11|1978"))
-
-
-    # bulk_data = pd.read_csv("sample_data_sources/valid.csv", sep="#")
-    # wd = bulk_data.copy()
-    # wd = wd.replace({np.nan: None})
-    #
-    # for column_name, column in wd.iteritems():
-    #     field_name = column_name
-    #     field_type_name = column[0]
-    #     if column[1].lower() == 'true':
-    #         field_required = True
-    #     else:
-    #         field_required = False
-    #     for row_index, row_value in column[4:].items():
-    #         validate_field(
-    #             column_name, row_index, field_type_name, field_required, row_value
-    #         )
-

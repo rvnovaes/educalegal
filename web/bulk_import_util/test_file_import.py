@@ -9,17 +9,24 @@ from .file_import import *
 
 
 @pytest.fixture
-def valid_csv_to_dataframe():
+def valid_csv():
     with open(os.path.join(script_dir, "sample_data_sources/valid.csv")) as csvfile:
         valid_data = pd.read_csv(csvfile, sep="#")
     return valid_data
 
 
 @pytest.fixture
-def empty_csv_to_dataframe():
-    with open(os.path.join(script_dir, "sample_data_sources/empty.csv")) as csvfile:
+def only_headers():
+    with open(os.path.join(script_dir, "sample_data_sources/only_headers.csv")) as csvfile:
         empty = pd.read_csv(csvfile, sep="#")
     return empty
+
+
+@pytest.fixture
+def empty_content():
+    with open(os.path.join(script_dir, "sample_data_sources/empty_content.csv")) as csvfile:
+        empty_content_fixture = pd.read_csv(csvfile, sep="#")
+    return empty_content_fixture
 
 
 @pytest.fixture
@@ -30,26 +37,30 @@ def metadata_fixture():
 
 
 @pytest.fixture
-def no_school_name_fixture():
+def no_school_name():
     with open(os.path.join(script_dir, "sample_data_sources/no_school_name_columnn.csv")) as csvfile:
         no_school_name_fixture = pd.read_csv(csvfile, sep="#")
     return no_school_name_fixture
 
 @pytest.fixture
-def no_unidadeAluno_fixture():
+def no_unidadeAluno():
     with open(os.path.join(script_dir, "sample_data_sources/no_unidadeAluno_column.csv")) as csvfile:
         no_unidadeAluno_fixture = pd.read_csv(csvfile, sep="#")
     return no_unidadeAluno_fixture
 
 
-
-def test_empty_data_frame(empty_csv_to_dataframe):
+def test_only_headers(only_headers):
     with pytest.raises(ValueError):
-        is_dataframe_empty(empty_csv_to_dataframe)
+        is_dataframe_empty(only_headers)
 
 
-def test_not_empty_data_frame(valid_csv_to_dataframe):
-    assert is_dataframe_empty(valid_csv_to_dataframe) is False
+def test_empty_content(empty_content):
+    with pytest.raises(ValueError):
+        is_dataframe_empty(empty_content.drop(empty_content.index[range(0, 4)]))
+
+
+def test_not_empty_data_frame(valid_csv):
+    assert is_dataframe_empty(valid_csv) is False
 
 
 def test_field_type_metadata(metadata_fixture):
@@ -76,23 +87,37 @@ def test_boolean_flag_metadata(metadata_fixture):
         is_boolean_flag_valid("wrong_boolean_flag", metadata_fixture["wrong_boolean_flag"])
 
 
-def test_valid_csv_metadata(valid_csv_to_dataframe):
-    assert is_csv_metadata_valid(valid_csv_to_dataframe) is True
+def test_valid_csv_metadata(valid_csv):
+    field_types_dict, required_fields_dict, is_csv_valid = is_csv_metadata_valid(valid_csv)
+    assert is_csv_valid is True
 
 
-def test_invalid_csv_metadata(empty_csv_to_dataframe):
+def test_invalid_csv_metadata(only_headers):
     with pytest.raises(ValueError):
-        is_csv_metadata_valid(empty_csv_to_dataframe)
+        is_csv_metadata_valid(only_headers)
 
 
-def test_no_school_column(no_school_name_fixture):
+def test_no_school_column(no_school_name):
     with pytest.raises(ValueError):
-        is_csv_content_valid(no_school_name_fixture)
+        is_csv_content_valid(no_school_name)
 
 
-def test_no_unidadeAluno(no_unidadeAluno_fixture):
+def test_no_unidadeAluno(no_unidadeAluno):
     with pytest.raises(ValueError):
-        is_csv_content_valid(no_unidadeAluno_fixture)
+        is_csv_content_valid(no_unidadeAluno)
+
+# def test_validate_field(valid_csv):
+#     for column_name, column in valid_csv.iteritems():
+#         field_type_name = column[0]
+#         if column[1].lower() == 'true':
+#             field_required = True
+#         else:
+#             field_required = False
+#         for row_index, row_value in column[4:].items():
+#             try:
+#                 validated_field_value = validate_field(
+#                     column_name, row_index, field_type_name, field_required, row_value
+#                 )
 
 
 def test_string_date_format():
