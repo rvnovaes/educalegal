@@ -29,6 +29,8 @@ from .forms import BulkInterviewForm
 from .models import BulkGeneration
 from .docassemble_client import DocassembleClient
 
+from .tasks import start_interview
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,16 +80,11 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 # Se os dados forem validos, retorna dois dicionarios: o de tipos de campos e
                 # os de obrigatoriedade dos registros
                 # Ambos são usados para criar a classe dinamica
-                field_types_dict, required_fields_dict, valid_csv_metadata = is_csv_metadata_valid(bulk_data)
-                # Valida o conteudo dos campos de acordo com seus tipos de dados e sua obrigadoriedade
-                # trata os registros para valores aceitáveis pelos documentos
-                # usando validators collection
-                # Também valida se existe a coluna school_name e unidadeAluno
-                # Para outras validações de conteúdo, veja a função
-                # Os campos vazios são transformados em None e deve ser tratados posteriormente ao fazer a chamada de API
-                # do Docassemble para que não saiam como None ou com erro nos documentos
-                # O campo unidadeAluno é transformado em ---
-                bulk_data_content, valid_csv_content = is_csv_content_valid(bulk_data)
+                (
+                    field_types_dict,
+                    required_fields_dict,
+                    csv_metadata_valid,
+                ) = is_csv_metadata_valid(bulk_data)
 
             except ValueError as e:
                 message = str(type(e).__name__) + " : " + str(e)
@@ -105,11 +102,56 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     },
                 )
 
+            # Valida o conteudo dos campos de acordo com seus tipos de dados e sua obrigadoriedade
+            # trata os registros para valores aceitáveis pelos documentos
+            # usando validators collection
+            # Também valida se existe a coluna school_name e unidadeAluno
+            # Para outras validações de conteúdo, veja a função
+            # Os campos vazios são transformados em None e deve ser tratados posteriormente ao fazer a chamada de API
+            # do Docassemble para que não saiam como None ou com erro nos documentos
+            # O campo unidadeAluno é transformado em ---
+            try:
+                (
+                    bulk_data_content,
+                    error_messages,
+                    csv_content_valid,
+                ) = is_csv_content_valid(bulk_data)
+            except ValueError as e:
+                message = str(type(e).__name__) + " : " + str(e)
+                messages.error(request, message)
+                logger.error(message)
+
+                return render(
+                    request,
+                    "bulk_interview/bulk_interview_validate_generate.html",
+                    {
+                        "form": form,
+                        "interview_id": interview.pk,
+                        "validation_error": True,
+                        "csv_valid": False,
+                    },
+                )
+
+            if not csv_content_valid:
+                for message in error_messages:
+                    messages.error(request, message)
+
+                return render(
+                    request,
+                    "bulk_interview/bulk_interview_validate_generate.html",
+                    {
+                        "form": form,
+                        "interview_id": interview.pk,
+                        "validation_error": True,
+                        "csv_valid": False,
+                    },
+                )
+
             # Se houver registro invalido, esta variavel sera definida como False ao final da funcao.
             # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
             # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
             # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
-            csv_valid = valid_csv_metadata and valid_csv_content
+            csv_valid = csv_metadata_valid and csv_content_valid
 
             # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
             # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
@@ -645,10 +687,10 @@ def _create_person(document, person_type, person_legal_type, index):
 
     person["name"] = dict()
 
-    if person_type == 'fj':
+    if person_type == "fj":
         person["_class"] = "docassemble.base.util.Person"
         person["name"]["_class"] = "docassemble.base.util.Name"
-    elif person_type == 'f':
+    elif person_type == "f":
         person["_class"] = "docassemble.base.util.Individual"
         person["name"]["_class"] = "docassemble.base.util.IndividualName"
 
@@ -659,9 +701,9 @@ def _create_person(document, person_type, person_legal_type, index):
         person["_class"] = "docassemble.base.util.Organization"
         person["name"]["_class"] = "docassemble.base.util.Name"
 
-    person["instanceName"] = person_legal_type + '[' + str(index) + ']'
+    person["instanceName"] = person_legal_type + "[" + str(index) + "]"
 
-    person["name"]["instanceName"] = person_legal_type + '[' + str(index) + '].name'
+    person["name"]["instanceName"] = person_legal_type + "[" + str(index) + "].name"
 
     document[person_legal_type] = dict()
     document[person_legal_type]["elements"] = list()
@@ -674,4 +716,3 @@ def _create_person(document, person_type, person_legal_type, index):
 
     document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
     document["submit_to_esignature"] = "True"
-

@@ -80,6 +80,7 @@ def is_csv_metadata_valid(bulk_data: pd.DataFrame):
 
 
 def is_csv_content_valid(bulk_data: pd.DataFrame):
+
     if not isinstance(bulk_data, pd.DataFrame):
         raise ValueError("O valor não é um Dataframe Pandas.\n")
 
@@ -100,8 +101,7 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
     # Substitui os campos vazios, aos quais o Pandas havia atribuido nan, por None
     bulk_data = bulk_data.replace({np.nan: None})
 
-    # working_data = bulk_data.copy()
-    # working_data = working_data.replace({np.nan: None})
+    error_messages = list()
 
     for column_name, column in bulk_data.iteritems():
         field_type_name = column[0]
@@ -124,13 +124,18 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
                         + str(e)
                 )
                 logger.error(message)
-                raise ValueError(message)
-
-            bulk_data[column_name].loc[row_index] = validated_field_value
+                error_messages.append(message)
+            else:
+                bulk_data[column_name].loc[row_index] = validated_field_value
 
         bulk_data_content = bulk_data.drop(bulk_data.index[range(0, 4)])
 
-    return bulk_data_content,  True
+    if len(error_messages) > 0:
+        csv_content_valid = False
+    else:
+        csv_content_valid = True
+
+    return bulk_data_content,  error_messages, csv_content_valid
 
 
 def validate_field(column_name, row_index, field_type_name, field_required, value):

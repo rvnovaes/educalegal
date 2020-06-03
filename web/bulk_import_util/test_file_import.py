@@ -106,20 +106,6 @@ def test_no_unidadeAluno(no_unidadeAluno):
     with pytest.raises(ValueError):
         is_csv_content_valid(no_unidadeAluno)
 
-# def test_validate_field(valid_csv):
-#     for column_name, column in valid_csv.iteritems():
-#         field_type_name = column[0]
-#         if column[1].lower() == 'true':
-#             field_required = True
-#         else:
-#             field_required = False
-#         for row_index, row_value in column[4:].items():
-#             try:
-#                 validated_field_value = validate_field(
-#                     column_name, row_index, field_type_name, field_required, row_value
-#                 )
-
-
 def test_string_date_format():
     assert string_date_format("12/12/2020") == datetime.strptime("12/12/2020", "%d/%m/%Y")
     assert string_date_format("1/1/2020") == datetime.strptime("01/01/2020", "%d/%m/%Y")
