@@ -4,6 +4,5 @@ VALID_FIELD_TYPES = [
     "EmailField",
     "FloatField",
     "IntField",
-    "LongField",
     "StringField",
 ]

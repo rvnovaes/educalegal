@@ -80,10 +80,15 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 # Ambos são usados para criar a classe dinamica
                 field_types_dict, required_fields_dict, valid_csv_metadata = is_csv_metadata_valid(bulk_data)
                 # Valida o conteudo dos campos de acordo com seus tipos de dados e sua obrigadoriedade
-                # Usando validators collection
                 # trata os registros para valores aceitáveis pelos documentos
-                # StringField: se vazio e não obrigatório --> ""
+                # usando validators collection
+                # Também valida se existe a coluna school_name e unidadeAluno
+                # Para outras validações de conteúdo, veja a função
+                # Os campos vazios são transformados em None e deve ser tratados posteriormente ao fazer a chamada de API
+                # do Docassemble para que não saiam como None ou com erro nos documentos
+                # O campo unidadeAluno é transformado em ---
                 bulk_data_content, valid_csv_content = is_csv_content_valid(bulk_data)
+
             except ValueError as e:
                 message = str(type(e).__name__) + " : " + str(e)
                 messages.error(request, message)
