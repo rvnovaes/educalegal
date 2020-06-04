@@ -89,7 +89,7 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
     # Lembre-se que a linha de header do df se mantem
     is_dataframe_empty(bulk_data.drop(bulk_data.index[range(0, 4)]))
 
-    if "school_name" not in bulk_data.columns:
+    if "selected_school" not in bulk_data.columns:
         raise ValueError("Não existe a coluna school_name. Ela é obrigatória.\n")
 
     if "unidadeAluno" not in bulk_data.columns:

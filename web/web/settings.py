@@ -87,7 +87,8 @@ INSTALLED_APPS = [
     "bootstrap4",
     # Django models currency
     "djmoney",
-    "google_analytics",
+    # Resultados do celery no banco do Django
+    # "django_celery_results",
     # Local
     "tenant",
     "users",
@@ -375,22 +376,31 @@ _FORMATTER.add_formatting_definition(
 )
 
 CURRENCIES = ("BRL",)
-
-# Google Analytics django-google-analytics-app
-GOOGLE_ANALYTICS = {
-    "google_analytics_id": "UA-149363385-1",
-}
+#
+# # Google Analytics django-google-analytics-app
+# GOOGLE_ANALYTICS = {
+#     "google_analytics_id": "UA-149363385-1",
+# }
 
 # MongoDB Settings
 MONGO_DB = "educalegal"
 MONGO_ALIAS = "default"
 MONGO_USERNAME = "educalegal"
 MONGO_PASSWORD = "educalegal"
-# MONGO_HOST = "localhost"
-MONGO_HOST = "mongo"
+MONGO_HOST = "localhost"
+# MONGO_HOST = "mongo"
 MONGO_PORT = 27017
 
 # mongoengine
 create_mongo_connection(
     MONGO_DB, MONGO_ALIAS, MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT
 )
+
+CELERY_BROKER_URL = 'amqp://educalegal:educalegal@localhost/educalegal'
+# CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_CACHE_BACKEND = 'django-cache'
+
+
+# CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
+
+# CELERY_BROKER_URL = 'amqp://rabbitmq_app'

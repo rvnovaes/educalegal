@@ -7,6 +7,8 @@ from retry_requests import retry
 
 logger = logging.getLogger(__name__)
 
+class DocassembleAPIException(Exception):
+    pass
 
 class DocassembleClient:
     def __init__(self, base_url, admin_key):
@@ -104,4 +106,4 @@ class DocassembleClient:
         }
 
         response = self.session.post(final_url, data=payload)
-        return response.status_code
+        return response.status_code, response.content

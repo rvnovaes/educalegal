@@ -27,9 +27,9 @@ from bulk_import_util.file_import import is_csv_metadata_valid, is_csv_content_v
 
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
-from .docassemble_client import DocassembleClient
+from .docassemble_client import DocassembleAPIException
 
-from .tasks import start_interview
+from .tasks import create_document
 
 logger = logging.getLogger(__name__)
 
@@ -297,149 +297,34 @@ def generate_bulk_documents(request, bulk_generation_id):
         logger.error(message)
         messages.error(request, message)
     else:
-        # cria cliente da api do docassemble
-        try:
-            dac = DocassembleClient(base_url, api_key)
-            logger.info(
-                "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
-                    base_url=base_url, api_key=api_key
-                )
-            )
-        except NewConnectionError as e:
-            message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
-                e=str(e)
-            )
-            logger.error(message)
-            messages.error(request, message)
-        else:
-            # monta nome da entrevista de acordo com especificações do docassemble
-            interview_full_name = build_interview_full_name(
-                isc.user_id,
-                isc.project_name,
-                interview.yaml_name,
-                "interview_filename",
-            )
+        # monta nome da entrevista de acordo com especificações do docassemble
+        interview_full_name = build_interview_full_name(
+            isc.user_id,
+            isc.project_name,
+            interview.yaml_name,
+            "interview_filename",
+        )
 
-            logger.info(
-                "Nome da entrevista: {interview_full_name} ".format(
-                    interview_full_name=interview_full_name
-                )
+        logger.info(
+            "Nome da entrevista: {interview_full_name} ".format(
+                interview_full_name=interview_full_name
             )
+        )
+        url_args = {
+            "tid": request.user.tenant.pk,
+            "ut": request.user.auth_token.key,
+            "intid": interview.pk,
+        }
 
-            # passa argumentos da url para a entrevista
-            url_args = {
-                "tid": request.user.tenant.pk,
-                "ut": request.user.auth_token.key,
-                "intid": interview.pk,
-            }
-
+        for i, interview_variables in enumerate(interview_variables_list):
+            interview_variables["url_args"] = url_args
             try:
-                response_json, status_code = dac.secret_read(username, user_password)
-                secret = response_json
-                logger.info(
-                    "Secret obtido do servidor de geração de documentos: {secret}".format(
-                        secret=secret
-                    )
-                )
-            except requests.exceptions.ConnectionError as e:
-                message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
+                create_document.delay(base_url, api_key, username, user_password, interview_full_name, interview_variables)
+            except DocassembleAPIException as e:
+                message = "Houve algum erro no processo de comunicação com a API do Docassemble {e}".format(
                     e=str(e)
                 )
                 logger.error(message)
-                messages.error(request, message)
-            else:
-                if status_code != 200:
-                    error_message = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(
-                        status_code=status_code, response=response_json
-                    )
-                    logger.error(error_message)
-                    messages.error(request, error_message)
-                else:
-                    # gera uma nova entrevista para a cada dicionário de variáveis de entrevista
-                    # na lista de  variáveis de entrevista
-                    for i, interview_variables in enumerate(interview_variables_list):
-                        # Uma nova sessão deve ser criada para cada entrevista
-                        try:
-                            (
-                                interview_session,
-                                response_json,
-                                status_code,
-                            ) = dac.start_interview(interview_full_name, secret)
-                            logger.info(
-                                "Sessão da entrevista gerada com sucesso: {interview_session}".format(
-                                    interview_session=interview_session
-                                )
-                            )
-                        except requests.exceptions.ConnectionError as e:
-                            message = "Não foi possível iniciar nova sessão de entrevista. | {e}".format(
-                                e=str(e)
-                            )
-                            logger.error(message)
-                            messages.error(request, message)
-                        else:
-                            if status_code != 200:
-                                error_message = "Erro ao iniciar nova sessão | Status Code: {status_code} | Response: {response}".format(
-                                    status_code=status_code, response=response_json
-                                )
-                                logger.error(error_message)
-                                messages.error(request, error_message)
-                            else:
-                                logger.info(
-                                    "Gerando documento {document_number} de {bulk_list_lenght}".format(
-                                        document_number=str(i + 1),
-                                        bulk_list_lenght=str(
-                                            len(interview_variables_list)
-                                        ),
-                                    )
-                                )
-                                interview_variables["url_args"] = url_args
-                                try:
-                                    logger.info(
-                                        "Tentando gerar entrevista {interview_full_name} com os dados {interview_variables}".format(
-                                            interview_full_name=interview_full_name,
-                                            interview_variables=interview_variables,
-                                        )
-                                    )
-
-                                    response, status_code = dac.interview_set_variables(
-                                        secret,
-                                        interview_full_name,
-                                        interview_variables,
-                                        interview_session,
-                                    )
-                                except Exception as e:
-                                    error_message = str(e)
-                                    logger.error(error_message)
-                                    messages.error(request, error_message)
-                                else:
-                                    if status_code != 200:
-                                        error_message = "Erro ao gerar entrevista | Status Code: {status_code} | Response: {response}".format(
-                                            status_code=status_code,
-                                            response=str(response.text),
-                                        )
-                                        logger.error(error_message)
-                                        messages.error(request, error_message)
-                                    else:
-                                        # Dispara a action de envio para assinatura eletronica
-                                        logger.info(
-                                            "Enviando entrevista para assinatura eletronica"
-                                        )
-                                        # TODO colocar opcao na interface do usuario para escolher se deseja mandar para esignature em lote
-                                        if interview_variables["submit_to_esignature"]:
-                                            status_code = dac.interview_run_action(
-                                                secret,
-                                                interview_full_name,
-                                                interview_session,
-                                                "submit_to_esignature",
-                                                None,
-                                            )
-                                            logger.info(status_code)
-                                        message = "Status Code: {status_code} | Response: {response}".format(
-                                            status_code=status_code,
-                                            response=str(response),
-                                        )
-                                        logger.info(message)
-                                        messages.success(request, message)
 
     storage = get_messages(request)
     for message in storage:
