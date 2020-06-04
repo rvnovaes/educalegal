@@ -110,19 +110,20 @@ def list_field_to_dict(list_field):
 
 
 def mongo_to_python_type(field, data):
-    if isinstance(field, DateTimeField):
-        return str(data.isoformat())
-    elif isinstance(field, ComplexDateTimeField):
-        return field.to_python(data).isoformat()
-    elif isinstance(field, StringField):
-        return str(data)
-    elif isinstance(field, FloatField):
-        return float(data)
-    elif isinstance(field, IntField):
-        return int(data)
-    elif isinstance(field, BooleanField):
-        return bool(data)
-    elif isinstance(field, ObjectIdField):
-        return str(data)
+    if data is None:
+        return None
     else:
-        return str(data)
+        if isinstance(field, DateTimeField):
+            return str(data.isoformat())
+        elif isinstance(field, StringField):
+            return str(data)
+        elif isinstance(field, FloatField):
+            return float(data)
+        elif isinstance(field, IntField):
+            return int(data)
+        elif isinstance(field, BooleanField):
+            return bool(data)
+        elif isinstance(field, ObjectIdField):
+            return str(data)
+        else:
+            return str(data)
