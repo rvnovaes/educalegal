@@ -48,7 +48,6 @@ urlpatterns = [
     url(
         r"^v1/docs/redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     ),
-    re_path("djga/", include("google_analytics.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if SILK:
