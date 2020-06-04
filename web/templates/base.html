@@ -3,6 +3,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {% block ga %}
+        {% include "snippets/ga.html" %}
+    {% endblock ga %}
     <meta charset="utf-8">
     <title>Educa Legal</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -64,10 +67,6 @@
 <div class="container">
     {% block body_block %}
     {% endblock %}
-</div>
-{% load google_analytics_tags %}
-<div style="display:none">
-    <img src="{% google_analytics %}" width="0" height="0"/>
 </div>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
         integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm"
