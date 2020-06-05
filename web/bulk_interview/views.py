@@ -19,9 +19,11 @@ from school.models import School, SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
 from bulk_import_util.mongo_util import (
+    create_mongo_connection,
     create_dynamic_document_class,
-    mongo_to_dict,
+    mongo_to_dict
 )
+
 
 from bulk_import_util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
@@ -30,6 +32,13 @@ from .models import BulkGeneration
 from .docassemble_client import DocassembleAPIException
 
 from .tasks import create_document
+
+
+from django.conf import settings
+
+create_mongo_connection(
+    settings.MONGO_DB, settings.MONGO_ALIAS, settings.MONGO_USERNAME, settings.MONGO_PASSWORD, settings.MONGO_HOST, settings.MONGO_PORT
+)
 
 logger = logging.getLogger(__name__)
 

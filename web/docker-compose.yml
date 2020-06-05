@@ -15,7 +15,42 @@ services:
         source: ./media
         target: /code/media
     environment:
+      - DJANGO_SETTINGS_MODULE=web.settings.production
       - EL_ENV=development
+    depends_on:
+      - rabbitmq_app
+  celery_app:
+    container_name: celery_app
+    build: .
+    command: celery -A web worker -l info
+    volumes:
+      - type: bind
+        source: .
+        target: /code
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - rabbitmq_app
+  flower_app:
+    container_name: flower_app
+    image: mher/flower
+    environment:
+      - CELERY_BROKER_URL=amqp://educalegal:educalegal@rabbitmq_app/educalegal
+      - FLOWER_PORT=8888
+    ports:
+      - "8888:8888"
+  rabbitmq_app:
+    container_name: rabbitmq_app
+    image: healthcheck/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: educalegal
+      RABBITMQ_DEFAULT_PASS: educalegal
+      RABBITMQ_DEFAULT_VHOST: educalegal
+    ports:
+      - "5672:5672"
+    volumes:
+      - /opt/educalegal/docker_volumes/rabbitmq_app:/var/lib/rabbitmq
   mongo:
     image: mongo:4.2.6
     container_name: mongo
@@ -40,16 +75,7 @@ services:
       ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_MONGODB_ADMINUSERNAME: educalegal
       ME_CONFIG_MONGODB_ADMINPASSWORD: educalegal
+    depends_on:
+      - mongo
     ports:
       - "8081:8081"
-  rabbitmq_app:
-    container_name: rabbitmq_app
-    image: healthcheck/rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: educalegal
-      RABBITMQ_DEFAULT_PASS: educalegal
-      RABBITMQ_DEFAULT_VHOST: educalegal
-    ports:
-      - "5672:5672"
-    volumes:
-      - /opt/educalegal/docker_volumes/rabbitmq_app:/var/lib/rabbitmq

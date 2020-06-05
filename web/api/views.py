@@ -15,7 +15,7 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework import viewsets
 
-from web.settings import BASE_DIR
+from django.conf import settings
 
 from billing.models import Plan
 from document.models import Document, DocumentESignatureLog
@@ -214,7 +214,7 @@ def docusign_webhook_listener(request):
 
         # Store the XML file on disk
         envelope_dir = os.path.join(
-            BASE_DIR, "media/docusign/", envelope_data["envelope_id"]
+            settings.BASE_DIR, "media/docusign/", envelope_data["envelope_id"]
         )
         Path(envelope_dir).mkdir(parents=True, exist_ok=True)
         filename = (
