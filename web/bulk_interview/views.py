@@ -76,7 +76,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             bulk_data = pd.read_csv(source_file, sep="#")
 
             try:
-                # Valida os metadados do CSV (timpos de campos e flags booleanas)
+                # Valida os metadados do CSV (tipos de campos e flags booleanas)
                 # Se os dados forem validos, retorna dois dicionarios: o de tipos de campos e
                 # os de obrigatoriedade dos registros
                 # Ambos são usados para criar a classe dinamica
@@ -113,6 +113,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             try:
                 (
                     bulk_data_content,
+                    parent_fields_dict,
                     error_messages,
                     csv_content_valid,
                 ) = is_csv_content_valid(bulk_data)
@@ -165,6 +166,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 dynamic_document_class_name,
                 field_types_dict,
                 required_fields_dict,
+                parent_fields_dict,
                 school_names_set=school_names_set,
                 school_units_names_set=school_units_names_set,
             )
@@ -218,6 +220,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     mongo_db_collection_name=dynamic_document_class_name,
                     field_types_dict=field_types_dict,
                     required_fields_dict=required_fields_dict,
+                    parent_fields_dict=parent_fields_dict,
                     school_names_set=list(school_names_set),
                     school_units_names_set=list(school_units_names_set),
                 )
@@ -267,18 +270,22 @@ def generate_bulk_documents(request, bulk_generation_id):
         bulk_generation.mongo_db_collection_name,
         bulk_generation.field_types_dict,
         bulk_generation.required_fields_dict,
+        bulk_generation.parent_fields_dict,
         school_names_set=list(bulk_generation.school_names_set),
         school_units_names_set=list(bulk_generation.school_units_names_set),
     )
 
     documents_collection = DynamicDocumentClass.objects
+    # iasmini
+    documents_list = _build_dict_from_mongo(documents_collection)
+
     documents_collection = list(documents_collection)
     logger.info(
         "Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection))
     )
 
     interview_variables_list = _dict_from_documents(
-        documents_collection, interview.document_type.pk
+        documents_list, interview.document_type.pk
     )
 
     # Se houver geracao com erro, esta variavel sera definida como False ao final da funcao.
@@ -339,7 +346,108 @@ def generate_bulk_documents(request, bulk_generation_id):
     )
 
 
-def _dict_from_documents(documents_collection, interview_type_id):
+def _remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
+
+
+def _build_dict_from_mongo(documents_collection):
+    """Monta a estrutura do dicionário em níveis de acordo com os objetos do Docassemble"""
+    documents = list()
+    for document in documents_collection:
+        document_dict = dict()
+        for field in document._fields:
+            # ignora o id pois ele nao tem o atributo parent
+            if field in ('id',):
+                document_dict[field] = document[field]
+                continue
+
+            if document._fields[field].parent:
+                # remove o prefixo (objeto pai) dos campos
+                prefix = document._fields[field].parent + '_'
+                field_name = _remove_prefix(field, prefix)
+
+                # verifica se a chave pai já existe no dict
+                if not document._fields[field].parent in document_dict:
+                    document_dict[document._fields[field].parent] = dict()
+
+                document_dict[document._fields[field].parent][field_name] = document[field]
+            else:
+                document_dict[field] = document[field]
+
+        documents.append(document_dict)
+    return documents
+
+
+def _dict_from_documents(documents, interview_type_id):
+    interview_variables_list = list()
+
+    for document in documents:
+        logger.info(
+            "Gerando lista de variáveis para o objeto {object_id}".format(
+                object_id=str(document['id'])
+            )
+        )
+        # cria hierarquia para name do students
+        _build_name_dict(document, 'students')
+
+        # cria hierarquia para endereço do students
+        _build_address_dict(document, 'students')
+
+        # cria hierarquia para name do contractors
+        _build_name_dict(document, 'contractors')
+
+        # cria hierarquia para endereço do contractors
+        _build_address_dict(document, 'contractors')
+
+        # Cria a representacao do objeto Individual para o students
+        _create_person(document, 'f', 'students', 0)
+
+        # Cria a representacao do objeto Individual para os contractors
+        _create_person(document, 'f', 'contractors', 0)
+
+        document[
+            "content_document"
+        ] = "contrato-prestacao-servicos-educacionais.docx"
+        document["valid_contratantes_table"] = "continue"
+        document["submit_to_esignature"] = "True"
+
+        interview_variables_list.append(document)
+
+    return interview_variables_list
+
+
+def _build_name_dict(document, parent):
+    document[parent]["name"] = dict()
+    document[parent]["name"]["text"] = document[parent]["name_text"]
+    document[parent].pop("name_text")
+
+    return document
+
+
+def _build_address_dict(document, parent):
+    address = dict()
+    address_attributes = [
+        "zip",
+        "street_name",
+        "street_number",
+        "unit",
+        "neighborhood",
+        "city",
+        "state"
+    ]
+
+    for attribute in address_attributes:
+        address[attribute] = document[parent][attribute]
+        document[parent].pop(attribute)
+
+    document[parent]["address"] = address
+
+    return document
+
+
+def _dict_from_documents2(documents_collection, interview_type_id):
 
     interview_variables_list = list()
 
@@ -399,24 +507,29 @@ def _dict_from_documents(documents_collection, interview_type_id):
                     document.pop(attribute)
                 except KeyError:
                     contratante[attribute] = ""
-            # Cria a representacao do objeto IndividualName dentro de contratante
-            contratante["name"] = dict()
-            contratante["name"]["first"] = document["name_first"]
-            document.pop("name_first")
-            contratante["instanceName"] = "contratantes[0]"
-            contratante["_class"] = "docassemble.base.util.Individual"
-            contratante["name"]["_class"] = "docassemble.base.util.IndividualName"
-            contratante["name"]["uses_parts"] = True
-            # TODO alteracao do indice para mais de um contratante ??
-            contratante["name"]["instanceName"] = "contratantes[0].name"
-            contratante["instanceName"] = "contratantes[0]"
-            document["contratantes"] = dict()
-            document["contratantes"]["elements"] = list()
-            document["contratantes"]["elements"].append(contratante)
-            document["contratantes"]["auto_gather"] = "False"
-            document["contratantes"]["gathered"] = "True"
-            document["contratantes"]["_class"] = "docassemble.base.core.DAList"
-            document["contratantes"]["instanceName"] = "contratantes"
+            # Cria a representacao do objeto Individual para o aluno
+            _create_person(document, 'f', 'students', 0)
+
+            # Cria a representacao do objeto Individual para os contratantes
+            _create_person(document, 'f', 'contractors', 0)
+
+            # contratante["name"] = dict()
+            # contratante["name"]["first"] = document["name_first"]
+            # document.pop("name_first")
+            # contratante["instanceName"] = "contratantes[0]"
+            # contratante["_class"] = "docassemble.base.util.Individual"
+            # contratante["name"]["_class"] = "docassemble.base.util.IndividualName"
+            # contratante["name"]["uses_parts"] = True
+            # # TODO alteracao do indice para mais de um contratante ??
+            # contratante["name"]["instanceName"] = "contratantes[0].name"
+            # contratante["instanceName"] = "contratantes[0]"
+            # document["contratantes"] = dict()
+            # document["contratantes"]["elements"] = list()
+            # document["contratantes"]["elements"].append(contratante)
+            # document["contratantes"]["auto_gather"] = "False"
+            # document["contratantes"]["gathered"] = "True"
+            # document["contratantes"]["_class"] = "docassemble.base.core.DAList"
+            # document["contratantes"]["instanceName"] = "contratantes"
 
             document[
                 "content_document"
@@ -559,45 +672,39 @@ def _dict_from_documents(documents_collection, interview_type_id):
     return interview_variables_list
 
 
-def _create_person(document, person_type, person_legal_type, index):
+def _create_person(document, person_type, person_list_name, index):
     """ Cria a representação da pessoa como objeto do Docassemble
         document
         person_type: f  - física
                      j  - jurídica
                      fj - ambos
-        person_legal_type - indica o tipo da parte: contratante, contratada, locatária, locadora, etc.
-        index - índice do elemento que está sendo convertido
+        person_list_name - nome da lista da parte: contratantes, contratadas, locatárias, locadoras, etc.
+        index - índice do elemento da lista que será convertido
     """
-    person = dict()
+    person = document[person_list_name]
 
     person["name"] = dict()
 
-    if person_type == "fj":
+    if person_type == 'fj':
         person["_class"] = "docassemble.base.util.Person"
         person["name"]["_class"] = "docassemble.base.util.Name"
-    elif person_type == "f":
+    elif person_type == 'f':
         person["_class"] = "docassemble.base.util.Individual"
         person["name"]["_class"] = "docassemble.base.util.IndividualName"
-
-        person["name"]["text"] = document["name_first"]
         person["name"]["uses_parts"] = True
-        document.pop("name_first")
     else:
         person["_class"] = "docassemble.base.util.Organization"
         person["name"]["_class"] = "docassemble.base.util.Name"
 
-    person["instanceName"] = person_legal_type + "[" + str(index) + "]"
+    person["instanceName"] = person_list_name + '[' + str(index) + ']'
+    person["name"]["instanceName"] = person_list_name + '[' + str(index) + '].name'
+    document.pop(person_list_name)
 
-    person["name"]["instanceName"] = person_legal_type + "[" + str(index) + "].name"
-
-    document[person_legal_type] = dict()
-    document[person_legal_type]["elements"] = list()
-    document[person_legal_type]["elements"].append(person)
-    document[person_legal_type]["auto_gather"] = "False"
-    document[person_legal_type]["gathered"] = "True"
-    document[person_legal_type]["_class"] = "docassemble.base.core.DAList"
-    document[person_legal_type]["instanceName"] = person_legal_type
-    document["valid_" + person_legal_type + "_table"] = "continue"
-
-    document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
-    document["submit_to_esignature"] = "True"
+    document[person_list_name] = dict()
+    document[person_list_name]["elements"] = list()
+    document[person_list_name]["elements"].append(person)
+    document[person_list_name]["auto_gather"] = "False"
+    document[person_list_name]["gathered"] = "True"
+    document[person_list_name]["_class"] = "docassemble.base.core.DAList"
+    document[person_list_name]["instanceName"] = person_list_name
+    document["valid_" + person_list_name + "_table"] = "continue"

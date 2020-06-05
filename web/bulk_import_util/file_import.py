@@ -101,6 +101,10 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
     # Substitui os campos vazios, aos quais o Pandas havia atribuido nan, por None
     bulk_data = bulk_data.replace({np.nan: None})
 
+    # Cria dicionario para guardar o objeto de cada campo
+    # A segunda linha do csv representa o objeto ao qual o campo pertence
+    parent_fields_dict = bulk_data.loc[2].to_dict()
+
     error_messages = list()
 
     for column_name, column in bulk_data.iteritems():
@@ -135,7 +139,7 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
     else:
         csv_content_valid = True
 
-    return bulk_data_content,  error_messages, csv_content_valid
+    return bulk_data_content, parent_fields_dict, error_messages, csv_content_valid
 
 
 def validate_field(column_name, row_index, field_type_name, field_required, value):

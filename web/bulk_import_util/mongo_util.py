@@ -31,12 +31,14 @@ def create_dynamic_document_class(
     class_name: str,
     field_properties_dict: dict,
     required_properties_dict: dict,
+    parent_fields_dict: dict,
     **kwargs
 ):
     # Cria o dicionario de atributos que será usado na classe dinamica
     custom_attributes = dict()
     for key, value in field_properties_dict.items():
         required = required_properties_dict[key]
+        parent = parent_fields_dict[key]
         if required.lower() == "true":
             required = True
         else:
@@ -45,17 +47,23 @@ def create_dynamic_document_class(
         key = key.replace(".", "_")
         custom_attributes[key] = get_field(value, required)
 
+        # insere o nome do objeto que contem o campo
+        custom_attributes[key].__setattr__('parent', parent)
+
     try:
         custom_attributes["selected_school"].choices = kwargs["school_names_set"]
+        custom_attributes["selected_school"].__setattr__('parent', None)
     except KeyError:
         pass
     try:
         custom_attributes["school_division"].choices = kwargs["school_units_names_set"]
+        custom_attributes["school_division"].__setattr__('parent', None)
     except KeyError:
         pass
 
     # Adiciona campo de data de criacao
     custom_attributes["created"] = DateTimeField(default=datetime.now())
+    custom_attributes["created"].__setattr__('parent', None)
 
     # Cria a classe de documento dinamica
     DynamicDocumentClass = type(class_name, (Document,), custom_attributes)

@@ -14,6 +14,7 @@ class BulkGeneration(TenantAwareModel):
     )
     field_types_dict = JSONField(null=False, default=dict, verbose_name="Campos do Modelo")
     required_fields_dict = JSONField(null=False, default=dict, verbose_name="Obrigatoriedade dos Campos do Modelo")
+    parent_fields_dict = JSONField(default=dict, verbose_name="Objeto que contém o campo")
     school_names_set = JSONField(null=False, default=dict, verbose_name="Conjunto de Nomes de Escola")
     school_units_names_set = JSONField(null=False, default=dict, verbose_name="Conjunto de Nomes de Unidades Escolares")
     mongo_db_collection_name = models.CharField(
