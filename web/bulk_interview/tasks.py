@@ -22,7 +22,7 @@ def create_document(base_url, api_key, username, user_password, interview_full_n
             e=str(e)
         )
         logger.error(message)
-        raise NewConnectionError(message)
+        raise DocassembleAPIException(message)
     else:
         try:
             response_json, status_code = dac.secret_read(username, user_password)
@@ -44,7 +44,7 @@ def create_document(base_url, api_key, username, user_password, interview_full_n
                     status_code=status_code, response=response_json
                 )
                 logger.error(error_message)
-                raise requests.exceptions.ConnectionError(error_message)
+                raise DocassembleAPIException(error_message)
             else:
                 try:
                     (
@@ -95,7 +95,7 @@ def create_document(base_url, api_key, username, user_password, interview_full_n
                                     response=str(response.text),
                                 )
                                 logger.error(message)
-                                DocassembleAPIException(message)
+                                raise DocassembleAPIException(message)
                             else:
                                 if interview_variables["submit_to_esignature"]:
                                     status_code = dac.interview_run_action(

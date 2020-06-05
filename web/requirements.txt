@@ -43,7 +43,7 @@ PyJWT
 # Validations
 validator-collection~=1.4.1
 # Celery
-celery~=4.4.4
+celery[mongodb]~=4.4.4
 django-celery-results~=1.2.1
 future
 # Tests
