@@ -18,11 +18,11 @@ INSTALLED_APPS += ["silk"]
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ["DATABASE_NAME"],
-        "USER": os.environ["DATABASE_USER"],
-        "PASSWORD": os.environ["DATABASE_PASSWORD"],
-        "HOST": os.environ["DATABASE_HOST"],
-        "PORT": os.environ["DATABASE_PORT"],
+        "NAME": "educalegal",
+        "USER": "educalegal",
+        "PASSWORD": "educalegal",
+        "HOST": "db",
+        "PORT": 5432,
     }
 }
 # No password validation
@@ -37,3 +37,5 @@ MONGO_USERNAME = "educalegal"
 MONGO_PASSWORD = "educalegal"
 MONGO_HOST = "mongo"
 MONGO_PORT = 27017
+
+CELERY_BROKER_URL = 'amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal'

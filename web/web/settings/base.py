@@ -252,11 +252,7 @@ _FORMATTER.add_formatting_definition(
 
 CURRENCIES = ("BRL",)
 
-CELERY_BROKER_URL = 'amqp://educalegal:educalegal@localhost/educalegal'
 # CELERY_RESULT_BACKEND = 'django-db'
 # CELERY_CACHE_BACKEND = 'django-cache'
-
-
 # CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
 
-# CELERY_BROKER_URL = 'amqp://rabbitmq_app'
