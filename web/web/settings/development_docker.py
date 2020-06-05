@@ -30,6 +30,7 @@ AUTH_PASSWORD_VALIDATORS = []
 # Static Files
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
 # MongoDB
 MONGO_DB = "educalegal"
 MONGO_ALIAS = "default"

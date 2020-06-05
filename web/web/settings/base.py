@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     # Django models currency
     "djmoney",
     # Resultados do celery no banco do Django
-    # "django_celery_results",
+    "django_celery_results",
     # Local
     "tenant",
     "users",
@@ -252,7 +252,6 @@ _FORMATTER.add_formatting_definition(
 
 CURRENCIES = ("BRL",)
 
-# CELERY_RESULT_BACKEND = 'django-db'
-# CELERY_CACHE_BACKEND = 'django-cache'
-# CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
+CELERY_RESULT_BACKEND = 'django-db'
 
+CELERY_CACHE_BACKEND = 'django-cache'
