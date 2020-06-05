@@ -20,6 +20,7 @@ from school.models import School, SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
 from mongo_util.mongo_util import (
+    create_mongo_connection,
     create_dynamic_document_class,
     mongo_to_dict,
     is_acceptable_field_type
@@ -28,6 +29,13 @@ from mongo_util.mongo_util import (
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
 from .docassemble_client import DocassembleClient
+
+
+from django.conf import settings
+
+create_mongo_connection(
+    settings.MONGO_DB, settings.MONGO_ALIAS, settings.MONGO_USERNAME, settings.MONGO_PASSWORD, settings.MONGO_HOST, settings.MONGO_PORT
+)
 
 logger = logging.getLogger(__name__)
 

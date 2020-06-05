@@ -33,8 +33,6 @@ django-silk~=4.0.1
 pandas~=1.0.3
 # Django models currency
 django-money~=1.1
-# Google Analytics
-django-google-analytics-app
 # MongoDB
 pymongo~=3.10.1
 mongoengine~=0.20.0

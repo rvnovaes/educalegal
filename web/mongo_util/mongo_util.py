@@ -1,6 +1,5 @@
 from datetime import datetime
 from mongoengine import *
-import math
 import numbers
 import re
 
@@ -13,6 +12,7 @@ VALID_FIELD_TYPES = [
     "LongField",
     "StringField",
 ]
+
 
 def create_mongo_connection(db, alias, username, password, host, port):
     connect(db, alias, username=username, password=password, host=host, port=port)
