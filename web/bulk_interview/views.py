@@ -18,12 +18,12 @@ from tenant.models import Tenant
 from school.models import School, SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
-from mongo_util.mongo_util import (
+from bulk_import_util.mongo_util import (
     create_mongo_connection,
     create_dynamic_document_class,
-    mongo_to_dict,
-    is_acceptable_field_type
+    mongo_to_dict
 )
+
 
 from bulk_import_util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
