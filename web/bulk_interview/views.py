@@ -1,8 +1,7 @@
 import logging
-import requests
 import uuid
-from urllib3.exceptions import NewConnectionError
-import numpy as np
+from enum import Enum
+
 from mongoengine import ValidationError
 import pandas as pd
 
@@ -41,6 +40,11 @@ create_mongo_connection(
 )
 
 logger = logging.getLogger(__name__)
+
+
+class DocumentType(Enum):
+    PRESTACAO_SERVICOS_ESCOLARES = 2
+    ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
 
 
 class ValidateCSVFile(LoginRequiredMixin, View):
@@ -398,29 +402,30 @@ def _dict_from_documents(documents, interview_type_id):
                 object_id=str(document['id'])
             )
         )
-        # cria hierarquia para name do students
-        _build_name_dict(document, 'students')
 
-        # cria hierarquia para endereço do students
-        _build_address_dict(document, 'students')
+        if DocumentType.PRESTACAO_SERVICOS_ESCOLARES:
+            # tipos de pessoa no contrato de prestacao de servicos
+            person_types = ['students', 'contractors']
 
-        # cria hierarquia para name do contractors
-        _build_name_dict(document, 'contractors')
+            for person in person_types:
+                # cria hierarquia para endereço da pessoa
+                _build_address_dict(document, person)
 
-        # cria hierarquia para endereço do contractors
-        _build_address_dict(document, 'contractors')
+                # Cria a representacao do objeto Individual da pessoa
+                _create_person_obj(document, 'f', person, 0)
 
-        # Cria a representacao do objeto Individual para o students
-        _create_person(document, 'f', 'students', 0)
+                # Cria a representacao do objeto Address da pessoa
+                _create_address_obj(document, person, 0)
 
-        # Cria a representacao do objeto Individual para os contractors
-        _create_person(document, 'f', 'contractors', 0)
+            document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
+        elif DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS:
+            pass
 
-        document[
-            "content_document"
-        ] = "contrato-prestacao-servicos-educacionais.docx"
-        document["valid_contratantes_table"] = "continue"
         document["submit_to_esignature"] = "True"
+
+        # remove campos herdados do mongo e que nao existem na entrevista
+        document.pop('id')
+        document.pop('created')
 
         interview_variables_list.append(document)
 
@@ -517,10 +522,10 @@ def _dict_from_documents2(documents_collection, interview_type_id):
                 except KeyError:
                     contratante[attribute] = ""
             # Cria a representacao do objeto Individual para o aluno
-            _create_person(document, 'f', 'students', 0)
+            _create_person_obj(document, 'f', 'students', 0)
 
             # Cria a representacao do objeto Individual para os contratantes
-            _create_person(document, 'f', 'contractors', 0)
+            _create_person_obj(document, 'f', 'contractors', 0)
 
             # contratante["name"] = dict()
             # contratante["name"]["first"] = document["name_first"]
@@ -681,7 +686,7 @@ def _dict_from_documents2(documents_collection, interview_type_id):
     return interview_variables_list
 
 
-def _create_person(document, person_type, person_list_name, index):
+def _create_person_obj(document, person_type, person_list_name, index):
     """ Cria a representação da pessoa como objeto do Docassemble
         document
         person_type: f  - física
@@ -690,6 +695,9 @@ def _create_person(document, person_type, person_list_name, index):
         person_list_name - nome da lista da parte: contratantes, contratadas, locatárias, locadoras, etc.
         index - índice do elemento da lista que será convertido
     """
+    # cria hierarquia para name do person_list_name
+    _build_name_dict(document, person_list_name)
+
     person = document[person_list_name]
 
     person["name"] = dict()
@@ -712,8 +720,13 @@ def _create_person(document, person_type, person_list_name, index):
     document[person_list_name] = dict()
     document[person_list_name]["elements"] = list()
     document[person_list_name]["elements"].append(person)
-    document[person_list_name]["auto_gather"] = "False"
-    document[person_list_name]["gathered"] = "True"
     document[person_list_name]["_class"] = "docassemble.base.core.DAList"
     document[person_list_name]["instanceName"] = person_list_name
     document["valid_" + person_list_name + "_table"] = "continue"
+
+
+def _create_address_obj(document, person_list_name, index):
+    document[person_list_name]["elements"][index]['address']["instanceName"] = person_list_name + '[' + str(index) + ']'
+    document[person_list_name]["elements"][index]['address']["_class"] = "docassemble.base.util.Address"
+    document[person_list_name]["auto_gather"] = "False"
+    document[person_list_name]["gathered"] = "True"
