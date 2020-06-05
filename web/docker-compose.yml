@@ -6,7 +6,7 @@ services:
     container_name: educalegal
     restart: unless-stopped
     build: .
-    command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8000"]
+    command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8000 --settings=web.settings.development_docker"]
     volumes:
       - type: bind
         source: .
@@ -15,7 +15,7 @@ services:
         source: ./media
         target: /code/media
     environment:
-      - EL_ENV=development
+      - DJANGO_SETTINGS_MODULE=web.settings.production
   mongo:
     image: mongo:4.2.6
     container_name: mongo

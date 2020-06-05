@@ -4,13 +4,6 @@ services:
   educalegal:
     command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
     environment:
-      - ALLOWED_HOSTS=app.educalegal.com.br,167.71.161.48
-      - DATABASE_NAME=educa-legal-app
-      - DATABASE_USER=educa-legal-app
-      - DATABASE_PASSWORD=e60k17byidfg20ye
-      - DATABASE_HOST=educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
-      - DATABASE_PORT=25060
-      - EL_USE_DIGITAL_OCEAN_SPACES=1
-      - EL_ENV=production
+      - DJANGO_SETTINGS_MODULE=web.settings.production
     ports:
       - "8000:8000"
