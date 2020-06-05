@@ -15,12 +15,12 @@ services:
         source: ./media
         target: /code/media
     environment:
-      - DJANGO_SETTINGS_MODULE=web.settings.production
-      - EL_ENV=development
+      - DJANGO_SETTINGS_MODULE=web.settings.development_docker
     depends_on:
-      - rabbitmq_app
-  celery_app:
-    container_name: celery_app
+      - educalegal_rabbitmq
+  educalegal_celery:
+    image: rvnovaes/educalegal:0.52
+    container_name: educalegal_celery
     build: .
     command: celery -A web worker -l info
     volumes:
@@ -29,19 +29,19 @@ services:
         target: /code
     environment:
       - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - DJANGO_SETTINGS_MODULE=web.settings.development_docker
     depends_on:
-      - rabbitmq_app
-  flower_app:
-    container_name: flower_app
+      - educalegal_rabbitmq
+  educalegal_flower:
+    container_name: educalegal_flower
     image: mher/flower
     environment:
-      - CELERY_BROKER_URL=amqp://educalegal:educalegal@rabbitmq_app/educalegal
+      - CELERY_BROKER_URL=amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal
       - FLOWER_PORT=8888
     ports:
       - "8888:8888"
-  rabbitmq_app:
-    container_name: rabbitmq_app
+  educalegal_rabbitmq:
+    container_name: educalegal_rabbitmq
     image: healthcheck/rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: educalegal

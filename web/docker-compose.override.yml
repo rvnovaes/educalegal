@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   educalegal:
+    # Os settings do banco devem ficar aqui tambem para permitir que o script wait for postgres funcione
     environment:
       DATABASE_NAME: educalegal
       DATABASE_USER: educalegal
