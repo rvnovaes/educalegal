@@ -50,7 +50,7 @@ def create_dynamic_document_class(
     except KeyError:
         pass
     try:
-        custom_attributes["unidadeAluno"].choices = kwargs["school_units_names_set"]
+        custom_attributes["school_division"].choices = kwargs["school_units_names_set"]
     except KeyError:
         pass
 

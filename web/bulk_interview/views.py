@@ -105,11 +105,11 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Valida o conteudo dos campos de acordo com seus tipos de dados e sua obrigadoriedade
             # trata os registros para valores aceitáveis pelos documentos
             # usando validators collection
-            # Também valida se existe a coluna school_name e unidadeAluno
+            # Também valida se existe a coluna selected_school e school_division
             # Para outras validações de conteúdo, veja a função
             # Os campos vazios são transformados em None e deve ser tratados posteriormente ao fazer a chamada de API
             # do Docassemble para que não saiam como None ou com erro nos documentos
-            # O campo unidadeAluno é transformado em ---
+            # O campo school_division é transformado em ---
             try:
                 (
                     bulk_data_content,

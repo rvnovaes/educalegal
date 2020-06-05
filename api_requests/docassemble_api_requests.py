@@ -30,7 +30,7 @@ user_password = "Silex2109"
 
 if __name__ == "__main__":
 
-    payload = {"id": "5ed031f7bb0cb6720079cce8", "nomeAluno": "Plat\u00e3o de Atenas", "unidadeAluno": "Super Bacana", "selected_school": "Col\u00e9gio Bacana", "created": "2020-05-28T18:49:43.705000", "submit_to_esignature": "False", "url_args": {"tid": 2, "ut": "48974bcc7b577ab3d6fed7c281d90324f4612810", "intid": 2}}
+    payload = {"id": "5ed031f7bb0cb6720079cce8", "nomeAluno": "Plat\u00e3o de Atenas", "school_division": "Super Bacana", "selected_school": "Col\u00e9gio Bacana", "created": "2020-05-28T18:49:43.705000", "submit_to_esignature": "False", "url_args": {"tid": 2, "ut": "48974bcc7b577ab3d6fed7c281d90324f4612810", "intid": 2}}
 
 
 
