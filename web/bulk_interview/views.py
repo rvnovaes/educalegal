@@ -43,6 +43,7 @@ logger = logging.getLogger(__name__)
 
 
 class DocumentType(Enum):
+    DEBUG_BULK = 1
     PRESTACAO_SERVICOS_ESCOLARES = 2
     ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
 
@@ -298,8 +299,12 @@ def generate_bulk_documents(request, bulk_generation_id):
     )
 
     interview_variables_list = _dict_from_documents(
-        documents_list, interview.document_type.pk
+        documents_collection, interview.document_type.pk
     )
+    # iasmini
+    # interview_variables_list = _dict_from_documents(
+    #     documents_list, interview.document_type.pk
+    # )
 
     # Se houver geracao com erro, esta variavel sera definida como False ao final da funcao.
     # Esta variavel ira modifica a logica de exibicao das telas ao usuario
@@ -403,7 +408,25 @@ def _dict_from_documents(documents, interview_type_id):
             )
         )
 
-        if DocumentType.PRESTACAO_SERVICOS_ESCOLARES:
+        if DocumentType.DEBUG_BULK:
+            for i, document in enumerate(documents):
+                logger.info(
+                    "Gerando lista de variáveis para o objeto {object_id}".format(
+                        object_id=str(document.id)
+                    )
+                )
+
+                document = mongo_to_dict(document, [])
+                document["submit_to_esignature"] = "False"
+
+                interview_variables_list.append(document)
+
+            logger.info(
+                "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
+                    size=len(interview_variables_list)
+                )
+            )
+        elif DocumentType.PRESTACAO_SERVICOS_ESCOLARES:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['students', 'contractors']
 
