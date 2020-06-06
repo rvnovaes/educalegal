@@ -8,8 +8,9 @@ from urllib3.exceptions import NewConnectionError
 
 logger = logging.getLogger(__name__)
 
-@shared_task
-def create_document(base_url, api_key, username, user_password, interview_full_name, interview_variables):
+
+@shared_task(bind=True, max_retries=3)
+def create_document(self, base_url, api_key, username, user_password, interview_full_name, interview_variables):
     try:
         dac = DocassembleClient(base_url, api_key)
         logger.info(
@@ -22,7 +23,8 @@ def create_document(base_url, api_key, username, user_password, interview_full_n
             e=str(e)
         )
         logger.error(message)
-        raise DocassembleAPIException(message)
+        # raise DocassembleAPIException(message)
+        self.retry(e=e, countdown=2 ** self.request.retries)
     else:
         try:
             response_json, status_code = dac.secret_read(username, user_password)
@@ -37,7 +39,8 @@ def create_document(base_url, api_key, username, user_password, interview_full_n
                 e=str(e)
             )
             logger.error(message)
-            raise DocassembleAPIException(message)
+            self.retry(e=e, countdown=2 ** self.request.retries)
+            # raise DocassembleAPIException(message)
         else:
             if status_code != 200:
                 error_message = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(

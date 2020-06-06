@@ -306,61 +306,40 @@ def generate_bulk_documents(request, bulk_generation_id):
     #     documents_list, interview.document_type.pk
     # )
 
-    # Se houver geracao com erro, esta variavel sera definida como False ao final da funcao.
-    # Esta variavel ira modifica a logica de exibicao das telas ao usuario
-    all_interviews_generated_success = True
+    isc = InterviewServerConfig.objects.get(interviews=interview.pk)
+    base_url = isc.base_url
+    api_key = isc.user_key
+    username = isc.username
+    user_password = isc.user_password
 
-    try:
-        # lê configurações do servidor da plataforma de geração de documentos (Docassemble)
-        isc = InterviewServerConfig.objects.get(interviews=interview.pk)
-        base_url = isc.base_url
-        api_key = isc.user_key
-        username = isc.username
-        user_password = isc.user_password
-    except ObjectDoesNotExist:
-        message = "Não foi configurado o servidor para esta entrevista!"
-        logger.error(message)
-        messages.error(request, message)
-    else:
-        # monta nome da entrevista de acordo com especificações do docassemble
-        interview_full_name = build_interview_full_name(
-            isc.user_id,
-            isc.project_name,
-            interview.yaml_name,
-            "interview_filename",
+    # monta nome da entrevista de acordo com especificações do docassemble
+    interview_full_name = build_interview_full_name(
+        isc.user_id,
+        isc.project_name,
+        interview.yaml_name,
+        "interview_filename",
+    )
+
+    logger.info(
+        "Servidor e nome da entrevista: {interview_full_name} ".format(
+            interview_full_name=interview_full_name
         )
+    )
 
-        logger.info(
-            "Nome da entrevista: {interview_full_name} ".format(
-                interview_full_name=interview_full_name
-            )
-        )
-        url_args = {
-            "tid": request.user.tenant.pk,
-            "ut": request.user.auth_token.key,
-            "intid": interview.pk,
-        }
+    url_args = {
+        "tid": request.user.tenant.pk,
+        "ut": request.user.auth_token.key,
+        "intid": interview.pk,
+    }
+    # TODO passar demais dados da entrevista para evitar chamadas desnecessarias a API do EducaLegal
 
-        for i, interview_variables in enumerate(interview_variables_list):
-            interview_variables["url_args"] = url_args
-            try:
-                create_document.delay(base_url, api_key, username, user_password, interview_full_name, interview_variables)
-            except DocassembleAPIException as e:
-                message = "Houve algum erro no processo de comunicação com a API do Docassemble {e}".format(
-                    e=str(e)
-                )
-                logger.error(message)
-
-    storage = get_messages(request)
-    for message in storage:
-        if message.level_tag == "error":
-            all_interviews_generated_success = False
-            break
+    for i, interview_variables in enumerate(interview_variables_list):
+        interview_variables["url_args"] = url_args
+        create_document.delay(base_url, api_key, username, user_password, interview_full_name, interview_variables)
 
     return render(
         request,
         "bulk_interview/bulk_interview_generation_result.html",
-        {"all_interviews_generated_success": all_interviews_generated_success},
     )
 
 

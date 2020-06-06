@@ -2,11 +2,6 @@
 {% block body_block %}
     <h2>Resultado da geração de documentos em lote</h2>
     <br>
-    {% if all_interviews_generated_success %}
-        <p>Todos os documentos foram gerados com sucesso!!!</p>
-    {% else %}
-        <p>Houve erro na geração de alguns documentos. Confira as mensagens abaixo.</p>
-    {% endif %}
     <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% if messages %}
         {% for message in messages %}
@@ -27,13 +22,4 @@
         {% endfor %}
         <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% endif %}
-{% endblock %}
-{% block scripts %}
-    <script>
-        // Add the following code if you want the name of the file appear on select
-        $(".custom-file-input").on("change", function () {
-            var fileName = $(this).val().split("\\").pop();
-            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-        });
-    </script>
 {% endblock %}

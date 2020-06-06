@@ -1,4 +1,4 @@
-selected_school#unidadeAluno#nomeAluno
+selected_school#school_division#nomeAluno
 StringField#StringField#StringField
 true#true#true
 Escola##Dados do aluno
