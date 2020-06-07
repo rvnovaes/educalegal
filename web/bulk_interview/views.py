@@ -8,7 +8,6 @@ from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
 
 
-
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -36,7 +35,7 @@ from .forms import BulkInterviewForm
 from .models import BulkGeneration
 from .docassemble_client import DocassembleAPIException
 
-from .tasks import create_document
+from .tasks import create_document, submit_to_esignature
 
 
 from django.conf import settings
@@ -310,7 +309,7 @@ def generate_bulk_documents(request, bulk_generation_id):
         "Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection))
     )
 
-    interview_variables_list = _dict_from_documents(
+    interview_variables_list = _dict_from_documents2(
         documents_collection, interview.document_type.pk
     )
     # iasmini
@@ -374,25 +373,50 @@ def generate_bulk_documents(request, bulk_generation_id):
     }
 
     results_list = list()
+    try:
+        secret = _create_secret(base_url, api_key, username, user_password)
 
-    secret = _create_secret(base_url, api_key, username, user_password)
+        for i, interview_variables in enumerate(interview_variables_list):
+            interview_variables["url_args"] = url_args
+            interview_variables["interview_data"] = interview_data
+            interview_variables["plan_data"] = plan_data
+            interview_variables["tenant_ged_data"] = tenant_ged_data
+            interview_variables["tenant_esignature_data"] = tenant_esignature_data
+            logger.info(
+                "Enviando tarefa {n} de {t}".format(
+                    n=str(i + 1), t=len(interview_variables_list)
+                )
+            )
 
-    for i, interview_variables in enumerate(interview_variables_list):
-        interview_variables["url_args"] = url_args
-        interview_variables["interview_data"] = interview_data
-        interview_variables["plan_data"] = plan_data
-        interview_variables["tenant_ged_data"] = tenant_ged_data
-        interview_variables["tenant_esignature_data"] = tenant_esignature_data
-        result = create_document.delay(
-            base_url,
-            api_key,
-            secret,
-            interview_full_name,
-            interview_variables,
-        )
-        results_list.append(result)
+            if interview_variables["submit_to_esignature"]:
+                result = chain(
+                    create_document.s(
+                        base_url,
+                        api_key,
+                        secret,
+                        interview_full_name,
+                        interview_variables,
+                    ),
+                    submit_to_esignature.s(
+                        base_url, api_key, secret, interview_full_name
+                    ),
+                )
+            else:
+                result = create_document.delay(
+                    base_url, api_key, secret, interview_full_name, interview_variables,
+                )
+            results_list.append(result)
 
-    return render(request, "bulk_interview/bulk_interview_generation_result.html", {"results_list": results_list})
+    except Exception as e:
+        message = "Houve erro no processo de geração em lote. | {e}".format(e=str(e))
+        logger.error(message)
+        messages.error(request, message)
+
+    return render(
+        request,
+        "bulk_interview/bulk_interview_generation_result.html",
+        {"results_list": results_list},
+    )
 
 
 def _remove_prefix(text, prefix):
@@ -442,17 +466,8 @@ def _dict_from_documents(documents, interview_type_id):
         )
 
         if DocumentType.DEBUG_BULK:
-            for i, document in enumerate(documents):
-                logger.info(
-                    "Gerando lista de variáveis para o objeto {object_id}".format(
-                        object_id=str(document.id)
-                    )
-                )
-
-                document = mongo_to_dict(document, [])
-                document["submit_to_esignature"] = "False"
-
-                interview_variables_list.append(document)
+            document = mongo_to_dict(document, [])
+            document["submit_to_esignature"] = False
 
             logger.info(
                 "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
@@ -476,10 +491,9 @@ def _dict_from_documents(documents, interview_type_id):
             document[
                 "content_document"
             ] = "contrato-prestacao-servicos-educacionais.docx"
+
         elif DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS:
             pass
-
-        document["submit_to_esignature"] = "True"
 
         # remove campos herdados do mongo e que nao existem na entrevista
         document.pop("id")
@@ -533,7 +547,7 @@ def _dict_from_documents2(documents_collection, interview_type_id):
             )
 
             document = mongo_to_dict(document, [])
-            document["submit_to_esignature"] = "False"
+            document["submit_to_esignature"] = True
 
             interview_variables_list.append(document)
 
@@ -607,7 +621,7 @@ def _dict_from_documents2(documents_collection, interview_type_id):
                 "content_document"
             ] = "contrato-prestacao-servicos-educacionais.docx"
             document["valid_contratantes_table"] = "continue"
-            document["submit_to_esignature"] = "True"
+            document["submit_to_esignature"] = True
 
             interview_variables_list.append(document)
 
@@ -731,7 +745,7 @@ def _dict_from_documents2(documents_collection, interview_type_id):
                 "content_document"
             ] = "acordos-individuais-trabalhistas-coronavirus.docx"
             document["valid_workers_table"] = "continue"
-            document["submit_to_esignature"] = "False"
+            document["submit_to_esignature"] = False
 
             interview_variables_list.append(document)
 

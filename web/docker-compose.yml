@@ -18,11 +18,12 @@ services:
       - DJANGO_SETTINGS_MODULE=web.settings.development_docker
     depends_on:
       - educalegal_rabbitmq
+      - mongo
   educalegal_celery:
     image: rvnovaes/educalegal:0.52
     container_name: educalegal_celery
     build: .
-    command: celery -A web worker -l info
+    command: celery -A web worker -l info -n educalegalworker1@%h
     volumes:
       - type: bind
         source: .
@@ -38,17 +39,20 @@ services:
     environment:
       - CELERY_BROKER_URL=amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal
       - FLOWER_PORT=8888
+    depends_on:
+      - educalegal_rabbitmq
     ports:
       - "8888:8888"
   educalegal_rabbitmq:
     container_name: educalegal_rabbitmq
-    image: healthcheck/rabbitmq
+    image: rabbitmq:3.8.4-management
     environment:
       RABBITMQ_DEFAULT_USER: educalegal
       RABBITMQ_DEFAULT_PASS: educalegal
       RABBITMQ_DEFAULT_VHOST: educalegal
     ports:
       - "5672:5672"
+      - "9999:15672"
     volumes:
       - /opt/educalegal/docker_volumes/rabbitmq_app:/var/lib/rabbitmq
   mongo:
