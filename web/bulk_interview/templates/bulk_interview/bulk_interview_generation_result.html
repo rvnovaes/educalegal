@@ -2,6 +2,9 @@
 {% block body_block %}
     <h2>Resultado da geração de documentos em lote</h2>
     <br>
+    {% for result in results_list %}
+        {{ result }}
+    {% endfor %}
     <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% if messages %}
         {% for message in messages %}

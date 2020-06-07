@@ -1,17 +1,21 @@
 import logging
 import uuid
 from enum import Enum
-
+from celery import chain
 from mongoengine import ValidationError
 import pandas as pd
+from urllib3.exceptions import NewConnectionError
+from requests.exceptions import ConnectionError
+
+
 
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.views import View
+
 
 from tenant.models import Tenant
 from school.models import School, SchoolUnit
@@ -20,8 +24,10 @@ from interview.util import build_interview_full_name
 from bulk_import_util.mongo_util import (
     create_mongo_connection,
     create_dynamic_document_class,
-    mongo_to_dict
+    mongo_to_dict,
 )
+
+from .docassemble_client import DocassembleClient, DocassembleAPIException
 
 
 from bulk_import_util.file_import import is_csv_metadata_valid, is_csv_content_valid
@@ -36,7 +42,12 @@ from .tasks import create_document
 from django.conf import settings
 
 create_mongo_connection(
-    settings.MONGO_DB, settings.MONGO_ALIAS, settings.MONGO_USERNAME, settings.MONGO_PASSWORD, settings.MONGO_HOST, settings.MONGO_PORT
+    settings.MONGO_DB,
+    settings.MONGO_ALIAS,
+    settings.MONGO_USERNAME,
+    settings.MONGO_PASSWORD,
+    settings.MONGO_HOST,
+    settings.MONGO_PORT,
 )
 
 logger = logging.getLogger(__name__)
@@ -280,6 +291,7 @@ def generate_bulk_documents(request, bulk_generation_id):
         )
     )
     interview = Interview.objects.get(pk=bulk_generation.interview.pk)
+    tenant = request.user.tenant
     DynamicDocumentClass = create_dynamic_document_class(
         bulk_generation.mongo_db_collection_name,
         bulk_generation.field_types_dict,
@@ -314,10 +326,7 @@ def generate_bulk_documents(request, bulk_generation_id):
 
     # monta nome da entrevista de acordo com especificações do docassemble
     interview_full_name = build_interview_full_name(
-        isc.user_id,
-        isc.project_name,
-        interview.yaml_name,
-        "interview_filename",
+        isc.user_id, isc.project_name, interview.yaml_name, "interview_filename",
     )
 
     logger.info(
@@ -331,21 +340,64 @@ def generate_bulk_documents(request, bulk_generation_id):
         "ut": request.user.auth_token.key,
         "intid": interview.pk,
     }
-    # TODO passar demais dados da entrevista para evitar chamadas desnecessarias a API do EducaLegal
+    # TODO continua chamando API para interview data (nao sei pq) e para school (ainda nao feita)
+    interview_data = {
+        "id": interview.pk,
+        "name": interview.name,
+        "version": interview.version,
+        "date_available": str(interview.date_available),
+        "description": interview.description,
+        "language": interview.language,
+        "custom_file_name": interview.custom_file_name,
+        "is_generic": interview.is_generic,
+        "is_freemium": interview.is_freemium,
+        "yaml_name": interview.yaml_name,
+        "document_type": interview.document_type.pk,
+    }
+
+    plan_data = {
+        "use_esignature": tenant.plan.use_esignature,
+        "use_ged": tenant.plan.use_ged,
+    }
+
+    tenant_ged_data = {
+        "url": tenant.tenantgeddata.url,
+        "token": tenant.tenantgeddata.token,
+    }
+
+    tenant_esignature_data = {
+        "provider": tenant.tenantesignaturedata.provider,
+        "private_key": tenant.tenantesignaturedata.private_key,
+        "client_id": tenant.tenantesignaturedata.client_id,
+        "impersonated_user_guid": tenant.tenantesignaturedata.impersonated_user_guid,
+        "test_mode": tenant.tenantesignaturedata.test_mode,
+    }
+
+    results_list = list()
+
+    secret = _create_secret(base_url, api_key, username, user_password)
 
     for i, interview_variables in enumerate(interview_variables_list):
         interview_variables["url_args"] = url_args
-        create_document.delay(base_url, api_key, username, user_password, interview_full_name, interview_variables)
+        interview_variables["interview_data"] = interview_data
+        interview_variables["plan_data"] = plan_data
+        interview_variables["tenant_ged_data"] = tenant_ged_data
+        interview_variables["tenant_esignature_data"] = tenant_esignature_data
+        result = create_document.delay(
+            base_url,
+            api_key,
+            secret,
+            interview_full_name,
+            interview_variables,
+        )
+        results_list.append(result)
 
-    return render(
-        request,
-        "bulk_interview/bulk_interview_generation_result.html",
-    )
+    return render(request, "bulk_interview/bulk_interview_generation_result.html", {"results_list": results_list})
 
 
 def _remove_prefix(text, prefix):
     if text.startswith(prefix):
-        return text[len(prefix):]
+        return text[len(prefix) :]
     return text
 
 
@@ -356,20 +408,22 @@ def _build_dict_from_mongo(documents_collection):
         document_dict = dict()
         for field in document._fields:
             # ignora o id pois ele nao tem o atributo parent
-            if field in ('id',):
+            if field in ("id",):
                 document_dict[field] = document[field]
                 continue
 
             if document._fields[field].parent:
                 # remove o prefixo (objeto pai) dos campos
-                prefix = document._fields[field].parent + '_'
+                prefix = document._fields[field].parent + "_"
                 field_name = _remove_prefix(field, prefix)
 
                 # verifica se a chave pai já existe no dict
                 if not document._fields[field].parent in document_dict:
                     document_dict[document._fields[field].parent] = dict()
 
-                document_dict[document._fields[field].parent][field_name] = document[field]
+                document_dict[document._fields[field].parent][field_name] = document[
+                    field
+                ]
             else:
                 document_dict[field] = document[field]
 
@@ -383,7 +437,7 @@ def _dict_from_documents(documents, interview_type_id):
     for document in documents:
         logger.info(
             "Gerando lista de variáveis para o objeto {object_id}".format(
-                object_id=str(document['id'])
+                object_id=str(document["id"])
             )
         )
 
@@ -407,27 +461,29 @@ def _dict_from_documents(documents, interview_type_id):
             )
         elif DocumentType.PRESTACAO_SERVICOS_ESCOLARES:
             # tipos de pessoa no contrato de prestacao de servicos
-            person_types = ['students', 'contractors']
+            person_types = ["students", "contractors"]
 
             for person in person_types:
                 # cria hierarquia para endereço da pessoa
                 _build_address_dict(document, person)
 
                 # Cria a representacao do objeto Individual da pessoa
-                _create_person_obj(document, 'f', person, 0)
+                _create_person_obj(document, "f", person, 0)
 
                 # Cria a representacao do objeto Address da pessoa
                 _create_address_obj(document, person, 0)
 
-            document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
+            document[
+                "content_document"
+            ] = "contrato-prestacao-servicos-educacionais.docx"
         elif DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS:
             pass
 
         document["submit_to_esignature"] = "True"
 
         # remove campos herdados do mongo e que nao existem na entrevista
-        document.pop('id')
-        document.pop('created')
+        document.pop("id")
+        document.pop("created")
 
         interview_variables_list.append(document)
 
@@ -451,7 +507,7 @@ def _build_address_dict(document, parent):
         "unit",
         "neighborhood",
         "city",
-        "state"
+        "state",
     ]
 
     for attribute in address_attributes:
@@ -524,10 +580,10 @@ def _dict_from_documents2(documents_collection, interview_type_id):
                 except KeyError:
                     contratante[attribute] = ""
             # Cria a representacao do objeto Individual para o aluno
-            _create_person_obj(document, 'f', 'students', 0)
+            _create_person_obj(document, "f", "students", 0)
 
             # Cria a representacao do objeto Individual para os contratantes
-            _create_person_obj(document, 'f', 'contractors', 0)
+            _create_person_obj(document, "f", "contractors", 0)
 
             # contratante["name"] = dict()
             # contratante["name"]["first"] = document["name_first"]
@@ -704,10 +760,10 @@ def _create_person_obj(document, person_type, person_list_name, index):
 
     person["name"] = dict()
 
-    if person_type == 'fj':
+    if person_type == "fj":
         person["_class"] = "docassemble.base.util.Person"
         person["name"]["_class"] = "docassemble.base.util.Name"
-    elif person_type == 'f':
+    elif person_type == "f":
         person["_class"] = "docassemble.base.util.Individual"
         person["name"]["_class"] = "docassemble.base.util.IndividualName"
         person["name"]["uses_parts"] = True
@@ -715,8 +771,8 @@ def _create_person_obj(document, person_type, person_list_name, index):
         person["_class"] = "docassemble.base.util.Organization"
         person["name"]["_class"] = "docassemble.base.util.Name"
 
-    person["instanceName"] = person_list_name + '[' + str(index) + ']'
-    person["name"]["instanceName"] = person_list_name + '[' + str(index) + '].name'
+    person["instanceName"] = person_list_name + "[" + str(index) + "]"
+    person["name"]["instanceName"] = person_list_name + "[" + str(index) + "].name"
     document.pop(person_list_name)
 
     document[person_list_name] = dict()
@@ -728,7 +784,51 @@ def _create_person_obj(document, person_type, person_list_name, index):
 
 
 def _create_address_obj(document, person_list_name, index):
-    document[person_list_name]["elements"][index]['address']["instanceName"] = person_list_name + '[' + str(index) + ']'
-    document[person_list_name]["elements"][index]['address']["_class"] = "docassemble.base.util.Address"
+    document[person_list_name]["elements"][index]["address"]["instanceName"] = (
+        person_list_name + "[" + str(index) + "]"
+    )
+    document[person_list_name]["elements"][index]["address"][
+        "_class"
+    ] = "docassemble.base.util.Address"
     document[person_list_name]["auto_gather"] = "False"
     document[person_list_name]["gathered"] = "True"
+
+
+def _create_secret(base_url, api_key, username, user_password):
+    try:
+        dac = DocassembleClient(base_url, api_key)
+        logger.info(
+            "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
+                base_url=base_url, api_key=api_key
+            )
+        )
+    except NewConnectionError as e:
+        message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
+            e=str(e)
+        )
+        logger.error(message)
+        raise DocassembleAPIException(message)
+    else:
+        try:
+            response_json, status_code = dac.secret_read(username, user_password)
+            secret = response_json
+            logger.info(
+                "Secret obtido do servidor de geração de documentos: {secret}".format(
+                    secret=secret
+                )
+            )
+        except ConnectionError as e:
+            message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
+                e=str(e)
+            )
+            logger.error(message)
+            raise DocassembleAPIException(message)
+        else:
+            if status_code != 200:
+                error = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(
+                    status_code=status_code, response=response_json
+                )
+                logger.error(error)
+                raise DocassembleAPIException(error)
+            else:
+                return secret

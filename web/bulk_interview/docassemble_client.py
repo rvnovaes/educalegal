@@ -7,8 +7,10 @@ from retry_requests import retry
 
 logger = logging.getLogger(__name__)
 
+
 class DocassembleAPIException(Exception):
     pass
+
 
 class DocassembleClient:
     def __init__(self, base_url, admin_key):
