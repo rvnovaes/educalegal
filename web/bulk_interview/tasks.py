@@ -57,7 +57,7 @@ def create_document(
 
             if status_code != 200:
                 message = "Erro ao gerar entrevista | Status Code: {status_code} | Response: {response}".format(
-                    status_code=status_code, response=str(response.text),
+                    status_code=status_code, response=str(response),
                 )
                 logger.error(message)
                 raise self.retry(countdown=count_down ** self.request.retries)
@@ -92,8 +92,8 @@ def create_document(
         raise self.retry(e=e, countdown=count_down ** self.request.retries)
 
     except Exception as e:
-        message = "Houve um erro inespecífico na criação do documento | {e}".format(
-            e=str(e)
+        message = "Houve um erro inespecífico na criação do documento | {exc}".format(
+            exc=str(type(e).__name__) + " : " + str(e)
         )
         logger.error(message)
         raise self.retry(e=e, countdown=count_down ** self.request.retries)

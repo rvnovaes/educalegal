@@ -23,7 +23,7 @@ services:
     image: rvnovaes/educalegal:0.52
     container_name: educalegal_celery
     build: .
-    command: celery -A web worker -l info -n educalegalworker1@%h
+    command: celery -A web worker -l info -c 1 -n educalegalworker1@%h
     volumes:
       - type: bind
         source: .

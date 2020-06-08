@@ -7,6 +7,7 @@ import pandas as pd
 from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -23,19 +24,13 @@ from bulk_import_util.mongo_util import (
     create_dynamic_document_class,
     mongo_to_hierarchical_dict,
 )
-
-from .docassemble_client import DocassembleClient, DocassembleAPIException
-
 from bulk_import_util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
+from .docassemble_client import DocassembleClient, DocassembleAPIException
 from .forms import BulkInterviewForm
 from .models import BulkGeneration
 from .docassemble_client import DocassembleAPIException
-
 from .tasks import create_document, submit_to_esignature
-
-
-from django.conf import settings
 
 create_mongo_connection(
     settings.MONGO_DB,
@@ -399,15 +394,18 @@ def generate_bulk_documents(request, bulk_generation_id):
                     submit_to_esignature.s(
                         base_url, api_key, secret, interview_full_name
                     ),
-                )
+                )()
+                result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(parent_id=result.parent.id, child_id=result.id)
+                results_list.append(result_description)
             else:
                 result = create_document.delay(
                     base_url, api_key, secret, interview_full_name, interview_variables,
                 )
-            results_list.append(result)
+                result_description = "Criação do documento: {id}".format(id=result.id)
+                results_list.append(result_description)
 
     except Exception as e:
-        message = "Houve erro no processo de geração em lote. | {e}".format(e=str(e))
+        message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
         logger.error(message)
         messages.error(request, message)
 
@@ -437,7 +435,7 @@ def _dict_to_docassemble_objects(documents, interview_type_id):
                 _build_address_dict(document, person)
 
                 # Cria a representacao do objeto Individual da pessoa
-                _create_person_obj(document, 'f', person, 0)
+                _create_person_obj(document, "f", person, 0)
 
                 # Cria a representacao do objeto Address da pessoa
                 _create_address_obj(document, person, 0)
