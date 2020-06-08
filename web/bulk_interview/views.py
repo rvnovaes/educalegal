@@ -336,6 +336,7 @@ def generate_bulk_documents(request, bulk_generation_id):
         "ut": request.user.auth_token.key,
         "intid": interview.pk,
     }
+
     # TODO continua chamando API para interview data (nao sei pq) e para school (ainda nao feita)
     interview_data = {
         "id": interview.pk,
@@ -373,14 +374,8 @@ def generate_bulk_documents(request, bulk_generation_id):
     try:
         secret = _create_secret(base_url, api_key, username, user_password)
 
-        for interview_variables in interview_variables_list:
+        for i, interview_variables in enumerate(interview_variables_list):
             interview_variables["url_args"] = url_args
-            try:
-                create_document.delay(
-                    base_url, api_key, username, user_password, interview_full_name, interview_variables)
-            except DocassembleAPIException as e:
-                message = "Houve algum erro no processo de comunicação com a API do Docassemble {e}".format(
-                    e=str(e)
             interview_variables["interview_data"] = interview_data
             interview_variables["plan_data"] = plan_data
             interview_variables["tenant_ged_data"] = tenant_ged_data
