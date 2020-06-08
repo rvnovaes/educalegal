@@ -95,6 +95,9 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
     if "school_division" not in bulk_data.columns:
         raise ValueError("Não existe a coluna school_division. Ela é obrigatória.\n")
 
+    if "submit_to_esignature" not in bulk_data.columns:
+        raise ValueError("Não existe a coluna submit_to_esignature. Ela é obrigatória.\n")
+
     # Substitui os campos de unidade escolar vazios, aos quais o Pandas havia atribuido nan, por ---
     bulk_data["school_division"] = bulk_data["school_division"].replace({np.nan: "---"})
 

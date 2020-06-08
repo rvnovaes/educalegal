@@ -21,7 +21,7 @@ from interview.util import build_interview_full_name
 from bulk_import_util.mongo_util import (
     create_mongo_connection,
     create_dynamic_document_class,
-    mongo_to_dict,
+    mongo_to_hierarchical_dict,
 )
 
 from .docassemble_client import DocassembleClient, DocassembleAPIException
@@ -298,19 +298,20 @@ def generate_bulk_documents(request, bulk_generation_id):
     )
 
     documents_collection = DynamicDocumentClass.objects
-    # iasmini
-    documents_list = _build_dict_from_mongo(documents_collection)
+
+    # gera lista de documentos em lista de dicionarios
+    documents_list = list()
+    for document in documents_collection:
+        document = mongo_to_hierarchical_dict(document)
+
+        documents_list.append(document)
 
     # documents_collection = list(documents_collection)
     logger.info(
         "Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection))
     )
 
-    # interview_variables_list = _dict_from_documents(
-    #     documents_collection, interview.document_type.pk
-    # )
-    # iasmini
-    interview_variables_list = _dict_from_documents(
+    interview_variables_list = _dict_to_docassemble_objects(
         documents_list, interview.document_type.pk
     )
 
@@ -417,41 +418,7 @@ def generate_bulk_documents(request, bulk_generation_id):
     )
 
 
-def _remove_prefix(text, prefix):
-    if text.startswith(prefix):
-        return text[len(prefix):]
-    return text
-
-
-def _build_dict_from_mongo(documents_collection):
-    """Monta a estrutura do dicionário em níveis de acordo com os objetos do Docassemble"""
-    documents = list()
-    for document in documents_collection:
-        document_dict = dict()
-        for field in document._fields:
-            # ignora o id pois ele nao tem o atributo parent
-            if field in ('id',):
-                document_dict[field] = document[field]
-                continue
-
-            if document._fields[field].parent:
-                # remove o prefixo (objeto pai) dos campos
-                prefix = document._fields[field].parent + '_'
-                field_name = _remove_prefix(field, prefix)
-
-                # verifica se a chave pai já existe no dict
-                if not document._fields[field].parent in document_dict:
-                    document_dict[document._fields[field].parent] = dict()
-
-                document_dict[document._fields[field].parent][field_name] = document[field]
-            else:
-                document_dict[field] = document[field]
-
-        documents.append(document_dict)
-    return documents
-
-
-def _dict_from_documents(documents, interview_type_id):
+def _dict_to_docassemble_objects(documents, interview_type_id):
     interview_variables_list = list()
 
     for document in documents:
@@ -461,11 +428,7 @@ def _dict_from_documents(documents, interview_type_id):
             )
         )
 
-        if interview_type_id == DocumentType.DEBUG_BULK.value:
-            document = mongo_to_dict(document, [])
-            document["submit_to_esignature"] = False
-
-        elif interview_type_id == DocumentType.PRESTACAO_SERVICOS_ESCOLARES.value:
+        if interview_type_id == DocumentType.PRESTACAO_SERVICOS_ESCOLARES.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['students', 'contractors']
 
@@ -482,8 +445,6 @@ def _dict_from_documents(documents, interview_type_id):
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
         elif interview_type_id == DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
             pass
-
-        document["submit_to_esignature"] = True
 
         # remove campos herdados do mongo e que nao existem na entrevista
         document.pop('id')
@@ -529,103 +490,8 @@ def _build_address_dict(document, parent):
     return document
 
 
-def _dict_from_documents2(documents_collection, interview_type_id):
-
+def _dict_from_documents_old(documents_collection, interview_type_id):
     interview_variables_list = list()
-
-    if interview_type_id == 1:
-
-        for i, document in enumerate(documents_collection):
-            logger.info(
-                "Gerando lista de variáveis para o objeto {object_id}".format(
-                    object_id=str(document.id)
-                )
-            )
-
-            document = mongo_to_dict(document, [])
-            document["submit_to_esignature"] = True
-
-            interview_variables_list.append(document)
-
-        logger.info(
-            "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
-                size=len(interview_variables_list)
-            )
-        )
-
-    if interview_type_id == 2:
-
-        for i, document in enumerate(documents_collection):
-            logger.info(
-                "Gerando lista de variáveis para o objeto {object_id}".format(
-                    object_id=str(document.id)
-                )
-            )
-
-            document = mongo_to_dict(document, [])
-
-            contratante = dict()
-            contratante_attributes = [
-                "nacionalidade",
-                "estadocivil",
-                "prof",
-                "cpf",
-                "rg",
-                "telefone",
-                "wtt",
-                "email",
-                "cep",
-                "rua",
-                "numb",
-                "complemento",
-                "bairro",
-                "cidade",
-                "estado",
-            ]
-            for attribute in contratante_attributes:
-                # Se não houver o atributo no documento, ele estava em branco na planilha
-                try:
-                    contratante[attribute] = document[attribute]
-                    document.pop(attribute)
-                except KeyError:
-                    contratante[attribute] = ""
-            # Cria a representacao do objeto Individual para o aluno
-            _create_person_obj(document, 'f', 'students', 0)
-
-            # Cria a representacao do objeto Individual para os contratantes
-            _create_person_obj(document, 'f', 'contractors', 0)
-
-            # contratante["name"] = dict()
-            # contratante["name"]["first"] = document["name_first"]
-            # document.pop("name_first")
-            # contratante["instanceName"] = "contratantes[0]"
-            # contratante["_class"] = "docassemble.base.util.Individual"
-            # contratante["name"]["_class"] = "docassemble.base.util.IndividualName"
-            # contratante["name"]["uses_parts"] = True
-            # # TODO alteracao do indice para mais de um contratante ??
-            # contratante["name"]["instanceName"] = "contratantes[0].name"
-            # contratante["instanceName"] = "contratantes[0]"
-            # document["contratantes"] = dict()
-            # document["contratantes"]["elements"] = list()
-            # document["contratantes"]["elements"].append(contratante)
-            # document["contratantes"]["auto_gather"] = "False"
-            # document["contratantes"]["gathered"] = "True"
-            # document["contratantes"]["_class"] = "docassemble.base.core.DAList"
-            # document["contratantes"]["instanceName"] = "contratantes"
-
-            document[
-                "content_document"
-            ] = "contrato-prestacao-servicos-educacionais.docx"
-            document["valid_contratantes_table"] = "continue"
-            document["submit_to_esignature"] = True
-
-            interview_variables_list.append(document)
-
-        logger.info(
-            "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
-                size=len(interview_variables_list)
-            )
-        )
 
     if interview_type_id == 37:
 
@@ -636,7 +502,7 @@ def _dict_from_documents2(documents_collection, interview_type_id):
                 )
             )
 
-            document = mongo_to_dict(document, [])
+            document = mongo_to_hierarchical_dict(document, [])
 
             worker = dict()
             worker_attributes = [
@@ -741,15 +607,6 @@ def _dict_from_documents2(documents_collection, interview_type_id):
                 "content_document"
             ] = "acordos-individuais-trabalhistas-coronavirus.docx"
             document["valid_workers_table"] = "continue"
-            document["submit_to_esignature"] = False
-
-            interview_variables_list.append(document)
-
-        logger.info(
-            "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
-                size=len(interview_variables_list)
-            )
-        )
 
     return interview_variables_list
 

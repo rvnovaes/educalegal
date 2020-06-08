@@ -70,7 +70,6 @@ def create_document(
 
             return interview_session
 
-
     except NewConnectionError as e:
         message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
             e=str(e)

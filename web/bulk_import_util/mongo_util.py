@@ -71,67 +71,33 @@ def create_dynamic_document_class(
     return DynamicDocumentClass
 
 
-# helper.py
-def mongo_to_dict(obj, exclude_fields):
-    return_data = []
+def _remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
 
-    if obj is None:
-        return None
 
-    if isinstance(obj, Document):
-        return_data.append(("id", str(obj.id)))
+def mongo_to_hierarchical_dict(document, exclude_fields=('id',)):
+    """Monta a estrutura do dicionário em níveis de acordo com os objetos do Docassemble"""
 
-    for field_name in obj._fields:
-
-        if field_name in exclude_fields:
+    document_dict = dict()
+    for field in document._fields:
+        # ignora o id pois ele nao tem o atributo parent
+        if field in exclude_fields:
+            document_dict[field] = document[field]
             continue
 
-        if field_name in ("id",):
-            continue
+        if document._fields[field].parent:
+            # remove o prefixo (objeto pai) dos campos
+            prefix = document._fields[field].parent + '_'
+            field_name = _remove_prefix(field, prefix)
 
-        data = obj._data[field_name]
+            # verifica se a chave pai já existe no dict
+            if not document._fields[field].parent in document_dict:
+                document_dict[document._fields[field].parent] = dict()
 
-        if isinstance(obj._fields[field_name], ListField):
-            return_data.append((field_name, list_field_to_dict(data)))
-        elif isinstance(obj._fields[field_name], EmbeddedDocumentField):
-            return_data.append((field_name, mongo_to_dict(data, [])))
-        elif isinstance(obj._fields[field_name], DictField):
-            return_data.append((field_name, data))
+            document_dict[document._fields[field].parent][field_name] = document[field]
         else:
-            return_data.append(
-                (field_name, mongo_to_python_type(obj._fields[field_name], data))
-            )
+            document_dict[field] = document[field]
 
-    return dict(return_data)
-
-
-def list_field_to_dict(list_field):
-    return_data = []
-
-    for item in list_field:
-        if isinstance(item, EmbeddedDocument):
-            return_data.append(mongo_to_dict(item, []))
-        else:
-            return_data.append(mongo_to_python_type(item, item))
-
-    return return_data
-
-
-def mongo_to_python_type(field, data):
-    if data is None:
-        return None
-    else:
-        if isinstance(field, DateTimeField):
-            return str(data.isoformat())
-        elif isinstance(field, StringField):
-            return str(data)
-        elif isinstance(field, FloatField):
-            return float(data)
-        elif isinstance(field, IntField):
-            return int(data)
-        elif isinstance(field, BooleanField):
-            return bool(data)
-        elif isinstance(field, ObjectIdField):
-            return str(data)
-        else:
-            return str(data)
+    return document_dict
