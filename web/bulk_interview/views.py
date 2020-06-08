@@ -293,18 +293,18 @@ def generate_bulk_documents(request, bulk_generation_id):
     # iasmini
     documents_list = _build_dict_from_mongo(documents_collection)
 
-    documents_collection = list(documents_collection)
+    # documents_collection = list(documents_collection)
     logger.info(
         "Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection))
     )
 
-    interview_variables_list = _dict_from_documents(
-        documents_collection, interview.document_type.pk
-    )
-    # iasmini
     # interview_variables_list = _dict_from_documents(
-    #     documents_list, interview.document_type.pk
+    #     documents_collection, interview.document_type.pk
     # )
+    # iasmini
+    interview_variables_list = _dict_from_documents(
+        documents_list, interview.document_type.pk
+    )
 
     # Se houver geracao com erro, esta variavel sera definida como False ao final da funcao.
     # Esta variavel ira modifica a logica de exibicao das telas ao usuario
@@ -341,10 +341,11 @@ def generate_bulk_documents(request, bulk_generation_id):
             "intid": interview.pk,
         }
 
-        for i, interview_variables in enumerate(interview_variables_list):
+        for interview_variables in interview_variables_list:
             interview_variables["url_args"] = url_args
             try:
-                create_document.delay(base_url, api_key, username, user_password, interview_full_name, interview_variables)
+                create_document.delay(
+                    base_url, api_key, username, user_password, interview_full_name, interview_variables)
             except DocassembleAPIException as e:
                 message = "Houve algum erro no processo de comunicação com a API do Docassemble {e}".format(
                     e=str(e)
@@ -408,25 +409,13 @@ def _dict_from_documents(documents, interview_type_id):
             )
         )
 
-        if DocumentType.DEBUG_BULK:
-            for i, document in enumerate(documents):
-                logger.info(
-                    "Gerando lista de variáveis para o objeto {object_id}".format(
-                        object_id=str(document.id)
-                    )
-                )
+        if interview_type_id == DocumentType.DEBUG_BULK.value:
+            document = mongo_to_dict(document, [])
+            document["submit_to_esignature"] = False
 
-                document = mongo_to_dict(document, [])
-                document["submit_to_esignature"] = "False"
+            interview_variables_list.append(document)
 
-                interview_variables_list.append(document)
-
-            logger.info(
-                "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
-                    size=len(interview_variables_list)
-                )
-            )
-        elif DocumentType.PRESTACAO_SERVICOS_ESCOLARES:
+        elif interview_type_id == DocumentType.PRESTACAO_SERVICOS_ESCOLARES.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['students', 'contractors']
 
@@ -441,16 +430,22 @@ def _dict_from_documents(documents, interview_type_id):
                 _create_address_obj(document, person, 0)
 
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
-        elif DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS:
+        elif interview_type_id == DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
             pass
 
-        document["submit_to_esignature"] = "True"
+        document["submit_to_esignature"] = True
 
         # remove campos herdados do mongo e que nao existem na entrevista
         document.pop('id')
         document.pop('created')
 
         interview_variables_list.append(document)
+
+        logger.info(
+            "Criada lista variáveis de documentos a serem gerados em lote com {size} documentos.".format(
+                size=len(interview_variables_list)
+            )
+        )
 
     return interview_variables_list
 
@@ -498,7 +493,7 @@ def _dict_from_documents2(documents_collection, interview_type_id):
             )
 
             document = mongo_to_dict(document, [])
-            document["submit_to_esignature"] = "False"
+            document["submit_to_esignature"] = False
 
             interview_variables_list.append(document)
 
@@ -572,7 +567,7 @@ def _dict_from_documents2(documents_collection, interview_type_id):
                 "content_document"
             ] = "contrato-prestacao-servicos-educacionais.docx"
             document["valid_contratantes_table"] = "continue"
-            document["submit_to_esignature"] = "True"
+            document["submit_to_esignature"] = True
 
             interview_variables_list.append(document)
 
@@ -696,7 +691,7 @@ def _dict_from_documents2(documents_collection, interview_type_id):
                 "content_document"
             ] = "acordos-individuais-trabalhistas-coronavirus.docx"
             document["valid_workers_table"] = "continue"
-            document["submit_to_esignature"] = "False"
+            document["submit_to_esignature"] = False
 
             interview_variables_list.append(document)
 
@@ -723,8 +718,6 @@ def _create_person_obj(document, person_type, person_list_name, index):
 
     person = document[person_list_name]
 
-    person["name"] = dict()
-
     if person_type == 'fj':
         person["_class"] = "docassemble.base.util.Person"
         person["name"]["_class"] = "docassemble.base.util.Name"
@@ -749,7 +742,7 @@ def _create_person_obj(document, person_type, person_list_name, index):
 
 
 def _create_address_obj(document, person_list_name, index):
-    document[person_list_name]["elements"][index]['address']["instanceName"] = person_list_name + '[' + str(index) + ']'
+    document[person_list_name]["elements"][index]['address']["instanceName"] = person_list_name + '[' + str(index) + '].address'
     document[person_list_name]["elements"][index]['address']["_class"] = "docassemble.base.util.Address"
-    document[person_list_name]["auto_gather"] = "False"
-    document[person_list_name]["gathered"] = "True"
+    document[person_list_name]["auto_gather"] = False
+    document[person_list_name]["gathered"] = True
