@@ -1,15 +1,16 @@
 import logging
 import uuid
 from enum import Enum
-
+from celery import chain
 from mongoengine import ValidationError
 import pandas as pd
+from urllib3.exceptions import NewConnectionError
+from requests.exceptions import ConnectionError
 
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.views import View
 
@@ -20,9 +21,10 @@ from interview.util import build_interview_full_name
 from bulk_import_util.mongo_util import (
     create_mongo_connection,
     create_dynamic_document_class,
-    mongo_to_dict
+    mongo_to_dict,
 )
 
+from .docassemble_client import DocassembleClient, DocassembleAPIException
 
 from bulk_import_util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
@@ -30,13 +32,18 @@ from .forms import BulkInterviewForm
 from .models import BulkGeneration
 from .docassemble_client import DocassembleAPIException
 
-from .tasks import create_document
+from .tasks import create_document, submit_to_esignature
 
 
 from django.conf import settings
 
 create_mongo_connection(
-    settings.MONGO_DB, settings.MONGO_ALIAS, settings.MONGO_USERNAME, settings.MONGO_PASSWORD, settings.MONGO_HOST, settings.MONGO_PORT
+    settings.MONGO_DB,
+    settings.MONGO_ALIAS,
+    settings.MONGO_USERNAME,
+    settings.MONGO_PASSWORD,
+    settings.MONGO_HOST,
+    settings.MONGO_PORT,
 )
 
 logger = logging.getLogger(__name__)
@@ -280,6 +287,7 @@ def generate_bulk_documents(request, bulk_generation_id):
         )
     )
     interview = Interview.objects.get(pk=bulk_generation.interview.pk)
+    tenant = request.user.tenant
     DynamicDocumentClass = create_dynamic_document_class(
         bulk_generation.mongo_db_collection_name,
         bulk_generation.field_types_dict,
@@ -306,40 +314,64 @@ def generate_bulk_documents(request, bulk_generation_id):
         documents_list, interview.document_type.pk
     )
 
-    # Se houver geracao com erro, esta variavel sera definida como False ao final da funcao.
-    # Esta variavel ira modifica a logica de exibicao das telas ao usuario
-    all_interviews_generated_success = True
+    isc = InterviewServerConfig.objects.get(interviews=interview.pk)
+    base_url = isc.base_url
+    api_key = isc.user_key
+    username = isc.username
+    user_password = isc.user_password
 
+    # monta nome da entrevista de acordo com especificações do docassemble
+    interview_full_name = build_interview_full_name(
+        isc.user_id, isc.project_name, interview.yaml_name, "interview_filename",
+    )
+
+    logger.info(
+        "Servidor e nome da entrevista: {interview_full_name} ".format(
+            interview_full_name=interview_full_name
+        )
+    )
+
+    url_args = {
+        "tid": request.user.tenant.pk,
+        "ut": request.user.auth_token.key,
+        "intid": interview.pk,
+    }
+    # TODO continua chamando API para interview data (nao sei pq) e para school (ainda nao feita)
+    interview_data = {
+        "id": interview.pk,
+        "name": interview.name,
+        "version": interview.version,
+        "date_available": str(interview.date_available),
+        "description": interview.description,
+        "language": interview.language,
+        "custom_file_name": interview.custom_file_name,
+        "is_generic": interview.is_generic,
+        "is_freemium": interview.is_freemium,
+        "yaml_name": interview.yaml_name,
+        "document_type": interview.document_type.pk,
+    }
+
+    plan_data = {
+        "use_esignature": tenant.plan.use_esignature,
+        "use_ged": tenant.plan.use_ged,
+    }
+
+    tenant_ged_data = {
+        "url": tenant.tenantgeddata.url,
+        "token": tenant.tenantgeddata.token,
+    }
+
+    tenant_esignature_data = {
+        "provider": tenant.tenantesignaturedata.provider,
+        "private_key": tenant.tenantesignaturedata.private_key,
+        "client_id": tenant.tenantesignaturedata.client_id,
+        "impersonated_user_guid": tenant.tenantesignaturedata.impersonated_user_guid,
+        "test_mode": tenant.tenantesignaturedata.test_mode,
+    }
+
+    results_list = list()
     try:
-        # lê configurações do servidor da plataforma de geração de documentos (Docassemble)
-        isc = InterviewServerConfig.objects.get(interviews=interview.pk)
-        base_url = isc.base_url
-        api_key = isc.user_key
-        username = isc.username
-        user_password = isc.user_password
-    except ObjectDoesNotExist:
-        message = "Não foi configurado o servidor para esta entrevista!"
-        logger.error(message)
-        messages.error(request, message)
-    else:
-        # monta nome da entrevista de acordo com especificações do docassemble
-        interview_full_name = build_interview_full_name(
-            isc.user_id,
-            isc.project_name,
-            interview.yaml_name,
-            "interview_filename",
-        )
-
-        logger.info(
-            "Nome da entrevista: {interview_full_name} ".format(
-                interview_full_name=interview_full_name
-            )
-        )
-        url_args = {
-            "tid": request.user.tenant.pk,
-            "ut": request.user.auth_token.key,
-            "intid": interview.pk,
-        }
+        secret = _create_secret(base_url, api_key, username, user_password)
 
         for interview_variables in interview_variables_list:
             interview_variables["url_args"] = url_args
@@ -349,19 +381,44 @@ def generate_bulk_documents(request, bulk_generation_id):
             except DocassembleAPIException as e:
                 message = "Houve algum erro no processo de comunicação com a API do Docassemble {e}".format(
                     e=str(e)
+            interview_variables["interview_data"] = interview_data
+            interview_variables["plan_data"] = plan_data
+            interview_variables["tenant_ged_data"] = tenant_ged_data
+            interview_variables["tenant_esignature_data"] = tenant_esignature_data
+            logger.info(
+                "Enviando tarefa {n} de {t}".format(
+                    n=str(i + 1), t=len(interview_variables_list)
                 )
-                logger.error(message)
+            )
 
-    storage = get_messages(request)
-    for message in storage:
-        if message.level_tag == "error":
-            all_interviews_generated_success = False
-            break
+            if interview_variables["submit_to_esignature"]:
+                result = chain(
+                    create_document.s(
+                        base_url,
+                        api_key,
+                        secret,
+                        interview_full_name,
+                        interview_variables,
+                    ),
+                    submit_to_esignature.s(
+                        base_url, api_key, secret, interview_full_name
+                    ),
+                )
+            else:
+                result = create_document.delay(
+                    base_url, api_key, secret, interview_full_name, interview_variables,
+                )
+            results_list.append(result)
+
+    except Exception as e:
+        message = "Houve erro no processo de geração em lote. | {e}".format(e=str(e))
+        logger.error(message)
+        messages.error(request, message)
 
     return render(
         request,
         "bulk_interview/bulk_interview_generation_result.html",
-        {"all_interviews_generated_success": all_interviews_generated_success},
+        {"results_list": results_list},
     )
 
 
@@ -412,8 +469,6 @@ def _dict_from_documents(documents, interview_type_id):
         if interview_type_id == DocumentType.DEBUG_BULK.value:
             document = mongo_to_dict(document, [])
             document["submit_to_esignature"] = False
-
-            interview_variables_list.append(document)
 
         elif interview_type_id == DocumentType.PRESTACAO_SERVICOS_ESCOLARES.value:
             # tipos de pessoa no contrato de prestacao de servicos
@@ -493,7 +548,7 @@ def _dict_from_documents2(documents_collection, interview_type_id):
             )
 
             document = mongo_to_dict(document, [])
-            document["submit_to_esignature"] = False
+            document["submit_to_esignature"] = True
 
             interview_variables_list.append(document)
 
@@ -746,3 +801,43 @@ def _create_address_obj(document, person_list_name, index):
     document[person_list_name]["elements"][index]['address']["_class"] = "docassemble.base.util.Address"
     document[person_list_name]["auto_gather"] = False
     document[person_list_name]["gathered"] = True
+
+
+def _create_secret(base_url, api_key, username, user_password):
+    try:
+        dac = DocassembleClient(base_url, api_key)
+        logger.info(
+            "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
+                base_url=base_url, api_key=api_key
+            )
+        )
+    except NewConnectionError as e:
+        message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
+            e=str(e)
+        )
+        logger.error(message)
+        raise DocassembleAPIException(message)
+    else:
+        try:
+            response_json, status_code = dac.secret_read(username, user_password)
+            secret = response_json
+            logger.info(
+                "Secret obtido do servidor de geração de documentos: {secret}".format(
+                    secret=secret
+                )
+            )
+        except ConnectionError as e:
+            message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
+                e=str(e)
+            )
+            logger.error(message)
+            raise DocassembleAPIException(message)
+        else:
+            if status_code != 200:
+                error = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(
+                    status_code=status_code, response=response_json
+                )
+                logger.error(error)
+                raise DocassembleAPIException(error)
+            else:
+                return secret

@@ -13,10 +13,10 @@ psycopg2-binary~=2.8.5
 django-allauth
 # Used to create tables and filtering
 django-tables2
-django-filter~=2.2.0
+django-filter~=2.3.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.13.22
+boto3~=1.13.24
 # Production server
 gunicorn
 # Misc
@@ -43,8 +43,8 @@ PyJWT
 # Validations
 validator-collection~=1.4.1
 # Celery
-celery[mongodb]~=4.4.4
+celery~=4.4.4
 django-celery-results~=1.2.1
-future
+future~=0.18.2
 # Tests
 pytest~=5.4.3
