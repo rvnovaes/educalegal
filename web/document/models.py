@@ -4,6 +4,7 @@ from django.contrib.postgres.fields import JSONField
 from tenant.models import TenantAwareModel
 from interview.models import Interview
 from school.models import School
+from bulk_interview.models import BulkGeneration
 
 
 class Document(TenantAwareModel):
@@ -43,6 +44,16 @@ class Document(TenantAwareModel):
         related_name="documents",
     )
     document_data = JSONField(null=True, verbose_name="Dados do Documento")
+
+    # bulk_generation = models.ForeignKey(
+    #     BulkGeneration, null=True, on_delete=models.CASCADE, verbose_name="Criação em Lote"
+    # )
+    #
+    # mongo_id = models.CharField(max_length=256, null=True, blank=True, verbose_name="Id do documento no Mongo")
+    #
+    # task_create_document = models.CharField(max_length=256, null=True, blank=True, verbose_name="Task de Criação de Documento")
+    #
+    # task_submit_to_esignature = models.CharField(max_length=256, null=True, blank=True, verbose_name="Task de Assinatura")
 
     def __str__(self):
         return self.name + " - " + self.school.name
