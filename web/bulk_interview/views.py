@@ -189,8 +189,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
             # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
             # no Mongo
-            mongo_documents_list = list()
-
             for register_index, row in enumerate(
                 bulk_data_content.itertuples(index=False)
             ):
@@ -201,7 +199,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
                 try:
                     document_data = dynamic_document.save()
-                    mongo_documents_list.append(document_data)
                     # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
                     # mensagem de sucesso
                     row_values = list(row_dict.values())
@@ -245,13 +242,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     school_units_names_set=list(school_units_names_set),
                 )
                 bulk_generation.save()
-
-                for document_data in mongo_documents_list:
-                    el_document = Document(
-                        name=""
-
-                    )
-
 
                 logger.info(
                     "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
