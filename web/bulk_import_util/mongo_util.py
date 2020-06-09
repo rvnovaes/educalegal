@@ -52,12 +52,10 @@ def create_dynamic_document_class(
 
     try:
         custom_attributes["selected_school"].choices = kwargs["school_names_set"]
-        custom_attributes["selected_school"].__setattr__('parent', None)
     except KeyError:
         pass
     try:
         custom_attributes["school_division"].choices = kwargs["school_units_names_set"]
-        custom_attributes["school_division"].__setattr__('parent', None)
     except KeyError:
         pass
 
