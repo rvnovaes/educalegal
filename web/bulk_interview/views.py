@@ -455,7 +455,7 @@ def _dict_to_docassemble_objects(documents, interview_type_id):
                 _create_address_obj(document, person, 0)
 
             # Cria a representacao da lista de documentos
-            _build_documents_obj(document)
+            _create_documents_obj(document)
 
             document["content_document"] = "acordos-individuais-trabalhistas-coronavirus.docx"
 
@@ -503,7 +503,7 @@ def _build_address_dict(document, parent):
     return document
 
 
-def _build_documents_obj(document):
+def _create_documents_obj(document):
     doc_names = {'docmp9272020': 'termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx',
                  'docmp9362020': 'acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx',
                  'docdireitoautoral': 'termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx'}
