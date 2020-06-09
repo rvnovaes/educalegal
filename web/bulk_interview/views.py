@@ -46,7 +46,6 @@ logger = logging.getLogger(__name__)
 
 
 class DocumentType(Enum):
-    DEBUG_BULK = 1
     PRESTACAO_SERVICOS_ESCOLARES = 2
     ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
 
@@ -455,7 +454,23 @@ def _dict_to_docassemble_objects(documents, interview_type_id):
 
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
         elif interview_type_id == DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
-            pass
+            # tipos de pessoa no contrato de prestacao de servicos
+            person_types = ['workers']
+
+            for person in person_types:
+                # cria hierarquia para endereço da pessoa
+                _build_address_dict(document, person)
+
+                # Cria a representacao do objeto Individual da pessoa
+                _create_person_obj(document, "f", person, 0)
+
+                # Cria a representacao do objeto Address da pessoa
+                _create_address_obj(document, person, 0)
+
+            # Cria a representacao da lista de documentos
+            _create_documents_obj(document)
+
+            document["content_document"] = "acordos-individuais-trabalhistas-coronavirus.docx"
 
         # remove campos herdados do mongo e que nao existem na entrevista
         document.pop('id')
@@ -501,125 +516,26 @@ def _build_address_dict(document, parent):
     return document
 
 
-def _dict_from_documents_old(documents_collection, interview_type_id):
-    interview_variables_list = list()
+def _create_documents_obj(document):
+    doc_names = {'docmp9272020': 'termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx',
+                 'docmp9362020': 'acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx',
+                 'docdireitoautoral': 'termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx'}
 
-    if interview_type_id == 37:
+    elements = dict()
+    for doc_type in document['documents_list']:
+        elements[doc_names[doc_type]] = document["documents_list"][doc_type]
 
-        for i, document in enumerate(documents_collection):
-            logger.info(
-                "Gerando lista de variáveis para o objeto {object_id}".format(
-                    object_id=str(document.id)
-                )
-            )
+    document.pop("documents_list")
+    document["documents_list"] = dict()
+    document["documents_list"]['elements'] = elements
+    document["documents_list"]["_class"] = "docassemble.base.core.DADict"
+    document["documents_list"]["ask_number"] = False
+    document["documents_list"]["ask_object_type"] = False
+    document["documents_list"]["auto_gather"] = False
+    document["documents_list"]["gathered"] = True
+    document["documents_list"]["instanceName"] = "documents_list"
 
-            document = mongo_to_hierarchical_dict(document, [])
-
-            worker = dict()
-            worker_attributes = [
-                "cpf",
-                "rg",
-                "nationality",
-                "marital_status",
-                "ctps",
-                "serie",
-                "email",
-            ]
-
-            for attribute in worker_attributes:
-                # Se não houver o atributo no documento, ele estava em branco na planilha
-                try:
-                    worker[attribute] = document[attribute]
-                    document.pop(attribute)
-                except KeyError:
-                    worker[attribute] = ""
-
-            worker["instanceName"] = "workers[0]"
-            worker["_class"] = "docassemble.base.util.Person"
-            worker["name"] = dict()
-            worker["name"]["_class"] = "docassemble.base.util.Name"
-            worker["name"]["text"] = document["name_text"]
-            worker["name"]["instanceName"] = "workers[0].name"
-            document.pop("name_text")
-
-            address = dict()
-            address_attributes = [
-                "zip",
-                "street_name",
-                "street_number",
-                "complement",
-                "neighborhood",
-                "city",
-                "state",
-            ]
-
-            for attribute in address_attributes:
-                # Se não houver o atributo no documento, ele estava em branco na planilha
-                try:
-                    address[attribute] = document[attribute]
-                    document.pop(attribute)
-                except KeyError:
-                    address[attribute] = ""
-
-            worker["address"] = address
-            worker["address"]["instanceName"] = "workers[0].address"
-            worker["address"]["_class"] = "docassemble.base.util.Address"
-
-            document["workers"] = dict()
-            document["workers"]["elements"] = list()
-            document["workers"]["elements"].append(worker)
-            document["workers"]["auto_gather"] = "False"
-            document["workers"]["gathered"] = "True"
-            document["workers"]["_class"] = "docassemble.base.core.DAList"
-            document["workers"]["instanceName"] = "workers"
-
-            document["documents_list"] = dict()
-            document["documents_list"]["_class"] = "docassemble.base.core.DADict"
-            document["documents_list"]["ask_number"] = False
-            document["documents_list"]["ask_object_type"] = False
-            document["documents_list"]["auto_gather"] = False
-            # document["documents_list"]["complete_attribute"] =  null,
-
-            document["documents_list"]["elements"] = dict()
-            if document["docmp9362020"] == "s":
-                document["documents_list"]["elements"][
-                    "acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx"
-                ] = True
-            else:
-                document["documents_list"]["elements"][
-                    "acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx"
-                ] = False
-
-            if document["docmp9272020"] == "s":
-                document["documents_list"]["elements"][
-                    "termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx"
-                ] = True
-            else:
-                document["documents_list"]["elements"][
-                    "termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx"
-                ] = False
-
-            if document["docdireitoautoral"] == "s":
-                document["documents_list"]["elements"][
-                    "termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx"
-                ] = True
-            else:
-                document["documents_list"]["elements"][
-                    "termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx"
-                ] = False
-
-            document["documents_list"]["gathered"] = True
-            document["documents_list"]["instanceName"] = "documents_list"
-            # document["documents_list"]["minimum_number"]: null,
-            # document["documents_list"]["object_type"]: null,
-            # document["documents_list"]["object_type_parameters"]: {}
-
-            document[
-                "content_document"
-            ] = "acordos-individuais-trabalhistas-coronavirus.docx"
-            document["valid_workers_table"] = "continue"
-
-    return interview_variables_list
+    return document
 
 
 def _create_person_obj(document, person_type, person_list_name, index):

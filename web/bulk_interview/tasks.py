@@ -61,6 +61,9 @@ def create_document(
                 )
                 logger.error(message)
                 raise self.retry(countdown=count_down ** self.request.retries)
+            else:
+                logger.info('Resposta da chamada interview_set_variables:')
+                logger.info(response)
 
             created_files = response["attachments"][0]["filename_with_extension"]
             message = "Criado(s) o(s) arquivo(s): {created_files}".format(
