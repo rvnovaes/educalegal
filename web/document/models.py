@@ -36,10 +36,10 @@ class Document(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
     signing_provider = models.CharField(
-        max_length=256, null=True, blank=True, verbose_name="Provedor"
+        max_length=256, verbose_name="Provedor"
     )
     envelope_id = models.CharField(
-        max_length=256, null=True, blank=True, verbose_name="Id do Envelope"
+        max_length=256, verbose_name="Id do Envelope"
     )
     status = models.CharField(max_length=256, blank=True, verbose_name="Status")
     ged_id = models.CharField(
