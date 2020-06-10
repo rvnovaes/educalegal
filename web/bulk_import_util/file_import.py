@@ -125,7 +125,7 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
                 message = (
                         str(type(e).__name__)
                         + " : "
-                        + "Não foi possível validar ou converter o valor {row_value} de {column_name} - linha: {row_index} em um campo tipo {field_type_name} - {field_required}.\n".format(
+                        + "Não foi possível validar ou converter o valor {row_value} da coluna {column_name} - linha: {row_index} em um campo tipo {field_type_name} - {field_required}.\n".format(
                     row_value=row_value, column_name=column_name, row_index=str(row_index + 2), field_type_name=field_type_name, field_required=field_required
                 )
                         + str(e)
@@ -231,6 +231,7 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
             return value, True
 
         if field_type_name == "FloatField":
+            value = float(value.replace(".", "").replace(",", "."))
             is_valid = checkers.is_float(value, coerce_value=False)
 
             if is_valid and checkers.is_float(value, coerce_value=True):
