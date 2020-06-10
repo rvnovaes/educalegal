@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import JSONField
 from tenant.models import TenantAwareModel
 from interview.models import Interview
 from school.models import School
-from bulk_interview.models import BulkGeneration
+from bulk_interview.models import BulkInterview
 
 
 class Document(TenantAwareModel):
@@ -12,10 +12,10 @@ class Document(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
     signing_provider = models.CharField(
-        max_length=256, blank=True, verbose_name="Provedor"
+        max_length=256, null=True, blank=True, verbose_name="Provedor"
     )
     envelope_id = models.CharField(
-        max_length=256, blank=True, verbose_name="Id do Envelope"
+        max_length=256, null=True, blank=True, verbose_name="Id do Envelope"
     )
     status = models.CharField(max_length=256, blank=True, verbose_name="Status")
     ged_id = models.CharField(
@@ -45,15 +45,17 @@ class Document(TenantAwareModel):
     )
     document_data = JSONField(null=True, verbose_name="Dados do Documento")
 
-    # bulk_generation = models.ForeignKey(
-    #     BulkGeneration, null=True, on_delete=models.CASCADE, verbose_name="Criação em Lote"
-    # )
-    #
-    # mongo_id = models.CharField(max_length=256, null=True, blank=True, verbose_name="Id do documento no Mongo")
-    #
-    # task_create_document = models.CharField(max_length=256, null=True, blank=True, verbose_name="Task de Criação de Documento")
-    #
-    # task_submit_to_esignature = models.CharField(max_length=256, null=True, blank=True, verbose_name="Task de Assinatura")
+    bulk_generation = models.ForeignKey(
+        BulkInterview, null=True, on_delete=models.CASCADE, verbose_name="Criação em Lote"
+    )
+
+    mongo_id = models.CharField(max_length=256, null=True, blank=True, verbose_name="Id do documento no Mongo")
+
+    task_create_document = models.CharField(max_length=256, null=True, blank=True, verbose_name="Task de criação de documento")
+
+    task_submit_to_esignature = models.CharField(max_length=256, null=True, blank=True, verbose_name="Task de assinatura")
+
+    submit_to_esignature = models.BooleanField(null=True, blank=True, default=False, verbose_name="Enivar para assinatura eletrônica?")
 
     def __str__(self):
         return self.name + " - " + self.school.name

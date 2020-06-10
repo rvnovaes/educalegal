@@ -5,7 +5,7 @@ from tenant.models import TenantAwareModel
 from interview.models import Interview
 
 
-class BulkGeneration(TenantAwareModel):
+class BulkInterview(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     interview = models.ForeignKey(
         Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"

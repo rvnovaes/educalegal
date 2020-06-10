@@ -14,12 +14,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views import View
+from django_tables2 import SingleTableView
 
 from tenant.models import Tenant
+from tenant.mixins import TenantAwareViewMixin
 from school.models import School, SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
 from document.models import Document
+from document.tables import DocumentTable
 from bulk_import_util.mongo_util import (
     create_mongo_connection,
     create_dynamic_document_class,
@@ -29,9 +32,10 @@ from bulk_import_util.file_import import is_csv_metadata_valid, is_csv_content_v
 
 from .docassemble_client import DocassembleClient, DocassembleAPIException
 from .forms import BulkInterviewForm
-from .models import BulkGeneration
+from .models import BulkInterview
 from .docassemble_client import DocassembleAPIException
 from .tasks import create_document, submit_to_esignature
+from .tables import BulkInterviewTable
 
 create_mongo_connection(
     settings.MONGO_DB,
@@ -50,13 +54,32 @@ class DocumentType(Enum):
     ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
 
 
+class BulkInterviewListView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView):
+    model = BulkInterview
+    table_class = BulkInterviewTable
+    context_object_name = "bulk_interviews"
+
+
+class BulkInterviewDocumentsListView(LoginRequiredMixin, SingleTableView):
+    model = BulkInterview
+    table_class = DocumentTable
+    context_object_name = "documents"
+
+    def get_queryset(self):
+        return self.model.objects.filter(tenant_id=self.request.user.tenant_id)
+
+
+
+
+
+
 class ValidateCSVFile(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form = BulkInterviewForm()
         interview = Interview.objects.get(pk=self.kwargs["interview_id"])
         return render(
             request,
-            "bulk_interview/bulk_interview_validate_generate.html",
+            "bulk_interview/bulkinterview_validate_generate.html",
             {
                 "form": form,
                 "interview_id": interview.pk,
@@ -71,7 +94,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Consulta dados do aplicativo necessarios as validacoes
             interview = Interview.objects.get(pk=self.kwargs["interview_id"])
             tenant = Tenant.objects.get(pk=self.request.user.tenant_id)
-            schools = School.objects.filter(tenant=tenant)
+            schools = tenant.school_set.all()
             # Monta os conjuntos de nomes de escolas e de unidades escolares para validacao
             school_units_names_set = set()
             for school in schools:
@@ -109,7 +132,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
                 return render(
                     request,
-                    "bulk_interview/bulk_interview_validate_generate.html",
+                    "bulk_interview/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -140,7 +163,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
                 return render(
                     request,
-                    "bulk_interview/bulk_interview_validate_generate.html",
+                    "bulk_interview/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -155,7 +178,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
                 return render(
                     request,
-                    "bulk_interview/bulk_interview_validate_generate.html",
+                    "bulk_interview/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -189,7 +212,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
             # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
             # no Mongo
-            mongo_documents_list = list()
+            mongo_document_data_list = list()
 
             for register_index, row in enumerate(
                 bulk_data_content.itertuples(index=False)
@@ -197,11 +220,11 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 # Transforma a linha em dicionario
                 row_dict = row._asdict()
                 # Cria um objeto Documento a partir da classe dinamica
-                dynamic_document = DynamicDocumentClass(**row_dict)
+                mongo_document = DynamicDocumentClass(**row_dict)
 
                 try:
-                    document_data = dynamic_document.save()
-                    mongo_documents_list.append(document_data)
+                    mongo_document_data = mongo_document.save()
+                    mongo_document_data_list.append(mongo_document_data)
                     # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
                     # mensagem de sucesso
                     row_values = list(row_dict.values())
@@ -234,7 +257,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     break
 
             if csv_valid:
-                bulk_generation = BulkGeneration(
+                bulk_generation = BulkInterview(
                     tenant=request.user.tenant,
                     interview=interview,
                     mongo_db_collection_name=dynamic_document_class_name,
@@ -246,12 +269,23 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 )
                 bulk_generation.save()
 
-                for document_data in mongo_documents_list:
+                el_document_list = list()
+                for mongo_document_data in mongo_document_data_list:
+                    school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
                     el_document = Document(
-                        name=""
-
+                        tenant=tenant,
+                        name=interview.name + " - em elaboração",
+                        status="rascunho",
+                        description=interview.description + " | " + interview.version + " | " + interview.date_available,
+                        interview=interview,
+                        school=school,
+                        bulk_generation=bulk_generation,
+                        mongo_id=mongo_document_data.id,
+                        submit_to_esignature=mongo_document_data.submit_to_esignature
                     )
+                    el_document_list.append(el_document)
 
+                Document.objects.bulk_create(el_document_list)
 
                 logger.info(
                     "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
@@ -261,7 +295,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
                 return render(
                     request,
-                    "bulk_interview/bulk_interview_validate_generate.html",
+                    "bulk_interview/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -272,10 +306,10 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
             else:
                 # TODO Testar se realmente apaga quando há erro Apaga a colecao do banco
-                dynamic_document.drop_collection()
+                mongo_document.drop_collection()
                 return render(
                     request,
-                    "bulk_interview/bulk_interview_validate_generate.html",
+                    "bulk_interview/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -286,8 +320,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
 
 @login_required
-def generate_bulk_documents(request, bulk_generation_id):
-    bulk_generation = BulkGeneration.objects.get(pk=bulk_generation_id)
+def generate_bulk_documents(request, bulk_interview_id):
+    bulk_generation = BulkInterview.objects.get(pk=bulk_interview_id)
     logger.info(
         "Usando a classe bulk_generation: {dynamic_document_class_name}".format(
             dynamic_document_class_name=bulk_generation.mongo_db_collection_name
@@ -423,7 +457,7 @@ def generate_bulk_documents(request, bulk_generation_id):
 
     return render(
         request,
-        "bulk_interview/bulk_interview_generation_result.html",
+        "bulk_interview/bulkinterview_generation_result.html",
         {"results_list": results_list},
     )
 
