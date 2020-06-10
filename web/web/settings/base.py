@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     "api",
     "document",
     "billing",
-    "bulk_interview",
 ]
 
 MIDDLEWARE = [

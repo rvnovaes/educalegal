@@ -1,8 +1,6 @@
 from datetime import datetime
 from mongoengine import *
 
-from .constants import VALID_FIELD_TYPES
-
 
 def create_mongo_connection(db, alias, username, password, host, port):
     connect(db, alias, username=username, password=password, host=host, port=port)

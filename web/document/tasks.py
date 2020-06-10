@@ -1,11 +1,12 @@
 from __future__ import absolute_import, unicode_literals
 import logging
-from requests.exceptions import ConnectionError
 import itertools
-from urllib3.exceptions import NewConnectionError
 from celery import shared_task
 
-from .docassemble_client import DocassembleClient
+from urllib3.exceptions import NewConnectionError
+from requests.exceptions import ConnectionError
+
+from util.docassemble_client import DocassembleClient
 
 logger = logging.getLogger(__name__)
 count_down = 5

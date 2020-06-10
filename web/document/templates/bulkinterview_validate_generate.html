@@ -4,12 +4,12 @@
     <br>
     {% if csv_valid %}
         <p>O arquivo foi validado. Clique no botão para gerar os documentos.</p>
-        <a href="{% url 'bulk_interview:bulk_interview_generation_result' bulk_generation_id %}" class="btn btn-success" >Gerar Lote</a>
+        <a href="{% url 'document:bulk_interview_generation_result' bulk_generation_id %}" class="btn btn-success" >Gerar Lote</a>
     {% else %}
         <label class="control-label">Baixe aqui o </label>
         <a target="_blank" href="https://atendimento.atlassian.net/wiki/spaces/EL/pages/40468495/Entrevista+em+lote?preview=%2F40468495%2F40501286%2Fcontrato-prestacao-servicos-educacionais.csv">layout
             do csv de importação (versão 1)</a> do contrato de prestação de serviços educacionais.
-        <form enctype="multipart/form-data" action="{% url 'bulk_interview:bulk_interview_validate_generate' interview_id %}"
+        <form enctype="multipart/form-data" action="{% url 'document:bulk_interview_validate_generate' interview_id %}"
               method="POST">
         {% csrf_token %}
         {{ form.non_field_errors }}

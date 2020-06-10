@@ -6,7 +6,7 @@ import pandas as pd
 from validator_collection import validators, checkers, errors
 import numpy as np
 
-from .constants import VALID_FIELD_TYPES
+from util.constants import VALID_FIELD_TYPES
 
 logger = logging.getLogger(__name__)
 

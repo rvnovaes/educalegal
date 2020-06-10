@@ -4,7 +4,31 @@ from django.contrib.postgres.fields import JSONField
 from tenant.models import TenantAwareModel
 from interview.models import Interview
 from school.models import School
-from bulk_interview.models import BulkInterview
+
+
+class BulkDocumentGeneration(TenantAwareModel):
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
+    interview = models.ForeignKey(
+        Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"
+    )
+    field_types_dict = JSONField(
+        null=False, default=dict, verbose_name="Campos do Modelo"
+    )
+    required_fields_dict = JSONField(
+        null=False, default=dict, verbose_name="Obrigatoriedade dos Campos do Modelo"
+    )
+    parent_fields_dict = JSONField(
+        default=dict, verbose_name="Objeto que contém o campo"
+    )
+    school_names_set = JSONField(
+        null=False, default=dict, verbose_name="Conjunto de Nomes de Escola"
+    )
+    school_units_names_set = JSONField(
+        null=False, default=dict, verbose_name="Conjunto de Nomes de Unidades Escolares"
+    )
+    mongo_db_collection_name = models.CharField(
+        max_length=1024, null=False, verbose_name="Coleção de Documentos no Mongo"
+    )
 
 
 class Document(TenantAwareModel):
@@ -46,7 +70,7 @@ class Document(TenantAwareModel):
     document_data = JSONField(null=True, verbose_name="Dados do Documento")
 
     bulk_generation = models.ForeignKey(
-        BulkInterview, null=True, on_delete=models.CASCADE, verbose_name="Criação em Lote"
+        BulkDocumentGeneration, null=True, on_delete=models.CASCADE, verbose_name="Criação em Lote"
     )
 
     mongo_id = models.CharField(max_length=256, null=True, blank=True, verbose_name="Id do documento no Mongo")

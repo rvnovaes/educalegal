@@ -1,7 +1,7 @@
 from django import forms
 
 
-class BulkInterviewForm(forms.Form):
+class BulkDocumentGenerationForm(forms.Form):
     source_file = forms.FileField(
         label="Selecione o arquivo csv",
         required=True,

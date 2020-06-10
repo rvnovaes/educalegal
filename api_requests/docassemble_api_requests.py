@@ -1,5 +1,4 @@
-import json
-from web.bulk_interview.docassemble_client import DocassembleClient
+from util.docassemble_client import DocassembleClient
 
 ###### LOCALHOST ######
 api_base_url = "http://localhost"

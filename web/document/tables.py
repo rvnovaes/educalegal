@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from django_tables2.utils import A
 
-from .models import Document
+from .models import Document, BulkDocumentGeneration
 
 
 class DocumentTable(tables.Table):
@@ -33,4 +33,24 @@ class DocumentTable(tables.Table):
             "status",
             "signing_provider",
             "ged_link",
+        )
+
+
+class BulkDocumentGenerationTable(tables.Table):
+    bulk_generation = tables.LinkColumn("document:bulk_interview-detail", args=[A("pk")])
+    created_date = tables.DateTimeColumn(format="d/m/Y H:i")
+    documentos = tables.TemplateColumn(
+        template_name="document/documentos_button.html", verbose_name="Documentos"
+    )
+
+    class Meta:
+        model = BulkDocumentGeneration
+        order_by = "-created_date"
+        template_name = "django_tables2/bootstrap4.html"
+        per_page = 20
+        fields = (
+            "created_date",
+            "interview",
+            "mongo_db_collection_name",
+            "documentos"
         )
