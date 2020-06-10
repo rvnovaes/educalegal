@@ -5,9 +5,6 @@ from celery import chain
 
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableView
-from django_tables2.paginators import LazyPaginator
-
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -23,17 +20,18 @@ from interview.util import build_interview_full_name
 from document.models import Document
 from document.tables import DocumentTable
 from util.mongo_util import (
-    create_mongo_connection,
     create_dynamic_document_class,
     mongo_to_hierarchical_dict,
 )
-from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
+from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
 from .models import BulkDocumentGeneration
 from .tasks import create_document, submit_to_esignature
 from .tables import BulkDocumentGenerationTable
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
@@ -44,26 +42,26 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
 class DocumentListView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView):
     model = Document
     table_class = DocumentTable
-    paginator_class = LazyPaginator
     context_object_name = "documents"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if "bulk_document_generation_id" in self.kwargs:
+            context['bulk_document_generation'] = BulkDocumentGeneration.objects.get(pk=self.kwargs["bulk_document_generation_id"])
+        return context
 
-create_mongo_connection(
-    settings.MONGO_DB,
-    settings.MONGO_ALIAS,
-    settings.MONGO_USERNAME,
-    settings.MONGO_PASSWORD,
-    settings.MONGO_HOST,
-    settings.MONGO_PORT,
-)
-
-logger = logging.getLogger(__name__)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if "bulk_document_generation_id" in self.kwargs:
+            return queryset.filter(bulk_generation=self.kwargs["bulk_document_generation_id"])
+        else:
+            return queryset
 
 
 class BulkDocumentGenerationListView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView):
     model = BulkDocumentGeneration
     table_class = BulkDocumentGenerationTable
-    context_object_name = "bulk_interviews"
+    context_object_name = "bulk_document_generations"
 
 
 class ValidateCSVFile(LoginRequiredMixin, View):
@@ -72,7 +70,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
         interview = Interview.objects.get(pk=self.kwargs["interview_id"])
         return render(
             request,
-            "bulkinterview_validate_generate.html",
+            "document/bulkinterview_validate_generate.html",
             {
                 "form": form,
                 "interview_id": interview.pk,
@@ -125,7 +123,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
                 return render(
                     request,
-                    "bulkinterview_validate_generate.html",
+                    "document/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -156,7 +154,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
                 return render(
                     request,
-                    "bulkinterview_validate_generate.html",
+                    "document/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -171,7 +169,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
                 return render(
                     request,
-                    "bulkinterview_validate_generate.html",
+                    "document/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -266,9 +264,9 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
                     el_document = Document(
                         tenant=tenant,
-                        name=interview.name + " - em elaboração",
+                        name=interview.name + " - rascunho",
                         status="rascunho",
-                        description=interview.description + " | " + interview.version + " | " + interview.date_available,
+                        description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
                         interview=interview,
                         school=school,
                         bulk_generation=bulk_generation,
@@ -287,7 +285,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
                 return render(
                     request,
-                    "bulkinterview_validate_generate.html",
+                    "document/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -301,7 +299,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 mongo_document.drop_collection()
                 return render(
                     request,
-                    "bulkinterview_validate_generate.html",
+                    "document/bulkinterview_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
@@ -330,24 +328,23 @@ def generate_bulk_documents(request, bulk_interview_id):
         school_units_names_set=list(bulk_generation.school_units_names_set),
     )
 
-    documents_collection = DynamicDocumentClass.objects
+    mongo_documents_collection = DynamicDocumentClass.objects
 
     # gera lista de documentos em lista de dicionarios
-    documents_list = list()
-    for document in documents_collection:
-        document = mongo_to_hierarchical_dict(document)
+    hierarchical_dict_list = list()
+    for mongo_document in mongo_documents_collection:
+        hierarchical_dict = mongo_to_hierarchical_dict(mongo_document)
 
-        documents_list.append(document)
+        hierarchical_dict_list.append(hierarchical_dict)
 
     # documents_collection = list(documents_collection)
     logger.info(
-        "Recuperados {n} documento(s) do Mongo".format(n=len(documents_collection))
+        "Recuperados {n} documento(s) do Mongo".format(n=len(mongo_documents_collection))
     )
 
     interview_variables_list = dict_to_docassemble_objects(
-        documents_list, interview.document_type.pk
+        hierarchical_dict_list, interview.document_type.pk
     )
-
     isc = InterviewServerConfig.objects.get(interviews=interview.pk)
     base_url = isc.base_url
     api_key = isc.user_key
@@ -420,6 +417,8 @@ def generate_bulk_documents(request, bulk_interview_id):
                 )
             )
 
+            el_document = Document.objects.get(mongo_id=interview_variables["mongo_id"])
+
             if interview_variables["submit_to_esignature"]:
                 result = chain(
                     create_document.s(
@@ -434,21 +433,21 @@ def generate_bulk_documents(request, bulk_interview_id):
                     ),
                 )()
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(parent_id=result.parent.id, child_id=result.id)
-                results_list.append(result_description)
+                el_document.task_create_document = result.parent.id
+                el_document.task_submit_to_esignature = result.id
+
             else:
                 result = create_document.delay(
                     base_url, api_key, secret, interview_full_name, interview_variables,
                 )
                 result_description = "Criação do documento: {id}".format(id=result.id)
-                results_list.append(result_description)
+                el_document.task_create_document = result.id
+            el_document.save()
+            logger.info(result_description)
 
     except Exception as e:
         message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
         logger.error(message)
         messages.error(request, message)
 
-    return render(
-        request,
-        "bulkinterview_generation_result.html",
-        {"results_list": results_list},
-    )
+    return DocumentListView.as_view()(request, bulk_document_generation_id=bulk_generation.pk)

@@ -37,7 +37,6 @@ class DocumentTable(tables.Table):
 
 
 class BulkDocumentGenerationTable(tables.Table):
-    bulk_generation = tables.LinkColumn("document:bulk_interview-detail", args=[A("pk")])
     created_date = tables.DateTimeColumn(format="d/m/Y H:i")
     documentos = tables.TemplateColumn(
         template_name="document/documentos_button.html", verbose_name="Documentos"
