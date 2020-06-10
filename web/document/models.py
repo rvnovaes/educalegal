@@ -4,6 +4,7 @@ from django.contrib.postgres.fields import JSONField
 from tenant.models import TenantAwareModel
 from interview.models import Interview
 from school.models import School
+from bulk_interview.models import BulkGeneration
 
 
 class Document(TenantAwareModel):

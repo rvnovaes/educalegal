@@ -19,6 +19,7 @@ from tenant.models import Tenant
 from school.models import School, SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
+from document.models import Document
 from bulk_import_util.mongo_util import (
     create_mongo_connection,
     create_dynamic_document_class,
@@ -195,8 +196,9 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 row_dict = row._asdict()
                 # Cria um objeto Documento a partir da classe dinamica
                 dynamic_document = DynamicDocumentClass(**row_dict)
+
                 try:
-                    dynamic_document.save()
+                    document_data = dynamic_document.save()
                     # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
                     # mensagem de sucesso
                     row_values = list(row_dict.values())
@@ -240,6 +242,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     school_units_names_set=list(school_units_names_set),
                 )
                 bulk_generation.save()
+
                 logger.info(
                     "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
                         dynamic_document_class_name=dynamic_document_class_name
@@ -258,7 +261,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 )
 
             else:
-                # Apaga a colecao do banco
+                # TODO Testar se realmente apaga quando há erro Apaga a colecao do banco
                 dynamic_document.drop_collection()
                 return render(
                     request,
