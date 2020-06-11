@@ -6,7 +6,7 @@ services:
     container_name: educalegal
     restart: unless-stopped
     build: .
-    command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8000"]
+    command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8008"]
     volumes:
       - type: bind
         source: .

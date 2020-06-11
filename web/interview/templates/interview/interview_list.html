@@ -11,7 +11,9 @@
   {% endif %}
     <h2>Modelos</h2>
       {% if interviews %}
-          {% render_table table %}
+          <div id="interview_table">
+            {% render_table table %}
+          </div>
       {% else %}
       <div class="alert alert-info" role="alert">
         Você não tem modelos disponíveis.
@@ -66,5 +68,30 @@
             let plan_upgrade_modal = $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
             plan_upgrade_modal.modal('show');
         });
+        $(".btn.btn-success.btn-sm").click(function() {
+            {#let api_url = window.location.host + "/v1/documents/";#}
+            let api_url = "http://localhost:8008/v1/documents/";
+            console.log(api_url);
+            let payload = {
+                name: "---",
+                status: "rascunho",
+                description: "descrição",
+                tenant: 2,
+                interview: 82
+            };
+            console.log(payload);
+
+            $.post({
+                api_url,
+                payload,
+                success: function(data){
+                    console.log(data)
+                }
+            })
+
+        });
     </script>
+
+
+
 {% endblock %}

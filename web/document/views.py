@@ -270,7 +270,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         interview=interview,
                         school=school,
                         bulk_generation=bulk_generation,
-                        mongo_id=mongo_document_data.id,
+                        unique_id=mongo_document_data.id,
                         submit_to_esignature=mongo_document_data.submit_to_esignature
                     )
                     el_document_list.append(el_document)
@@ -401,7 +401,6 @@ def generate_bulk_documents(request, bulk_interview_id):
         "test_mode": tenant.tenantesignaturedata.test_mode,
     }
 
-    results_list = list()
     try:
         secret = create_secret(base_url, api_key, username, user_password)
 
@@ -417,7 +416,7 @@ def generate_bulk_documents(request, bulk_interview_id):
                 )
             )
 
-            el_document = Document.objects.get(mongo_id=interview_variables["mongo_id"])
+            el_document = Document.objects.get(doc_uuid=interview_variables["doc_uuid"])
 
             if interview_variables["submit_to_esignature"]:
                 result = chain(

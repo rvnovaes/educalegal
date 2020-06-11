@@ -182,6 +182,7 @@ REST_FRAMEWORK = {
     #     "rest_framework.throttling.UserRateThrottle",
     # ],
     # "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "10000/day"},
+    # 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' => Usado para CoreAPI (Deprecado)
 }
 
 

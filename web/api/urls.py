@@ -41,7 +41,7 @@ urlpatterns = [
     ),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
-    path("docs/", include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
+    # path("docs/", include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
     # path("rest-auth/", include("rest_auth.urls")),
     # path("rest-auth/registration/", include('rest_auth.registration.urls')),
 ]

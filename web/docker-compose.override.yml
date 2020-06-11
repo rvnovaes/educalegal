@@ -10,7 +10,7 @@ services:
       DATABASE_HOST: db
       DATABASE_PORT: 5432
     ports:
-      - "8000:8000"
+      - "8008:8008"
     depends_on:
       - db
       - docassemble
@@ -33,7 +33,7 @@ services:
     volumes:
       - /opt/educalegal/docker_volumes/mayan:/var/lib/mayan
     ports:
-      - "8080:8000"
+      - "8000:8000"
     depends_on:
       - db_ged
       - redis

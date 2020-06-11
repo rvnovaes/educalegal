@@ -1,10 +1,13 @@
 import logging
+import uuid
 from enum import Enum
 from datetime import datetime
 
 from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
 from util.docassemble_client import DocassembleClient, DocassembleAPIException
+
+from .models import Document
 
 logger = logging.getLogger(__name__)
 
@@ -103,10 +106,10 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
             document["content_document"] = "acordos-individuais-trabalhistas-coronavirus.docx"
 
-        # remove campos herdados do mongo e que nao existem na entrevista
+        # remove campos herdados do mongo e que nao existem na entrevista e converte o objeto OB ID do mongo em campo doc_uuid
         mongo_id = str(document.get("id"))
         document.pop('id')
-        document["mongo_id"] = mongo_id
+        document["doc_uuid"] = mongo_id
         document.pop('created')
 
         interview_variables_list.append(document)
