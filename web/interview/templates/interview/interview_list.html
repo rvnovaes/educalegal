@@ -3,23 +3,23 @@
 {% load render_table from django_tables2 %}
 
 {% block body_block %}
-  {% if filter %}
-      <form action="" method="get" class="form form-inline" style="float: right">
-        {% bootstrap_form filter.form layout="inline" %}
-        {% bootstrap_button "Buscar" %}
-      </form>
-  {% endif %}
-    <h2>Modelos</h2>
-      {% if interviews %}
-          <div id="interview_table">
-            {% render_table table %}
-          </div>
-      {% else %}
-      <div class="alert alert-info" role="alert">
-        Você não tem modelos disponíveis.
-      </div>
+    {% if filter %}
+        <form action="" method="get" class="form form-inline" style="float: right">
+            {% bootstrap_form filter.form layout="inline" %}
+            {% bootstrap_button "Buscar" %}
+        </form>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <h2>Modelos</h2>
+    {% if interviews %}
+        <div id="interview_table">
+            {% render_table table %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Você não tem modelos disponíveis.
+        </div>
+    {% endif %}
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
     {% if user.tenant.school_set.count == 0 %}
         <div class="modal fade" id="tutorial_modal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -39,7 +39,7 @@
             </div>
         </div>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
     {% if reached_document_limit %}
         <div class="modal fade" id="plan_upgrade_modal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -48,46 +48,74 @@
                         <h5 class="modal-title">Faça um upgrade do seu plano!</h5>
                     </div>
                     <div class="modal-body">
-                        <p>Foi atingido o limite mensal de geração de {{ document_limit }} documentos para o plano contratado.</p>
+                        <p>Foi atingido o limite mensal de geração de {{ document_limit }} documentos para o plano
+                            contratado.</p>
                         <p>Entre em contato conosco e faça um upgrade de seu plano.</p>
                     </div>
                     <div class="modal-footer">
-                        <a href="https://www.educalegal.com.br/contato/" target="_blank" class="btn btn-primary">Entrar em contato</a>
+                        <a href="https://www.educalegal.com.br/contato/" target="_blank" class="btn btn-primary">Entrar
+                            em contato</a>
                     </div>
                 </div>
             </div>
         </div>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
-        $(window).on('load',function(){
+        $(window).on('load', function () {
             let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
             tutorial_modal.modal('show');
             let plan_upgrade_modal = $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
             plan_upgrade_modal.modal('show');
-        });
-        $(".btn.btn-success.btn-sm").click(function() {
-            {#let api_url = window.location.host + "/v1/documents/";#}
-            let api_url = "http://localhost:8008/v1/documents/";
-            console.log(api_url);
-            let payload = {
-                name: "---",
-                status: "rascunho",
-                description: "descrição",
-                tenant: 2,
-                interview: 82
-            };
-            console.log(payload);
 
-            $.post({
-                api_url,
-                payload,
-                success: function(data){
-                    console.log(data)
+        });
+
+        let clicked_button = $(".btn.btn-success.btn-sm").click(function () {
+            let csrftoken = $.cookie('csrftoken');
+            console.log(csrftoken)
+
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
                 }
-            })
+            });
+
+            $.ajax({
+                url: "http://localhost:8008/v1/documents/",
+                type: "post",
+                data:
+                    {
+                        name: "---",
+                        status: "rascunho",
+                        description: "descrição",
+                        tenant: 2,
+                        interview: 83
+                    },
+                datatype: "json",
+                success: function (data, status) {
+                    console.log(data);
+                    console.log(status);
+
+                    destination_link = clicked_button.attr("href") + "&doc_uuid=" + data["doc_uuid"];
+                    console.log(destination_link);
+                    let win = window.open(destination_link, "_blank");
+                    win.focus();
+                },
+                error: function (data, status) {
+                    console.log(data);
+                    console.log(status);
+                },
+            });
 
         });
     </script>
