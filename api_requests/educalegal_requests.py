@@ -56,7 +56,7 @@ if __name__ == "__main__":
     description = "Contrato de prestação de serviços educacionais entre aluno e escola. - 1.1 - 2020-01-23"
     tenant = 2
     # school = 1
-    interview = 37
+    interview = 83
     # related_documents = None
     # document_data = "test"
 
