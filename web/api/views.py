@@ -319,14 +319,9 @@ class DocumentViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentSerializer
 
     def partial_update(self, request, *args, **kwargs):
-        if "doc_uuid" in request.data["doc_uuid"]:
-            doc_uuid = request.data["doc_uuid"]
-            logger.debug("Atualizando o documento em lote {doc_uuid}".format(doc_uuid=str(doc_uuid)))
-            instance = self.queryset.get(doc_uuid)
-        elif "el_document_created_id" in request.data["el_document_created_id"]:
-            el_document_id = request.data["el_document_created_id"]
-            logger.debug("Atualizando o documento {el_document_id}".format(el_document_id=str(el_document_id)))
-            instance = self.queryset.get(pk=el_document_id)
+        doc_uuid = request.data["doc_uuid"]
+        logger.info("Atualizando o documento {doc_uuid}".format(doc_uuid=str(doc_uuid)))
+        instance = self.queryset.get(doc_uuid=doc_uuid)
         serializer = self.serializer_class(instance, data=request.data, partial=True)
         logger.debug(request.data)
         serializer.is_valid(raise_exception=True)

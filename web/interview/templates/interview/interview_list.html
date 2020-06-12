@@ -65,23 +65,33 @@
 {% block scripts %}
     <script type="text/javascript">
         $(window).on('load', function () {
-            let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
+            const tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
             tutorial_modal.modal('show');
-            let plan_upgrade_modal = $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
+            const plan_upgrade_modal = $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
             plan_upgrade_modal.modal('show');
 
         });
+        // Quando o usuário clica em um botão criar, um novo documento rascunho é criado.
+        $(".btn.btn-success.btn-sm").click(function (event) {
+            // Captura o cookie que contém o csrf token que será usado no post. Se não houver esse cookie, o post
+            // retorna 403 Forbidden
+            const csrftoken = $.cookie('csrftoken');
+            // Captura o atributo href do botão
+            const queryString = event.target.getAttribute("href");
+            console.log(queryString);
+            // O objeto urlParams permite buscar os parâmtros da URL do link. tid e intid serão usados para criar
+            // o documento rascunho
+            const urlParams = new URLSearchParams(queryString);
 
-        let clicked_button = $(".btn.btn-success.btn-sm").click(function () {
-            let csrftoken = $.cookie('csrftoken');
-            console.log(csrftoken)
+            // URL de origem da requisicao. Exemplo https://app.educalegal.com.br
+            const origin   = window.location.origin
 
+             // these HTTP methods do not require CSRF protection
             function csrfSafeMethod(method) {
-                // these HTTP methods do not require CSRF protection
                 return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-            }
+             }
 
-
+            // Como o método post requer CSRF, a consulta ajax que será feita a seguir terá no header o cookie de CSRF
             $.ajaxSetup({
                 beforeSend: function (xhr, settings) {
                     if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -90,23 +100,30 @@
                 }
             });
 
+            // Monta o payload do post com os valores constantes e toma o tid e intid do href do botão
+            const payload = {
+                name: "---",
+                status: "rascunho",
+                description: "Documento em elaboração...",
+                tenant: urlParams.get("tid"),
+                interview: urlParams.get("intid")
+            }
+
+
+
+            // Cria o registro do documento no banco do EducaLegal
             $.ajax({
-                url: "http://localhost:8008/v1/documents/",
+                url: origin + "/v1/documents/",
                 type: "post",
-                data:
-                    {
-                        name: "---",
-                        status: "rascunho",
-                        description: "descrição",
-                        tenant: 2,
-                        interview: 83
-                    },
+                data: payload,
                 datatype: "json",
+                // Em caso de sucesso, abre a nova janela, acrescentando ao href do botão o doc_uuid gerado
+                // Esse doc_uuid deverá ser usado pelo servidor de geração de documentos para identificar de modo único
+                // cada documento
                 success: function (data, status) {
                     console.log(data);
                     console.log(status);
-
-                    destination_link = clicked_button.attr("href") + "&doc_uuid=" + data["doc_uuid"];
+                    destination_link = event.target.getAttribute("href") + "&doc_uuid=" + data["doc_uuid"];
                     console.log(destination_link);
                     let win = window.open(destination_link, "_blank");
                     win.focus();
@@ -116,10 +133,6 @@
                     console.log(status);
                 },
             });
-
         });
     </script>
-
-
-
 {% endblock %}
