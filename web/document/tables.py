@@ -50,6 +50,6 @@ class BulkDocumentGenerationTable(tables.Table):
         fields = (
             "created_date",
             "interview",
-            "mongo_db_collection_name",
+            "status",
             "documentos"
         )

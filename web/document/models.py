@@ -30,6 +30,8 @@ class BulkDocumentGeneration(TenantAwareModel):
     mongo_db_collection_name = models.CharField(
         max_length=1024, null=False, verbose_name="Coleção de Documentos no Mongo"
     )
+    status = models.CharField(max_length=256, default="", verbose_name="Status")
+
 
 
 class Document(TenantAwareModel):
@@ -76,6 +78,10 @@ class Document(TenantAwareModel):
     task_create_document = models.CharField(max_length=256, default="", verbose_name="Task de criação de documento")
     task_submit_to_esignature = models.CharField(max_length=256, default="", verbose_name="Task de assinatura")
     submit_to_esignature = models.BooleanField(default=False, verbose_name="Enviar para assinatura eletrônica?")
+
+    mongo_uuid = models.CharField(
+        max_length=256, default="", verbose_name="UUID do Mongo"
+    )
 
     def __str__(self):
         return self.name + " - " + self.school.name

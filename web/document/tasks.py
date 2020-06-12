@@ -46,9 +46,9 @@ def create_document(
             raise self.retry(countdown=count_down ** self.request.retries)
         else:
             logger.info(
-                "Tentando gerar entrevista {interview_full_name} com os dados {interview_variables} ...".format(
+                "Tentando gerar entrevista {interview_full_name} para o documento {doc_uuid} ...".format(
                     interview_full_name=interview_full_name,
-                    interview_variables=str(dict(itertools.islice(interview_variables.items(), 5)))
+                    doc_uuid=interview_variables["url_args"]["doc_uuid"]
                 )
             )
 
