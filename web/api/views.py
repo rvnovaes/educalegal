@@ -18,7 +18,7 @@ from rest_framework import viewsets
 from web.settings import BASE_DIR
 
 from billing.models import Plan
-from document.models import Document, DocumentESignatureLog
+from document.models import Document, DocumentESignatureLog, SignerLog
 from interview.models import Interview
 from school.models import School
 from tenant.models import Tenant, TenantGedData, TenantESignatureData
@@ -75,6 +75,7 @@ def docusign_xml_parser(data):
     envelope_data["envelope_sent"] = xml["EnvelopeStatus"]["Sent"]
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
 
+    # copia com .copy() pra criar outro objeto
     envelope_data_translated = envelope_data.copy()
 
     #formatting strings: 2020-04-15T11:20:19.693
@@ -93,24 +94,25 @@ def docusign_xml_parser(data):
     else:
         envelope_data_translated["envelope_status"] = 'não encontrado'
 
-    e_status_detail = (
-        "ID do envelope: "
-        + envelope_data_translated["envelope_id"]
-        + "<br>"
-        + "Status do envelope: "
-        + envelope_data_translated["envelope_status"]
-        + "<br>"
-        + "Data de criação: "
-        + envelope_data_translated["envelope_created"]
-        + "<br>"
-        + "Data de envio: "
-        + envelope_data_translated["envelope_sent"]
-        + "<br>"
-        + "Criação do envelope: "
-        + envelope_data_translated["envelope_time_generated"]
-        + "<br>"
-    )
-    envelope_data["envelope_status_detail_message"] = e_status_detail
+    # e_status_detail = (
+    #     "ID do envelope: "
+    #     + envelope_data_translated["envelope_id"]
+    #     + "<br>"
+    #     + "Status do envelope: "
+    #     + envelope_data_translated["envelope_status"]
+    #     + "<br>"
+    #     + "Data de criação: "
+    #     + envelope_data_translated["envelope_created"]
+    #     + "<br>"
+    #     + "Data de envio: "
+    #     + envelope_data_translated["envelope_sent"]
+    #     + "<br>"
+    #     + "Criação do envelope: "
+    #     + envelope_data_translated["envelope_time_generated"]
+    #     + "<br>"
+    # )
+    # envelope_data["envelope_status_detail_message"] = e_status_detail
+
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
 
     # translation of the type and status of the recipient
@@ -126,31 +128,31 @@ def docusign_xml_parser(data):
         else:
             recipient_status['Status'] = 'não encontrado'
 
-    r_status_detail = ""
-    for r in recipient_statuses:
-        r_status_detail += (
-            r["RoutingOrder"]
-            + " - "
-            + r["UserName"]
-            + " - "
-            + r["Email"]
-            + " - "
-            + r["Type"]
-            + " - "
-            + r["Status"]
-            + "<br>"
-        )
-    envelope_data["envelope_recipient_status_detail_message"] = r_status_detail
-    all_details = (
-        "<b> Detalhes do Envelope </b><br>"
-        + e_status_detail
-        + "<br>"
-        + "<b> Detalhes dos Destinatários </b><br>"
-        + r_status_detail
-        + "<br>"
-    )
-    envelope_data["envelope_all_details_message"] = all_details
-    return envelope_data
+    # r_status_detail = ""
+    # for r in recipient_statuses:
+    #     r_status_detail += (
+    #         r["RoutingOrder"]
+    #         + " - "
+    #         + r["UserName"]
+    #         + " - "
+    #         + r["Email"]
+    #         + " - "
+    #         + r["Type"]
+    #         + " - "
+    #         + r["Status"]
+    #         + "<br>"
+    #     )
+    # envelope_data["envelope_recipient_status_detail_message"] = r_status_detail
+    # all_details = (
+    #     "<b> Detalhes do Envelope </b><br>"
+    #     + e_status_detail
+    #     + "<br>"
+    #     + "<b> Detalhes dos Destinatários </b><br>"
+    #     + r_status_detail
+    #     + "<br>"
+    # )
+    # envelope_data["envelope_all_details_message"] = all_details
+    return envelope_data, envelope_data_translated, recipient_statuses
 
 
 def docusign_pdf_files_saver(data, envelope_dir):
@@ -205,9 +207,8 @@ def docusign_webhook_listener(request):
     logger.debug(request.content_type)
     data = request.body  # This is the entire incoming POST content in Django
     try:
-        envelope_data = docusign_xml_parser(
-            data
-        )  # Parses XML data and returns a dictionary and formated messages
+        # Parses XML data and returns a dictionary and formated messages
+        envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
         logger.debug(envelope_data["envelope_id"])
         logger.debug(envelope_data["envelope_time_generated"])
         logger.debug(envelope_data["envelope_all_details_message"])
@@ -233,62 +234,77 @@ def docusign_webhook_listener(request):
     document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
     envelope_status = str(envelope_data["envelope_status"]).lower()
 
-    tenant = Tenant.objects.get(pk=document.tenant.pk)
-    # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
-    if envelope_status == "completed" and tenant.plan.use_ged:
-        try:
-            (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
-                data, envelope_dir
-            )
-            logger.debug(envelope_data)
-
-            # Get document related interview data to post to GED
-            interview = Interview.objects.get(pk=document.interview.pk)
-            document_type_pk = interview.document_type.pk
-            document_language = interview.language
-
-            # Post documents to GED
-            tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
-            mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
-
-            for pdf in envelope_data["pdf_documents"]:
-                response = mc.document_create(
-                    pdf["full_filename"],
-                    document_type_pk,
-                    pdf["filename"],
-                    document_language,
-                    pdf["description"],
+    if envelope_status == "completed":
+        tenant = Tenant.objects.get(pk=document.tenant.pk)
+        # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
+        if tenant.plan.use_ged:
+            try:
+                (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
+                    data, envelope_dir
                 )
-                logger.debug("Posting document to GED: " + pdf["filename"])
-                logger.debug(response.text)
+                logger.debug(envelope_data)
 
-        except Exception as e:
-            msg = str(e)
-            logger.exception(msg)
-            return HttpResponse(msg)
+                # Get document related interview data to post to GED
+                interview = Interview.objects.get(pk=document.interview.pk)
+                document_type_pk = interview.document_type.pk
+                document_language = interview.language
+
+                # Post documents to GED
+                tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
+                mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
+
+                for pdf in envelope_data["pdf_documents"]:
+                    response = mc.document_create(
+                        pdf["full_filename"],
+                        document_type_pk,
+                        pdf["filename"],
+                        document_language,
+                        pdf["description"],
+                    )
+                    logger.debug("Posting document to GED: " + pdf["filename"])
+                    logger.debug(response.text)
+
+            except Exception as e:
+                msg = str(e)
+                logger.exception(msg)
+                return HttpResponse(msg)
 
     if envelope_status in envelope_statuses.keys():
         document.status = envelope_statuses[envelope_status]
     else:
         document.status = "não encontrado"
 
-    if envelope_status == "completed":
-        log = ""
-        for pdf in envelope_data["pdf_documents"]:
-            log += pdf["filename"] + "<br>"
-
-        log += "<br>"
-        esignature_log_documents = DocumentESignatureLog(
-            esignature_log=log, document=document,
-        )
-        esignature_log_documents.save()
-
-    esignature_log_messages = DocumentESignatureLog(
-        esignature_log=envelope_data["envelope_all_details_message"], document=document,
-    )
-    esignature_log_messages.save()
-
     document.save()
+
+    # if envelope_status == "completed":
+    #     log = ""
+    #     for pdf in envelope_data["pdf_documents"]:
+    #         log += pdf["filename"] + "<br>"
+    #
+    #     log += "<br>"
+    #     esignature_log_documents = DocumentESignatureLog(
+    #         esignature_log=log, document=document,
+    #     )
+    #     esignature_log_documents.save()
+
+    esignature_log = DocumentESignatureLog(
+        envelope_id=envelope_data['envelope_id'],
+        status=envelope_data['envelope_status'],
+        created_date=envelope_data['envelope_created'],
+        sent_date=envelope_data['envelope_sent'],
+        status_update_date=envelope_data['envelope_time_generated'],
+        document=document,
+    )
+    esignature_log.save()
+
+    for recipient_status in recipient_statuses:
+        singer_log = SignerLog(
+            name=recipient_status['UserName'],
+            email=recipient_status['Email'],
+            status=recipient_status['Status'],
+            document_esignature_log=esignature_log,
+        )
+        singer_log.save()
 
     return HttpResponse("Success!")
 

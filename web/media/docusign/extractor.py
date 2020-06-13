@@ -1,5 +1,6 @@
 import xmltodict
 
+
 def docusign_xml_parser(data):
     envelope_data = dict()
     xml = xmltodict.parse(data)['DocuSignEnvelopeInformation']
@@ -65,7 +66,6 @@ def docusign_xml_parser(data):
 
 
 if __name__ == '__main__':
-
     with open("4a07d560-5a76-4aa8-80e3-fe0489d6ba37/2020-02-29T10_49_11.6502835.xml", 'r') as file:
         print(docusign_xml_parser(file.read())['envelope_all_details_message'])
 
@@ -74,10 +74,3 @@ if __name__ == '__main__':
 
     with open("4a07d560-5a76-4aa8-80e3-fe0489d6ba37/2020-02-29T10_52_54.4970792.xml", 'r') as file:
         print(docusign_xml_parser(file.read())['envelope_all_details_message'])
-
-
-
-
-
-
-
