@@ -17,5 +17,6 @@ urlpatterns = [
     path("bulk_document_generation/", BulkDocumentGenerationListView.as_view(), name="bulk-document-generation-list"),
     path("bulk_document_generation/<int:bulk_document_generation_id>", DocumentListView.as_view(), name="bulk-document-generation-document-list"),
     path("bulk_document_generation/validate/<int:interview_id>", ValidateCSVFile.as_view(), name="bulk-document-generation-validate-generate"),
+    # TODO chamar via ajax
     path("bulk_document_generation/generate/<int:bulk_interview_id>", generate_bulk_documents, name="bulk-document-generation-result"),
 ]

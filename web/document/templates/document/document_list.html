@@ -17,6 +17,11 @@
                             <span class="font-weight-bold">Modelo: </span>{{ bulk_document_generation.interview.name }}</li>
                         <li class="list-group-item">
                             <span class="font-weight-bold">Coleção: </span>{{ bulk_document_generation.mongo_db_collection_name }}</li>
+                        {% if bulk_document_generation.status == "não executada"%}
+                        <li class="list-group-item">
+                            <button class="btn btn-danger btn-sm">Executar</button></li>
+                        {% endif %}
+
                     </ul>
                 </div>
             </div>
@@ -55,6 +60,26 @@
         $(window).on('load',function(){
             let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
             tutorial_modal.modal('show');
+        });
+
+        // Dispara a criação de documentos em lote
+        $(".btn.btn-danger.btn-sm").click(function (event) {
+
+            // URL de origem da requisicao. Exemplo https://app.educalegal.com.br
+            const origin   = window.location.origin
+
+            $.ajax({
+                url: origin + "/document/bulk_document_generation/generate/" + {{ bulk_document_generation.pk }},
+                type: "get",
+                success: function (data, status) {
+                    console.log(data);
+                    console.log(status);
+                },
+                error: function (data, status) {
+                    console.log(data);
+                    console.log(status);
+                },
+            });
         });
     </script>
 {% endblock %}

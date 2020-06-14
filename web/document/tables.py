@@ -30,6 +30,7 @@ class DocumentTable(tables.Table):
             "school",
             "created_date",
             "altered_date",
+            "submit_to_esignature",
             "status",
             "signing_provider",
             "ged_link",

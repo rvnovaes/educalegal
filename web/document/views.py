@@ -1,4 +1,5 @@
 import logging
+import json
 import pandas as pd
 from mongoengine.errors import ValidationError
 from celery import chain
@@ -9,7 +10,7 @@ from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, HttpResponse
 from django.views import View
 
 from tenant.models import Tenant
@@ -456,14 +457,11 @@ def generate_bulk_documents(request, bulk_interview_id):
         bulk_document_generation.status = "executada"
 
         bulk_document_generation.save()
-        #
-        # return render(request,
-        #               "document/document_list.html",
-        #               {"bulk_document_generation": bulk_document_generation,
-        #                "documents": documents,
-        #                "table": DocumentTable(documents)})
 
-        return redirect("/document/bulk_document_generation/" + str(bulk_document_generation.pk))
+        payload = {
+            "message": "A tarefa foi enviada para execução"
+        }
+        return HttpResponse(json.dumps(payload), content_type="application/json")
 
     except Exception as e:
         message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
