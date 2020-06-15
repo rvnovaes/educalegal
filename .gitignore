@@ -133,6 +133,8 @@ dmypy.json
 /docker_volumes/mayan/
 /docker_volumes/rabbitmq/
 /docker_volumes/mongo_db/
+/docker_volumes/rabbitmq_app/
+/docker_volumes/rabbitmq_ged/
 
 /web/media/dump.yaml
 /web/static/admin/
