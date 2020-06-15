@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     "bootstrap4",
     # Django models currency
     "djmoney",
-    "google_analytics",
     # Local
     "tenant",
     "users",
