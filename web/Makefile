@@ -10,6 +10,8 @@ ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 else ifeq ($(e), nodebug)
 	docker-compose up -d
+else ifeq ($(e), test)
+	docker-compose up -d
 else
 	docker-compose up
 endif
@@ -22,6 +24,8 @@ restart: stop run
 collectstatic:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py collectstatic --noinput
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run educalegal python manage.py collectstatic --noinput
 else
 	docker-compose run educalegal python manage.py collectstatic --noinput
 endif
@@ -29,6 +33,8 @@ endif
 migrate:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py migrate --noinput
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run educalegal python manage.py migrate --noinput
 else
 	docker-compose run educalegal python manage.py migrate --noinput
 endif
@@ -36,6 +42,8 @@ endif
 makemigrations:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py makemigrations --noinput
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run educalegal python manage.py makemigrations --noinput
 else
 	docker-compose run educalegal python manage.py makemigrations --noinput
 endif
