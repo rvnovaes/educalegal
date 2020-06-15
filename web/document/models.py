@@ -33,7 +33,6 @@ class BulkDocumentGeneration(TenantAwareModel):
     status = models.CharField(max_length=256, default="", verbose_name="Status")
 
 
-
 class Document(TenantAwareModel):
     name = models.CharField(max_length=512, verbose_name="Nome")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
@@ -101,3 +100,86 @@ class DocumentESignatureLog(TenantAwareModel):
 
     def __str__(self):
         return self.esignature_log + " | " + str(self.created_date)
+
+
+class DocumentTaskView(TenantAwareModel):
+
+    name = models.CharField(max_length=512, verbose_name="Nome")
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
+    altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
+    signing_provider = models.CharField(
+        max_length=256, default="", verbose_name="Provedor"
+    )
+    envelope_id = models.CharField(
+        max_length=256, default="", verbose_name="Id do Envelope"
+    )
+    document_status = models.CharField(max_length=256, default="", verbose_name="Status do Documento")
+    ged_id = models.CharField(
+        max_length=128, default="", verbose_name="ID do Documento no GED"
+    )
+    ged_link = models.CharField(max_length=256, default="", verbose_name="Link")
+    ged_uuid = models.CharField(
+        max_length=256,
+        default="",
+        help_text="UUID do documento. UUID = Universally Unique ID.",
+        verbose_name="UUID",
+    )
+    description = models.TextField(default="", verbose_name="Descrição")
+    interview = models.ForeignKey(
+        Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"
+    )
+    school = models.ForeignKey(
+        School, null=True, on_delete=models.CASCADE, verbose_name="Escola"
+    )
+    related_documents = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="documents",
+    )
+    document_data = JSONField(null=True, verbose_name="Dados do Documento")
+
+    bulk_generation = models.ForeignKey(
+        BulkDocumentGeneration, null=True, on_delete=models.CASCADE, verbose_name="Criação em Lote"
+    )
+    doc_uuid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="UUID")
+    task_create_document = models.CharField(max_length=256, default="", verbose_name="Task de criação de documento")
+    task_submit_to_esignature = models.CharField(max_length=256, default="", verbose_name="Task de assinatura")
+    submit_to_esignature = models.BooleanField(default=False, verbose_name="Enviar para assinatura eletrônica?")
+
+    mongo_uuid = models.CharField(
+        max_length=256, default="", verbose_name="UUID do Mongo"
+    )
+
+    task_name = models.CharField(
+        null=True, max_length=255,
+        verbose_name='Nome da Task',
+        )
+
+    task_status = models.CharField(
+        max_length=50,
+        verbose_name="Status da Task",
+    )
+
+    task_created_date = models.DateTimeField(
+        auto_now_add=True, db_index=True,
+        verbose_name= 'Criação da Task',
+
+    )
+    task_done_date = models.DateTimeField(
+        auto_now=True, db_index=True,
+        verbose_name='Término da Task'
+    )
+    traceback = models.TextField(
+        blank=True, null=True,
+        verbose_name="Traceback"
+    )
+
+    def __str__(self):
+        return self.name + " - " + self.task_status
+
+    class Meta:
+        managed = False
+        db_table = 'document_task'
+

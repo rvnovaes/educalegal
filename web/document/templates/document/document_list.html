@@ -14,12 +14,15 @@
                             <span class="font-weight-bold">Data de Criação: </span>{{ bulk_document_generation.created_date|date:"d/m/Y H:i" }}
                         </li>
                         <li class="list-group-item">
-                            <span class="font-weight-bold">Modelo: </span>{{ bulk_document_generation.interview.name }}</li>
+                            <span class="font-weight-bold">Modelo: </span>{{ bulk_document_generation.interview.name }}
+                        </li>
                         <li class="list-group-item">
-                            <span class="font-weight-bold">Coleção: </span>{{ bulk_document_generation.mongo_db_collection_name }}</li>
-                        {% if bulk_document_generation.status == "não executada"%}
-                        <li class="list-group-item">
-                            <button class="btn btn-danger btn-sm">Executar</button></li>
+                            <span class="font-weight-bold">Coleção: </span>{{ bulk_document_generation.mongo_db_collection_name }}
+                        </li>
+                        {% if bulk_document_generation.status == "não executada" %}
+                            <li class="list-group-item">
+                                <button class="btn btn-danger btn-sm">Executar</button>
+                            </li>
                         {% endif %}
 
                     </ul>
@@ -27,13 +30,14 @@
             </div>
         {% endif %}
         <br/>
+        <div id="progressbar"></div>
         {% render_table table %}
     {% else %}
         <div class="alert alert-info" role="alert">
             Você não criou nenhum documento.
         </div>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
     {% if user.tenant.school_set.count == 0 %}
         <div class="modal fade" id="tutorial_modal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -53,33 +57,68 @@
             </div>
         </div>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
-        $(window).on('load',function(){
+        $(window).on('load', function () {
             let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
             tutorial_modal.modal('show');
         });
 
-        // Dispara a criação de documentos em lote
-        $(".btn.btn-danger.btn-sm").click(function (event) {
+        function sleep(milliseconds) {
+            const date = Date.now();
+            let currentDate = null;
+            do {
+                currentDate = Date.now();
+            } while (currentDate - date < milliseconds);
+        }
+
+        function update_progress_bar(total_task_size) {
+            $.get(origin + "/document/bulk_document_generation/generate/progress/" + {{ bulk_document_generation.pk }})
+                .done(function (data, status) {
+                    console.log(data);
+                    console.log(status);
+                    let processed_task_size = data["processed_task_size"];
+                    $("#progressbar").progressbar({
+                        max: total_task_size,
+                        value: processed_task_size
+                    });
+                    if (processed_task_size < total_task_size) {
+                        sleep(2000);
+                        update_progress_bar(total_task_size);
+                    }
+                })
+                .fail(function (data, status) {
+                    console.log(data);
+                    console.log(status);
+
+                })
+
+        }
+
+        // Dispara a criação de documentos em lote/
+        const executar_button = $(".btn.btn-danger.btn-sm").click(function () {
 
             // URL de origem da requisicao. Exemplo https://app.educalegal.com.br
-            const origin   = window.location.origin
+            const origin = window.location.origin
 
-            $.ajax({
-                url: origin + "/document/bulk_document_generation/generate/" + {{ bulk_document_generation.pk }},
-                type: "get",
-                success: function (data, status) {
+            let total_task_size = 0;
+            let processed_task_size = 0;
+
+            $.get(origin + "/document/bulk_document_generation/generate/" + {{ bulk_document_generation.pk }})
+                .done(function (data, status) {
                     console.log(data);
                     console.log(status);
-                },
-                error: function (data, status) {
+                    executar_button.hide();
+                    total_task_size = data["total_task_size"];
+                    update_progress_bar(total_task_size);
+
+                })
+                .fail(function (data, status) {
                     console.log(data);
                     console.log(status);
-                },
-            });
+                });
         });
     </script>
 {% endblock %}

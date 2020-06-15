@@ -18,19 +18,17 @@ from tenant.mixins import TenantAwareViewMixin
 from school.models import SchoolUnit
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
-from document.models import Document
-from document.tables import DocumentTable
 from util.mongo_util import (
     create_dynamic_document_class,
     mongo_to_hierarchical_dict,
 )
-
 from util.file_import import is_csv_metadata_valid, is_csv_content_valid
+
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
-from .models import BulkDocumentGeneration
+from .models import Document, BulkDocumentGeneration, DocumentTaskView
 from .tasks import create_document, submit_to_esignature
-from .tables import BulkDocumentGenerationTable
+from .tables import DocumentTable, BulkDocumentGenerationTable
 
 logger = logging.getLogger(__name__)
 
@@ -312,8 +310,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
 
 @login_required
-def generate_bulk_documents(request, bulk_interview_id):
-    bulk_document_generation = BulkDocumentGeneration.objects.get(pk=bulk_interview_id)
+def generate_bulk_documents(request, bulk_document_generation_id):
+    bulk_document_generation = BulkDocumentGeneration.objects.get(pk=bulk_document_generation_id)
     logger.info(
         "Usando a classe bulk_generation: {dynamic_document_class_name}".format(
             dynamic_document_class_name=bulk_document_generation.mongo_db_collection_name
@@ -412,6 +410,8 @@ def generate_bulk_documents(request, bulk_interview_id):
     try:
         secret = create_secret(base_url, api_key, username, user_password)
 
+        total_task_size = 0
+
         for i, interview_variables in enumerate(interview_variables_list):
             # Recupera o registro do documento no Educa Legal e passa o doc_uuid como url_args
             el_document = Document.objects.get(mongo_uuid=interview_variables["mongo_uuid"])
@@ -422,7 +422,7 @@ def generate_bulk_documents(request, bulk_interview_id):
             interview_variables["tenant_ged_data"] = tenant_ged_data
             interview_variables["tenant_esignature_data"] = tenant_esignature_data
             logger.info(
-                "Enviando tarefa {n} de {t}".format(
+                "Enviando documento {n} de {t}".format(
                     n=str(i + 1), t=len(interview_variables_list)
                 )
             )
@@ -443,6 +443,7 @@ def generate_bulk_documents(request, bulk_interview_id):
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(parent_id=result.parent.id, child_id=result.id)
                 el_document.task_create_document = result.parent.id
                 el_document.task_submit_to_esignature = result.id
+                total_task_size += 2
 
             else:
                 result = create_document.delay(
@@ -450,15 +451,19 @@ def generate_bulk_documents(request, bulk_interview_id):
                 )
                 result_description = "Criação do documento: {id}".format(id=result.id)
                 el_document.task_create_document = result.id
+                total_task_size += 1
+
+            request.session["total_task_size"] = total_task_size
 
             el_document.save()
             logger.info(result_description)
 
-        bulk_document_generation.status = "executada"
+        bulk_document_generation.status = "em andamento..."
 
         bulk_document_generation.save()
 
         payload = {
+            "total_task_size": total_task_size,
             "message": "A tarefa foi enviada para execução"
         }
         return HttpResponse(json.dumps(payload), content_type="application/json")
@@ -467,5 +472,40 @@ def generate_bulk_documents(request, bulk_interview_id):
         message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
         logger.error(message)
         messages.error(request, message) #TODO tela de erro e tratamento do erro
+
+
+@login_required
+def bulk_generation_progress(request, bulk_document_generation_id):
+    document_task_view = DocumentTaskView.objects.filter(bulk_generation_id=bulk_document_generation_id).values("task_status")
+    processed_task_size = 0
+    success_task_size = 0
+    failure_task_size = 0
+
+    if len(document_task_view) > 0:
+        success_task_size = len([x for x in document_task_view if x["task_status"] == "SUCCESS"])
+        failure_task_size = len([x for x in document_task_view if x["task_status"] == "FAILURE"])
+        processed_task_size = success_task_size + failure_task_size
+
+    if request.session["total_task_size"] == processed_task_size:
+        bulk_document_generation = BulkDocumentGeneration.objects.get(pk=bulk_document_generation_id)
+        if request.session["total_task_size"] == success_task_size:
+            bulk_document_generation.status = "concluída com sucesso"
+        if request.session["total_task_size"] > success_task_size:
+            bulk_document_generation.status = "concluída com erros"
+        bulk_document_generation.save()
+        del request.session["total_task_size"]
+
+    payload = {
+        "processed_task_size": processed_task_size,
+        "success_task_size": success_task_size,
+        "failure_task_size": failure_task_size
+    }
+
+    logger.info(payload)
+
+    return HttpResponse(json.dumps(payload), content_type="application/json")
+
+
+
 
 
