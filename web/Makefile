@@ -11,7 +11,7 @@ ifeq ($(e), prod)
 else ifeq ($(e), nodebug)
 	docker-compose up -d
 else ifeq ($(e), test)
-	docker-compose up -d
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d
 else
 	docker-compose up
 endif
