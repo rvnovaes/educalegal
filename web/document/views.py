@@ -464,6 +464,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
 
         payload = {
             "total_task_size": total_task_size,
+            "bulk_status": bulk_document_generation.status,
             "message": "A tarefa foi enviada para execução"
         }
         return HttpResponse(json.dumps(payload), content_type="application/json")
@@ -477,6 +478,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
 @login_required
 def bulk_generation_progress(request, bulk_document_generation_id):
     document_task_view = DocumentTaskView.objects.filter(bulk_generation_id=bulk_document_generation_id).values("task_status")
+    bulk_document_generation = BulkDocumentGeneration.objects.get(pk=bulk_document_generation_id).values("status")
     processed_task_size = 0
     success_task_size = 0
     failure_task_size = 0
@@ -487,7 +489,6 @@ def bulk_generation_progress(request, bulk_document_generation_id):
         processed_task_size = success_task_size + failure_task_size
 
     if request.session["total_task_size"] == processed_task_size:
-        bulk_document_generation = BulkDocumentGeneration.objects.get(pk=bulk_document_generation_id)
         if request.session["total_task_size"] == success_task_size:
             bulk_document_generation.status = "concluída com sucesso"
         if request.session["total_task_size"] > success_task_size:
@@ -498,8 +499,11 @@ def bulk_generation_progress(request, bulk_document_generation_id):
     payload = {
         "processed_task_size": processed_task_size,
         "success_task_size": success_task_size,
-        "failure_task_size": failure_task_size
+        "failure_task_size": failure_task_size,
+        "bulk_status": bulk_document_generation.status
     }
+
+
 
     logger.info(payload)
 

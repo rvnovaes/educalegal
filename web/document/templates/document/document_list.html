@@ -6,7 +6,8 @@
         {% if bulk_document_generation %}
             <div class="card">
                 <div class="card-header">
-                    <h4>Geração em Lote de Documentos - {{ bulk_document_generation.status }}</h4>
+                    <h4>Geração em Lote de Documentos - <span
+                            id="bulk_status_text">{{ bulk_document_generation.status }}</span></h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
@@ -30,7 +31,9 @@
             </div>
         {% endif %}
         <br/>
-        <div id="progressbar"></div>
+        <div id="progressbar">
+            <div class="progress-label">Iniciando...</div>
+        </div>
         {% render_table table %}
     {% else %}
         <div class="alert alert-info" role="alert">
@@ -66,6 +69,11 @@
             tutorial_modal.modal('show');
         });
 
+        const origin = window.location.origin
+        const bulk_status_text = $("#bulk_status_text");
+        const progress_bar = $("#progressbar");
+        const progress_label = $(".progress-label");
+
         function sleep(milliseconds) {
             const date = Date.now();
             let currentDate = null;
@@ -80,40 +88,53 @@
                     console.log(data);
                     console.log(status);
                     let processed_task_size = data["processed_task_size"];
-                    $("#progressbar").progressbar({
+
+                    progress_bar.progressbar({
                         max: total_task_size,
-                        value: processed_task_size
+                        value: processed_task_size,
+                        change: function () {
+                            progress_label.text(processed_task_size + " de " + total_task_size);
+                        },
+                        complete: function () {
+                            progress_label.text("Fim!");
+                            bulk_status_text.text(data["bulk_status"]);
+                            bulk_status_text.css("visibility", "visible");
+                        }
                     });
                     if (processed_task_size < total_task_size) {
-                        sleep(2000);
+                        sleep(3000);
                         update_progress_bar(total_task_size);
                     }
                 })
                 .fail(function (data, status) {
                     console.log(data);
                     console.log(status);
-
                 })
-
         }
 
         // Dispara a criação de documentos em lote/
         const executar_button = $(".btn.btn-danger.btn-sm").click(function () {
+            executar_button.hide();
+            bulk_status_text.text(data["bulk_status"]);
+            bulk_status_text.each(function () {
+                let elem = $(this);
+                setInterval(function () {
+                    if (elem.css("visibility") == "hidden") {
+                        elem.css("visibility", "visible");
+                    } else {
+                        elem.css("visibility", "hidden");
+                    }
+                }, 500);
+            });
 
-            // URL de origem da requisicao. Exemplo https://app.educalegal.com.br
-            const origin = window.location.origin
-
+            // Representa o número de tarefas de criação de documentos + assinatura de documentos
             let total_task_size = 0;
-            let processed_task_size = 0;
 
             $.get(origin + "/document/bulk_document_generation/generate/" + {{ bulk_document_generation.pk }})
                 .done(function (data, status) {
-                    console.log(data);
-                    console.log(status);
-                    executar_button.hide();
                     total_task_size = data["total_task_size"];
+                    bulk_status_text.text("")
                     update_progress_bar(total_task_size);
-
                 })
                 .fail(function (data, status) {
                     console.log(data);
