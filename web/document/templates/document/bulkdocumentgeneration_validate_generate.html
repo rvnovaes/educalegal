@@ -8,7 +8,7 @@
     {% else %}
         <label class="control-label">Baixe aqui o </label>
         <a target="_blank" href="https://atendimento.atlassian.net/wiki/spaces/EL/pages/40468495/Entrevista+em+lote?preview=%2F40468495%2F40501286%2Fcontrato-prestacao-servicos-educacionais.csv">layout
-            do csv de importação (versão 1)</a> do contrato de prestação de serviços educacionais.
+            do csv de importação (versão 1)</a> do documento que você deseja gerar.
         <form enctype="multipart/form-data" action="{% url 'document:bulk-document-generation-validate-generate' interview_id %}"
               method="POST">
         {% csrf_token %}

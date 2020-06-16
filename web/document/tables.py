@@ -58,6 +58,12 @@ class BulkDocumentGenerationTable(tables.Table):
 
 class DocumentTaskViewTable(tables.Table):
     interview = tables.LinkColumn("document:document-detail", args=[A("pk")])
+    task_name = tables.TemplateColumn(
+        template_name="document/task_name.html", verbose_name="Tipo de Tarefa"
+    )
+    task_status  = tables.TemplateColumn(
+        template_name="document/task_status.html", verbose_name="Tipo de Tarefa"
+    )
     ged_link = tables.TemplateColumn(
         template_name="document/ir_button.html", verbose_name="Link"
     )
