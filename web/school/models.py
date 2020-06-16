@@ -77,6 +77,7 @@ class School(TenantAwareModel):
         return reverse("school:school-detail", kwargs={"pk": self.pk})
 
     class Meta:
+        ordering = ["name"]
         verbose_name = "Escola"
         verbose_name_plural = "Escolas"
 

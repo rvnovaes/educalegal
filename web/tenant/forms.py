@@ -1,12 +1,13 @@
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import Group
 
 from allauth.account.forms import SignupForm
 
-from tenant.models import Tenant
-from tenant.models import TenantGedData
-from tenant.models import TenantESignatureData
+from tenant.models import (
+    Tenant,
+    TenantGedData,
+    ESignatureApp
+)
 from interview.models import Interview
 from billing.models import Plan
 
@@ -33,6 +34,7 @@ class EducaLegalSignupForm(SignupForm):
 
     def save(self, request):
         essential_plan = Plan.objects.get(pk=1)
+        demo_esignature_app = ESignatureApp.objects.get(pk=1)
 
         tenant = Tenant.objects.create(
             name=self.cleaned_data.get("tenant_name"),
@@ -40,6 +42,7 @@ class EducaLegalSignupForm(SignupForm):
             eua_agreement=self.cleaned_data.get("eua"),
             plan=essential_plan,
             auto_enrolled=True,
+            esignature_app=demo_esignature_app
         )
         tenant.save()
         tenant_ged_data = TenantGedData.objects.create(
@@ -58,15 +61,6 @@ class EducaLegalSignupForm(SignupForm):
             storage_region_name=""
         )
         tenant_ged_data.save()
-        tenant_esignatura_data = TenantESignatureData.objects.create(
-            tenant=tenant,
-            provider="",
-            private_key="",
-            client_id="",
-            impersonated_user_guid="",
-            test_mode=True
-        )
-        tenant_esignatura_data.save()
         # Selects every freemium interview and adds to newly created tenant
         freemium_interviews = Interview.objects.filter(is_freemium=True)
         # https://docs.djangoproject.com/en/3.0/ref/models/relations/#django.db.models.fields.related.RelatedManager.add
