@@ -29,8 +29,7 @@ from .serializers import (
     PlanSerializer,
     SchoolSerializer,
     TenantSerializer,
-    TenantGedDataSerializer,
-    ESignatureAppSerializer
+    TenantGedDataSerializer
 )
 from .docusign_translations import envelope_statuses, recipient_statuses_dict, recipient_types_dict
 
@@ -366,10 +365,3 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return TenantGedData.objects.filter(tenant=self.kwargs["pk"])
-
-
-class ESignatureAppViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = ESignatureAppSerializer
-
-    def get_queryset(self):
-        return ESignatureApp.objects.filter(tenant=self.kwargs["pk"])

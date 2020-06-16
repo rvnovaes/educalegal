@@ -42,12 +42,6 @@ class SchoolSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TenantSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tenant
-        fields = "__all__"
-
-
 class TenantGedDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantGedData
@@ -58,3 +52,12 @@ class ESignatureAppSerializer(serializers.ModelSerializer):
     class Meta:
         model = ESignatureApp
         fields = "__all__"
+
+
+class TenantSerializer(serializers.ModelSerializer):
+    esignature_app = ESignatureAppSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Tenant
+        fields = "__all__"
+

@@ -9,7 +9,6 @@ from .views import (
     TenantSchoolViewSet,
     TenantViewSet,
     TenantGedDataViewSet,
-    ESignatureAppViewSet,
     docusign_webhook_listener
 )
 
@@ -29,7 +28,6 @@ urlpatterns = [
     path("tenants/<int:pk>/schools/", TenantSchoolViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>/schools/<int:spk>", TenantSchoolViewSet.as_view({"get": "retrieve"})),
     path("tenants/<int:pk>/ged/", TenantGedDataViewSet.as_view({"get": "retrieve"})),
-    path("tenants/<int:pk>/esignature/", ESignatureAppViewSet.as_view({"get": "retrieve"})),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
     # path("docs/", include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
