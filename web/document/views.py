@@ -28,7 +28,7 @@ from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
 from .models import Document, BulkDocumentGeneration, DocumentTaskView
 from .tasks import create_document, submit_to_esignature
-from .tables import DocumentTable, BulkDocumentGenerationTable
+from .tables import DocumentTable, BulkDocumentGenerationTable, DocumentTaskViewTable
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +47,26 @@ class DocumentListView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView
         context = super().get_context_data(**kwargs)
         if "bulk_document_generation_id" in self.kwargs:
             context['bulk_document_generation'] = BulkDocumentGeneration.objects.get(pk=self.kwargs["bulk_document_generation_id"])
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if "bulk_document_generation_id" in self.kwargs:
+            return queryset.filter(bulk_generation=self.kwargs["bulk_document_generation_id"])
+        else:
+            return queryset
+
+
+class BulkDocumentGenerationDetailView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView):
+    model = DocumentTaskView
+    table_class = DocumentTaskViewTable
+    context_object_name = "document_tasks"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if "bulk_document_generation_id" in self.kwargs:
+            context['bulk_document_generation'] = BulkDocumentGeneration.objects.get(
+                pk=self.kwargs["bulk_document_generation_id"])
         return context
 
     def get_queryset(self):
@@ -400,11 +420,11 @@ def generate_bulk_documents(request, bulk_document_generation_id):
     }
 
     tenant_esignature_data = {
-        "provider": tenant.tenantesignaturedata.provider,
-        "private_key": tenant.tenantesignaturedata.private_key,
-        "client_id": tenant.tenantesignaturedata.client_id,
-        "impersonated_user_guid": tenant.tenantesignaturedata.impersonated_user_guid,
-        "test_mode": tenant.tenantesignaturedata.test_mode,
+        "provider": tenant.esignature_app.provider,
+        "private_key": tenant.esignature_app.private_key,
+        "client_id": tenant.esignature_app.client_id,
+        "impersonated_user_guid": tenant.esignature_app.impersonated_user_guid,
+        "test_mode": tenant.esignature_app.test_mode,
     }
 
     try:
@@ -477,17 +497,21 @@ def generate_bulk_documents(request, bulk_document_generation_id):
 
 @login_required
 def bulk_generation_progress(request, bulk_document_generation_id):
-    document_task_view = DocumentTaskView.objects.filter(bulk_generation_id=bulk_document_generation_id).values("task_status")
-    bulk_document_generation = BulkDocumentGeneration.objects.get(pk=bulk_document_generation_id).values("status")
+    document_task_view = DocumentTaskView.objects.filter(bulk_generation_id=bulk_document_generation_id)
+    bulk_document_generation = BulkDocumentGeneration.objects.get(pk=bulk_document_generation_id)
+
+    # Como as tarefas sao passadas assincronamente para o Celery, há um atraso até que a tabela de tarefas seja carregada.
+    # por isso é necessário iniciar as variáveis com 0 e perguntar pelo tamanho da lista de tarefas
     processed_task_size = 0
     success_task_size = 0
     failure_task_size = 0
 
     if len(document_task_view) > 0:
-        success_task_size = len([x for x in document_task_view if x["task_status"] == "SUCCESS"])
-        failure_task_size = len([x for x in document_task_view if x["task_status"] == "FAILURE"])
+        success_task_size = len([x for x in document_task_view if x.task_status == "SUCCESS"])
+        failure_task_size = len([x for x in document_task_view if x.task_status == "FAILURE"])
         processed_task_size = success_task_size + failure_task_size
 
+    # A quantidade total de tarefas é armazenada na seção na função generate_bulk_documents
     if request.session["total_task_size"] == processed_task_size:
         if request.session["total_task_size"] == success_task_size:
             bulk_document_generation.status = "concluída com sucesso"
@@ -502,9 +526,6 @@ def bulk_generation_progress(request, bulk_document_generation_id):
         "failure_task_size": failure_task_size,
         "bulk_status": bulk_document_generation.status
     }
-
-
-
     logger.info(payload)
 
     return HttpResponse(json.dumps(payload), content_type="application/json")

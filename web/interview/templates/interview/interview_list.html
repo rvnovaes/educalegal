@@ -4,10 +4,10 @@
 
 {% block body_block %}
     {% if filter %}
-        <form action="" method="get" class="form form-inline" style="float: right">
-            {% bootstrap_form filter.form layout="inline" %}
-            {% bootstrap_button "Buscar" %}
-        </form>
+            <form action="" method="get" class="form form-inline" style="float: right">
+                {% bootstrap_form filter.form layout="inline" %}
+                {% bootstrap_button "Buscar" %}
+            </form>
     {% endif %}
     <h2>Modelos</h2>
     {% if interviews %}
@@ -84,12 +84,12 @@
             const urlParams = new URLSearchParams(queryString);
 
             // URL de origem da requisicao. Exemplo https://app.educalegal.com.br
-            const origin   = window.location.origin
+            const origin = window.location.origin
 
-             // these HTTP methods do not require CSRF protection
+            // these HTTP methods do not require CSRF protection
             function csrfSafeMethod(method) {
                 return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-             }
+            }
 
             // Como o método post requer CSRF, a consulta ajax que será feita a seguir terá no header o cookie de CSRF
             $.ajaxSetup({

@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from django_tables2.utils import A
 
-from .models import Document, BulkDocumentGeneration
+from .models import Document, BulkDocumentGeneration, DocumentTaskView
 
 
 class DocumentTable(tables.Table):
@@ -53,4 +53,29 @@ class BulkDocumentGenerationTable(tables.Table):
             "interview",
             "status",
             "documentos"
+        )
+
+
+class DocumentTaskViewTable(tables.Table):
+    interview = tables.LinkColumn("document:document-detail", args=[A("pk")])
+    ged_link = tables.TemplateColumn(
+        template_name="document/ir_button.html", verbose_name="Link"
+    )
+
+    class Meta:
+        model = DocumentTaskView
+        template_name = "django_tables2/bootstrap4.html"
+        per_page = 20
+
+        fields = (
+            "interview",
+            "school",
+            "created_date",
+            "altered_date",
+            "submit_to_esignature",
+            "document_status",
+            "task_name",
+            "task_status",
+            "signing_provider",
+            "ged_link",
         )

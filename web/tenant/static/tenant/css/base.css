@@ -32,14 +32,25 @@ footer{
 
 }
 
-.ui-progressbar {
-    position: relative;
+#progressbar{
+    height: 65px;
+}
+
+.start-hidden {
+  visibility: hidden;
 }
 
 .progress-label {
     position: absolute;
     left: 50%;
-    top: 4px;
+    top: 18px;
     font-weight: bold;
-    text-shadow: 1px 1px 0 #fff;
+}
+
+.ui-progressbar {
+    position: relative;
+}
+
+.ui-progressbar-value{
+    color: #328838;
 }
