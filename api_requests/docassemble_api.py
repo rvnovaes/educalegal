@@ -121,4 +121,4 @@ if __name__ == "__main__":
 
     post_to_docassemble(api_key, server_url, brcomeducalegal_questions, "questions", user_id, project)
     post_to_docassemble(api_key, server_url, brcomeducalegal_templates, "templates", user_id, project)
-    # post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", user_id, project)
+    post_to_docassemble(api_key, server_url, brcomeducalegal_modules, "modules", user_id, project)
