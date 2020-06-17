@@ -1,44 +1,39 @@
 {% extends 'base.html' %}
 {% load render_table from django_tables2 %}
 {% block body_block %}
-    <h2>Documentos</h2>
-    {% if document_tasks %}
-        {% if bulk_document_generation %}
-            <div class="card">
-                <div class="card-header">
-                    <h4>Geração em Lote de Documentos - <span
-                            id="bulk_status_text">{{ bulk_document_generation.status }}</span></h4>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Data de Criação: </span>{{ bulk_document_generation.created_date|date:"d/m/Y H:i" }}
-                        </li>
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Modelo: </span>{{ bulk_document_generation.interview.name }}
-                        </li>
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Coleção: </span>{{ bulk_document_generation.mongo_db_collection_name }}
-                        </li>
-                        {% if bulk_document_generation.status == "não executada" %}
-                            <li class="list-group-item">
-                                <button class="btn btn-danger">Executar</button>
-                            </li>
-                        {% endif %}
-                        <li style="visibility: hidden">
-                            <div id="progressbar" class="list-group-item start-hidden">
-                                <div class="progress-label start-hidden">Iniciando...</div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        {% endif %}
-        {% render_table table %}
-    {% else %}
-        <div class="alert alert-info" role="alert">
-            Você não criou nenhum documento.
+    <h2>Geração em Lote</h2>
+    <div class="card">
+        <div class="card-header">
+            <h4>Status: <span id="bulk_status_text">{{ bulk_document_generation.status }}</span></h4>
         </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <span class="font-weight-bold">Data de Criação: </span>{{ bulk_document_generation.created_date|date:"d/m/Y H:i" }}
+                </li>
+                <li class="list-group-item">
+                    <span class="font-weight-bold">Modelo: </span>{{ bulk_document_generation.interview.name }}
+                </li>
+                <li class="list-group-item">
+                    <span class="font-weight-bold">Coleção: </span>{{ bulk_document_generation.mongo_db_collection_name }}
+                </li>
+                {% if bulk_document_generation.status == "não executada" %}
+                    <li class="list-group-item">
+                        <button class="btn btn-danger">Executar</button>
+                    </li>
+                {% endif %}
+                <li style="visibility: hidden">
+                    <div id="progressbar" class="list-group-item start-hidden">
+                        <div class="progress-label start-hidden">Iniciando...</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    {% if not task_table.data|length_is:"0" %}
+        {% render_table task_table %}
+    {% else %}
+        {% render_table document_table %}
     {% endif %}
     <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
     {% if user.tenant.school_set.count == 0 %}
@@ -94,11 +89,14 @@
                         max: total_task_size,
                         value: processed_task_size,
                         change: function () {
-                            progress_label.text(processed_task_size + " de " + total_task_size);
+                            progress_label.text(processed_task_size + " de " + total_task_size + " tarefas");
                         },
                         complete: function () {
                             progress_label.text("Fim!");
+                            bulk_status_text.css("color", "black")
                             bulk_status_text.text(data["bulk_status"]);
+                            sleep(3000);
+                            location.reload();
                         }
                     });
                     if (processed_task_size < total_task_size) {
@@ -119,6 +117,7 @@
             executar_button.hide();
             $(".start-hidden").css("visibility", "visible");
             bulk_status_text.text("em andamento...");
+            bulk_status_text.css("color", "red")
             // Cria uma barra com valor indeterminado
             progress_bar.progressbar({value: 0});
 

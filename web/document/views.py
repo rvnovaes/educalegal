@@ -60,13 +60,18 @@ class DocumentListView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView
 class BulkDocumentGenerationDetailView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView):
     model = DocumentTaskView
     table_class = DocumentTaskViewTable
+    context_table_name = "task_table"
     context_object_name = "document_tasks"
+    template_name = "document/bulkdocumentgeneration_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if "bulk_document_generation_id" in self.kwargs:
-            context['bulk_document_generation'] = BulkDocumentGeneration.objects.get(
+            bulk_generation = BulkDocumentGeneration.objects.get(
                 pk=self.kwargs["bulk_document_generation_id"])
+            documents = Document.objects.filter(bulk_generation=bulk_generation)
+            context['bulk_document_generation'] = bulk_generation
+            context['document_table'] = DocumentTable(documents)
         return context
 
     def get_queryset(self):
