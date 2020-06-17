@@ -91,7 +91,7 @@ if __name__ == "__main__":
         elif user == "3":
             # luis paim
             user_id = 4
-            api_key = "AeJ34g4IlBQepoCW3wvmp570m3yrjwfl"
+            api_key = "iTIDPnFnl1LudNZAbbUJUsxlvmXypSfv"
         elif user == "4":
             # roberto
             user_id = 14
