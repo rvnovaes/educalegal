@@ -90,7 +90,7 @@ if __name__ == "__main__":
             api_key = "wlbF8RfxKD2uP9ysiUxlKvSIUeIfKxDA"
         elif user == "3":
             # luis paim
-            user_id = 5
+            user_id = 4
             api_key = "AeJ34g4IlBQepoCW3wvmp570m3yrjwfl"
         elif user == "4":
             # roberto
