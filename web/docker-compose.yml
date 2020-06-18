@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   educalegal:
-    image: rvnovaes/educalegal:0.52
+    image: rvnovaes/educalegal:0.53
     container_name: educalegal
     restart: unless-stopped
     build: .
