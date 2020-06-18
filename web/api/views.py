@@ -10,7 +10,7 @@ from datetime import datetime as dt
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -21,7 +21,7 @@ from billing.models import Plan
 from document.models import Document, DocumentESignatureLog
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData, TenantESignatureData
+from tenant.models import Tenant, TenantGedData, ESignatureApp
 
 from .serializers import (
     DocumentSerializer,
@@ -29,8 +29,7 @@ from .serializers import (
     PlanSerializer,
     SchoolSerializer,
     TenantSerializer,
-    TenantGedDataSerializer,
-    TenantESignatureDataSerializer,
+    TenantGedDataSerializer
 )
 from .docusign_translations import envelope_statuses, recipient_statuses_dict, recipient_types_dict
 
@@ -293,14 +292,35 @@ def docusign_webhook_listener(request):
     return HttpResponse("Success!")
 
 
+# @require_POST
+# def create_draft_document(interview, tenant, school=None, doc_uuid=None):
+#     document = Document.objects.create(
+#         tenant=tenant,
+#         school=school,
+#         interview=interview,
+#         name=interview.custom_file_name + "_",
+#         description=interview.description + ' | ' + interview.version + ' | ' + str(interview.date_available),
+#         doc_uuid=doc_uuid,
+#         status="rascunho"
+#     )
+#
+#     document = document.save()
+#
+#     data = {
+#         doc_uuid: document.doc_uuid
+#     }
+#
+#     return JsonResponse(data)
+
+
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
 
     def partial_update(self, request, *args, **kwargs):
-        el_document_id = request.data["el_document_created_id"]
-        logger.debug("Atualizando o documento {el_document_id}".format(el_document_id=str(el_document_id)))
-        instance = self.queryset.get(pk=el_document_id)
+        doc_uuid = request.data["doc_uuid"]
+        logger.info("Atualizando o documento {doc_uuid}".format(doc_uuid=str(doc_uuid)))
+        instance = self.queryset.get(doc_uuid=doc_uuid)
         serializer = self.serializer_class(instance, data=request.data, partial=True)
         logger.debug(request.data)
         serializer.is_valid(raise_exception=True)
@@ -345,10 +365,3 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return TenantGedData.objects.filter(tenant=self.kwargs["pk"])
-
-
-class TenantESignatureDataViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = TenantESignatureDataSerializer
-
-    def get_queryset(self):
-        return TenantESignatureData.objects.filter(tenant=self.kwargs["pk"])

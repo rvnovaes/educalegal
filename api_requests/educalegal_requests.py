@@ -5,7 +5,7 @@ sys.path.append("/opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/da
 from element_educalegal_client import EducaLegalClient
 
 ###### LOCALHOST ######
-api_base_url = "http://localhost:8000"
+api_base_url = "http://localhost:8008"
 token = "48974bcc7b577ab3d6fed7c281d90324f4612810"
 ##### app.educalegal.com.br #####
 # api_base_url = "https://app.educalegal.com.br"
@@ -44,29 +44,32 @@ if __name__ == "__main__":
     print(elc.interviews_read(3))
 
     # Criação de documento
-    name = "20200229_666666_contrato_de_prestacao_de_servicos_educacionais.pdf"
-    status = "criado"
+    # name = "20200229_666666_contrato_de_prestacao_de_servicos_educacionais.pdf"
+    name = "---"
+    # status = "criado"
+    status = "rascunho"
     envelope_id = None
     signing_provider = None
-    ged_id = 1
-    ged_link = "http://whatever"
-    ged_uuid = "179dad8b-9bg6-4945-8f81-257d37050111"
+    # ged_id = 1
+    # ged_link = "http://whatever"
+    # ged_uuid = "179dad8b-9bg6-4945-8f81-257d37050111"
     description = "Contrato de prestação de serviços educacionais entre aluno e escola. - 1.1 - 2020-01-23"
     tenant = 2
-    school = 1
-    interview = 2
-    related_documents = None
-    document_data = "test"
+    # school = 1
+    interview = 83
+    # related_documents = None
+    # document_data = "test"
+
 
     response = elc.create_document(
         name,
         status,
         description,
         tenant,
-        school,
+        # school,
         interview,
-        related_documents,
-        document_data,
+        # related_documents,
+        # document_data,
     )
     el_document_created_id = response["id"]
     print(el_document_created_id)

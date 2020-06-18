@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     "bootstrap4",
     # Django models currency
     "djmoney",
+    # Resultados do celery no banco do Django
+    "django_celery_results",
     # Local
     "tenant",
     "users",
@@ -55,7 +57,6 @@ INSTALLED_APPS = [
     "api",
     "document",
     "billing",
-    "bulk_interview",
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+FILE_UPLOAD_HANDLERS = (
+    "django.core.files.uploadhandler.MemoryFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+)
+
+FILE_UPLOAD_TEMP_DIR = "/upload_temp_dir"
+
+
 # The Debug Toolbar is shown only if your IP address is listed in the INTERNAL_IPS setting. This means that for local
 # development, you must add '127.0.0.1' to INTERNAL_IPS; you’ll need to create this setting if it doesn’t already exist
 # in your settings module:
@@ -78,7 +87,7 @@ ROOT_URLCONF = "web.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "templates"), ],
+        "DIRS": [os.path.join(BASE_DIR, "templates"),],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -173,6 +182,7 @@ REST_FRAMEWORK = {
     #     "rest_framework.throttling.UserRateThrottle",
     # ],
     # "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "10000/day"},
+    # 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' => Usado para CoreAPI (Deprecado)
 }
 
 
@@ -242,3 +252,6 @@ _FORMATTER.add_formatting_definition(
 
 CURRENCIES = ("BRL",)
 
+CELERY_RESULT_BACKEND = 'django-db'
+
+CELERY_CACHE_BACKEND = 'django-cache'
