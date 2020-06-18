@@ -29,6 +29,7 @@ if __name__ == "__main__":
             2 - generation.educalegal.com.br - Development - Playground do seu usuário no servidor produção            
             3 - generation.educalegal.com.br  - Autotest - Playground do admin@admin.com
             4 - generation.educalegal.com.br  - Production - Playground do admin@admin.com
+            5 - doctest.educalegal.com.br - Development - Playground do seu usuário no servidor de teste            
     """
     )
 
@@ -62,7 +63,6 @@ if __name__ == "__main__":
         elif user == "4":
             # roberto
             api_key = "zGWrABl58FZHYL7GYv9JgReI4E4FKBYf"
-
     if destination == "2":
         # 2 - generation.educalegal.com.br - Development - Playground do seu usuário no servidor produção
         server_url = "https://generation.educalegal.com.br/api/playground"
@@ -108,6 +108,39 @@ if __name__ == "__main__":
         project = "Production"
         user_id = 1
         api_key = "D8WUkJKxxW06qDS1UB5KlwyVXeUE1Mnx"
+    if destination == "5":
+        # 5 - doctest.educalegal.com.br - Development - Playground do seu usuário no servidor teste
+        server_url = "https://doctest.educalegal.com.br/api/playground"
+        project = "Development"
+        print(
+            """
+        Você optou por enviar para seu próprio playground no ambiente de teste.
+        """
+        )
+        user = input(
+            """
+            Digite seu usuário:
+            1 - Iasmini
+            2 - Isabela
+            3 - Luis
+            4 - Roberto
+        """)
+        if user == "1":
+            # iasmini
+            user_id = 3
+            api_key = "jcSPRTYY3y6zOe0EE7ZgXMqSFDwbncn6"
+        elif user == "2":
+            # isabela
+            user_id = 5
+            api_key = "keybCASwsLW4nX9HfvbQjBAhVOjnLVQ6rTp"
+        elif user == "4":
+            # luis paim
+            user_id = 4
+            api_key = "qGVCn4ZIkZ4HrRziB3St5BobUtTRUEho"
+        elif user == "4":
+            # roberto
+            user_id = 14
+            api_key = "k99JrqjxoTTeH3o7tiVhaHVX2CiKaLoC"
 
     brcomeducalegal_questions = (
         "/opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data/questions"
