@@ -10,7 +10,7 @@ pg_dump --host=educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalo
   --no-password \
   --verbose \
   --clean > ${FILENAME}
-PGPASSWORD=e60k17byidfg20ye dropdb -U educa-legal-app -h educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com -p 25060 --echo educa-legal-test
-PGPASSWORD=e60k17byidfg20ye createdb -U educa-legal-app -h educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com -p 25060 --echo educa-legal-test
-PGPASSWORD=e60k17byidfg20ye psql -U educa-legal-app -d educa-legal-test -h educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com -e -p 25060 < ${FILENAME}
+PGPASSWORD=lvr0emmvuc8241ez dropdb -U doadmin -h educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com -p 25060 --echo educa-legal-test
+PGPASSWORD=lvr0emmvuc8241ez createdb -U doadmin -h educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com -p 25060 --echo educa-legal-test
+PGPASSWORD=lvr0emmvuc8241ez psql -U doadmin -d educa-legal-test -h educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com -e -p 25060 < ${FILENAME}
 rm ${FILENAME}
