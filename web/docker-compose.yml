@@ -20,7 +20,7 @@ services:
       - educalegal_rabbitmq
       - mongo
   educalegal_celery:
-    image: rvnovaes/educalegal:0.52
+    image: rvnovaes/educalegal:0.53
     container_name: educalegal_celery
     build: .
     command: celery -A web worker -l info -c 1 -n educalegalworker1@%h
