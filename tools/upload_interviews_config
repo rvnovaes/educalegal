@@ -1,0 +1,9 @@
+[keys]
+LOCALHOST = 5H4lWRgV4hNqEaqYSXVe7QgarHYLf4eR
+DOCTEST = t9JDYM8X48ZmCF1GRUJT63rSrzw2OuG5
+PRODUCTION =
+
+[sources]
+questions = /opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data/questions
+templates = /opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data/templates
+modules = /opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data
