@@ -12,7 +12,15 @@ def da_user_list(api_key, server_url):
     payload = {
         "key": api_key,
     }
-    r = requests.get(server_url, params=payload)
+    try:
+        r = requests.get(server_url, params=payload)
+
+    except Exception as e:
+        raise ConnectionError("Não foi possível conectar-se com o Docassemble" + str(e))
+
+    if r.status_code == 403:
+        raise PermissionError("Acesso Negado. Verifique a chake em upload_interviews_config")
+
     return r.json()
 
 
@@ -37,9 +45,6 @@ def post_to_docassemble(
     else:
         return "Success posting " + file_path
 
-
-# sg.theme("Material1")
-
 destination_options = [
     "http://localhost",
     "https://doctest.educalegal.com.br",
@@ -57,16 +62,21 @@ layout = [
     [sg.Button("Ok", key="final_ok"), sg.Button("Sair")],
 ]
 
-# Create the Window
 window = sg.Window("Selecione o Destino", layout)
 
 selected_destination = None
 selected_user_id = None
 selected_project = None
-user_options_dict = dict()
-user_emails = list()
+
 configuration_summary_message = ""
 selected_items_message = ""
+
+questions = sorted([f for f in listdir(config["sources"]["questions"]) if isfile(join(config["sources"]["questions"], f))])
+templates = sorted([f for f in listdir(config["sources"]["templates"]) if isfile(join(config["sources"]["templates"], f))])
+modules = sorted([f for f in listdir(config["sources"]["modules"]) if isfile(join(config["sources"]["modules"], f))])
+selected_questions = []
+selected_modules = []
+selected_templates =[]
 
 step2 = False
 step3 = False
@@ -85,15 +95,20 @@ while True:
             api_key = config["keys"]["PRODUCTION"]
 
         selected_destination = values["destination_options"]
+        try:
+            users = da_user_list(api_key, selected_destination + "/api/user_list")
+            user_options_dict = dict()
+            user_emails = list()
 
-        users = da_user_list(api_key, selected_destination + "/api/user_list")
+            for u in users:
+                id = u["id"]
+                email = u["email"]
+                user_options_dict[email] = id
+                user_emails.append(email)
+            window["user_options"].update(values=user_emails)
 
-        for u in users:
-            id = u["id"]
-            email = u["email"]
-            user_options_dict[email] = id
-            user_emails.append(email)
-        window["user_options"].update(values=user_emails)
+        except Exception as e:
+            sg.Print(e)
 
     if event == "final_ok":
         selected_destination = values["destination_options"]
@@ -108,28 +123,18 @@ while True:
         window.close()
 
 # Step 2
-
-questions = [f for f in listdir(config["sources"]["questions"]) if isfile(join(config["sources"]["questions"], f))]
-templates = [f for f in listdir(config["sources"]["templates"]) if isfile(join(config["sources"]["templates"], f))]
-modules = [f for f in listdir(config["sources"]["modules"]) if isfile(join(config["sources"]["modules"], f))]
-
-
 layout = [
     [sg.Text("Selecione os items a serem enviados:")],
-    [sg.Checkbox("Questions", key="questions_checkbox"), sg.Checkbox("Templates", key="templates_checkbox"), sg.Checkbox("Modules", key="modules_checkbox")],
+    [sg.Text("Todos: "), sg.Checkbox("Questions", key="questions_checkbox"), sg.Checkbox("Templates", key="templates_checkbox"), sg.Checkbox("Modules", key="modules_checkbox")],
     [
-        sg.Listbox(questions, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 30), key="questions_listbox"),
-        sg.Listbox(templates, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 30), key="templates_listbox"),
-        sg.Listbox(modules, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 30), key="modules_listbox")
+        sg.Listbox(questions, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="questions_listbox"),
+        sg.Listbox(templates, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="templates_listbox"),
+        sg.Listbox(modules, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="modules_listbox")
     ],
     [sg.Button("Ok", key="final_ok"), sg.Button("Cancel")],
 ]
 
 window = sg.Window("Selecione os items", layout)
-
-selected_questions = []
-selected_modules = []
-selected_templates =[]
 
 while step2:
     event, values = window.read()
@@ -166,8 +171,8 @@ while step2:
 layout = [
     [sg.Text("Confirmação")],
     [sg.Multiline(configuration_summary_message, size=(210, 5))],
-    [sg.Multiline(selected_items_message, size=(210, 30))],
-    [sg.Multiline("", size=(210, 30), key="output")],
+    [sg.Multiline(selected_items_message, size=(210, 25))],
+    [sg.Multiline("", size=(210, 25), key="output")],
     [sg.Button("Enviar", key="final_ok", button_color=("white", "red")), sg.Button("Sair")],
 ]
 
@@ -179,24 +184,18 @@ while step3:
     if event == sg.WIN_CLOSED or event == "Sair":
         break
     if event == "final_ok":
-        success_messages = list()
-        if len(selected_questions) > 0:
-            for question in selected_questions:
-                message = post_to_docassemble(api_key, selected_destination, join(config["sources"]["questions"], question), "questions", selected_user_id, selected_project)
-                success_messages.append(message)
-        if len(selected_templates) > 0:
-            for template in selected_templates:
-                message = post_to_docassemble(api_key, selected_destination, join(config["sources"]["templates"], template), "templates", selected_user_id, selected_project)
-                success_messages.append(message)
-        if len(selected_modules) > 0:
-            for module in selected_modules:
-                message = post_to_docassemble(api_key, selected_destination, join(config["sources"]["modules"], module), "modules", selected_user_id, selected_project)
-                success_messages.append(message)
-        # Converte a lista numa string na qual cada item tem uma quebra de linha
-        window["output"].update('\n'.join(map(str, success_messages)))
-
-
-
-
-
-
+        try:
+            if len(selected_questions) > 0:
+                for question in selected_questions:
+                    message = post_to_docassemble(api_key, selected_destination, join(config["sources"]["questions"], question), "questions", selected_user_id, selected_project)
+                    window["output"].print(message)
+            if len(selected_templates) > 0:
+                for template in selected_templates:
+                    message = post_to_docassemble(api_key, selected_destination, join(config["sources"]["templates"], template), "templates", selected_user_id, selected_project)
+                    window["output"].print(message)
+            if len(selected_modules) > 0:
+                for module in selected_modules:
+                    message = post_to_docassemble(api_key, selected_destination, join(config["sources"]["modules"], module), "modules", selected_user_id, selected_project)
+                    window["output"].print(message)
+        except Exception as e:
+            window["output"].print(e)
