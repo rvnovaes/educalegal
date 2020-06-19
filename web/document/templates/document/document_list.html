@@ -1,43 +1,19 @@
 {% extends 'base.html' %}
+{% load bootstrap4 %}
 {% load render_table from django_tables2 %}
 {% block body_block %}
+    {% if filter %}
+        <form action="" method="get" class="form form-inline" style="float: right">
+            {% bootstrap_form filter.form layout="inline" %}
+            {% bootstrap_button "Buscar" %}
+        </form>
+    {% endif %}
     <h2>Documentos</h2>
     {% if documents %}
-        {% if bulk_document_generation %}
-            <div class="card">
-                <div class="card-header">
-                    <h4>Geração em Lote de Documentos - <span
-                            id="bulk_status_text">{{ bulk_document_generation.status }}</span></h4>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Data de Criação: </span>{{ bulk_document_generation.created_date|date:"d/m/Y H:i" }}
-                        </li>
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Modelo: </span>{{ bulk_document_generation.interview.name }}
-                        </li>
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Coleção: </span>{{ bulk_document_generation.mongo_db_collection_name }}
-                        </li>
-                        {% if bulk_document_generation.status == "não executada" %}
-                            <li class="list-group-item">
-                                <button class="btn btn-danger">Executar</button>
-                            </li>
-                        {% endif %}
-                        <li style="visibility: hidden">
-                            <div id="progressbar" class="list-group-item start-hidden">
-                                <div class="progress-label start-hidden">Iniciando...</div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        {% endif %}
         {% render_table table %}
     {% else %}
         <div class="alert alert-info" role="alert">
-            Você não criou nenhum documento.
+            Nenhum documento encontrado.
         </div>
     {% endif %}
     <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
