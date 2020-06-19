@@ -146,7 +146,7 @@ class DocumentTaskView(TenantAwareModel):
     doc_uuid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="UUID")
     task_create_document = models.CharField(max_length=256, default="", verbose_name="Task de criação de documento")
     task_submit_to_esignature = models.CharField(max_length=256, default="", verbose_name="Task de assinatura")
-    submit_to_esignature = models.BooleanField(default=False, verbose_name="Enviar para assinatura eletrônica?")
+    submit_to_esignature = models.BooleanField(default=False, verbose_name="Assinar?")
 
     mongo_uuid = models.CharField(
         max_length=256, default="", verbose_name="UUID do Mongo"

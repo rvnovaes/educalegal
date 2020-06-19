@@ -82,6 +82,5 @@ class DocumentTaskViewTable(tables.Table):
             "doc_uuid",
             "task_name",
             "task_status",
-            "signing_provider",
             "ged_link",
         )

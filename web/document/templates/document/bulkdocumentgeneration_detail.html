@@ -19,7 +19,7 @@
                 </li>
                 {% if bulk_document_generation.status == "não executada" %}
                     <li class="list-group-item">
-                        <button class="btn btn-danger">Executar</button>
+                        <button class="btn btn-danger btn-block">Executar</button>
                     </li>
                 {% endif %}
                 <li style="visibility: hidden">
@@ -113,7 +113,7 @@
         }
 
         // Dispara a criação de documentos em lote/
-        const executar_button = $(".btn.btn-danger").click(function () {
+        const executar_button = $(".btn.btn-danger.btn-block").click(function () {
             executar_button.hide();
             $(".start-hidden").css("visibility", "visible");
             bulk_status_text.text("em andamento...");
