@@ -58,7 +58,7 @@ class School(TenantAwareModel):
     letterhead = models.CharField(max_length=255, default="timbrado-padrao.docx", verbose_name="Timbrado")
 
     def __str__(self):
-        return self.name + " - " + self.legal_name
+        return self.name
 
     @property
     def address(self):
