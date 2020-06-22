@@ -38,6 +38,7 @@ services:
     image: mher/flower
     environment:
       - CELERY_BROKER_URL=amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal
+      - FLOWER_BASIC_AUTH=educalegal:cavaloverdegrande
       - FLOWER_PORT=8888
     depends_on:
       - educalegal_rabbitmq
@@ -75,7 +76,7 @@ services:
     image: mongo-express
     environment:
       ME_CONFIG_BASICAUTH_USERNAME: educalegal
-      ME_CONFIG_BASICAUTH_PASSWORD: educalegal
+      ME_CONFIG_BASICAUTH_PASSWORD: cavaloverdegrande
       ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_MONGODB_ADMINUSERNAME: educalegal
       ME_CONFIG_MONGODB_ADMINPASSWORD: educalegal
