@@ -253,5 +253,5 @@ _FORMATTER.add_formatting_definition(
 CURRENCIES = ("BRL",)
 
 CELERY_RESULT_BACKEND = 'django-db'
-
 CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_BROKER_URL = 'amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal'
