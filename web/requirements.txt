@@ -1,4 +1,4 @@
-django~=3.0.6
+django~=3.0.7
 # API
 djangorestframework~=3.11.0
 django-cors-headers~=3.3.0
@@ -13,10 +13,10 @@ psycopg2-binary~=2.8.5
 django-allauth
 # Used to create tables and filtering
 django-tables2
-django-filter~=2.2.0
+django-filter~=2.3.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.13.13
+boto3~=1.13.24
 # Production server
 gunicorn
 # Misc
@@ -24,19 +24,27 @@ lxml~=4.5.1
 xmltodict~=0.12.0
 Pillow
 pyyaml~=5.3.1
-django-bootstrap4~=1.1.1
+django-bootstrap4~=2.0.1
 # Debug
 django-debug-toolbar~=2.2
 # API Debugging
 django-silk~=4.0.1
 # Read csv
-pandas~=1.0.3
+pandas~=1.0.4
 # Django models currency
 django-money~=1.1
 # Google Analytics
-django-google-analytics-app
+# django-google-analytics-app
 # MongoDB
 pymongo~=3.10.1
 mongoengine~=0.20.0
 # Used to test docusign requests
-pyjwt
+PyJWT
+# Validations
+validator-collection~=1.4.1
+# Celery
+celery~=4.4.4
+django-celery-results~=1.2.1
+future~=0.18.2
+# Tests
+pytest~=5.4.3

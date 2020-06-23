@@ -31,3 +31,26 @@ footer{
     line-height: 1.2 !important;
 
 }
+
+#progressbar{
+    height: 65px;
+}
+
+.start-hidden {
+  visibility: hidden;
+}
+
+.progress-label {
+    position: absolute;
+    left: 50%;
+    top: 18px;
+    font-weight: bold;
+}
+
+.ui-progressbar {
+    position: relative;
+}
+
+.ui-progressbar-value{
+    color: #328838;
+}

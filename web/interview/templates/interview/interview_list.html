@@ -3,21 +3,23 @@
 {% load render_table from django_tables2 %}
 
 {% block body_block %}
-  {% if filter %}
-      <form action="" method="get" class="form form-inline" style="float: right">
-        {% bootstrap_form filter.form layout="inline" %}
-        {% bootstrap_button "Buscar" %}
-      </form>
-  {% endif %}
-    <h2>Modelos</h2>
-      {% if interviews %}
-          {% render_table table %}
-      {% else %}
-      <div class="alert alert-info" role="alert">
-        Você não tem modelos disponíveis.
-      </div>
+    {% if filter %}
+            <form action="" method="get" class="form form-inline" style="float: right">
+                {% bootstrap_form filter.form layout="inline" %}
+                {% bootstrap_button "Buscar" %}
+            </form>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <h2>Modelos</h2>
+    {% if interviews %}
+        <div id="interview_table">
+            {% render_table table %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Você não tem modelos disponíveis.
+        </div>
+    {% endif %}
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
     {% if user.tenant.school_set.count == 0 %}
         <div class="modal fade" id="tutorial_modal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -37,7 +39,7 @@
             </div>
         </div>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
     {% if reached_document_limit %}
         <div class="modal fade" id="plan_upgrade_modal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -46,25 +48,89 @@
                         <h5 class="modal-title">Faça um upgrade do seu plano!</h5>
                     </div>
                     <div class="modal-body">
-                        <p>Foi atingido o limite mensal de geração de {{ document_limit }} documentos para o plano contratado.</p>
+                        <p>Foi atingido o limite mensal de geração de {{ document_limit }} documentos para o plano
+                            contratado.</p>
                         <p>Entre em contato conosco e faça um upgrade de seu plano.</p>
                     </div>
                     <div class="modal-footer">
-                        <a href="https://www.educalegal.com.br/contato/" target="_blank" class="btn btn-primary">Entrar em contato</a>
+                        <a href="https://www.educalegal.com.br/contato/" target="_blank" class="btn btn-primary">Entrar
+                            em contato</a>
                     </div>
                 </div>
             </div>
         </div>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
-        $(window).on('load',function(){
-            let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
+        $(window).on('load', function () {
+            const tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
             tutorial_modal.modal('show');
-            let plan_upgrade_modal = $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
+            const plan_upgrade_modal = $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
             plan_upgrade_modal.modal('show');
+
+        });
+        // Quando o usuário clica em um botão criar, um novo documento rascunho é criado.
+        $(".btn.btn-success.btn-sm").click(function (event) {
+            // Captura o cookie que contém o csrf token que será usado no post. Se não houver esse cookie, o post
+            // retorna 403 Forbidden
+            const csrftoken = $.cookie('csrftoken');
+            // Captura o atributo href do botão
+            const queryString = event.target.getAttribute("href");
+            console.log(queryString);
+            // O objeto urlParams permite buscar os parâmtros da URL do link. tid e intid serão usados para criar
+            // o documento rascunho
+            const urlParams = new URLSearchParams(queryString);
+
+            // URL de origem da requisicao. Exemplo https://app.educalegal.com.br
+            const origin = window.location.origin
+
+            // these HTTP methods do not require CSRF protection
+            function csrfSafeMethod(method) {
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+            // Como o método post requer CSRF, a consulta ajax que será feita a seguir terá no header o cookie de CSRF
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+
+            // Monta o payload do post com os valores constantes e toma o tid e intid do href do botão
+            const payload = {
+                name: "---",
+                status: "rascunho",
+                description: "Documento em elaboração...",
+                tenant: urlParams.get("tid"),
+                interview: urlParams.get("intid")
+            }
+
+            // Cria o registro do documento no banco do EducaLegal
+            $.ajax({
+                url: origin + "/v1/documents/",
+                type: "post",
+                data: payload,
+                datatype: "json",
+                // Em caso de sucesso, abre a nova janela, acrescentando ao href do botão o doc_uuid gerado
+                // Esse doc_uuid deverá ser usado pelo servidor de geração de documentos para identificar de modo único
+                // cada documento
+                success: function (data, status) {
+                    console.log(data);
+                    console.log(status);
+                    destination_link = event.target.getAttribute("href") + "&doc_uuid=" + data["doc_uuid"];
+                    console.log(destination_link);
+                    let win = window.open(destination_link, "_blank");
+                    win.focus();
+                },
+                error: function (data, status) {
+                    console.log(data);
+                    console.log(status);
+                },
+            });
         });
     </script>
 {% endblock %}

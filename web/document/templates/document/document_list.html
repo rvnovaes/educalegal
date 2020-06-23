@@ -3,13 +3,44 @@
 {% block body_block %}
     <h2>Documentos</h2>
     {% if documents %}
+        {% if bulk_document_generation %}
+            <div class="card">
+                <div class="card-header">
+                    <h4>Geração em Lote de Documentos - <span
+                            id="bulk_status_text">{{ bulk_document_generation.status }}</span></h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Data de Criação: </span>{{ bulk_document_generation.created_date|date:"d/m/Y H:i" }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Modelo: </span>{{ bulk_document_generation.interview.name }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Coleção: </span>{{ bulk_document_generation.mongo_db_collection_name }}
+                        </li>
+                        {% if bulk_document_generation.status == "não executada" %}
+                            <li class="list-group-item">
+                                <button class="btn btn-danger">Executar</button>
+                            </li>
+                        {% endif %}
+                        <li style="visibility: hidden">
+                            <div id="progressbar" class="list-group-item start-hidden">
+                                <div class="progress-label start-hidden">Iniciando...</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
         {% render_table table %}
     {% else %}
         <div class="alert alert-info" role="alert">
             Você não criou nenhum documento.
         </div>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
     {% if user.tenant.school_set.count == 0 %}
         <div class="modal fade" id="tutorial_modal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -29,13 +60,80 @@
             </div>
         </div>
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
-        $(window).on('load',function(){
+        const origin = window.location.origin
+        const bulk_status_text = $("#bulk_status_text");
+        const progress_bar = $("#progressbar");
+        const progress_label = $(".progress-label");
+
+        $(window).on('load', function () {
             let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
             tutorial_modal.modal('show');
+
+        });
+
+        function sleep(milliseconds) {
+            const date = Date.now();
+            let currentDate = null;
+            do {
+                currentDate = Date.now();
+            } while (currentDate - date < milliseconds);
+        }
+
+        function update_progress_bar(total_task_size) {
+            $.get(origin + "/document/bulk_document_generation/generate/progress/" + {{ bulk_document_generation.pk }})
+                .done(function (data, status) {
+                    console.log(data);
+                    console.log(status);
+                    let processed_task_size = data["processed_task_size"];
+
+                    progress_bar.progressbar({
+                        max: total_task_size,
+                        value: processed_task_size,
+                        change: function () {
+                            progress_label.text(processed_task_size + " de " + total_task_size);
+                        },
+                        complete: function () {
+                            progress_label.text("Fim!");
+                            bulk_status_text.text(data["bulk_status"]);
+                        }
+                    });
+                    if (processed_task_size < total_task_size) {
+                        sleep(3000);
+                        update_progress_bar(total_task_size);
+                    } else {
+
+                    }
+                })
+                .fail(function (data, status) {
+                    console.log(data);
+                    console.log(status);
+                })
+        }
+
+        // Dispara a criação de documentos em lote/
+        const executar_button = $(".btn.btn-danger").click(function () {
+            executar_button.hide();
+            $(".start-hidden").css("visibility", "visible");
+            bulk_status_text.text("em andamento...");
+            // Cria uma barra com valor indeterminado
+            progress_bar.progressbar({value: 0});
+
+            // Representa o número de tarefas de criação de documentos + assinatura de documentos
+            let total_task_size = 0;
+
+            $.get(origin + "/document/bulk_document_generation/generate/" + {{ bulk_document_generation.pk }})
+                .done(function (data, status) {
+                    total_task_size = data["total_task_size"];
+                    update_progress_bar(total_task_size);
+                })
+                .fail(function (data, status) {
+                    console.log(data);
+                    console.log(status);
+                });
         });
     </script>
 {% endblock %}

@@ -4,5 +4,6 @@ from .models import School
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["name", "cnpj", "legal_name", "letterhead"]
+    search_fields = ["name", "cnpj"]
 

@@ -10,6 +10,8 @@ ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 else ifeq ($(e), nodebug)
 	docker-compose up -d
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d
 else
 	docker-compose up
 endif
@@ -22,6 +24,8 @@ restart: stop run
 collectstatic:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py collectstatic --noinput
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run educalegal python manage.py collectstatic --noinput
 else
 	docker-compose run educalegal python manage.py collectstatic --noinput
 endif
@@ -29,6 +33,8 @@ endif
 migrate:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py migrate --noinput
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run educalegal python manage.py migrate --noinput
 else
 	docker-compose run educalegal python manage.py migrate --noinput
 endif
@@ -36,6 +42,8 @@ endif
 makemigrations:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py makemigrations --noinput
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run educalegal python manage.py makemigrations --noinput
 else
 	docker-compose run educalegal python manage.py makemigrations --noinput
 endif
@@ -67,14 +75,18 @@ db_app_start:
 	docker-compose start db
 
 db_app_synchronize:
-	./pg_dump_digital_ocean_to_local_educalegal_app.sh
+	./scripts/pg_dump_digital_ocean_to_local_educalegal_app.sh
 
 db_app_stop:
 	docker-compose stop db
 
 db_app_remote_to_local: db_app_start db_app_synchronize db_app_stop
 
+make_bkp_local:
+	./scripts/make_bkp_local.sh
 
+restore_bkp_local:
+	./scripts/restore_bkp_local.sh
 
 
 # https://docs.docker.com/compose/extends/

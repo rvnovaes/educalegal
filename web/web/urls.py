@@ -1,7 +1,6 @@
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import path, include
 from django.conf.urls import url
-from django.conf import settings
 from django.conf.urls.static import static
 
 from rest_framework import permissions
@@ -10,7 +9,7 @@ from drf_yasg import openapi
 
 from allauth.account.views import LoginView
 
-from .settings import DEBUG, SILK
+from django.conf import settings
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -32,7 +31,6 @@ urlpatterns = [
     url(r"^interview/", include("interview.urls")),
     url(r"^document/", include("document.urls")),
     url(r"^school/", include("school.urls")),
-    url(r"^bulk_interview/", include("bulk_interview.urls")),
     path("v1/", include("api.urls")),
     path("v1/api-auth/", include("rest_framework.urls")),
     url(
@@ -48,10 +46,9 @@ urlpatterns = [
     url(
         r"^v1/docs/redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     ),
-    re_path("djga/", include("google_analytics.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if SILK:
+if settings.SILK:
     urlpatterns.append(url(r"^silk/", include("silk.urls", namespace="silk")))
 
 if settings.DEBUG:
