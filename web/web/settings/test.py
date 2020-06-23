@@ -8,9 +8,9 @@ DEBUG = True
 MESSAGE_LEVEL = message_constants.INFO
 INSTALLED_APPS += ["debug_toolbar"]
 MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
-SILK = True
-MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")
-INSTALLED_APPS += ["silk"]
+SILK = False
+#MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")
+#INSTALLED_APPS += ["silk"]
 # Database
 DATABASES = {
     "default": {

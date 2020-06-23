@@ -38,5 +38,3 @@ MONGO_USERNAME = "educalegal"
 MONGO_PASSWORD = "educalegal"
 MONGO_HOST = "localhost"
 MONGO_PORT = 27017
-
-CELERY_BROKER_URL = "amqp://educalegal:educalegal@localhost/educalegal"

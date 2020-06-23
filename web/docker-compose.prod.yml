@@ -7,3 +7,9 @@ services:
       - DJANGO_SETTINGS_MODULE=web.settings.production
     ports:
       - "8000:8000"
+  educalegal_celery:
+    environment:
+      - DEBUG=0
+      - DJANGO_SETTINGS_MODULE=web.settings.production
+    depends_on:
+      - educalegal_rabbitmq
