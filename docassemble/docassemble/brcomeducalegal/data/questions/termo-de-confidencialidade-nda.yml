@@ -1,0 +1,475 @@
+metadata:
+  title: Termo de Confidencialidade - NDA
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Escola
+  - Outra Parte
+  - Cláusulas
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "termo-de-confidencialidade-nda.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    if school_party_type == "revealing":
+      receptors.gather()
+      if plan_use_esignature:
+        valid_receptors_table
+    else:
+      revealings.gather()
+      if plan_use_esignature:
+        valid_revealings_table
+    years_agreement
+    state
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+section: Escola
+question: |
+  Qual o tipo da parte é a escola?
+fields:
+  - "Tipo:": school_party_type
+    required: True
+    datatype: radio
+    choices:
+      - Receptora: receptor
+      - Reveladora: revealing
+right: |
+  ###Receptora
+  Parte que receberá informações confidenciais de propriedade exclusiva da parte reveladora.
+---
+code: |
+  if school_party_type == "receptor":
+    receptors.target_number = 1
+    receptors[0].person_type = "organization"
+    receptors[0].name.text = school_legal_name
+    receptors[0].cnpj = school_cnpj
+    receptors[0].email = school_email
+    receptors[0].address.street_name = school_street
+    receptors[0].address.street_number = school_street_number
+    receptors[0].address.unit = school_unit
+    receptors[0].address.neighborhood = school_neighborhood
+    receptors[0].address.city = school_city
+    receptors[0].address.state = school_state
+    receptors[0].address.zip = school_zip
+  else:
+    revealings.target_number = 1
+    revealings[0].person_type = "organization"
+    revealings[0].name.text = school_legal_name
+    revealings[0].cnpj = school_cnpj
+    revealings[0].email = school_email
+    revealings[0].address.street_name = school_street
+    revealings[0].address.street_number = school_street_number
+    revealings[0].address.unit = school_unit
+    revealings[0].address.neighborhood = school_neighborhood
+    revealings[0].address.city = school_city
+    revealings[0].address.state = school_state
+    revealings[0].address.zip = school_zip
+---
+objects:
+  - receptors: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+ga id: |
+  code: ga_id_begin
+section: Outra Parte
+progress: 30
+question: |
+  Número de receptores das informações confidenciais
+fields:
+  - Número: receptors.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  receptors[i].name.text
+  receptors[i].address.street_name
+  receptors[i].complete = True
+---
+question: |
+  Dados do(a) ${ word(ordinal(i)) } receptor das informações confidenciais
+fields:
+  - "Tipo:": receptors[i].person_type
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome completo:": receptors[i].name.text
+    show if:
+      variable: receptors[i].person_type
+      is: individual
+  - "CPF:": receptors[i].cpf
+    validate: validate_cpf
+    show if:
+      variable: receptors[i].person_type
+      is: individual
+  - "Número do RG:": receptors[i].rg
+    show if:
+      variable: receptors[i].person_type
+      is: individual
+  - "Nacionalidade:": receptors[i].nationality
+    default: brasileiro(a)
+    show if:
+      variable: receptors[i].person_type
+      is: individual
+  - "Estado civil:": receptors[i].marital_status
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+    show if:
+      variable: receptors[i].person_type
+      is: individual
+  - "Profissão:": receptors[i].occupation
+    required: False
+    show if:
+      variable: receptors[i].person_type
+      is: individual
+  - "Razão social:": receptors[i].name.text
+    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
+    show if:
+      variable: receptors[i].person_type
+      is: organization
+  - "CNPJ:": receptors[i].cnpj
+    validate: validate_cnpj
+    show if:
+      variable: receptors[i].person_type
+      is: organization
+  - "E-mail:": receptors[i].email
+    datatype: email
+    help: ${ help_email_msg }
+    required: False
+    js show if: |
+       val("receptors[i].person_type") != null
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+question: |
+  Endereço do(a) ${ receptors[i] }
+fields:
+  - "CEP:": receptors[i].address.zip
+    required: True
+  - "Logradouro:": receptors[i].address.street_name
+    required: True
+  - "Número:": receptors[i].address.street_number
+    required: True
+  - "Complemento:": receptors[i].address.unit
+    required: False
+  - "Bairro:": receptors[i].address.neighborhood
+    required: True
+  - "Cidade:": receptors[i].address.city
+    required: True
+  - "Estado:": receptors[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#cmVjZXB0b3JzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#cmVjZXB0b3JzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#cmVjZXB0b3JzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#cmVjZXB0b3JzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#cmVjZXB0b3JzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#cmVjZXB0b3JzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#cmVjZXB0b3JzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Outra Parte
+field: valid_receptors_table
+question: |
+  Receptores:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ receptors.table }
+buttons:
+  Continuar: continue
+---
+table: receptors.table
+rows: receptors
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+objects:
+  - revealings: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+section: Outra Parte
+progress: 30
+question: |
+  Número de reveladores das informações confidenciais
+fields:
+  - Número: revealings.target_number
+    datatype: integer
+    default: 1
+    min: 1
+right: |
+  ###Revelador
+  Parte que fornece informações confidenciais exclusivas para a parte receptora.
+---
+code: |
+  revealings[i].name.text
+  revealings[i].address.street_name
+  revealings[i].complete = True
+---
+question: |
+  Dados do(a) ${ word(ordinal(i)) } revelador das informações confidenciais
+fields:
+  - "Tipo:": revealings[i].person_type
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome completo:": revealings[i].name.text
+    show if:
+      variable: revealings[i].person_type
+      is: individual
+  - "CPF:": revealings[i].cpf
+    validate: validate_cpf
+    show if:
+      variable: revealings[i].person_type
+      is: individual
+  - "Número do RG:": revealings[i].rg
+    show if:
+      variable: revealings[i].person_type
+      is: individual
+  - "Nacionalidade:": revealings[i].nationality
+    default: brasileiro(a)
+    show if:
+      variable: revealings[i].person_type
+      is: individual
+  - "Estado civil:": revealings[i].marital_status
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+    show if:
+      variable: revealings[i].person_type
+      is: individual
+  - "Profissão:": revealings[i].occupation
+    required: False
+    show if:
+      variable: revealings[i].person_type
+      is: individual
+  - "Razão social:": revealings[i].name.text
+    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
+    show if:
+      variable: revealings[i].person_type
+      is: organization
+  - "CNPJ:": revealings[i].cnpj
+    validate: validate_cnpj
+    show if:
+      variable: revealings[i].person_type
+      is: organization
+  - "E-mail:": revealings[i].email
+    datatype: email
+    help: ${ help_email_msg }
+    required: False
+    js show if: |
+       val("revealings[i].person_type") != null
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+question: |
+  Endereço do(a) ${ revealings[i] }
+fields:
+  - "CEP:": revealings[i].address.zip
+    required: True
+  - "Logradouro:": revealings[i].address.street_name
+    required: True
+  - "Número:": revealings[i].address.street_number
+    required: True
+  - "Complemento:": revealings[i].address.unit
+    required: False
+  - "Bairro:": revealings[i].address.neighborhood
+    required: True
+  - "Cidade:": revealings[i].address.city
+    required: True
+  - "Estado:": revealings[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#cmV2ZWFsaW5nc1tpXS5hZGRyZXNzLnppcA').mask('00000-000');
+  });
+
+  $("#cmV2ZWFsaW5nc1tpXS5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#cmV2ZWFsaW5nc1tpXS5hZGRyZXNzLnppcA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#cmV2ZWFsaW5nc1tpXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#cmV2ZWFsaW5nc1tpXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#cmV2ZWFsaW5nc1tpXS5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#cmV2ZWFsaW5nc1tpXS5hZGRyZXNzLnN0YXRl").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Outra Parte
+field: valid_revealings_table
+question: |
+  Reveladores:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ revealings.table }
+buttons:
+  Continuar: continue
+---
+table: revealings.table
+rows: revealings
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+code: |
+  from num2words import num2words
+  years_agreement_in_words = num2words(years_agreement, lang='pt_BR')
+---
+progress: 70
+section: Cláusulas
+question: |
+  Prazo do Acordo
+fields:
+  - "Prazo da confidencialidade:": years_agreement
+    datatype: integer
+    default: 02
+    note: ano(s)
+---
+code: |
+  recipients = list()
+  for rec in receptors:
+    if rec.email:
+      new_recipient = dict()
+      new_recipient['name'] = rec.name.text
+      new_recipient['email'] = rec.email
+      new_recipient['group'] = 'signers'
+      new_recipient['routingOrder'] = 1
+      new_recipient['tabs'] = [
+        {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', rec.email)
+        },
+      ]
+      recipients.append(new_recipient)
+
+  for rev in revealings:
+    if rev.email:
+      new_recipient = dict()
+      new_recipient['name'] = rev.name.text
+      new_recipient['email'] = rev.email
+      new_recipient['group'] = 'signers'
+      new_recipient['routingOrder'] = 2
+      new_recipient['tabs'] = [
+        {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', rev.email)
+        },
+      ]
+      recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

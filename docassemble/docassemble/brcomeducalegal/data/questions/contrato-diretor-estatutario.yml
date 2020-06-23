@@ -1,0 +1,267 @@
+metadata:
+  title: Contrato de Diretor Estatutário
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Contratante
+  - Contratada
+  - Cláusulas
+  - Conclusão
+---
+code:  |
+  content_document = "contrato-diretor-estatutario.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    contratadas.target_number = 1
+    for item in contratadas:
+      item.name.first
+    if plan_use_esignature:
+      valid_contratadas_table
+    job_title
+    contract_term
+    state
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - contratadas: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  contratadas[i].name.first
+  contratadas[i].address.street_name
+  contratadas[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+ga id: |
+  code: ga_id_begin
+section: Contratada
+progress: 30
+question: Número de Contratadas
+fields:
+  - Número: contratadas.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Contratada
+progress: 33
+question: |
+  Dados do(a) Diretor(a)
+fields:
+  - "Nome completo:": contratadas[i].name.first
+    required: True
+  - "CPF:": contratadas[i].cpf
+    validate: validate_cpf
+    required: True
+  - "Número da identidade (RG):": contratadas[i].rg
+    required: True
+    datatype: text
+  - "Nacionalidade:": contratadas[i].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado civil:": contratadas[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+  - "Profissão:": contratadas[i].occupation
+    required: True
+  - "E-mail:": contratadas[i].email
+    help: ${ help_email_msg }
+    required: False
+    datatype: email
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#Y29udHJhdGFkYXNbaV0uY3Bm').mask('000.000.000-00', {reverse: true});
+    });
+  </script>
+---
+section: Contratada
+progress: 44
+question: |
+  Endereço do(a) ${ contratadas[i].name.first }
+fields:
+  - "CEP:": contratadas[i].address.zip
+    required: True
+  - "Logradouro:": contratadas[i].address.street_name
+    required: True
+  - "Número:": contratadas[i].address.street_number
+    required: True
+  - "Complemento:": contratadas[i].address.complement
+    required: False
+  - "Bairro:": contratadas[i].address.neighborhood
+    required: True
+  - "Cidade:": contratadas[i].address.city
+    required: True
+  - "Estado:": contratadas[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+  });
+
+  $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Contratada
+field: valid_contratadas_table
+question: |
+  Contratada:
+subquestion: |
+  Confira o e-mail do destinatário abaixo, pois este será usado
+  no envio para a assinatura eletrônica.
+  ${ contratadas.table }
+buttons:
+  Continuar: continue
+---
+table: contratadas.table
+rows: contratadas
+columns:
+  - Name: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+code: |
+  job_title_list = ["Diretor(a) Administrativo(a) Financeiro(a)", "Diretor(a) Pedagógico(a)"]
+---
+code: |
+  from num2words import num2words
+  job_remuneration_as_word = num2words(job_remuneration, lang='pt_BR', to='currency')
+---
+code: |
+  from num2words import num2words
+  job_remuneration_payment_as_word = num2words(job_remuneration_payment, lang='pt_BR')
+---
+section: Cláusulas
+progress: 55
+question: |
+  Cargo de Direção
+fields:
+  - "Selecione o cargo de Direção:": job_title
+    required: True
+    code: job_title_list
+  - 'Remuneração:': job_remuneration
+    datatype: currency
+  - 'Número de parcelas:': job_remuneration_payment
+    datatype: integer
+    default: 12
+    help: "Preencher com o número de parcelas mensais a serem pagas ao(à) Diretor(a)."
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#am9iX3JlbXVuZXJhdGlvbg').mask('###0.00', {reverse: true});
+      });
+  </script>
+---
+section: Cláusulas
+progress: 66
+question: Prazo
+fields:
+  - 'O contrato será válido até': contract_term
+    datatype: date
+---
+code: |
+  recipients = list()
+  for item in contratadas:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.first
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

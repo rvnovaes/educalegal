@@ -1,0 +1,114 @@
+metadata:
+  title: Proposta de Renegociação - Fluxo de Pagamento
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Fornecedor
+  - FLuxo de Pagamento
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "proposta-de-renegociacao-fluxo-de-pagamento.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    fornecedor.name.first
+    parcelas
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - fornecedor: Individual
+---
+ga id: |
+  code: ga_id_begin
+section: Fornecedor
+progress: 25
+question: |
+  Nome do Fornecedor
+fields:
+  - "Nome completo:": fornecedor.name.first
+    required: True
+  - "E-mail:": fornecedor.email
+    help: "O e-mail informado será utilizado para o envio do documento"
+    datatype: email
+    required: False
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#bm90aWZpZWQuY3Bm').mask('000.000.000-00', {reverse: true});
+    });
+  </script>
+---
+section: Fluxo de Pagamento
+progress: 60
+question: |
+  Fluxo de Pagamento
+subquestion: |
+  A Escola está enviando uma proposta de renegociação para que o saldo em aberto seja reparcelado em [FIELD parcelas] vezes e com a primeira parcela a partir de [FIELD data_parcela]
+fields:
+  - Número de Parcelas: parcelas
+    datatype: integer
+    inline width: 10em
+  - Data: data_parcela
+    datatype: date
+---
+code: |
+  recipients = list()
+  notificante_recipient = dict()
+  notificante_recipient['name'] = school_legal_name
+  notificante_recipient['email'] = school_email
+  notificante_recipient['group'] = 'signers'
+  notificante_recipient['routingOrder'] = 1
+  notificante_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(notificante_recipient)
+
+  fornecedor_recipient = dict()
+  fornecedor_recipient['name'] = fornecedor.name.first
+  fornecedor_recipient['email'] = fornecedor.email
+  fornecedor_recipient['group'] = 'certifiedDeliveries'
+  fornecedor_recipient['routingOrder'] = 2
+  recipients.append(fornecedor_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
