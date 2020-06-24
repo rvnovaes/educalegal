@@ -11,17 +11,10 @@ class TestTermodeacordoindividualdebancodehorasmp9272020(WebTest):
     @pytest.mark.parametrize(
         "server,user,password,document_name",
         [
-            (
-                "https://test.educalegal.com.br/",
-                "autotest@educalegal.com.br",
-                "Silex2109",
-                "Autotest_Termo de Acordo Individual para Banco de Horas MP 927-2020",),
-            # (
-            #     "https://generation.educalegal.com.br/",
-            #     "maria.secretaria@educalegal.com.br",
-            #     "silex@568",
-            #     "Termo de Acordo Individual para Banco de Horas MP 927-2020",
-            # ),
+            ("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
+             "Autotest_Termo de Acordo Individual para Banco de Horas MP 927-2020",),
+            ("https://generation.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
+                "Termo de Acordo Individual para Banco de Horas MP 927-2020",),
         ],
     )
     def test_termodeacordoindividualdebancodehorasmp9272020(self, server, user, password, document_name):
