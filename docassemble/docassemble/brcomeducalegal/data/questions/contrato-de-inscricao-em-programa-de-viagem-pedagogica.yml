@@ -1,0 +1,429 @@
+metadata:
+  title: Contrato de Inscricão em Programa de Viagem Pedagógica
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Contratada
+  - Participante
+  - Cláusulas
+  - Assinatura
+  - Conclusão
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    contractor.name.text
+    contractor.address.zip
+    participants.gather()
+    if plan_use_esignature:
+      valid_participants_table
+    emergency_contacts.gather()
+    program_location
+    accommodation_type
+    city
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - contractor: Organization
+---
+ga id: |
+  code: ga_id_begin
+section: Contratada
+progress: 8
+question: Dados da contratada
+fields:
+  - 'Razão social:': contractor.name.text
+    datatype: text
+    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
+  - 'CNPJ:': contractor.cnpj
+    datatype: text
+    validate: validate_cnpj
+  - "E-mail:": contractor.email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#Y29udHJhY3Rvci5jbnBq').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Contratada
+progress: 16
+question: Endereço do(a) ${ contractor.name.text }
+fields:
+  - 'CEP:': contractor.address.zip
+    datatype: text
+  - 'Logradouro:': contractor.address.street_name
+    datatype: text
+  - 'Número:': contractor.address.street_number
+    datatype: text
+  - 'Complemento:': contractor.address.unit
+    datatype: text
+    required: false
+  - 'Bairro:': contractor.address.neighborhood
+    datatype: text
+  - 'Município:': contractor.address.city
+    datatype: text
+  - 'Estado:': contractor.address.state
+    code: state_initials_list
+    datatype: dropdown
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y29udHJhY3Rvci5hZGRyZXNzLnppcA').mask('00000-000');
+  });
+
+  $("#Y29udHJhY3Rvci5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#Y29udHJhY3Rvci5hZGRyZXNzLnppcA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y29udHJhY3Rvci5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#Y29udHJhY3Rvci5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#Y29udHJhY3Rvci5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#Y29udHJhY3Rvci5hZGRyZXNzLnN0YXRl").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+objects:
+  - participants: |
+      DAList.using(
+        object_type=Individual,
+        ask_number=True,
+        complete_attribute='complete')
+---
+section: Participante
+progress: 32
+question: |
+  Número de participantes
+fields:
+  - "Número:": participants.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  participants[i].name.first
+  participants[i].address.street_name
+  participants[i].complete = True
+---
+section: Participante
+progress: 40
+question: |
+  Dados do(a) ${ word(ordinal(i)) } participante
+fields:
+  - "Nome Completo:": participants[i].name.first
+    required: True
+  - "CPF:": participants[i].cpf
+    required: True
+    validate: validate_cpf
+  - "Número do RG:": participants[i].rg
+    required: True
+  - "Nacionalidade:": participants[i].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado Civil:": participants[i].marital_status
+    required: True
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    datatype: radio
+  - "Data de nascimento:": participants[i].birthdate
+    required: True
+    datatype: date
+  - "Profissão:": participants[i].occupation
+    required: True
+  - "Escola onde trabalha:": participants[i].work_school
+    required: True
+  - "Cargo:": participants[i].role
+    required: True
+  - "Telefone:": participants[i].telephone
+    required: True
+  - "Whatsapp:": participants[i].whatsapp
+    required: True
+  - "E-mail:": participants[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#cGFydGljaXBhbnRzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+section: Participante
+progress: 48
+question: |
+  Endereço do(a) ${ participants[i] }
+fields:
+  - "CEP:": participants[i].address.zip
+    required: True
+  - "Logradouro:": participants[i].address.street_name
+    required: True
+  - "Número:": participants[i].address.street_number
+    required: True
+  - "Complemento:": participants[i].address.unit
+    required: False
+  - "Bairro:": participants[i].address.neighborhood
+    required: True
+  - "Cidade:": participants[i].address.city
+    required: True
+  - "Estado:": participants[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#cGFydGljaXBhbnRzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#cGFydGljaXBhbnRzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#cGFydGljaXBhbnRzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#cGFydGljaXBhbnRzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#cGFydGljaXBhbnRzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#cGFydGljaXBhbnRzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#cGFydGljaXBhbnRzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Participante
+field: valid_participants_table
+progress: 56
+question: |
+  Participantes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ participants.table }
+buttons:
+  Continuar: continue
+---
+table: participants.table
+rows: participants
+columns:
+  - Name: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+objects:
+  - emergency_contacts: |
+      DAList.using(
+        object_type=Individual,
+        ask_number=True)
+---
+section: Participante
+progress: 64
+question: |
+  Número de contatos de emergência
+fields:
+  - "Número:": emergency_contacts.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Participante
+progress: 72
+question: |
+  Dados do(a) ${ word(ordinal(i)) } contato de emergência
+fields:
+  - "Nome Completo:": emergency_contacts[i].name.first
+    required: True
+  - "Telefone:": emergency_contacts[i].telephone
+    required: True
+  - "Whatsapp:": emergency_contacts[i].whatsapp
+    required: True
+  - "E-mail:": emergency_contacts[i].email
+    required: false
+    datatype: email
+---
+code: |
+  time_interval = date_difference(starting=arrival_date, ending=departure_date)
+  time_interval_days = str(time_interval.days)
+  hosting_days = time_interval_days.split(".")
+  hosting_days = hosting_days[0]
+---
+section: Cláusulas
+progress: 80
+question: |
+  Informações do programa
+fields:
+  - "Local do Programa:": program_location
+    required: True
+  - "Local da Hospedagem:": hosting_palce
+    required: True
+  - "Data de Chegada:": arrival_date
+    required: True
+    datatype: date
+  - "Data de Saída:": departure_date
+    required: True
+    datatype: date
+---
+section: Cláusulas
+progress: 88
+question: |
+  Informações Financeiras
+fields:
+  - "Tipo de acomodação:": accommodation_type
+    required: True
+    datatype: radio
+    choices:
+      - Individual: individual
+      - Duplo: duplo
+  - "Valor:": accommodation_value
+    required: True
+    datatype: currency
+    hint: 0000,00
+  - "Forma de Pagamento": payment_method
+    required: True
+    datatype: radio
+    choices:
+      - "boleto bancário": boleto bancário
+      - "em até 10 (dez) parcelas por meio de cartão de crédito": cartao
+  - "Associado ZDP:": zdp_associate
+    required: True
+    datatype: radio
+    choices:
+      - Sim: Sim
+      - Não: Não
+  - "Nota fiscal em nome de:": invoice_recipient
+    required: True
+    datatype: text
+  - "Tipo de Pessoa:": invoice_person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "CPF:": invoice_recipient_cpf
+    validate: validate_cpf
+    datatype: string
+    required: True
+    show if:
+      variable: invoice_person_type
+      is: individual
+  - "CNPJ": invoice_recipient_cnpj
+    validate: validate_cnpj
+    datatype: string
+    required: True
+    show if:
+      variable: invoice_person_type
+      is: organization
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#YWNjb21tb2RhdGlvbl92YWx1ZQ').mask("###0.00", {reverse: true});
+        $('#X2ZpZWxkXzY').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
+    });
+  </script>
+---
+code:  |
+  content_document = "contrato-de-inscricao-em-programa-de-viagem-pedagogica.docx"
+---
+code: |
+  recipients = list()
+
+  for item in participants:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.first
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = contractor.name.text
+  new_recipient['email'] = contractor.email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', contractor.email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

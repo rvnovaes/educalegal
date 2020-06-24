@@ -1,0 +1,371 @@
+{
+  "id": "2834dd03-9c19-4b3c-bc4a-9f0fa9283452",
+  "version": "2.0",
+  "name": "termo-de-uso-e-responsabilidade-iscool-app",
+  "url": "https://app.educalegal.com.br/",
+  "tests": [{
+    "id": "ebc26195-8ce0-4489-8cca-f31ec6552274",
+    "name": "termo-de-uso-e-responsabilidade-iscool-app",
+    "commands": [{
+      "id": "e93d4d08-76de-4fd7-9b7a-10365dca13f2",
+      "comment": "",
+      "command": "open",
+      "target": "https://app.educalegal.com.br/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "370f37c2-c4e5-4c51-bbfd-675b41a3c58b",
+      "comment": "",
+      "command": "type",
+      "target": "id=id_login",
+      "targets": [
+        ["id=id_login", "id"],
+        ["name=login", "name"],
+        ["css=#id_login", "css:finder"],
+        ["xpath=//input[@id='id_login']", "xpath:attributes"],
+        ["xpath=//div[@id='div_id_login']/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "maria.secretaria@educalegal.com.br"
+    }, {
+      "id": "510186e7-90d2-4b55-8af8-9ee9bd69a225",
+      "comment": "",
+      "command": "type",
+      "target": "id=id_password",
+      "targets": [
+        ["id=id_password", "id"],
+        ["name=password", "name"],
+        ["css=#id_password", "css:finder"],
+        ["xpath=//input[@id='id_password']", "xpath:attributes"],
+        ["xpath=//div[@id='div_id_password']/div/input", "xpath:idRelative"],
+        ["xpath=//div[2]/div/input", "xpath:position"]
+      ],
+      "value": "silex@568"
+    }, {
+      "id": "6537d799-6613-4c68-bd93-4ff992b5138c",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn",
+      "targets": [
+        ["css=.btn", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Entrar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "af96f101-b207-489b-b678-10f74992b218",
+      "comment": "",
+      "command": "click",
+      "target": "id=id_name",
+      "targets": [
+        ["id=id_name", "id"],
+        ["name=name", "name"],
+        ["css=#id_name", "css:finder"],
+        ["xpath=//input[@id='id_name']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "0d5dbcc3-6a1f-46c3-b49a-54d5351ddd03",
+      "comment": "",
+      "command": "type",
+      "target": "id=id_name",
+      "targets": [
+        ["id=id_name", "id"],
+        ["name=name", "name"],
+        ["css=#id_name", "css:finder"],
+        ["xpath=//input[@id='id_name']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "Termo de Uso e Responsabilidade - Iscool App"
+    }, {
+      "id": "669574fc-8dd4-4882-b0d3-afe18e706172",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Buscar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "2ce1d544-26cd-4ca3-8ea2-eeaa83ae6351",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn-success",
+      "targets": [
+        ["css=.btn-success", "css:finder"],
+        ["xpath=(//a[contains(text(),'Criar')])[2]", "xpath:link"],
+        ["xpath=//a[contains(@href, 'https://docs.educalegal.com.br/interview?i=docassemble.playground1Production%3Atermo-de-uso-e-responsabilidade-iscool-app.yml&tid=2&ut=48974bcc7b577ab3d6fed7c281d90324f4612810&intid=66&new_session=1')]", "xpath:href"],
+        ["xpath=//td[5]/a", "xpath:position"]
+      ],
+      "value": "",
+      "opensWindow": true,
+      "windowHandleName": "win6039",
+      "windowTimeout": 2000
+    }, {
+      "id": "f0e2caf1-b7c2-4dcc-8c38-a5f69dae5a98",
+      "comment": "",
+      "command": "selectWindow",
+      "target": "handle=${win6039}",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "3d3eafcd-c37c-491b-ad30-17efbc512416",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Escolha a escola')]", "xpath:innerText"]
+      ],
+      "value": "Escolha a escola"
+    }, {
+      "id": "e978f67e-d5e3-4c16-a901-7853d9000dd4",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/fieldset/div/div/label",
+      "targets": [
+        ["css=.row:nth-child(2) > .col-md-12 > .btn-light", "css:finder"],
+        ["xpath=//form[@id='daform']/fieldset/div/div/label", "xpath:idRelative"],
+        ["xpath=//label", "xpath:position"],
+        ["xpath=//label[contains(.,'Escola da Família')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "e54d9ced-81bf-4e7d-a674-80c99eb1f2c0",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset[2]/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "770bebf2-f4b5-4e69-87a8-e0208cf0b7f1",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Dados do(a) Empregado')]", "xpath:innerText"]
+      ],
+      "value": "Dados do(a) Empregado"
+    }, {
+      "id": "901e3e3e-9489-4869-93b0-cdb9c076c009",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=ZW1wbG95ZWVzW2ldLm5hbWUudGV4dA", "id"],
+        ["name=ZW1wbG95ZWVzW2ldLm5hbWUudGV4dA", "name"],
+        ["css=#ZW1wbG95ZWVzW2ldLm5hbWUudGV4dA", "css:finder"],
+        ["xpath=//input[@id='ZW1wbG95ZWVzW2ldLm5hbWUudGV4dA']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "JOSUÉ SIGNATÁRIO"
+    }, {
+      "id": "5762ca1a-fddc-47d6-b43e-ab6b1aa71849",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[3]/div/input",
+      "targets": [
+        ["id=ZW1wbG95ZWVzW2ldLnJn", "id"],
+        ["name=ZW1wbG95ZWVzW2ldLnJn", "name"],
+        ["css=#ZW1wbG95ZWVzW2ldLnJn", "css:finder"],
+        ["xpath=//input[@id='ZW1wbG95ZWVzW2ldLnJn']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[3]/div/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div/input", "xpath:position"]
+      ],
+      "value": "15-4344.4343"
+    }, {
+      "id": "fc58c473-ab81-4d1d-9f57-8e3945b58210",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/div[5]/div/fieldset/label",
+      "targets": [
+        ["css=.btn-light:nth-child(3)", "css:finder"],
+        ["xpath=//form[@id='daform']/div[5]/div/fieldset/label", "xpath:idRelative"],
+        ["xpath=//fieldset/label", "xpath:position"],
+        ["xpath=//label[contains(.,'solteiro(a)')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "37c34268-dad5-4ec3-b25c-acf59e0da728",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[6]/div/input",
+      "targets": [
+        ["id=ZW1wbG95ZWVzW2ldLm9jY3VwYXRpb24", "id"],
+        ["name=ZW1wbG95ZWVzW2ldLm9jY3VwYXRpb24", "name"],
+        ["css=#ZW1wbG95ZWVzW2ldLm9jY3VwYXRpb24", "css:finder"],
+        ["xpath=//input[@id='ZW1wbG95ZWVzW2ldLm9jY3VwYXRpb24']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[6]/div/input", "xpath:idRelative"],
+        ["xpath=//div[6]/div/input", "xpath:position"]
+      ],
+      "value": "PROFESSOR"
+    }, {
+      "id": "7a8ae42f-787e-4acc-88aa-aa37eba8dc09",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[7]/div/input",
+      "targets": [
+        ["id=ZW1wbG95ZWVzW2ldLmVtYWls", "id"],
+        ["name=ZW1wbG95ZWVzW2ldLmVtYWls", "name"],
+        ["css=#ZW1wbG95ZWVzW2ldLmVtYWls", "css:finder"],
+        ["xpath=//input[@id='ZW1wbG95ZWVzW2ldLmVtYWls']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[7]/div/input", "xpath:idRelative"],
+        ["xpath=//div[7]/div/input", "xpath:position"]
+      ],
+      "value": "josue.signatario@gmail.com"
+    }, {
+      "id": "17ada1ea-7a41-44c8-951f-98380a9eadc9",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "124c19d6-3925-4b5b-9cdf-8c90e1ef9ea9",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Endereço do(a) JOSUÉ SIGNATÁRIO')]", "xpath:innerText"]
+      ],
+      "value": "Endereço do(a) JOSUÉ SIGNATÁRIO"
+    }, {
+      "id": "3b3fbd67-67f4-4969-bf4f-8db2dd71588b",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=ZW1wbG95ZWVzW2ldLmFkZHJlc3Muemlw", "id"],
+        ["name=ZW1wbG95ZWVzW2ldLmFkZHJlc3Muemlw", "name"],
+        ["css=#ZW1wbG95ZWVzW2ldLmFkZHJlc3Muemlw", "css:finder"],
+        ["xpath=//input[@id='ZW1wbG95ZWVzW2ldLmFkZHJlc3Muemlw']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "30180-090"
+    }, {
+      "id": "6133007c-a62c-4222-886e-bfd060a28734",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/input",
+      "targets": [
+        ["id=ZW1wbG95ZWVzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg", "id"],
+        ["name=ZW1wbG95ZWVzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg", "name"],
+        ["css=#ZW1wbG95ZWVzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg", "css:finder"],
+        ["xpath=//input[@id='ZW1wbG95ZWVzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/input", "xpath:idRelative"],
+        ["xpath=//div[4]/div/input", "xpath:position"]
+      ],
+      "value": "683"
+    }, {
+      "id": "acde8307-ef1a-4234-a0a3-db28bea6a466",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/input",
+      "targets": [
+        ["id=ZW1wbG95ZWVzW2ldLmFkZHJlc3MuY29tcGxlbWVudA", "id"],
+        ["name=ZW1wbG95ZWVzW2ldLmFkZHJlc3MuY29tcGxlbWVudA", "name"],
+        ["css=#ZW1wbG95ZWVzW2ldLmFkZHJlc3MuY29tcGxlbWVudA", "css:finder"],
+        ["xpath=//input[@id='ZW1wbG95ZWVzW2ldLmFkZHJlc3MuY29tcGxlbWVudA']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/input", "xpath:position"]
+      ],
+      "value": "apartamento 09"
+    }, {
+      "id": "a943a7f2-9950-40f9-8f72-185c471ffa7e",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ed78a9bd-5998-41c6-a1dd-0643ba86b0fa",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Local e Data')]", "xpath:innerText"]
+      ],
+      "value": "Local e Data"
+    }, {
+      "id": "155698a5-b962-4ac7-b0a0-c6a42ea062bf",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=c2lnbmF0dXJlX2xvY2Fs", "id"],
+        ["name=c2lnbmF0dXJlX2xvY2Fs", "name"],
+        ["css=#c2lnbmF0dXJlX2xvY2Fs", "css:finder"],
+        ["xpath=//input[@id='c2lnbmF0dXJlX2xvY2Fs']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "BELO HORIZONTE"
+    }, {
+      "id": "81b196b8-a982-4ddf-84a7-b8d7d691ce5f",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "9e927d07-b4f0-4212-9b41-d94543313dae",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["ebc26195-8ce0-4489-8cca-f31ec6552274"]
+  }],
+  "urls": ["https://app.educalegal.com.br/interview/interview", "https://app.educalegal.com.br/"],
+  "plugins": []
+}

@@ -1,0 +1,905 @@
+metadata:
+  title: Contrato de Locação de Imóvel
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Escola
+  - Outra Parte
+  - Cláusulas
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "contrato-de-locacao-de-imovel.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    if school_party_type == "locador":
+      parte_insert_manager
+      locatarios.gather()
+      if plan_use_esignature:
+        valid_locatarios_table
+      contraparte_insert_manager
+    else:
+      contraparte_insert_manager
+      locadores.gather()
+      if plan_use_esignature:
+        valid_locadores_table
+      parte_insert_manager
+    fiadores.gather()
+    if plan_use_esignature:
+      valid_fiadores_table
+    extraparte_insert_manager
+    area_imovel
+    duracao_contrato
+    valor_aluguel
+    state
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+section: Escola
+question: |
+  Qual o tipo da parte é a escola?
+fields:
+  - "Tipo:": school_party_type
+    required: True
+    datatype: radio
+    choices:
+      - Locador: locador
+      - Locatário: locatarios
+---
+code: |
+  if school_party_type == "locador":
+    locadores.target_number = 1
+    locadores[0].person_type = "organization"
+    locadores[0].name.text = school_legal_name
+    locadores[0].cnpj = school_cnpj
+    locadores[0].email = school_email
+    locadores[0].address.street_name = school_street
+    locadores[0].address.street_number = school_street_number
+    locadores[0].address.unit = school_unit
+    locadores[0].address.neighborhood = school_neighborhood
+    locadores[0].address.city = school_city
+    locadores[0].address.state = school_state
+    locadores[0].address.zip = school_zip
+  else:
+    locatarios.target_number = 1
+    locatarios[0].person_type = "organization"
+    locatarios[0].name.text = school_legal_name
+    locatarios[0].cnpj = school_cnpj
+    locatarios[0].email = school_email
+    locatarios[0].address.street_name = school_street
+    locatarios[0].address.street_number = school_street_number
+    locatarios[0].address.unit = school_unit
+    locatarios[0].address.neighborhood = school_neighborhood
+    locatarios[0].address.city = school_city
+    locatarios[0].address.state = school_state
+    locatarios[0].address.zip = school_zip
+---
+objects:
+  - locadores: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+ga id: |
+  code: ga_id_begin
+section: Outra Parte
+progress: 15
+question: |
+  Número de Locadores
+fields:
+  - "Número:": locadores.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  locadores[i].name.text
+  locadores[i].address.street_name
+  locadores[i].complete = True
+---
+section: Outra Parte
+progress: 15
+question: |
+  Dados do(a) ${ word(ordinal(i)) } locador(a)
+fields:
+  - "Tipo:": locadores[i].person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome Completo:": locadores[i].name.text
+    required: True
+    show if: 
+      variable: locadores[i].person_type
+      is: individual
+  - "CPF:": locadores[i].cpf
+    required: True
+    validate: validate_cpf
+    show if:
+      variable: locadores[i].person_type
+      is: individual
+  - "Número do RG:": locadores[i].rg
+    required: True
+    show if:
+      variable: locadores[i].person_type
+      is: individual
+  - "Nacionalidade:": locadores[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if: 
+      variable: locadores[i].person_type
+      is: individual
+  - "Estado Civil:": locadores[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+    show if: 
+      variable: locadores[i].person_type
+      is: individual
+  - "Profissão:": locadores[i].occupation
+    required: True
+    show if: 
+      variable: locadores[i].person_type
+      is: individual
+  - "Razão social:": locadores[i].name.text
+    required: True
+    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
+    show if: 
+      variable: locadores[i].person_type
+      is: organization  
+  - "CNPJ:": locadores[i].cnpj
+    required: True
+    validate: validate_cnpj
+    show if:
+      variable: locadores[i].person_type
+      is: organization
+  - "E-mail:": locadores[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+    js show if: |
+      val("locadores[i].person_type") == "organization" || val("locadores[i].person_type") == "individual"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Outra Parte
+progress: 15
+question: |
+  Endereço do(a) ${ locadores[i] }
+fields:
+  - "CEP:": locadores[i].address.zip
+    required: True
+  - "Logradouro:": locadores[i].address.street_name
+    required: True
+  - "Número:": locadores[i].address.street_number
+    required: True
+  - "Complemento:": locadores[i].address.unit
+    required: False
+  - "Bairro:": locadores[i].address.neighborhood
+    required: True
+  - "Cidade:": locadores[i].address.city
+    required: True
+  - "Estado:": locadores[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Dados da Pessoa
+field: valid_locadores_table
+question: |
+  Locadores:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ locadores.table }
+buttons:
+  Continuar: continue
+---
+table: locadores.table
+rows: locadores
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+question: Gestor do Contrato da parte Locadora
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': parte_insert_manager
+    datatype: yesnoradio
+  - 'Nome:': parte_name_manager
+    datatype: text
+    show if:
+      variable: parte_insert_manager
+      is: true
+    required: True
+  - 'E-mail:': parte_email_manager
+    datatype: email
+    show if:
+      variable: parte_insert_manager
+      is: true
+    required: False
+  - 'Telefone:': parte_telephone_manager
+    datatype: text
+    show if:
+      variable: parte_insert_manager
+      is: true
+    required: False
+---
+objects:
+  - locatarios: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+section: Outra Parte
+progress: 30
+question: |
+  Número de Locatários
+fields:
+  - Número: locatarios.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  locatarios[i].name.text
+  locatarios[i].address.street_name
+  locatarios[i].complete = True
+---
+section: Outra Parte
+progress: 30
+question: |
+  Dados do(a) ${ word(ordinal(i)) } locatário(a)
+fields:
+  - "Tipo:": locatarios[i].person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome Completo:": locatarios[i].name.text
+    required: True
+    show if: 
+      variable: locatarios[i].person_type
+      is: individual
+  - "CPF:": locatarios[i].cpf
+    required: True
+    validate: validate_cpf
+    show if:
+      variable: locatarios[i].person_type
+      is: individual
+  - "Número do RG:": locatarios[i].rg
+    required: True
+    show if:
+      variable: locatarios[i].person_type
+      is: individual
+  - "Nacionalidade:": locatarios[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if: 
+      variable: locatarios[i].person_type
+      is: individual
+  - "Estado Civil:": locatarios[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+    show if: 
+      variable: locatarios[i].person_type
+      is: individual
+  - "Profissão:": locatarios[i].occupation
+    required: True
+    show if: 
+      variable: locatarios[i].person_type
+      is: individual
+  - "Razão social:": locatarios[i].name.text
+    required: True
+    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
+    show if: 
+      variable: locatarios[i].person_type
+      is: organization  
+  - "CNPJ:": locatarios[i].cnpj
+    required: True
+    validate: validate_cnpj
+    show if:
+      variable: locatarios[i].person_type
+      is: organization
+  - "E-mail:": locatarios[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+    js show if: |
+      val("locatarios[i].person_type") == "individual" || val("locatarios[i].person_type") == "organization"  
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Outra Parte
+progress: 30
+question: |
+  Endereço do(a) ${ locatarios[i] }
+fields:
+  - "CEP:": locatarios[i].address.zip
+    required: True
+  - "Logradouro:": locatarios[i].address.street_name
+    required: True
+  - "Número:": locatarios[i].address.street_number
+    required: True
+  - "Complemento:": locatarios[i].address.unit
+    required: False
+  - "Bairro:": locatarios[i].address.neighborhood
+    required: True
+  - "Cidade:": locatarios[i].address.city
+    required: True
+  - "Estado:": locatarios[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#bG9jYXRhcmlvc1tpXS5hZGRyZXNzLnppcA').mask('00000-000');
+  });
+
+  $("#bG9jYXRhcmlvc1tpXS5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#bG9jYXRhcmlvc1tpXS5hZGRyZXNzLnppcA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#bG9jYXRhcmlvc1tpXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#bG9jYXRhcmlvc1tpXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#bG9jYXRhcmlvc1tpXS5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#bG9jYXRhcmlvc1tpXS5hZGRyZXNzLnN0YXRl").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Dados da Pessoa
+field: valid_locatarios_table
+question: |
+  Locatários:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ locatarios.table }
+buttons:
+  Continuar: continue
+---
+table: locatarios.table
+rows: locatarios
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Outra Parte
+progress: 30
+question: Gestor do Contrato da parte Locatária
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': contraparte_insert_manager
+    datatype: yesnoradio
+  - 'Nome:': contraparte_name_manager
+    datatype: text
+    show if:
+      variable: contraparte_insert_manager
+      is: true
+    required: True
+  - 'E-mail:': contraparte_email_manager
+    datatype: email
+    show if:
+      variable: contraparte_insert_manager
+      is: true
+    required: False
+  - 'Telefone:': contraparte_telephone_manager
+    datatype: text
+    show if:
+      variable: contraparte_insert_manager
+      is: true
+    required: False
+---
+objects:
+  - fiadores: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+section: Outra Parte
+progress: 45
+question: |
+  Número de Fiadores
+fields:
+  - Número: fiadores.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  fiadores[i].name.text
+  fiadores[i].address.street_name
+  fiadores[i].complete = True
+---
+section: Outra Parte
+progress: 45
+question: |
+  Dados do(a) ${ word(ordinal(i)) } fiador(a)
+fields:
+  - "Tipo:": fiadores[i].person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome Completo:": fiadores[i].name.text
+    required: True
+    show if: 
+      variable: fiadores[i].person_type
+      is: individual
+  - "CPF:": fiadores[i].cpf
+    required: True
+    validate: validate_cpf
+    show if:
+      variable: fiadores[i].person_type
+      is: individual
+  - "Número do RG:": fiadores[i].rg
+    required: True
+    show if:
+      variable: fiadores[i].person_type
+      is: individual
+  - "Nacionalidade:": fiadores[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if: 
+      variable: fiadores[i].person_type
+      is: individual
+  - "Estado Civil:": fiadores[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+    show if: 
+      variable: fiadores[i].person_type
+      is: individual
+  - "Profissão:": fiadores[i].occupation
+    required: True
+    show if: 
+      variable: fiadores[i].person_type
+      is: individual
+  - "Razão social:": fiadores[i].name.text
+    required: True
+    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
+    show if: 
+      variable: fiadores[i].person_type
+      is: organization  
+  - "CNPJ:": fiadores[i].cnpj
+    required: True
+    validate: validate_cnpj
+    show if:
+      variable: fiadores[i].person_type
+      is: organization
+  - "E-mail:": fiadores[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+    js show if: |
+      val("fiadores[i].person_type") == "individual" || val("fiadores[i].person_type") == "organization"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Outra Parte
+progress: 45  
+question: |
+  Endereço do(a) ${ fiadores[i] }
+fields:
+  - "CEP:": fiadores[i].address.zip
+    required: True
+  - "Logradouro:": fiadores[i].address.street_name
+    required: True
+  - "Número:": fiadores[i].address.street_number
+    required: True
+  - "Complemento:": fiadores[i].address.unit
+    required: False
+  - "Bairro:": fiadores[i].address.neighborhood
+    required: True
+  - "Cidade:": fiadores[i].address.city
+    required: True
+  - "Estado:": fiadores[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#ZmlhZG9yZXNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+  });
+
+  $("#ZmlhZG9yZXNbaV0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#ZmlhZG9yZXNbaV0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#ZmlhZG9yZXNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#ZmlhZG9yZXNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#ZmlhZG9yZXNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#ZmlhZG9yZXNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Dados da Pessoa
+field: valid_fiadores_table
+question: |
+  Fiadores:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ fiadores.table }
+buttons:
+  Continuar: continue
+---
+table: fiadores.table
+rows: fiadores
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+question: Gestor do Contrato
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': extraparte_insert_manager
+    datatype: yesnoradio
+  - 'Nome:': extraparte_name_manager
+    datatype: text
+    show if:
+      variable: extraparte_insert_manager
+      is: true
+    required: True
+  - 'E-mail:': extraparte_email_manager
+    datatype: email
+    show if:
+      variable: extraparte_insert_manager
+      is: true
+    required: False
+  - 'Telefone:': extraparte_telephone_manager
+    datatype: text
+    show if:
+      variable: extraparte_insert_manager
+      is: true
+    required: False
+---
+code: |
+  data_fim_locacao = data_inicio_locacao.plus(months=duracao_contrato)
+---
+section: Cláusulas
+progress: 60
+question: |
+  Dados do Imóvel
+fields:
+  - "Área total (m²):": area_imovel
+    datatype: number
+    hint: 00,00
+  - "Número da matrícula:": numero_matricula_imovel
+  - "Cartório:": cartorio_registro
+    datatype: area
+    hint: "ex.: Cartório do 4º Ofício de Registro de Imóveis de Belo Horizonte/MG"
+  - "CEP:": cep_imovel
+    required: True
+  - "Logradouro:": logradouro_imovel
+    required: True
+  - "Número:": numero_imovel
+    required: True
+  - "Complemento:": complemento_imovel
+    required: False
+  - "Bairro:": bairro_imovel
+    required: True
+  - "Cidade:": cidade_imovel
+    required: True
+  - "Estado:": estado_imovel
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y2VwX2ltb3ZlbA').mask('00000-000');
+    $('#YXJlYV9pbW92ZWw').mask("###0.00", {reverse: true});
+  });
+
+  $("#Y2VwX2ltb3ZlbA").focusout(function(){
+    var cep = $("#Y2VwX2ltb3ZlbA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#bG9ncmFkb3Vyb19pbW92ZWw").val(data.logradouro);
+          $("#YmFpcnJvX2ltb3ZlbA").val(data.bairro);
+          $("#Y2lkYWRlX2ltb3ZlbA").val(data.localidade);
+          $("#ZXN0YWRvX2ltb3ZlbA").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Cláusulas
+progress: 60
+question: |
+  Prazo do Contrato
+fields:
+  - "Duração do contrato (meses):": duracao_contrato
+    datatype: integer
+  - "Data do início da locação:": data_inicio_locacao
+    datatype: date
+---
+code: |
+  from num2words import num2words
+  duracao_contrato_extenso = num2words(duracao_contrato,lang='pt_BR')
+---
+code: |
+  from num2words import num2words
+  valor_aluguel_extenso = num2words(valor_aluguel, lang='pt_BR', to='currency')
+---
+code: |
+  from num2words import num2words
+  tempo_carencia_extenso = num2words(tempo_carencia, lang='pt_BR')
+---
+code: |
+  data_fim_carencia = data_inicio_locacao.plus(months=tempo_carencia)
+---
+section: Cláusulas
+progress: 75
+question: |
+  Valor e Condições de Pagamento
+fields:
+  - "Valor mensal do aluguel:": valor_aluguel
+    datatype: currency
+  - "Há carência:": carencia
+    datatype: radio
+    choices:
+      - Sim: Sim
+      - Não: Não
+  - "Indique o tempo de carência (meses):": tempo_carencia
+    datatype: integer
+    show if:
+      variable: carencia
+      is: Sim
+  - "Dia do vencimento do aluguel (dia útil):": vencimento_aluguel
+    datatype: integer
+    default: 5
+  - "Forma de pagamento:": forma_pagamento
+    datatype: radio
+    choices:
+      - conta corrente: conta corrente
+      - boleto bancário: boleto bancário
+  - "Banco:": banco
+    datatype: text
+    help: "Ex.: Banco do Brasil"
+    show if:
+      variable: forma_pagamento
+      is: conta corrente
+  - "Agência:": agencia
+    datatype: text
+    show if:
+      variable: forma_pagamento
+      is: conta corrente
+  - "Conta corrente:": conta_corrente
+    datatype: text
+    show if:
+      variable: forma_pagamento
+      is: conta corrente
+  - "Tipo de pessoa:": tipo_pessoa_conta_corrente
+    datatype: radio
+    choices:
+      - Física: fisica
+      - Jurídica: juridica
+    show if:
+      variable: forma_pagamento
+      is: conta corrente
+  - "CNPJ:": cnpj_conta_corrente
+    datatype: text
+    validate: validate_cnpj
+    show if:
+      variable: tipo_pessoa_conta_corrente
+      is: juridica
+  - "CPF:": cpf_conta_corrente
+    datatype: text
+    validate: validate_cpf
+    show if:
+      variable: tipo_pessoa_conta_corrente
+      is: fisica
+  - "Índice de reajuste anual do aluguel:": indice_reajuste
+    datatype: radio
+    help: Índice de correção monetária do valor da mensalidade do aluguel. 
+    choices:
+      - IPC-A: IPC-A
+      - IGP-M: IGP-M
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#dmFsb3JfYWx1Z3VlbA').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzEw').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzk').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+code: |
+  recipients = list()
+  for item in locadores:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  for item in locatarios:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  for item in fiadores:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

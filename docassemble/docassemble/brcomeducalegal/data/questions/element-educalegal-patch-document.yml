@@ -1,0 +1,15 @@
+---
+modules:
+  - .element_educalegal_client
+---
+include:
+  - element-custom-file-name.yml
+---
+code: |
+  cd_name = custom_file_name + '.pdf'
+  cd_status = 'criado'
+  cd_related_documents = None
+  cd_document_data = all_variables()
+  el_document_patched_with_docassemble_data = elc.patch_document_with_docassemble_data(doc_uuid, cd_name, interview_description, cd_status, school_id, cd_related_documents, cd_document_data)
+  log("Atualizado no app Educa Legal o documento {doc_uuid} - {el_document_patched_with_docassemble_data}".format(doc_uuid=doc_uuid, el_document_patched_with_docassemble_data=el_document_patched_with_docassemble_data))
+---

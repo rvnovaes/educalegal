@@ -1,0 +1,214 @@
+metadata:
+  title: Notificação extrajudicial
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Notificado
+  - Objeto da cobrança
+  - Dados do Notificante
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "notificacao-extrajudicial.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    notified.name.first
+    notified.address_postal_code
+    student_name
+    financeiro_email
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - notified: Individual
+---
+ga id: |
+  code: ga_id_begin
+section: Notificado
+progress: 25
+question: |
+  Dados do(a) notificado
+fields:
+  - "Nome completo:": notified.name.first
+    required: True
+  - "CPF:": notified.cpf
+    required: True
+    validate: validate_cpf
+  - "Número do RG:": notified.rg
+    required: True
+  - "Nacionalidade:": notified.nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado civil:": notified.marital_status
+    required: True
+    datatype: radio
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+  - "Profissão:": notified.occupation
+    required: False
+  - "E-mail:": notified.email
+    help: ${ help_email_msg }
+    datatype: email
+    required: False
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#bm90aWZpZWQuY3Bm').mask('000.000.000-00', {reverse: true});
+    });
+  </script>
+---
+section: Notificado
+progress: 50
+question: |
+  Endereço do(a) ${ notified.name.first }
+fields:
+  - "CEP:": notified.address_postal_code
+    required: True
+  - "Logradouro:": notified.address.street_name
+    required: True
+  - "Número:": notified.address_street_number
+    required: True
+  - "Complemento:": notified.address_complement
+    required: False
+  - "Bairro:": notified.address_neighborhood
+    required: True
+  - "Cidade:": notified.address_city
+    required: True
+  - "Estado:": notified.address_state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#bm90aWZpZWQuYWRkcmVzc19wb3N0YWxfY29kZQ').mask('00000-000');
+        $("#bm90aWZpZWQuYWRkcmVzc19wb3N0YWxfY29kZQ").focusout(function(){
+          var cep = $("#bm90aWZpZWQuYWRkcmVzc19wb3N0YWxfY29kZQ").val();
+          cep = cep.replace ("-","");
+          var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+          $.ajax({
+            url: urlStr,
+            type: "get",
+            dataType: "json",
+            success: function(data){
+              console.log(data);
+              $("#bm90aWZpZWQuYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+              $("#bm90aWZpZWQuYWRkcmVzc19uZWlnaGJvcmhvb2Q").val(data.bairro);
+              $("#bm90aWZpZWQuYWRkcmVzc19jaXR5").val(data.localidade);
+              $("#bm90aWZpZWQuYWRkcmVzc19zdGF0ZQ").val(data.uf);
+            },
+            error: function(erro){
+              console.log(erro);
+            }
+          });
+        });
+      });
+  </script>
+---
+section: Objeto da cobrança
+progress: 60
+question: |
+  Dados do contrato do aluno e valor do débito
+fields:
+  - Nome do aluno: student_name
+  - Ano letivo: school_year
+    help: 'Ano letivo no qual teve origem o débito'
+    datatype: integer
+  - Valor do débito: debit_value
+    datatype: currency
+    hint: 0000,00
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#ZGViaXRfdmFsdWU').mask('###0.00', {reverse: true});
+      });
+  </script>
+---
+code: |
+  from num2words import num2words
+  extended_debit_value = num2words(debit_value, lang='pt_BR', to='currency')
+---
+section: Dados do Financeiro
+progress: 70
+question: Dados do financeiro
+fields:
+  - 'E-mail do financeiro:': financeiro_email
+    help: "O e-mail informado será utilizado para contato com o setor financeiro da escola."
+    datatype: email
+    required: False
+---
+code: |
+  recipients = list()
+  notificante_recipient = dict()
+  notificante_recipient['name'] = school_legal_name
+  notificante_recipient['email'] = school_email
+  notificante_recipient['group'] = 'signers'
+  notificante_recipient['routingOrder'] = 1
+  notificante_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(notificante_recipient)
+
+  notified_recipient = dict()
+  notified_recipient['name'] = notified.name.first
+  notified_recipient['email'] = notified.email
+  notified_recipient['group'] = 'certifiedDeliveries'
+  notified_recipient['routingOrder'] = 2
+  recipients.append(notified_recipient)
+
+  financeiro_recipient = dict()
+  financeiro_recipient['name'] = "Contato Financeiro"
+  financeiro_recipient['email'] = financeiro_email
+  financeiro_recipient['group'] = 'carbonCopies'
+  financeiro_recipient['routingOrder'] = 3
+  recipients.append(financeiro_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

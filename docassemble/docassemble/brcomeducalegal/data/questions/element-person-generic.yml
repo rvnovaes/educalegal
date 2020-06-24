@@ -1,0 +1,478 @@
+---
+include:
+  - element-data-list.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+objects:
+  - part: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+  - counterpart: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+  - extrapart: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+  - x.child: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+generic object: Person
+code: |
+  if x is part and part_loop_type == False:
+    x.target_number = 1
+  if x is counterpart and counterpart_loop_type == False:
+    x.target_number = 1
+  if x is extrapart and extrapart_loop_type == False:
+    x.target_number = 1
+---
+generic object: Person
+code: |
+  x.name.text
+  x.address.street_name
+  x.child.gather()
+  x.complete = True
+---
+generic object: Person
+code: |
+  x.child[j].name.text
+  x.child[j].address.street_name
+  x.child[j].complete = True
+---
+generic object: Person
+section: Partes
+progress: 0
+question: |
+  % if x is part:
+  Há ${ part_name }
+  % elif x is counterpart:
+  Há ${ counterpart_name }
+  % elif x is extrapart:
+  Há ${ extrapart_name }
+  % endif
+yesno: has_part
+---
+generic object: Person
+section: Partes
+progress: 0
+question: |
+  % if x is part:
+  Número de ${ part_name }
+  % elif x is counterpart:
+  Número de ${ counterpart_name }
+  % elif x is extrapart:
+  Número de ${ extrapart_name }
+  % endif
+fields:
+  - Número: x.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+generic object: Person
+section: Partes
+progress: 5
+question: |
+  % if part_loop_type==True and x is part:
+  Dados do(a) ${ word(ordinal(i)) } ${ part_name }
+  % elif part_loop_type==False and x is part:
+  Dados do(a) ${ part_name }
+  % endif
+  % if counterpart_loop_type==True and x is counterpart:
+  Dados do(a) ${ word(ordinal(i)) } ${ counterpart_name }
+  % elif counterpart_loop_type==False and x is counterpart:
+  Dados do(a) ${ counterpart_name }
+  % endif
+  % if extrapart_loop_type==True and x is extrapart:
+  Dados do(a) ${ word(ordinal(i)) } ${ extrapart_name }
+  % elif extrapart_loop_type==False and x is extrapart:
+  Dados do(a) ${ extrapart_name }
+  % endif
+fields:
+  - no label: x.person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+    default: individual
+    show if:
+      code: |
+          part_person_type == "individual" and part_has_representative_pf == False and part_has_representative_pj == False
+  - no label: x.person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Jurídica: organization
+    default: organization
+    show if:
+      code: |
+        part_person_type == "organization" and part_has_representative_pj == False and part_has_representative_pf == False
+  - no label: x.person_type
+    required: True
+    datatype: radio
+    choices:
+      - Adolescente ou criança: legally_incapable_individual
+    default: legally_incapable_individual
+    show if:
+      code: |
+        part_person_type == "individual" and part_has_representative_pf == True and part_has_representative_pj == False
+  - no label: x.person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Jurídica: legally_incapable_organization
+    default: legally_incapable_organization
+    show if:
+      code: |
+        part_person_type == "organization" and part_has_representative_pj == True and part_has_representative_pf == False
+  - "Tipo:": x.person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+    show if:
+      code: |
+        part_person_type == "both" and part_has_representative_pj == False and part_has_representative_pf == False
+  - "Tipo:": x.person_type
+    required: True
+    datatype: radio
+    choices:
+      - Adolescente ou criança: legally_incapable_individual
+      - Adulto capaz: individual
+    show if:
+      code: |
+        part_has_representative_pf == "both" and part_person_type == "individual" and part_has_representative_pj == False
+  - "Nome Completo:": x.name.text
+    required: True
+    js show if: |
+      val("x.person_type") == "individual"
+  - "CPF:": x.cpf
+    required: part_cpf_required
+    validate: validate_cpf
+    show if:
+      code: part_cpf_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Número do RG:": x.rg
+    required: part_rg_required
+    show if:
+      code: part_rg_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Nacionalidade:": x.nationality
+    required: part_nationality_required
+    default: brasileiro(a)
+    show if:
+      code: part_nationality_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Estado civil:": x.marital_status
+    required: part_marital_status_required
+    datatype: radio
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    show if:
+      code: part_marital_status_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Razão Social:": x.name.text
+    required: True
+    js show if: |
+      val("x.person_type") == "organization" || val("x.person_type") == "legally_incapable_organization"
+  - "CNPJ:": x.cnpj
+    required: part_cnpj_required
+    validate: validate_cnpj
+    show if:
+      code: part_cnpj_show
+    js show if: |
+      val("x.person_type") == "organization" || val("x.person_type") == "legally_incapable_organization"
+  - "Nome do menor incapaz:": x.name.text
+    required: True
+    js show if: |
+      val("x.person_type") == "legally_incapable_individual"
+  - "CPF do menor incapaz:": x.cpf_minor
+    required: part_cpf_minor_required
+    validate: validate_cpf
+    show if:
+      code: part_cpf_minor_show
+    js show if: |
+      val("x.person_type") == "legally_incapable_individual"
+  - "RG do menor incapaz:": x.rg_minor
+    required: part_rg_minor_required
+    show if:
+      code: part_rg_minor_show
+    js show if: |
+      val("x.person_type") == "legally_incapable_individual"
+  - "Número de representantes:": x.child.target_number
+    required: False
+    datatype: integer
+    default: 1
+    min: 1
+    js show if: |
+      val("x.person_type") == "legally_incapable_individual" || val("x.person_type") == "legally_incapable_organization"
+  - "Data de Nascimento:": x.birthdate
+    required: part_birthdate_required
+    datatype: date
+    show if:
+      code: part_birthdate_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Profissão:": x.occupation
+    required: part_occupation_required
+    show if:
+      code: part_occupation_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Escola onde trabalha:": x.school_role
+    required: part_school_role_required
+    show if:
+      code: part_school_role_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Cargo:": x.role
+    required: part_role_required
+    show if:
+      code: part_role_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Celular:": x.celphone
+    required: part_celphone_required
+    show if:
+      code: part_celphone_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Telefone:": x.telephone
+    required: part_telephone_required
+    show if:
+      code: part_telephone_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "Whatsapp:": x.whatsapp
+    required: part_whatsapp_required
+    show if:
+      code: part_whatsapp_show
+    js show if: |
+      val("x.person_type") == "individual"
+  - "E-mail:": x.email
+    required: part_email_required
+    datatype: email
+    help: ${ help_email_msg }
+    show if:
+      code: part_email_show
+    js show if: |
+      val("x.person_type") == "organization" || val("x.person_type") == "individual" ||  val("x.person_type") == "legally_incapable_organization"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzc').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzEy').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzE0').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzIx').mask('(00) Z 0000-0000', {
+          translation: {
+            'Z': {
+              pattern: /[9]/, optional: true
+            }
+          }
+        });
+        $('#X2ZpZWxkXzIy').mask('(00) Z 0000-0000', {
+          translation: {
+            'Z': {
+              pattern: /[9]/, optional: true
+            }
+          }
+        });
+        $('#X2ZpZWxkXzIz').mask('(00) Z 0000-0000', {
+          translation: {
+            'Z': {
+              pattern: /[9]/, optional: true
+            }
+          }
+        });
+    });
+  </script>
+---
+generic object: Person
+section: Partes
+progress: 10
+question: |
+  Endereço do(a) ${ x }
+fields:
+  - "CEP:": x.address.zip
+    required: True
+  - "Logradouro:": x.address.street_name
+    required: True
+  - "Número:": x.address.street_number
+    required: True
+  - "Complemento:": x.address.unit
+    required: False
+  - "Bairro:": x.address.neighborhood
+    required: True
+  - "Cidade:": x.address.city
+    required: True
+  - "Estado:": x.address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#cGFydFtpXS5hZGRyZXNzLnppcA').mask('00000-000');
+  });
+  $("#cGFydFtpXS5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#cGFydFtpXS5hZGRyZXNzLnppcA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#cGFydFtpXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#cGFydFtpXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#cGFydFtpXS5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#cGFydFtpXS5hZGRyZXNzLnN0YXRl").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+generic object: Person
+code: |
+  if x is part and part_has_representative_pf == False:
+    x.child.target_number = 0
+  if x is counterpart and counterpart_has_representative_pf == False:
+    x.child.target_number = 0
+  if x is extrapart and extrapart_has_representative_pf == False:
+    x.child.target_number = 0
+---
+generic object: Person
+code: |
+  if x is part and part_has_representative_pj != True:
+    x.child.target_number = 0
+  if x is counterpart and counterpart_has_representative_pj != True:
+    x.child.target_number = 0
+  if x is extrapart and extrapart_has_representative_pj != True:
+    x.child.target_number = 0
+---
+generic object: Person
+code: |
+  if x is part and part_person_type == "both":
+    x.child.target_number = 0
+  if x is counterpart and counterpart_person_type == "both":
+    x.child.target_number = 0
+  if x is extrapart and extrapart_person_type == "both":
+    x.child.target_number = 0
+---
+generic object: Person
+section: Partes
+progress: 10
+question: |
+  Dados do ${ word(ordinal(j)) } representante do(a) ${ x }:
+fields:
+  - "Nome completo:": x.child[j].name.text
+    required: True
+  - "CPF:": x.child[j].cpf
+    required: True
+    validate: validate_cpf
+    datatype: string
+  - "Número do RG:": x.child[j].rg
+    required: True
+  - "Nacionalidade:": x.child[j].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado civil:": x.child[j].marital_status
+    required: True
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    datatype: radio
+  - "Profissão:": x.child[j].occupation
+    required: True
+  - "E-mail:": x.child[j].email
+    required: False
+    datatype: email
+    help: ${ help_email_msg }
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#cGFydFtpXS5jaGlsZFtqXS5jcGY').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+generic object: Person
+section: Partes
+progress: 10
+question: |
+  Endereço do representante ${ x.child[j] }:
+fields:
+  - "CEP:": x.child[j].address.zip
+    required: True
+  - "Logradouro:": x.child[j].address.street_name
+    required: True
+  - "Número:": x.child[j].address.street_number
+    required: True
+  - "Complemento:": x.child[j].address.unit
+    required: False
+  - "Bairro:": x.child[j].address.neighborhood
+    required: True
+  - "Cidade:": x.child[j].address.city
+    required: True
+  - "Estado:": x.child[j].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#cGFydFtpXS5jaGlsZFtqXS5hZGRyZXNzLnppcA').mask('00000-000');
+  });
+  $("#cGFydFtpXS5jaGlsZFtqXS5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#cGFydFtpXS5jaGlsZFtqXS5hZGRyZXNzLnppcA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#cGFydFtpXS5jaGlsZFtqXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#cGFydFtpXS5jaGlsZFtqXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#cGFydFtpXS5jaGlsZFtqXS5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#cGFydFtpXS5jaGlsZFtqXS5hZGRyZXNzLnN0YXRl").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

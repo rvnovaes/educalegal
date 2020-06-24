@@ -1,0 +1,496 @@
+---
+variable name: state_initials_list
+data:
+  - AC: AC
+  - AL: AL
+  - AM: AM
+  - AP: AP
+  - BA: BA
+  - CE: CE
+  - DF: DF
+  - ES: ES
+  - GO: GO
+  - MA: MA
+  - MT: MT
+  - MS: MS
+  - MG: MG
+  - PA: PA
+  - PB: PB
+  - PR: PR
+  - PE: PE
+  - PI: PI
+  - RJ: RJ
+  - RN: RN
+  - RS: RS
+  - RO: RO
+  - RR: RR
+  - SC: SC
+  - SP: SP
+  - SE: SE
+  - TO: TO
+---
+variable name: state_list
+data:
+  - Acre
+  - Alagoas
+  - Amapá
+  - Amazonas
+  - Bahia
+  - Ceará
+  - Distrito Federal
+  - Espírito Santo
+  - Goiás
+  - Maranhão
+  - Mato Grosso
+  - Mato Grosso do Sul
+  - Minas Gerais
+  - Pará
+  - Paraíba
+  - Paraná
+  - Pernambuco
+  - Piauí
+  - Rio de Janeiro
+  - Rio Grande do Norte
+  - Rio Grande do Sul
+  - Rondônia
+  - Roraima
+  - Santa Catarina
+  - São Paulo
+  - Sergipe
+  - Tocantins
+---
+variable name: society_list
+data:
+  - sociedade limitada: sociedade limitada
+  - sociedade anônima: sociedade anônima
+  - associação privada: associação privada
+  - associação pública: associação pública
+  - autarquia estadual: autarquia estadual
+  - autarquia federal: autarquia federal
+  - autarquia municipal: autarquia municipal
+  - candidato a cargo político eletivo: candidato a cargo político eletivo
+  - clube de investimento: clube de investimento
+  - comissão de conciliação prévia: comissão de conciliação prévia
+  - comissão polinacional: comissão polinacional
+  - comunidade indígena: comunidade indígena
+  - condomínio edilício: condomínio edilício
+  - consórcio de empregadores: consórcio de empregadores
+  - consórcio de sociedades: consórcio de sociedades
+  - consórcio simples: consórcio simples
+  - contribuinte individual (produtor rural): contribuinte individual (produtor rural)
+  - cooperativa: cooperativa
+  - empresa individual de responsabilidade limitada – de natureza empresária: empresa individual de responsabilidade limitada – de natureza empresária
+  - empresa individual de responsabilidade limitada – de natureza simples,empresa individual: empresa individual de responsabilidade limitada – de natureza simples,empresa individual
+  - imobiliária: imobiliária
+  - empresa pública: empresa pública
+  - empresário (individual): empresário (individual)
+  - entidade de mediação e arbitragem: entidade de mediação e arbitragem
+  - entidade sindical: entidade sindical
+  - estabelecimento. no brasil, de empresa binacional argentino-brasileira: estabelecimento. no brasil, de empresa binacional argentino-brasileira
+  - estabelecimento, no brasil, de fundação ou associação estrangeiras: estabelecimento, no brasil, de fundação ou associação estrangeiras
+  - estabelecimento, no brasil, de sociedade estrangeira: estabelecimento, no brasil, de sociedade estrangeira
+  - fundação estadual: fundação estadual
+  - fundação federal: fundação federal
+  - fundação municipal: fundação municipal
+  - fundação privada: fundação privada
+  - fundo de investimento: fundo de investimento
+  - fundo privado: fundo privado
+  - fundo público: fundo público
+  - grupo de sociedades: grupo de sociedades
+  - instituição financeira de direito privado: instituição financeira de direito privado
+  - organização religiosa: organização religiosa
+  - órgão público autônomo estadual: órgão público autônomo estadual
+  - órgão público autônomo federal: órgão público autônomo federal
+  - órgão público autônomo municipal: órgão público autônomo municipal
+  - órgão público do poder executivo estadual: órgão público do poder executivo estadual
+  - órgão público do poder executivo federal: órgão público do poder executivo federal
+  - órgão público do poder executivo municipal: órgão público do poder executivo municipal
+  - órgão público do poder judiciário estadual: órgão público do poder judiciário estadual
+  - órgão público do poder judiciário federal: órgão público do poder judiciário federal
+  - órgão público do poder legislativo estadual: órgão público do poder legislativo estadual
+  - órgão público do poder legislativo federal: órgão público do poder legislativo federal
+  - órgão público do poder legislativo municipal: órgão público do poder legislativo municipal
+  - partido político: partido político
+  - pessoa jurídica de direito privado: pessoa jurídica de direito privado
+  - serviço notorial e registral(cartório): serviço notorial e registral(cartório)
+  - serviço social autônomo: serviço social autônomo
+  - sociedade anônima aberta: sociedade anônima aberta
+  - sociedade anônima fechada: sociedade anônima fechada
+  - sociedade de economia mista: sociedade de economia mista
+  - sociedade em conta de participação: sociedade em conta de participação
+  - sociedade empresária em comandita por ações: sociedade empresária em comandita por ações
+  - sociedade empresária em comandita simples: sociedade empresária em comandita simples
+  - sociedade empresária em nome coletivo: sociedade empresária em nome coletivo
+  - sociedade empresária limitada: sociedade empresária limitada
+  - sociedade simples em comandita simples: sociedade simples em comandita simples
+  - sociedade simples em nome coletivo: sociedade simples em nome coletivo
+  - sociedade simples limitada: sociedade simples limitada
+  - sociedade simples pura: sociedade simples pura
+---
+variable name: bank_list
+data:
+  - Banco do Brasil S.A.
+  - Banco Itaú S.A.
+  - Banco Santander (Brasil) S.A.
+  - Banco Real S.A. (antigo)
+  - Itaú Unibanco Holding S.A.
+  - Banco Bradesco S.A.
+  - Banco Citibank S.A.
+  - HSBC Bank Brasil S.A. – Banco Múltiplo
+  - Caixa Econômica Federal
+  - Banco Mercantil do Brasil S.A.
+  - Banco Rural S.A.
+  - Banco Safra S.A.
+  - Banco Rendimento S.A.
+---
+variable name: signature_local_default
+data: ""
+---
+variable name: part_name
+data: ""
+---
+variable name: part_show
+data: True
+---
+variable name: has_part_show
+data: False
+---
+variable name: part_person_type
+data: ""
+---
+variable name: part_person_both_show
+data: False
+---
+variable name: part_individual_both_show
+data: False
+---
+variable name: part_loop_type
+data: True
+---
+variable name: part_has_representative_pf
+data: False
+---
+variable name: part_has_representative_pj
+data: False
+---
+variable name: part_manager_show
+data: False
+---
+variable name: part_cpf_show
+data: True
+---
+variable name: part_rg_show
+data: True
+---
+variable name: part_nationality_show
+data: True
+---
+variable name: part_marital_status_show
+data: True
+---
+variable name: part_cnpj_show
+data: True
+---
+variable name: part_cpf_minor_show
+data: True
+---
+variable name: part_rg_minor_show
+data: True
+---
+variable name: part_occupation_show
+data: True
+---
+variable name: part_email_show
+data: True
+---
+variable name: part_birthdate_show
+data: False
+---
+variable name: part_school_role_show
+data: False
+---
+variable name: part_role_show
+data: False
+---
+variable name: part_celphone_show
+data: False
+---
+variable name: part_telephone_show
+data: False
+---
+variable name: part_whatsapp_show
+data: False
+---
+variable name: part_cpf_required
+data: True
+---
+variable name: part_rg_required
+data: True
+---
+variable name: part_nationality_required
+data: True
+---
+variable name: part_marital_status_required
+data: True
+---
+variable name: part_cnpj_required
+data: True
+---
+variable name: part_cpf_minor_required
+data: False
+---
+variable name: part_rg_minor_required
+data: False
+---
+variable name: part_occupation_required
+data: True
+---
+variable name: part_email_required
+data: False
+---
+variable name: part_birthdate_required
+data: False
+---
+variable name: part_celphone_required
+data: False
+---
+variable name: part_telephone_required
+data: False
+---
+variable name: part_whatsapp_required
+data: False
+---
+variable name: part_role_required
+data: False
+---
+variable name: part_school_role_required
+data: False
+---
+variable name: counterpart_name
+data: ""
+---
+variable name: counterpart_show
+data: False
+---
+variable name: has_counterpart_show
+data: False
+---
+variable name: counterpart_person_type
+data: ""
+---
+variable name: counterpart_loop_type
+data: True
+---
+variable name: counterpart_has_representative_pf
+data: False
+---
+variable name: counterpart_has_representative_pj
+data: False
+---
+variable name: counterpart_manager_show
+data: False
+---
+variable name: counterpart_cpf_show
+data: True
+---
+variable name: counterpart_rg_show
+data: True
+---
+variable name: counterpart_nationality_show
+data: True
+---
+variable name: counterpart_marital_status_show
+data: True
+---
+variable name: counterpart_cnpj_show
+data: True
+---
+variable name: counterpart_cpf_minor_show
+data: True
+---
+variable name: counterpart_rg_minor_show
+data: True
+---
+variable name: counterpart_occupation_show
+data: True
+---
+variable name: counterpart_email_show
+data: True
+---
+variable name: counterpart_birthdate_show
+data: False
+---
+variable name: counterpart_school_role_show
+data: False
+---
+variable name: counterpart_role_show
+data: False
+---
+variable name: counterpart_celphone_show
+data: False
+---
+variable name: counterpart_telephone_show
+data: False
+---
+variable name: counterpart_whatsapp_show
+data: False
+---
+variable name: counterpart_cpf_required
+data: True
+---
+variable name: counterpart_rg_required
+data: True
+---
+variable name: counterpart_nationality_required
+data: True
+---
+variable name: counterpart_marital_status_required
+data: True
+---
+variable name: counterpart_cnpj_required
+data: True
+---
+variable name: counterpart_cpf_minor_required
+data: False
+---
+variable name: counterpart_rg_minor_required
+data: False
+---
+variable name: counterpart_occupation_required
+data: True
+---
+variable name: counterpart_email_required
+data: False
+---
+variable name: counterpart_birthdate_required
+data: False
+---
+variable name: counterpart_celphone_required
+data: False
+---
+variable name: counterpart_telephone_required
+data: False
+---
+variable name: counterpart_whatsapp_required
+data: False
+---
+variable name: counterpart_role_required
+data: False
+---
+variable name: counterpart_school_role_required
+data: False
+---
+variable name: extrapart_name
+data: ""
+---
+variable name: extrapart_show
+data: False
+---
+variable name: has_extrapart_show
+data: False
+---
+variable name: extrapart_person_type
+data: ""
+---
+variable name: extrapart_loop_type
+data: True
+---
+variable name: extrapart_has_representative_pf
+data: False
+---
+variable name: extrapart_has_representative_pj
+data: False
+---
+variable name: extrapart_manager_show
+data: False
+---
+variable name: extrapart_cpf_show
+data: True
+---
+variable name: extrapart_rg_show
+data: True
+---
+variable name: extrapart_nationality_show
+data: True
+---
+variable name: extrapart_marital_status_show
+data: True
+---
+variable name: extrapart_cnpj_show
+data: True
+---
+variable name: extrapart_cpf_minor_show
+data: True
+---
+variable name: extrapart_rg_minor_show
+data: True
+---
+variable name: extrapart_occupation_show
+data: True
+---
+variable name: extrapart_email_show
+data: True
+---
+variable name: extrapart_birthdate_show
+data: False
+---
+variable name: extrapart_school_role_show
+data: False
+---
+variable name: extrapart_role_show
+data: False
+---
+variable name: extrapart_celphone_show
+data: False
+---
+variable name: extrapart_telephone_show
+data: False
+---
+variable name: extrapart_whatsapp_show
+data: False
+---
+variable name: extrapart_cpf_required
+data: True
+---
+variable name: extrapart_rg_required
+data: True
+---
+variable name: extrapart_nationality_required
+data: True
+---
+variable name: extrapart_marital_status_required
+data: True
+---
+variable name: extrapart_cnpj_required
+data: True
+---
+variable name: extrapart_cpf_minor_required
+data: False
+---
+variable name: extrapart_rg_minor_required
+data: False
+---
+variable name: extrapart_occupation_required
+data: True
+---
+variable name: extrapart_email_required
+data: False
+---
+variable name: extrapart_birthdate_required
+data: False
+---
+variable name: extrapart_celphone_required
+data: False
+---
+variable name: extrapart_telephone_required
+data: False
+---
+variable name: extrapart_whatsapp_required
+data: False
+---
+variable name: extrapart_role_required
+data: False
+---
+variable name: extrapart_school_role_required
+data: False
+---

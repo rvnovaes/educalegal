@@ -1,0 +1,447 @@
+metadata:
+  title: Contrato de Prestação de Serviços de Consultoria
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Contratante
+  - Contratada
+  - Cláusulas
+  - Conclusão
+---
+code:  |
+  content_document = "contrato-prestacao-servicos-consultoria.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    inserirDadosGestor
+    contratadas.gather()
+    if plan_use_esignature:
+      valid_contratadas_table
+    inserirDadosGestor2
+    objeto
+    tipoParcela
+    prazoInicio
+    temExclusividade
+    if temOutraObrigacao:
+      for item in obrigacao:
+        item.name.text
+    localExecucaoServicos
+    state
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+ga id: |
+  code: ga_id_begin
+section: Contratante
+progress: 10
+question: Gestor do Contrato da Escola
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': inserirDadosGestor
+    datatype: yesnoradio
+  - 'Nome:': nome_gestor
+    datatype: text
+    show if:
+      variable: inserirDadosGestor
+      is: true
+    required: True
+  - 'E-mail:': email_gestor
+    datatype: email
+    show if:
+      variable: inserirDadosGestor
+      is: true
+    required: False
+  - 'Telefone:': telefone_gestor
+    datatype: text
+    show if:
+      variable: inserirDadosGestor
+      is: true
+    required: False
+---
+objects:
+  - contratadas: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  contratadas[i].name.first
+  contratadas[i].address.street
+  contratadas[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Contratada
+progress: 30
+question: Número de Contratadas
+fields:
+  - Número: contratadas.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Contratada
+progress: 35
+question: Dados do(a) ${word(ordinal(i)) } Contratada
+fields:
+  - 'Razão social:': contratadas[i].name.first
+    datatype: text
+    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
+  - 'CNPJ:': contratadas[i].cnpj
+    datatype: text
+    validate: validate_cnpj
+  - "E-mail:": contratadas[i].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: False
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#Y29udHJhdGFkYXNbaV0uY25wag').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Contratada
+progress: 40
+question: Endereço do(a) ${ contratadas[i].name.first }
+fields:
+  - 'CEP:': contratadas[i].address.zip
+    datatype: text
+  - 'Logradouro:': contratadas[i].address.street
+    datatype: text
+  - 'Número:': contratadas[i].address.street_number
+    datatype: text
+  - 'Complemento:': contratadas[i].address.unit
+    datatype: text
+    required: false
+  - 'Bairro:': contratadas[i].address.neighborhood
+    datatype: text
+  - 'Município:': contratadas[i].address.city
+    datatype: text
+  - 'Estado:': contratadas[i].address.state
+    code: state_initials_list
+    datatype: dropdown
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+  });
+
+  $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy5zdHJlZXQ").val(data.logradouro);
+          $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#Y29udHJhdGFkYXNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Contratada
+field: valid_contratadas_table
+question: |
+  Contratadas:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ contratadas.table }
+buttons:
+  Continuar: continue
+---
+table: contratadas.table
+rows: contratadas
+columns:
+  - Name: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Contratada
+progress: 45
+question: Gestor do Contrato
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': inserirDadosGestor2
+    datatype: yesnoradio
+  - 'Nome:': nome_gestor2
+    datatype: text
+    show if:
+      variable: inserirDadosGestor2
+      is: true
+    required: True
+  - 'E-mail:': email_gestor2
+    datatype: email
+    show if:
+      variable: inserirDadosGestor2
+      is: true
+    required: False
+  - 'Telefone:': telefone_gestor2
+    datatype: text
+    show if:
+      variable: inserirDadosGestor2
+      is: true
+    required: False
+---
+section: Cláusulas
+progress: 55
+question: |
+  Objeto
+subquestion: |
+  O presente Contrato tem como objeto a prestação de serviços de [FIELD objeto].
+fields:
+  - 'Objeto:': objeto
+    datatype: text
+    inline width: 30em
+  - 'A contratada será responsável por fornecer os equipamentos necessários à prestação do serviço?': contratadaForneceEquipamentos
+    datatype: yesnoradio
+  - 'Existe Anexo com especificações e/ou proposta comercial?': has_payment_attachment
+    datatype: yesnoradio
+  - Anexo(s): payment_attachment
+    datatype: files
+    show if:
+      is: true
+      variable: has_payment_attachment
+    required: False
+---
+code: |
+  from num2words import num2words
+  valorContratoExtenso = num2words(valorContrato, lang='pt_BR', to='currency')
+
+  if tipoParcela != 'mensal' and formaPagamento == 'parcelado':
+    nrParcelasExtenso = num2words(nrParcelas, lang='pt_BR')
+---
+section: Cláusulas
+progress: 60
+question: Preço e forma de pagamento
+subquestion: |
+  A Contratante pagará à Contratada o valor [FIELD tipoParcela] de [FIELD valorContrato].
+fields:
+  - 'A Contratante pagará à Contratada o valor:': tipoParcela
+    datatype: dropdown
+    choices:
+    - mensal: mensal
+    - anual: anual
+    - total: total
+  - 'Valor:': valorContrato
+    datatype: currency
+    hint: 0000,00
+  - Forma de pagamento: formaPagamento
+    datatype: radio
+    choices:
+      - À vista: a_vista
+      - Parcelado: parcelado
+    hide if:
+      variable: tipoParcela
+      is: mensal
+  - 'Nº de parcelas:': nrParcelas
+    datatype: integer
+    show if:
+      variable: formaPagamento
+      is: parcelado
+  - 'O pagamento do Preço será realizado mediante:': tipoPagamento
+    choices:
+      - conta corrente: conta corrente
+      - boleto bancário: boleto bancário
+    datatype: radio
+  - 'Banco:': banco
+    datatype: text
+    help: 'Ex.: Bradesco'
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - 'Agência:': agencia
+    datatype: text
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - 'Conta corrente:': contaCorrente
+    datatype: text
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - Tipo de pessoa: tipo_pessoa_cc
+    input type: radio
+    choices:
+      - Física
+      - Jurídica
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - 'CNPJ:': cnpj_cc
+    datatype: text
+    validate: validate_cnpj
+    show if:
+      variable: tipo_pessoa_cc
+      is: Jurídica
+  - 'CPF:': cpf_cc
+    datatype: text
+    validate: validate_cpf
+    show if:
+      variable: tipo_pessoa_cc
+      is: Física
+  - 'Deseja inserir condições específicas de pagamento?' : adicional
+    datatype: yesnoradio
+    help: 'Ex: Do valor total da prestação de serviços R$ XX,XX serão pagos à primeira contratada e R$ XX,XX serão pagos à segunda contratada. Ex.2: O pagamento será realizado em 2 (duas) parcelas no valor de R$ XX,XX, com vencimento em XX/XX/XX '
+  - 'Condições específicas de pagamento:': formasPagamento
+    datatype: area
+    show if:
+      is: true
+      variable: adicional
+  - 'Quem arcará com as despesas de locomoção, estadia e alimentação?': pgtoDespesasExtras
+    input type: radio
+    choices:
+      - Contratante
+      - Contratada
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzk').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzEw').mask('000.000.000-00', {reverse: true});
+        $('#dmFsb3JDb250cmF0bw').mask('000000000000000.00', {reverse: true});
+      });
+  </script>
+---
+section: Cláusulas
+progress: 65
+question: Prazo
+subquestion: |
+  O presente Contrato irá vigorar de [FIELD prazoInicio] até [FIELD prazoFim].
+fields:
+  - 'Data do início do Contrato': prazoInicio
+    datatype: date
+  - 'Data do fim do Contrato': prazoFim
+    datatype: date
+---
+section: Cláusulas
+progress: 70
+question: 'O presente Contrato prevê exclusividade por parte da Contratada no que se refere ao segmento de atuação da Contratante?'
+yesno: temExclusividade
+---
+section: Cláusulas
+progress: 75
+question: 'Existem outras obrigações da Contratada além das previstas no Contrato?'
+yesno: temOutraObrigacao
+---
+objects:
+  obrigacao: DAList.using(object_type=Thing, there_are_any=True)
+---
+progress: 80
+question: |
+  Cite as outras obrigações da Contratada.
+fields:
+  - 'Obrigação:': obrigacao[i].name.text
+    help: 'Ex.: apresentação de relatórios com determinada frequência'
+    required: False
+list collect: True
+section: Cláusulas
+---
+field: obrigacao_table
+table: obrigacao.table
+rows: obrigacao
+columns:
+  - 'Obrigação:': row_item.name
+edit:
+  - name.text
+---
+section: Cláusulas
+progress: 90
+question: Local da prestação dos serviços
+fields:
+  - 'A execução dos Serviços ocorrerá nas dependências da': localExecucaoServicos
+    datatype: radio
+    choices:
+      - Contratante
+      - Contratada
+      - Outros
+  - 'A execução dos Serviços ocorrerá no(a)': localOutros
+    datatype: text
+    help: 'Ex.: local de realização da pesquisa'
+    show if:
+      variable: localExecucaoServicos
+      is: Outros
+  - 'O serviço será prestado de forma remota?': servicoRemoto
+    datatype: yesnoradio
+---
+code: |
+  recipients = list()
+  for item in contratadas:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.first
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

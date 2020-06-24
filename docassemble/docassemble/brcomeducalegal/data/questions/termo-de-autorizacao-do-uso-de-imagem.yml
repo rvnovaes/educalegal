@@ -1,0 +1,249 @@
+metadata:
+  title: Termo de Autorização do Uso de Imagem
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Escola
+  - Dados da Pessoa
+  - Prazo
+  - Assinatura
+  - Conclusão
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    authorizers.gather()
+    if plan_use_esignature:
+      valid_authorizers_table
+    years_agreement
+    city
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - authorizers: DAList.using(object_type=Individual, ask_number=True, complete_attribute='complete')
+---
+code: |
+  authorizers[i].person_type
+  authorizers[i].name.first
+  authorizers[i].address.address
+  authorizers[i].complete = True
+---
+ga id: |
+  code: ga_id_begin
+section: Dados da Pessoa
+progress: 10
+question: Número de pessoas que irão conceder o uso de sua imagem
+fields:
+  - Número: authorizers.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+question: |
+  Informe o tipo da pessoa que irá conceder o uso da imagem
+fields:
+  - "Tipo:": authorizers[i].person_type
+    required: True
+    datatype: radio
+    choices:
+      - adulto com 18 anos completos: individual
+      - adolescente ou criança: representative
+---
+question: |
+  % if authorizers[i].person_type == "individual":
+  Dados do(a) ${ word(ordinal(i)) } pessoa que irá conceder o uso da imagem
+  % else:
+  Dados do representante do(a) ${ word(ordinal(i)) } da pessoa que irá conceder o uso da imagem
+  % endif
+fields:
+  - "Nome completo:": authorizers[i].name.first
+    required: True
+  - "CPF:": authorizers[i].cpf
+    required: True
+    validate: validate_cpf
+  - "Número do RG:": authorizers[i].rg
+    required: True
+  - "Nacionalidade:": authorizers[i].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado civil:": authorizers[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+  - "E-mail:": authorizers[i].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: False
+  - "Nome completo do(a) criança/adolescente:": authorizers[i].minor_name
+    required: True
+    show if:
+      code: |
+        authorizers[i].person_type == 'representative'
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#YXV0aG9yaXplcnNbaV0uY3Bm').mask('000.000.000-00', {reverse: true});
+    });
+  </script>
+---
+question: |
+  Endereço do(a) ${ authorizers[i] }
+fields:
+  - "CEP:": authorizers[i].address_postal_code
+    required: True
+  - "Logradouro:": authorizers[i].address.address
+    required: True
+  - "Número:": authorizers[i].address_street_number
+    required: True
+  - "Complemento:": authorizers[i].address_complement
+    required: False
+  - "Bairro:": authorizers[i].address_neighborhood
+    required: True
+  - "Cidade:": authorizers[i].address_city
+    required: True
+  - "Estado:": authorizers[i].address_state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#YXV0aG9yaXplcnNbaV0uYWRkcmVzc19wb3N0YWxfY29kZQ').mask('00000-000');
+  });
+
+  $("#YXV0aG9yaXplcnNbaV0uYWRkcmVzc19wb3N0YWxfY29kZQ").focusout(function(){
+    var cep = $("#YXV0aG9yaXplcnNbaV0uYWRkcmVzc19wb3N0YWxfY29kZQ").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#YXV0aG9yaXplcnNbaV0uYWRkcmVzcy5hZGRyZXNz").val(data.logradouro);
+          $("#YXV0aG9yaXplcnNbaV0uYWRkcmVzc19uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#YXV0aG9yaXplcnNbaV0uYWRkcmVzc19jaXR5").val(data.localidade);
+          $("#YXV0aG9yaXplcnNbaV0uYWRkcmVzc19zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Dados da Pessoa
+field: valid_authorizers_table
+question: |
+  Autorizantes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ authorizers.table }
+buttons:
+  Continuar: continue
+---
+table: authorizers.table
+rows: authorizers
+columns:
+  - Name: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+code: |
+  from num2words import num2words
+  years_agreement_in_words = num2words(years_agreement, lang='pt_BR')
+---
+progress: 50
+section: Prazo
+question: |
+  Prazo do Acordo
+fields:
+  - "Prazo do uso da imagem:": years_agreement
+    datatype: integer
+    default: 01
+    note: ano(s)
+---
+code:  |
+  content_document = "termo-de-autorizacao-do-uso-de-imagem.docx"
+---
+code: |
+  recipients = list()
+  for item in authorizers:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.first
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

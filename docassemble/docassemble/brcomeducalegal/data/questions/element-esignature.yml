@@ -1,0 +1,69 @@
+---
+modules:
+  - .element_docusign_client
+  - .element_educalegal_client
+---
+ga id: |
+  code: ga_id_e_signature
+event: submit_to_esignature
+code: |
+  log("Executando element-esignature.yml")
+  if tenant_esignature_provider ==  'Docusign':
+    dsc = DocuSignClient(tenant_client_id, tenant_impersonated_user_guid, tenant_test_mode, tenant_private_key)
+    data_sent, data_received, e_signature_response_status_code = dsc.send_to_docusign(recipients, documents, send_immediately=True, email_subject="Documento para sua assinatura")
+    log("Docusign data_received: {data_received}".format(data_received=data_received))
+    if el_log_to_console:
+      log("Docusign data_received: {data_received}".format(data_received=data_received), "console")
+    status = data_received['status'].lower()
+    envelope_statuses = {'sent': 'enviado',
+                       'delivered': 'entregue',
+                       'completed': 'finalizado',
+                       'declined': 'recusado',
+                       'voided': 'inválido'}
+    if status in envelope_statuses.keys():
+        status = envelope_statuses[status]
+    else:
+        status = 'não encontrado'
+    envelope_id = data_received['envelopeId']
+  el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, tenant_esignature_provider, True)
+  log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
+  if el_log_to_console:
+    log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
+  if e_signature_response_status_code == 201:
+    signature_success
+  else:
+    signature_fail
+---
+event: signature_success
+back button: False
+question: Documento enviado para assinatura com sucesso
+subquestion: |
+  ####O documento foi enviado para os seguintes destinatários:
+  % for recipient in recipients:
+    % if recipient['email']:
+      * ${ recipient['name'] }
+      - ${ recipient['email'] }
+      ---
+    % endif
+  % endfor
+    Você também pode baixar os documentos:
+    [PDF](${ generated_file.pdf.url_for() })
+    ou
+    [DOCX](${ generated_file.docx.url_for() })
+action buttons:
+  code: |
+    [el_button]
+---
+question: Tentativa de enviar o documento para assinatura falhou
+event: signature_fail
+subquestion: |
+  Entre em contato com o suporte e forneça as informações abaixo:
+
+  Dados enviados para o servidor:
+  ${ data_sent }
+
+  Dados retornados do servidor:
+  ${ data_received }
+
+  Código de status: ${ status_code }
+---
