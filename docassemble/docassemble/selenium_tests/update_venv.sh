@@ -1,3 +1,3 @@
 #!/bin/bash
-source /opt/venvs/docassemble-brcomeducalegal/bin/activate
+source /opt/venvs/educalegal/bin/activate
 pip install --upgrade -r /var/lib/jenkins/workspace/AutotestPipeline/docassemble/selenium_tests/requirements.txt
