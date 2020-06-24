@@ -7,7 +7,7 @@ pipeline {
            steps {
                git (
                    credentialsId: '75810dd9-c7b3-4b29-991d-f8527ddb4f21',
-                   url: 'https://github.com/silexsistemas/docassemble-brcomeducalegal.git'
+                   url: 'https://github.com/silexsistemas/educalegal.git'
                    )
             }
        }

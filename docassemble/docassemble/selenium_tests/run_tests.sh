@@ -1,4 +1,4 @@
 #!/bin/bash
-source /opt/venvs/docassemble-brcomeducalegal/bin/activate
-cd /opt/docassemble-brcomeducalegal/docassemble/selenium_tests
+source /opt/venvs/educalegal/bin/activate
+cd /opt/educalegal/docassemble/docassemble/selenium_tests
 pytest
