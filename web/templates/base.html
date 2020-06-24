@@ -8,72 +8,29 @@
     {% endblock ga %}
     <meta charset="utf-8">
     <title>Educa Legal</title>
+    <link rel="shortcut icon" href="{% static 'tenant/favicon.ico' %}"/>
+    <!-- ----------------------------------------------- CSS  ------------------------------------------------------ -->
+    <link rel="stylesheet" href="{% static 'tenant/css/base.css' %}"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="shortcut icon" href="{% static 'tenant/favicon.ico' %}"/>
+    <script src="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"
+            integrity="sha384-CkbBL/n3ZOZkc8ovstsrGxoxn5rrvlQXBesVNiMgEo17kPWvANS0hFBRkMl0Omh4"
+            crossorigin="anonymous"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="{% static 'tenant/css/base.css' %}"/>
+    <!-- ----------------------------------------------- JS  ------------------------------------------------------ -->
     <script src="https://code.jquery.com/jquery-3.5.0.min.js"
             integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ="
             crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
             integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <script src="{% static 'tenant/js/jquery.cookie.js' %}"></script>
-
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"
+            integrity="sha384-RxzVJNpULMjRDJ3nd+aAVYb11VBDmhgIonMdvYdLxYvylOdEl6pprk4R4PK0t3xG"
+            crossorigin="anonymous"></script>
 </head>
 <body>
 {% if user.is_authenticated %}
-    <!-- ------------------------------------------------- Navbar -------------------------------------------------- -->
-    <nav class="navbar navbar-fixed-top navbar-expand-md navbar-dark bg-dark docassemble-line-height">
-        <div class="container danavcontainer justify-content-start">
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ user.tenant.name }}
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{% url 'billing:plan-details' user.tenant.plan.pk %}">Dados
-                                do plano</a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'interview:interview-list' %}"
-                                            data-toggle="tooltip" data-placement="bottom"
-                                            title="Criar novos contratos e documentos.">Modelos</a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'document:document-list' %}"
-                                            data-toggle="tooltip" data-placement="bottom"
-                                            title="Ver detalhes dos documentos que você já criou.">Documentos</a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link text-white"
-                                            href="{% url 'document:bulk-document-generation-list' %}"
-                                            data-toggle="tooltip" data-placement="bottom"
-                                            title="Ver detalhes dos documentos que você já criou.">Geração em Lote</a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link text-white"
-                                            href="{% url 'school:school-list' %}" data-toggle="tooltip"
-                                            data-placement="bottom"
-                                            title="Cadastrar ou editar dados das suas escolas. Esses dados são usados na geração dos documentos e contratos.">Escolas</a>
-                    </li>
-                    {% if user.tenant.plan.use_ged %}
-                        <li class="nav-item"><a class="nav-link text-white" href="{{ user.tenant.tenantgeddata.url }}"
-                                                target="_blank" data-toggle="tooltip" data-placement="bottom"
-                                                title="Acesse os documentos armazenados.">GED</a>
-                        </li>
-                    {% endif %}
-                    <li class="nav-item"><a class="nav-link text-white"
-                                            href="https://atendimento.atlassian.net/servicedesk/customer/portal/2"
-                                            data-toggle="tooltip" data-placement="bottom"
-                                            title="Faça perguntas para nossos advogados e acesse a base de conhecimento."
-                                            target="_blank">Portal do Cliente</a></li>
-                </ul>
-                <span class="navbar-text text-white">
-                  Olá, {{ user.first_name }} {{ user.last_name }}!
-                </span>
-                <a class="btn btn-outline-success text-white ml-4" href="{% url 'account_logout' %}">Sair</a>
-            </div>
-        </div>
-    </nav>
+    {% include "snippets/navigation.html" %}
 {% endif %}
 <br/>
 <div id="app_body" class="container" style="margin-top: 15px">
