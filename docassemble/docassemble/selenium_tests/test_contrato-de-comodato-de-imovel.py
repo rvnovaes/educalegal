@@ -13,7 +13,7 @@ class TestContratodecomodatodeimovel(WebTest):
         "server,user,password,document_name",
         [
             ("https://test.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Contrato de comodato de imóvel"),
-            ("https://generation.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Contrato de comodato de imóvel"),
+            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Contrato de comodato de imóvel"),
 
         ],
     )
