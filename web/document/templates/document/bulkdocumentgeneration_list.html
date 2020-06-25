@@ -11,25 +11,9 @@
     {% endif %}
 <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
     {% if user.tenant.school_set.count == 0 %}
-        <div class="modal fade" id="tutorial_modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Bem-vindo à plataforma Educa Legal!</h4>
-                    </div>
-                    <div class="modal-body">
-                        <p>Para iniciar o uso, é necessário primeiro cadastrar uma <b>Escola</b>.</p>
-                        <p>Os dados da <b>Escola</b> serão usados na criação dos contratos e documentos.</p>
-                        <p>O menu <b>Documentos</b> é usado para listar os contratos e documentos já criados.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="{% url 'school:school-list' %}" class="btn btn-primary btn-block">Criar Escola</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include "snippets/welcome_modal.html" %}
     {% endif %}
-<!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
