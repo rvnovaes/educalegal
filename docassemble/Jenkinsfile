@@ -7,13 +7,13 @@ pipeline {
            steps {
                git (
                    credentialsId: '75810dd9-c7b3-4b29-991d-f8527ddb4f21',
-                   url: 'https://github.com/silexsistemas/docassemble-brcomeducalegal.git'
+                   url: 'https://github.com/silexsistemas/educalegal.git'
                    )
             }
        }
        stage('update_venv') {
            steps {
-               dir('docassemble/selenium_tests/'){
+               dir('docassemble/docassemble/selenium_tests/'){
                    sh './update_venv.sh'
                }
            }
@@ -21,7 +21,7 @@ pipeline {
        stage('test_aditivo-contrato-trabalho-banco-horas') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    dir('docassemble/selenium_tests/'){
+                    dir('docassemble/docassemble/selenium_tests/'){
                         sh './jenkins_test_aditivo-contrato-trabalho-banco-horas.sh'
                     }
                }
@@ -30,7 +30,7 @@ pipeline {
        stage('test_contrato-de-cessao-de-espaco-para-fins-comerciais') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    dir('docassemble/selenium_tests/'){
+                    dir('docassemble/docassemble/selenium_tests/'){
                         sh './jenkins_test_contrato-de-cessao-de-espaco-para-fins-comerciais.sh'
                }    }
            }
@@ -38,7 +38,7 @@ pipeline {
        stage('test_contrato-de-comodato-de-imovel') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_contrato-de-comodato-de-imovel.sh'
                    }
                }
@@ -47,7 +47,7 @@ pipeline {
        stage('test_contrato-de-locacao-de-imovel') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_contrato-de-locacao-de-imovel.sh'
                    }
                }
@@ -56,7 +56,7 @@ pipeline {
        stage('test_contrato-diretor-estatutario') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_contrato-diretor-estatutario.sh'
                    }
                }
@@ -65,7 +65,7 @@ pipeline {
        stage('test_contrato-prestacao-servicos-com-sem-cessao-mao-obra') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_contrato-prestacao-servicos-com-sem-cessao-mao-obra.sh'
                    }
                }
@@ -74,7 +74,7 @@ pipeline {
        stage('test_contrato-prestacao-servicos-consultoria') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_contrato-prestacao-servicos-consultoria.sh'
                    }
                }
@@ -83,7 +83,7 @@ pipeline {
        stage('test_contrato-prestacao-servicos-educacionais') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_contrato-prestacao-servicos-educacionais.sh'
                    }
                }
@@ -92,7 +92,7 @@ pipeline {
        stage('test_notificacao-extrajudicial') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_notificacao-extrajudicial.sh'
                    }
                }
@@ -101,7 +101,7 @@ pipeline {
        stage('test_termo-de-autorizacao-do-uso-de-imagem') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_termo-de-autorizacao-do-uso-de-imagem.sh'
                    }
                }
@@ -110,7 +110,7 @@ pipeline {
        stage('test_termo-de-confidencialidade-nda') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_termo-de-confidencialidade-nda.sh'
                    }
                }
@@ -119,7 +119,7 @@ pipeline {
        stage('test_termo-de-confissao-de-divida') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_termo-de-confissao-de-divida.sh'
                    }
                }
@@ -129,7 +129,7 @@ pipeline {
        stage('test_contrato-de-inscricao-em-programa-de-viagem-pedagogica') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_contrato-de-inscricao-em-programa-de-viagem-pedagogica.sh'
                    }
                }
@@ -138,7 +138,7 @@ pipeline {
        stage('test_termo-de-uso-e-responsabilidade-iscool-app') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_termo-de-uso-e-responsabilidade-iscool-app.sh'
                    }
                }
@@ -147,7 +147,7 @@ pipeline {
        stage('test_acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.sh'
                    }
                }
@@ -156,7 +156,7 @@ pipeline {
        stage('test_termo-de-acordo-individual-de-banco-de-horas-mp-927-2020') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.sh'
                    }
                }
@@ -165,7 +165,7 @@ pipeline {
        stage('test_termo-home-office-e-direito-autoral') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_termo-home-office-e-direito-autoral.sh'
                    }
                }
@@ -174,7 +174,7 @@ pipeline {
        stage('test_acordos-individuais-trabalhistas-coronavirus.py') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   dir('docassemble/selenium_tests/'){
+                   dir('docassemble/docassemble/selenium_tests/'){
                        sh './jenkins_test_acordos-individuais-trabalhistas-coronavirus.sh'
                    }
                }

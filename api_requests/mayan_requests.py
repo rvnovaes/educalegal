@@ -5,7 +5,7 @@ from retry_requests import retry
 import time
 from requests.exceptions import RequestException
 
-sys.path.append("/opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data")
+sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
 from element_mayan_client import MayanClient
 
 base_url = 'http://localhost:8080'
