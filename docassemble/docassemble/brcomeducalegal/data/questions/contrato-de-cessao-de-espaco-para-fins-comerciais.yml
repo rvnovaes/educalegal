@@ -1,0 +1,590 @@
+metadata:
+  title: Contrato de Cessão de Espaço para fins Comerciais
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Escola
+  - Outra Parte
+  - Cláusulas
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "contrato-de-cessao-de-espaco-para-fins-comerciais.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    if school_party_type == "cedente":
+      parte_insert_manager
+      cessionarias.gather()
+      if plan_use_esignature:
+        valid_cessionarias_table
+      contraparte_insert_manager
+    else:
+      contraparte_insert_manager
+      cedentes.gather()
+      if plan_use_esignature:
+        valid_cedentes_table
+      parte_insert_manager
+    object_contract
+    initial_date
+    payment_type
+    if payment_type == "total" and payment_method == "parcelado":
+      payment_attachment
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+section: Escola
+question: |
+  Qual o tipo da parte é a escola?
+fields:
+  - "Tipo:": school_party_type
+    required: True
+    datatype: radio
+    choices:
+      - Cedente: cedente
+      - Cessionária: cessionaria
+---
+code: |
+  if school_party_type == "cedente":
+    cedentes.target_number = 1
+    cedentes[0].person_type = "organization"
+    cedentes[0].name.text = school_legal_name
+    cedentes[0].cnpj = school_cnpj
+    cedentes[0].email = school_email
+    cedentes[0].address.street_name = school_street
+    cedentes[0].address.street_number = school_street_number
+    cedentes[0].address.unit = school_unit
+    cedentes[0].address.neighborhood = school_neighborhood
+    cedentes[0].address.city = school_city
+    cedentes[0].address.state = school_state
+    cedentes[0].address.zip = school_zip
+  else:
+    cessionarias.target_number = 1
+    cessionarias[0].person_type = "organization"
+    cessionarias[0].name.text = school_legal_name
+    cessionarias[0].cnpj = school_cnpj
+    cessionarias[0].email = school_email
+    cessionarias[0].address.street_name = school_street
+    cessionarias[0].address.street_number = school_street_number
+    cessionarias[0].address.unit = school_unit
+    cessionarias[0].address.neighborhood = school_neighborhood
+    cessionarias[0].address.city = school_city
+    cessionarias[0].address.state = school_state
+    cessionarias[0].address.zip = school_zip
+---
+objects:
+  - cedentes: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute="complete")
+---
+ga id: |
+  code: ga_id_begin
+section: Outra Parte
+question: |
+  Número de Cedente(s)
+fields:
+  - Número: cedentes.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  cedentes[i].name.text
+  cedentes[i].address.street_name
+  cedentes[i].complete = True
+---
+section: Outra Parte
+question: |
+  Dados do(a) ${ word(ordinal(i)) } Cedente
+fields:
+  - "Razão social:": cedentes[i].name.text
+    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
+    required: True
+  - "CNPJ:": cedentes[i].cnpj
+    required: True
+    validate: validate_cnpj
+  - "E-mail:": cedentes[i].email
+    help: ${ help_email_msg }
+    required: False
+    datatype: email
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $("#Y2VkZW50ZXNbaV0uY25wag").mask("00.000.000/0000-00", {reverse: true});
+      });
+  </script>
+---
+question: |
+  Endereço do(a) ${ cedentes[i] }
+fields:
+  - "CEP:": cedentes[i].address.zip
+    required: True
+  - "Logradouro:": cedentes[i].address.street_name
+    required: True
+  - "Número:": cedentes[i].address.street_number
+    required: True
+  - "Complemento:": cedentes[i].address.unit
+    required: False
+  - "Bairro:": cedentes[i].address.neighborhood
+    required: True
+  - "Cidade:": cedentes[i].address.city
+    required: True
+  - "Estado:": cedentes[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y2VkZW50ZXNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+  });
+
+  $("#Y2VkZW50ZXNbaV0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#Y2VkZW50ZXNbaV0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y2VkZW50ZXNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#Y2VkZW50ZXNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#Y2VkZW50ZXNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#Y2VkZW50ZXNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Outra Parte
+field: valid_cedentes_table
+question: |
+  Cedentes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ cedentes.table }
+buttons:
+  Continuar: continue
+---
+table: cedentes.table
+rows: cedentes
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+question: Gestor do Contrato da parte Cedente
+fields:
+  - "Inserir os dados de contato do gestor do contrato?": parte_insert_manager
+    datatype: yesnoradio
+  - "Nome:": parte_name_manager
+    required: True
+    datatype: text
+    show if:
+      variable: parte_insert_manager
+      is: true
+  - "E-mail:": parte_email_manager
+    required: False
+    datatype: email
+    show if:
+      variable: parte_insert_manager
+      is: true
+  - "Telefone:": parte_tel_manager
+    required: False
+    datatype: text
+    show if:
+      variable: parte_insert_manager
+      is: true
+---
+objects:
+  - cessionarias: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute="complete")
+---
+section: Outra Parte
+question: |
+  Número de Cessionárias
+fields:
+  - Número: cessionarias.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  cessionarias[i].name.text
+  cessionarias[i].address.street_name
+  cessionarias[i].complete = True
+---
+section: Outra Parte
+question: |
+  Dados do(a) ${ word(ordinal(i)) } Cessionária
+fields:
+  - "Tipo:": cessionarias[i].person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome completo:": cessionarias[i].name.text
+    required: True
+    show if:
+      variable: cessionarias[i].person_type
+      is: individual
+  - "CPF:": cessionarias[i].cpf
+    validate: validate_cpf
+    required: True
+    show if:
+      variable: cessionarias[i].person_type
+      is: individual
+  - "Número do RG:": cessionarias[i].rg
+    required: True
+    show if:
+      variable: cessionarias[i].person_type
+      is: individual
+  - "Nacionalidade:": cessionarias[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if:
+      variable: cessionarias[i].person_type
+      is: individual
+  - "Estado civil:": cessionarias[i].marital_status
+    required: True
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    datatype: radio
+    show if:
+      variable: cessionarias[i].person_type
+      is: individual
+  - "Profissão:": cessionarias[i].occupation
+    required: True
+    show if:
+      variable: cessionarias[i].person_type
+      is: individual
+  - "Razão social:": cessionarias[i].name.text
+    required: True
+    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
+    show if:
+      variable: cessionarias[i].person_type
+      is: organization
+  - "CNPJ:": cessionarias[i].cnpj
+    validate: validate_cnpj
+    required: True
+    show if:
+      variable: cessionarias[i].person_type
+      is: organization
+  - "E-mail:": cessionarias[i].email
+    help: ${ help_email_msg }
+    required: False
+    datatype: email
+    js show if: |
+      val("cessionarias[i].person_type") == "organization" || val("cessionarias[i].person_type") == "individual"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $("#X2ZpZWxkXzI").mask("000.000.000-00", {reverse: true});
+        $("#X2ZpZWxkXzg").mask("00.000.000/0000-00", {reverse: true});
+      });
+  </script>
+---
+question: |
+  Endereço do(a) ${ cessionarias[i] }
+fields:
+  - "CEP:": cessionarias[i].address.zip
+    required: True
+  - "Logradouro:": cessionarias[i].address.street_name
+    required: True
+  - "Número:": cessionarias[i].address.street_number
+    required: True
+  - "Complemento:": cessionarias[i].address.unit
+    required: False
+  - "Bairro:": cessionarias[i].address.neighborhood
+    required: True
+  - "Cidade:": cessionarias[i].address.city
+    required: True
+  - "Estado:": cessionarias[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y2Vzc2lvbmFyaWFzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#Y2Vzc2lvbmFyaWFzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#Y2Vzc2lvbmFyaWFzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y2Vzc2lvbmFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#Y2Vzc2lvbmFyaWFzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#Y2Vzc2lvbmFyaWFzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#Y2Vzc2lvbmFyaWFzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Outra Parte
+field: valid_cessionarias_table
+question: |
+  Cessionárias:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ cessionarias.table }
+buttons:
+  Continuar: continue
+---
+table: cessionarias.table
+rows: cessionarias
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+question: Gestor do Contrato da parte Cessionária
+fields:
+  - "Inserir os dados de contato do gestor do contrato?": contraparte_insert_manager
+    datatype: yesnoradio
+  - "Nome:": contraparte_name_manager
+    required: True
+    datatype: text
+    show if:
+      variable: contraparte_insert_manager
+      is: true
+  - "E-mail:": contraparte_email_manager
+    required: False
+    datatype: email
+    show if:
+      variable: contraparte_insert_manager
+      is: true
+  - "Telefone:": contraparte_tel_manager
+    required: False
+    datatype: text
+    show if:
+      variable: contraparte_insert_manager
+      is: true
+---
+section: Cláusulas
+question: |
+  Objeto
+subquestion: |
+  O objeto do presente contrato é a cessão à CESSIONÁRIA de espaço localizado no prédio da CEDENTE, exclusivamente para a instalação de um(a) [FIELD object_contract].
+fields:
+  - "Objeto:": object_contract
+    datatype: text
+    inline width: 30em
+    hint: Informar como será utilizado o espaço cedido
+  - "O espaço cedido atenderá somente ao público interno do colégio?": public_use
+    datatype: yesnoradio
+---
+code: initial_date = today()
+---
+section: Cláusulas
+question: Prazo
+subquestion: |
+  O presente Contrato irá vigorar de [FIELD initial_date] até [FIELD final_date].
+fields:
+  - "Data do início do Contrato": initial_date
+    datatype: date
+    default: ${ initial_date }
+  - "Data do fim do Contrato": final_date
+    datatype: date
+---
+code: |
+  from num2words import num2words
+  contract_value_extenso = num2words(contract_value, lang="pt_BR", to="currency")
+
+  if payment_type != "mensal" and payment_method == "parcelado":
+    n_payment_extenso = num2words(n_payment, lang="pt_BR")
+---
+section: Cláusulas
+question: Preço e forma de pagamento
+subquestion: |
+  A Cessionária pagará à Cedente o valor [FIELD payment_type] de [FIELD contract_value].
+fields:
+  - "A Cessionária pagará à Cedente o valor:": payment_type
+    datatype: dropdown
+    choices:
+    - mensal: mensal
+    - anual: anual
+    - total: total
+  - "Valor:": contract_value
+    datatype: currency
+    hint: 0000,00
+  - "Forma de pagamento:": payment_method
+    datatype: radio
+    choices:
+      - à vista: a_vista
+      - parcelado: parcelado
+    hide if:
+      variable: payment_type
+      is: mensal
+  - "Nº de parcelas:": n_payment
+    datatype: integer
+    show if:
+      variable: payment_method
+      is: parcelado
+  - "O pagamento do Preço será realizado mediante:": payment_account
+    choices:
+      - conta corrente: conta corrente
+      - boleto bancário: boleto bancário
+    datatype: radio
+  - "Banco:": banco
+    datatype: text
+    help: "Ex.: Bradesco"
+    show if:
+      is: conta corrente
+      variable: payment_account
+  - "Agência:": agencia
+    datatype: text
+    show if:
+      is: conta corrente
+      variable: payment_account
+  - "Conta corrente:": conta_corrente
+    datatype: text
+    show if:
+      is: conta corrente
+      variable: payment_account
+  - Tipo de pessoa: tipo_pessoa_cc
+    input type: radio
+    choices:
+      - Física
+      - Jurídica
+    show if:
+      is: conta corrente
+      variable: payment_account
+  - "CNPJ:": cnpj_cc
+    datatype: text
+    validate: validate_cnpj
+    show if:
+      variable: tipo_pessoa_cc
+      is: Jurídica
+  - "CPF:": cpf_cc
+    datatype: text
+    validate: validate_cpf
+    show if:
+      variable: tipo_pessoa_cc
+      is: Física
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $("#X2ZpZWxkXzk").mask("00.000.000/0000-00", {reverse: true});
+        $("#X2ZpZWxkXzEw").mask("000.000.000-00", {reverse: true});
+        $("#Y29udHJhY3RfdmFsdWU").mask("###0.00", {reverse: true});
+    });
+  </script>
+---
+section: Cláusulas
+question: |
+  Anexo
+fields:
+  - "Inserir anexo(s) com o cronograma de pagamento :": payment_attachment
+    required: False
+    datatype: files
+    help: "Formatos válidos: PDF, JPEG e PNG"
+    accept: |
+      "image/jpeg, image/png, application/pdf"
+---
+code: |
+  recipients = list()
+  for item in cedentes:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  for item in cessionarias:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."

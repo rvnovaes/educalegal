@@ -1,0 +1,8 @@
+---
+features:
+  navigation: horizontal
+  progress bar: True
+  question back button: True
+  javascript: 
+    - https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js
+---

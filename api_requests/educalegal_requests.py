@@ -1,7 +1,7 @@
 import sys
 import json
 
-sys.path.append("/opt/docassemble-brcomeducalegal/docassemble/brcomeducalegal/data")
+sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
 from element_educalegal_client import EducaLegalClient
 
 ###### LOCALHOST ######

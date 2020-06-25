@@ -1,0 +1,229 @@
+---
+code: |
+  el_environment
+  el_log_to_console
+  log("el_environment: {el_environment}".format(el_environment=el_environment))
+  if el_log_to_console:
+    log("el_environment: {el_environment}".format(el_environment=el_environment), "console")
+
+  educalegal_url
+  log("educalegal_url: {educalegal_url}".format(educalegal_url=educalegal_url))
+  if el_log_to_console:
+    log("educalegal_url: {educalegal_url}".format(educalegal_url=educalegal_url), "console")
+
+  if 'tid' not in url_args:
+    invalid_tenant
+  else:
+    log("ID to tenant: {tid}".format(tid=url_args["tid"]))
+    if el_log_to_console:
+      log("ID to tenant: {tid}".format(tid=url_args["tid"]), "console")
+
+  if 'ut' not in url_args:
+    invalid_user
+  else:
+    log("Token do usário: {ut}".format(ut=url_args["ut"]))
+    if el_log_to_console:
+      log("Token do usário: {ut}".format(ut=url_args["ut"]), "console")
+
+  if 'intid' not in url_args:
+    invalid_interview
+  else:
+    log("ID da entrevista: {intid}".format(intid=url_args["intid"]))
+    if el_log_to_console:
+      log("ID da entrevista: {intid}".format(intid=url_args["intid"]), "console")
+
+  if 'doc_uuid' not in url_args:
+    invalid_doc_uuid
+  else:
+    log("Doc uuid: {doc_uuid}".format(doc_uuid=url_args["doc_uuid"]))
+    if el_log_to_console:
+      log("Doc uuid: {doc_uuid}".format(doc_uuid=url_args["doc_uuid"]), "console")
+
+  if not elc:
+    invalid_elc
+  else:
+    log("Educa Legal Client Válido")
+    if el_log_to_console:
+      log("Educa Legal Client Válido", "console")
+
+  # Quando não tem ged cadastrado retorna um dicionario tenant_ged_data: {‘detail’: ‘Not found.’}
+  if plan_data['use_ged']:
+    if 'detail' in tenant_ged_data:
+      if tenant_ged_data['detail'] == 'Not found.':
+        invalid_ecm
+      else:
+          log("Plan data - use ged: {plan_data}".format(plan_data=plan_data['use_ged']))
+          if el_log_to_console:
+            log("Plan data - use ged: {plan_data}".format(plan_data=plan_data['use_ged']), "console")
+
+  # Se não tiver esignature_app cadastrado, volta None e entra em invalid_esignature
+  if plan_data['use_esignature']:
+    if not tenant_data['esignature_app']:
+      invalid_esignature
+    else:
+      log("Plan data - use esignature: {plan_data}".format(plan_data=plan_data['use_esignature']))
+      if el_log_to_console:
+        log("Plan data - use esignature: {plan_data}".format(plan_data=plan_data['use_esignature']), "console")
+
+  if len(school_names_list) == 0:
+    school_registration_url = educalegal_url + '/school/school/'
+    invalid_school
+
+  if plan_data['use_ged']:
+    if 'detail' in document_type_data:
+      if document_type_data['detail'] == 'Invalid token.':
+        invalid_ged_token
+
+      if document_type_data['detail'] == 'Not found.':
+        invalid_document_type
+
+  valid_data = True
+---
+code: |
+  el_environment = get_config('el environment')
+  el_log_to_console = get_config('el log to console')
+  if el_environment == 'production':
+    educalegal_url = 'https://app.educalegal.com.br'
+  elif el_environment == 'test':
+    educalegal_url = 'https://test.educalegal.com.br'
+  else:
+    educalegal_url = 'http://educalegal:8008'
+---
+code: |
+    elc = EducaLegalClient(educalegal_url, ut)
+    log("Chamando elc.interviews_read")
+    interview_data = elc.interviews_read(intid)
+    log("interview_data: {interview_data}".format(interview_data=interview_data))
+    if el_log_to_console:
+      log("interview_data: {interview_data}".format(interview_data=interview_data), "console")
+---
+code: |
+    ut = url_args['ut']
+    tid = url_args['tid']
+    intid = url_args['intid']
+    doc_uuid = url_args['doc_uuid']
+---
+code: |
+    elc = EducaLegalClient(educalegal_url, ut)
+    log("Chamando elc.tenants_read")
+    tenant_data = elc.tenants_read(tid)
+    log("tenant_data: {tenant_data}".format(tenant_data=tenant_data))
+    if el_log_to_console:
+      log("tenant_data: {tenant_data}".format(tenant_data=tenant_data), "console")
+---
+code: |
+    elc = EducaLegalClient(educalegal_url, ut)
+    log("Chamando elc.plans_read")
+    plan_data = elc.plans_read(tenant_data['plan'])
+    plan_use_ged = plan_data['use_ged']
+    plan_use_esignature = plan_data['use_esignature']
+    log("plan_data: {plan_data}".format(plan_data=plan_data))
+    if el_log_to_console:
+      log("plan_data: {plan_data}".format(plan_data=plan_data), "console")
+---
+code: |
+    elc = EducaLegalClient(educalegal_url, ut)
+    log("Chamando elc.tenants_ged_read")
+    tenant_ged_data = elc.tenants_ged_read(tid)
+    log("tenant_ged_data: {tenant_ged_data}".format(tenant_ged_data=tenant_ged_data))
+    if el_log_to_console:
+      log("tenant_ged_data: {tenant_ged_data}".format(tenant_ged_data=tenant_ged_data), "console")
+---
+code: |
+    mc = MayanClient(tenant_ged_url, tenant_ged_token)
+    # o tipo do documento esta sendo verificado logo apos a criacao do mc client
+    # para que o docassemble execute a criacao do mc client desse bloco de codigo
+    # senao ele tenta executar a criacao do mc client do element-mayan-create-document.yml
+    # e bagunca a ordem da entrevista
+    # a outra opcao seria trocar o nome da variavel mc
+    log("Chamando mc.document_type_read")
+    document_type_data = mc.document_type_read(interview_document_type)
+    log("document_type_data: {document_type_data}".format(document_type_data=document_type_data))
+    if el_log_to_console:
+      log("document_type_data: {document_type_data}".format(document_type_data=document_type_data), "console")
+---
+code: |
+    tenant_ged_url = tenant_ged_data['url']
+    tenant_ged_token = tenant_ged_data['token']
+    log("tenant_ged_url: {tenant_ged_url}".format(tenant_ged_url=tenant_ged_url))
+    if el_log_to_console:
+      log("tenant_ged_url: {tenant_ged_url}".format(tenant_ged_url=tenant_ged_url), "console")
+    log("tenant_ged_token: {tenant_ged_token}".format(tenant_ged_token=tenant_ged_token))
+    if el_log_to_console:
+      log("tenant_ged_token: {tenant_ged_token}".format(tenant_ged_token=tenant_ged_token), "console")
+---
+code: |
+    tenant_esignature_provider = tenant_data['esignature_app']['provider']
+    tenant_client_id = tenant_data['esignature_app']['client_id']
+    tenant_impersonated_user_guid = tenant_data['esignature_app']['impersonated_user_guid']
+    tenant_test_mode = tenant_data['esignature_app']['test_mode']
+    tenant_private_key = tenant_data['esignature_app']['private_key']
+---
+code: |
+    elc = EducaLegalClient(educalegal_url, ut)
+    log("Chamando elc.tenants_school_names_school_data")
+    school_names_list, school_units_dict, school_data_dict  = elc.tenants_school_names_school_data(tid)
+    log("Lista de nomes de esocolas" + str(school_names_list))
+    if el_log_to_console:
+      log("Lista de nomes de esocolas" + str(school_names_list), "console")
+    log("Dicionário de unidades escolares" + str(school_units_dict))
+    if el_log_to_console:
+      log("Dicionário de unidades escolares" + str(school_units_dict), "console")
+---
+code: |
+    interview_document_type = interview_data['document_type']
+---
+code: |
+    interview_label = interview_data['name']
+    interview_description = interview_data['description'] + ' | ' + interview_data['version'] + ' | ' + interview_data['date_available']
+    interview_language = interview_data['language']
+    interview_custom_file_name_string = interview_data['custom_file_name']
+    interview_is_freemium = interview_data['is_freemium']
+---
+progress: 1
+section: Escola
+question: Escolha a escola
+field: selected_school
+choices:
+  code: |
+    school_names_list
+---
+progress: 5
+section: Escola
+question: Escolha a unidade escolar
+field: school_division
+choices:
+  code: |
+    school_units_list
+---
+code: |
+   school = school_data_dict[selected_school]
+   school_units_list = school_units_dict[selected_school]
+   school_id = school['id']
+   school_name = school['name']
+   school_legal_name = school['legal_name']
+   school_cnpj = school['cnpj']
+   school_email = school['email']
+   school_phone = school['phone']
+   school_street = school['street']
+   school_street_number = school['street_number']
+   school_unit = school['unit']
+   school_neighborhood = school['neighborhood']
+   school_city = school['city']
+   school_state = school['state']
+   school_zip = school['zip']
+   school_letterhead = school['letterhead']
+---
+code: |
+    ga_id_begin = str(interview_document_type) + '-begin'
+    ga_id_end = str(interview_document_type) + '-end'
+    ga_id_e_signature = str(interview_document_type) + '-e_signature'
+---
+modules:
+  - .element_base_domain
+  - .element_educalegal_client
+  - .element_mayan_client
+---
+include:
+  - element-tenant-school-interview-error-screens.yml
+---

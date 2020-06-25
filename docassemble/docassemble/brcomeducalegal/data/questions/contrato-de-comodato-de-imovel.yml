@@ -1,0 +1,641 @@
+metadata:
+  title: Contrato de Comodato de Imóvel
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Escola
+  - Outra Parte
+  - Imóvel
+  - Prazo
+  - Cláusulas
+  - Assinatura
+  - Conclusão
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    if school_party_type == "comodante":
+      parte_insert_manager
+      comodatarias.gather()
+      if plan_use_esignature:
+        valid_comodatarias_table
+      contraparte_insert_manager
+    else:
+      contraparte_insert_manager
+      comodantes.gather()
+      if plan_use_esignature:
+        valid_comodantes_table
+      parte_insert_manager
+    area_imovel
+    atividade
+    duracao_contrato
+    city
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+section: Escola
+question: |
+  Qual o tipo da parte é a escola?
+fields:
+  - "Tipo:": school_party_type
+    required: True
+    datatype: radio
+    choices:
+      - Comodante: comodante
+      - Comodatária: comodataria
+---
+code: |
+  if school_party_type == "comodante":
+    comodantes.target_number = 1
+    comodantes[0].person_type = "organization"
+    comodantes[0].name.text = school_legal_name
+    comodantes[0].cnpj = school_cnpj
+    comodantes[0].email = school_email
+    comodantes[0].address.street_name = school_street
+    comodantes[0].address.street_number = school_street_number
+    comodantes[0].address.unit = school_unit
+    comodantes[0].address.neighborhood = school_neighborhood
+    comodantes[0].address.city = school_city
+    comodantes[0].address.state = school_state
+    comodantes[0].address.zip = school_zip
+  else:
+    comodatarias.target_number = 1
+    comodatarias[0].person_type = "organization"
+    comodatarias[0].name.text = school_legal_name
+    comodatarias[0].cnpj = school_cnpj
+    comodatarias[0].email = school_email
+    comodatarias[0].address.street_name = school_street
+    comodatarias[0].address.street_number = school_street_number
+    comodatarias[0].address.unit = school_unit
+    comodatarias[0].address.neighborhood = school_neighborhood
+    comodatarias[0].address.city = school_city
+    comodatarias[0].address.state = school_state
+    comodatarias[0].address.zip = school_zip
+---
+objects:
+  - comodantes: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+ga id: |
+  code: ga_id_begin
+section: Outra Parte
+progress: 10
+question: |
+  Número de comodantes
+fields:
+  - "Número:": comodantes.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  comodantes[i].name.text
+  comodantes[i].address.street_name
+  comodantes[i].complete = True
+---
+section: Outra Parte
+progress: 15
+question: |
+  Dados do(a) ${ word(ordinal(i)) } comodante
+fields:
+  - "Tipo:": comodantes[i].person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome Completo:": comodantes[i].name.text
+    required: True
+    show if: 
+      variable: comodantes[i].person_type
+      is: individual
+  - "CPF:": comodantes[i].cpf
+    required: True
+    validate: validate_cpf
+    show if:
+      variable: comodantes[i].person_type
+      is: individual
+  - "Número do RG:": comodantes[i].rg
+    required: True
+    show if:
+      variable: comodantes[i].person_type
+      is: individual
+  - "Nacionalidade:": comodantes[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if: 
+      variable: comodantes[i].person_type
+      is: individual
+  - "Estado Civil:": comodantes[i].marital_status
+    required: True
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    datatype: radio
+    show if: 
+      variable: comodantes[i].person_type
+      is: individual
+  - "Profissão:": comodantes[i].occupation
+    required: True
+    show if: 
+      variable: comodantes[i].person_type
+      is: individual
+  - "Razão social:": comodantes[i].name.text
+    required: True
+    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
+    show if: 
+      variable: comodantes[i].person_type
+      is: organization  
+  - "CNPJ:": comodantes[i].cnpj
+    required: True
+    validate: validate_cnpj
+    show if:
+      variable: comodantes[i].person_type
+      is: organization
+  - "E-mail:": comodantes[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+    js show if: |
+      val("comodantes[i].person_type") == "individual" || val("comodantes[i].person_type") == "organization"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Outra Parte
+progress: 20
+question: |
+  Endereço do(a) ${ comodantes[i] }
+fields:
+  - "CEP:": comodantes[i].address.zip
+    required: True
+  - "Logradouro:": comodantes[i].address.street_name
+    required: True
+  - "Número:": comodantes[i].address.street_number
+    required: True
+  - "Complemento:": comodantes[i].address.unit
+    required: False
+  - "Bairro:": comodantes[i].address.neighborhood
+    required: True
+  - "Cidade:": comodantes[i].address.city
+    required: True
+  - "Estado:": comodantes[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA').mask('00000-000');
+  });
+
+  $("#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0YXRl").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Outra Parte
+field: valid_comodantes_table
+question: |
+  Comodantes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ comodantes.table }
+buttons:
+  Continuar: continue
+---
+table: comodantes.table
+rows: comodantes
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+question: Gestor do Contrato da parte Comodante
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': parte_insert_manager
+    datatype: yesnoradio
+  - 'Nome:': parte_name_manager
+    datatype: text
+    show if:
+      variable: parte_insert_manager
+      is: true
+    required: True
+  - 'E-mail:': parte_email_manager
+    datatype: email
+    show if:
+      variable: parte_insert_manager
+      is: true
+    required: False
+  - 'Telefone:': parte_telephone_manager
+    datatype: text
+    show if:
+      variable: parte_insert_manager
+      is: true
+    required: False
+---
+objects:
+  - comodatarias: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+section: Outra Parte
+progress: 40
+question: |
+  Número de Comodatárias
+fields:
+  - Número: comodatarias.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  comodatarias[i].name.text
+  comodatarias[i].address.street_name
+  comodatarias[i].complete = True
+---
+section: Outra Parte
+progress: 50
+question: |
+  Dados do(a) ${ word(ordinal(i)) } comodatário(a)
+fields:
+  - "Tipo:": comodatarias[i].person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome Completo:": comodatarias[i].name.text
+    required: True
+    show if: 
+      variable: comodatarias[i].person_type
+      is: individual
+  - "CPF:": comodatarias[i].cpf
+    required: True
+    validate: validate_cpf
+    show if:
+      variable: comodatarias[i].person_type
+      is: individual
+  - "Número do RG:": comodatarias[i].rg
+    required: True
+    show if:
+      variable: comodatarias[i].person_type
+      is: individual
+  - "Nacionalidade:": comodatarias[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if: 
+      variable: comodatarias[i].person_type
+      is: individual
+  - "Estado Civil:": comodatarias[i].marital_status
+    required: True
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    datatype: radio
+    show if: 
+      variable: comodatarias[i].person_type
+      is: individual
+  - "Profissão:": comodatarias[i].occupation
+    required: True
+    show if: 
+      variable: comodatarias[i].person_type
+      is: individual
+  - "Razão social:": comodatarias[i].name.text
+    required: True
+    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
+    show if: 
+      variable: comodatarias[i].person_type
+      is: organization  
+  - "CNPJ:": comodatarias[i].cnpj
+    required: True
+    validate: validate_cnpj
+    show if:
+      variable: comodatarias[i].person_type
+      is: organization
+  - "E-mail:": comodatarias[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+    js show if: |
+      val("comodatarias[i].person_type") == "individual" || val("comodatarias[i].person_type") == "organization"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Outra Parte
+progress: 60
+question: |
+  Endereço do(a) ${ comodatarias[i] }
+fields:
+  - "CEP:": comodatarias[i].address.zip
+    required: True
+  - "Logradouro:": comodatarias[i].address.street_name
+    required: True
+  - "Número:": comodatarias[i].address.street_number
+    required: True
+  - "Complemento:": comodatarias[i].address.unit
+    required: False
+  - "Bairro:": comodatarias[i].address.neighborhood
+    required: True
+  - "Cidade:": comodatarias[i].address.city
+    required: True
+  - "Estado:": comodatarias[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Outra Parte
+field: valid_comodatarias_table
+question: |
+  Comodatárias:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ comodatarias.table }
+buttons:
+  Continuar: continue
+---
+table: comodatarias.table
+rows: comodatarias
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+question: Gestor do Contrato da parte Comodatária
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': contraparte_insert_manager
+    datatype: yesnoradio
+  - 'Nome:': contraparte_name_manager
+    datatype: text
+    show if:
+      variable: contraparte_insert_manager
+      is: true
+    required: True
+  - 'E-mail:': contraparte_email_manager
+    datatype: email
+    show if:
+      variable: contraparte_insert_manager
+      is: true
+    required: False
+  - 'Telefone:': contraparte_telephone_manager
+    datatype: text
+    show if:
+      variable: contraparte_insert_manager
+      is: true
+    required: False
+---
+code: |
+  data_fim_locacao = data_inicio_locacao.plus(months=duracao_contrato)
+---
+section: Imóvel
+progress: 80
+question: |
+  Dados do Imóvel
+fields:
+  - "Área total (m²):": area_imovel
+    datatype: number
+    hint: 00,00
+  - "Número da matrícula:": numero_matricula_imovel
+  - "Cartório:": cartorio_registro
+    datatype: area
+    hint: "ex.: Cartório do 4º Ofício de Registro de Imóveis de Belo Horizonte/MG"
+  - "CEP:": cep_imovel
+    required: True
+  - "Logradouro:": logradouro_imovel
+    required: True
+  - "Número:": numero_imovel
+    required: True
+  - "Complemento:": complemento_imovel
+    required: False
+  - "Bairro:": bairro_imovel
+    required: True
+  - "Cidade:": cidade_imovel
+    required: True
+  - "Estado:": estado_imovel
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y2VwX2ltb3ZlbA').mask('00000-000');
+    $('#YXJlYV9pbW92ZWw').mask('###0.00', {reverse: true});
+  });
+
+  $("#Y2VwX2ltb3ZlbA").focusout(function(){
+    var cep = $("#Y2VwX2ltb3ZlbA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#bG9ncmFkb3Vyb19pbW92ZWw").val(data.logradouro);
+          $("#YmFpcnJvX2ltb3ZlbA").val(data.bairro);
+          $("#Y2lkYWRlX2ltb3ZlbA").val(data.localidade);
+          $("#ZXN0YWRvX2ltb3ZlbA").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Imóvel
+progress: 85
+question: |
+  Uso do Imóvel
+subquestion: |
+  A comodante cede o imóvel objeto deste contrato à COMODATÁRIA, devendo este utilizar-se do mesmo para fins [FIELD atividade].
+fields:
+  - 'Atividade:': atividade
+    datatype: text
+    inline width: 30em
+    hint: "Ex.: residencial; de papelaria; de cantina; de venda de uniformes; de venda de material didático"
+  - 'Inserir o laudo de vistoria inicial em anexo?': has_attachments
+    datatype: yesnoradio
+  - "Inserir anexo(s):": attachments
+    required: False
+    datatype: files
+    help: "Formatos válidos: PDF, JPEG e PNG"
+    accept: |
+      "image/jpeg, image/png, application/pdf"
+    show if:
+      variable: has_attachments
+      is: true
+---
+section: Prazo
+progress: 90
+question: |
+  Prazo do Contrato
+fields:
+  - "Duração do contrato (meses):": duracao_contrato
+    datatype: integer
+  - "Data do início da locação:": data_inicio_locacao
+    datatype: date
+  - "Retroagir os efeitos do Contrato?": retroagir
+    datatype: radio
+    choices:
+      - Sim: Sim
+      - Não: Não
+  - "Data que será considerada o início do prazo de vigência:": data_vigencia
+    datatype: date
+    show if:
+      is: Sim
+      variable: retroagir
+---
+code: |
+  from num2words import num2words
+  duracao_contrato_extenso = num2words(duracao_contrato,lang='pt_BR')
+---
+code:  |
+  content_document = "contrato-de-comodato-de-imovel.docx"
+---
+code: |
+  recipients = list()
+  for item in comodantes:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  for item in comodatarias:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

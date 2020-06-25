@@ -1,0 +1,103 @@
+metadata:
+  title: Debug
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Escola
+  - Aluno(a)
+  - Conclusão
+---
+code:  |
+  content_document = "entrevista-debug-bulk.docx"
+---
+id: logic
+mandatory: True
+code: |
+  log("Nova entrevista")
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    if len(school_units_list) == 0:
+      # nao pode ser usado school_unit pq essa variavel foi usada no endereco da escola
+      school_division = None
+    elif len(school_units_list) == 1:
+      school_division = school_units_list[0]
+    else:
+      school_division
+    nomeAluno
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+progress: 10
+section: Aluno(a)
+question: Dados do(a) Aluno(a)
+subquestion: ${ doc_uuid }
+fields:
+  - 'Nome completo: ': nomeAluno
+    datatype: text
+    default: "Anton Bruckner"
+---
+code: |
+  recipients = list()
+
+  student_recipient = dict()
+  student_recipient['name'] = nomeAluno
+  student_recipient['email'] = 'rvnovaes@gmail.com'
+  student_recipient['group'] = 'signers'
+  student_recipient['routingOrder'] = 1
+  student_recipient['tabs'] = [
+    {
+      'type': 'signHere',
+      'anchorString': generate_anchor('signHere', 'rvnovaes@gmail.com')
+    },
+  ]
+  recipients.append(student_recipient)
+
+  school_recipient = dict()
+  school_recipient['name'] = school_legal_name
+  school_recipient['email'] = school_email
+  school_recipient['group'] = 'signers'
+  school_recipient['routingOrder'] = 2
+  school_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(school_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

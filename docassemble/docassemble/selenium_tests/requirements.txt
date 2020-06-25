@@ -1,0 +1,6 @@
+beautifulsoup4~=4.8.2
+pandas~=0.25.3
+lxml~=4.4.2
+selenium~=3.141.0
+pytest
+pytest-xdist

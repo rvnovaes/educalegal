@@ -1,0 +1,37 @@
+---
+code: |
+  menu_items = [ action_menu_item('Roteiro', 'roadmap') ]
+comment: |
+  Criação do Roadmap.
+---
+initial: True
+code: |
+  if returning_user(minutes=0.1):
+    welcome_back
+comment: |
+  Retornar a entrevista, do momento em que parou.
+---
+event: welcome_back
+question: |
+  Bem vindo novamente!
+subquestion: |
+  Você está atualmente na sessão
+  **${ nav.get_section(display=True) }**
+  .
+  ${ nav }
+  Pressione "Continuar" para retomar
+buttons:
+  Continuar: continue
+---
+event: roadmap
+question: |
+  Roteiro
+subquestion: |
+  Você está atualmente na sessão
+  **${ nav.get_section(display=True) }**
+  .
+  ${ nav }
+  Pressione "Continuar" para retomar.
+buttons:
+  Continuar: continue
+---

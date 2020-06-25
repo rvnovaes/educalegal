@@ -1,0 +1,14 @@
+---
+section: Cláusulas
+progress: 85
+question: |
+  Eleição do Foro
+subquestion: |
+  Fica eleito para a solução de controvérsias o foro da cidade de [FIELD city]/[FIELD state], com a renúncia de qualquer outro, por mais privilegiado que seja.
+fields:
+  - 'Estado:': state
+    code: state_initials_list
+  - 'Cidade:': city
+    datatype: text
+    inline width: 20em
+---
