@@ -84,6 +84,8 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("21-05-2020")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
 
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Local e Data"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("BELO HORIZONTE")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         try:
