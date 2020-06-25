@@ -3,7 +3,19 @@
 {% block body_block %}
     <h2>Documentos</h2>
     {% if documents %}
-        {% render_table table %}
+        <table id="data_table" class="dataTable cell-border hover order-column row-border stripe">
+            <thead>
+            <tr>
+                <th data-data="name">Documento</th>
+                <th data-data="interview">Modelo</th>
+                <th data-data="school">Escola</th>
+                <th data-data="created_date">Criação</th>
+                <th data-data="altered_date">Alteração</th>
+                <th data-data="status">Status</th>
+                <th data-data="submit_to_esignature">AE</th>
+            </tr>
+            </thead>
+        </table>
     {% else %}
         <div class="alert alert-info" role="alert">
             Você não criou nenhum documento.
@@ -16,84 +28,64 @@
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
-        $(window).on('load',function(){
+        $(window).on('load', function () {
             let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
             tutorial_modal.modal('show');
         });
     </script>
 
-
-    <script type="text/javascript">
-        const origin = window.location.origin
-        const bulk_status_text = $("#bulk_status_text");
-        const progress_bar = $("#progressbar");
-        const progress_label = $(".progress-label");
-
-        $(window).on('load', function () {
-            let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
-            tutorial_modal.modal('show');
-
-        });
-
-        function sleep(milliseconds) {
-            const date = Date.now();
-            let currentDate = null;
-            do {
-                currentDate = Date.now();
-            } while (currentDate - date < milliseconds);
-        }
-
-        function update_progress_bar(total_task_size) {
-            $.get(origin + "/document/bulk_document_generation/generate/progress/" + {{ bulk_document_generation.pk }})
-                .done(function (data, status) {
-                    console.log(data);
-                    console.log(status);
-                    let processed_task_size = data["processed_task_size"];
-
-                    progress_bar.progressbar({
-                        max: total_task_size,
-                        value: processed_task_size,
-                        change: function () {
-                            progress_label.text(processed_task_size + " de " + total_task_size);
-                        },
-                        complete: function () {
-                            progress_label.text("Fim!");
-                            bulk_status_text.text(data["bulk_status"]);
+    <script>
+        $(document).ready(function () {
+            const table_data_url = "/v1/tenants/" + {{ user.tenant.pk  }} +"/documents/?format=datatables"
+            $("#data_table").DataTable({
+                info: true,
+                dom: 'Blfrtip',
+                buttons: [
+                    'excelHtml5',
+                    'csvHtml5',
+                    'pdfHtml5'
+                ],
+                ajax: {
+                    url: table_data_url,
+                    method: "GET",
+                },
+                columns: [
+                    {
+                        data: null, render: function (data, type, row) {
+                            return '<a href="/document/document/' + data.id + '"' + ' target="_blank">' + data.name + '</a>'
                         }
-                    });
-                    if (processed_task_size < total_task_size) {
-                        sleep(3000);
-                        update_progress_bar(total_task_size);
-                    } else {
-
-                    }
-                })
-                .fail(function (data, status) {
-                    console.log(data);
-                    console.log(status);
-                })
-        }
-
-        // Dispara a criação de documentos em lote/
-        const executar_button = $(".btn.btn-danger").click(function () {
-            executar_button.hide();
-            $(".start-hidden").css("visibility", "visible");
-            bulk_status_text.text("em andamento...");
-            // Cria uma barra com valor indeterminado
-            progress_bar.progressbar({value: 0});
-
-            // Representa o número de tarefas de criação de documentos + assinatura de documentos
-            let total_task_size = 0;
-
-            $.get(origin + "/document/bulk_document_generation/generate/" + {{ bulk_document_generation.pk }})
-                .done(function (data, status) {
-                    total_task_size = data["total_task_size"];
-                    update_progress_bar(total_task_size);
-                })
-                .fail(function (data, status) {
-                    console.log(data);
-                    console.log(status);
-                });
+                    },
+                    {data: "interview"},
+                    {data: "school"},
+                    {data: "created_date"},
+                    {data: "altered_date"},
+                    {data: "status"},
+                    {
+                        data: "submit_to_esignature", render: function (data, type, row) {
+                            if (data === true) {
+                                return '<svg class="bi bi-check-circle" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">\n' +
+                                    '  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>\n' +
+                                    '  <path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/>\n' +
+                                    '</svg>'
+                            } else {
+                                return '<svg class="bi bi-x-circle" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">\n' +
+                                    '  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>\n' +
+                                    '  <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>\n' +
+                                    '  <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>\n' +
+                                    '</svg>'
+                            }
+                        },
+                    },
+                ],
+                columnDefs: [
+                    {
+                        targets: [3, 4], "width": "14%", render: function (data) {
+                            return moment(data).format('DD/MM/YYYY - hh:mm');
+                        },
+                    },
+                ],
+                language: {% include "locale/data_tables_pt_br.json" %}
+            });
         });
     </script>
 {% endblock %}

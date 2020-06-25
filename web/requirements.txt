@@ -48,3 +48,5 @@ django-celery-results~=1.2.1
 future~=0.18.2
 # Tests
 pytest~=5.4.3
+# https://github.com/izimobil/django-rest-framework-datatables
+djangorestframework-datatables

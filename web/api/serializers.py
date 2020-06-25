@@ -14,6 +14,8 @@ class DocumentESignatureLogSerializer(serializers.ModelSerializer):
 
 
 class DocumentSerializer(serializers.ModelSerializer):
+    interview = serializers.StringRelatedField()
+    school = serializers.StringRelatedField()
     class Meta:
         model = Document
         fields = "__all__"

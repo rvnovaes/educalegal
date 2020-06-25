@@ -4,6 +4,7 @@ import pandas as pd
 from mongoengine.errors import ValidationError
 from celery import chain
 
+from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableView
 from django.contrib import messages
@@ -28,7 +29,7 @@ from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
 from .models import Document, BulkDocumentGeneration, DocumentTaskView
 from .tasks import create_document, submit_to_esignature
-from .tables import DocumentTable, BulkDocumentGenerationTable, DocumentTaskViewTable
+from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
 logger = logging.getLogger(__name__)
 
@@ -38,23 +39,9 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
     context_object_name = "document"
 
 
-class DocumentListView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView):
+class DocumentListView(LoginRequiredMixin, TenantAwareViewMixin, ListView):
     model = Document
-    table_class = DocumentTable
     context_object_name = "documents"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if "bulk_document_generation_id" in self.kwargs:
-            context['bulk_document_generation'] = BulkDocumentGeneration.objects.get(pk=self.kwargs["bulk_document_generation_id"])
-        return context
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if "bulk_document_generation_id" in self.kwargs:
-            return queryset.filter(bulk_generation=self.kwargs["bulk_document_generation_id"])
-        else:
-            return queryset
 
 
 class BulkDocumentGenerationDetailView(LoginRequiredMixin, TenantAwareViewMixin, SingleTableView):

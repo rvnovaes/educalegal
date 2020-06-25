@@ -19,6 +19,7 @@
             Você não tem modelos disponíveis.
         </div>
     {% endif %}
+    {% include "snippets/messages.html" %}
     <!-- ------------------------------------------ Welcome Modal -------------------------------------------------- -->
     {% if user.tenant.school_set.count == 0 %}
         {% include "snippets/welcome_modal.html" %}

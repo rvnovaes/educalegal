@@ -351,6 +351,32 @@ class TenantSchoolViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+class TenantInterviewViewSet(viewsets.ViewSet):
+    def list(self, request, pk=None):
+        queryset = Interview.objects.filter(tenants=pk)
+        serializer = InterviewSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, spk=None):
+        queryset = Interview.objects.all()
+        interview = get_object_or_404(queryset, id=spk, tenants=pk)
+        serializer = SchoolSerializer(interview)
+        return Response(serializer.data)
+
+
+class TenantDocumentViewSet(viewsets.ViewSet):
+    def list(self, request, pk=None):
+        queryset = Document.objects.filter(tenant=pk)
+        serializer = DocumentSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, spk=None):
+        queryset = Document.objects.all()
+        interview = get_object_or_404(queryset, id=spk, tenant=pk)
+        serializer = DocumentSerializer(interview)
+        return Response(serializer.data)
+
+
 class TenantViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Returns a list or retrieves a tenant.
