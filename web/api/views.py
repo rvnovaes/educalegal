@@ -229,65 +229,71 @@ def docusign_webhook_listener(request):
         logger.exception(msg)
         return HttpResponse(msg)
 
-    document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
+    try:
+        document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
+    except Document.DoesNotExist:
+        message = 'O envelope {envelope_id} não existe.'.format(envelope_id=envelope_data["envelope_id"])
+        logger.debug(message)
+    else:
+        tenant = Tenant.objects.get(pk=document.tenant.pk)
+
     envelope_status = str(envelope_data["envelope_status"]).lower()
 
-    tenant = Tenant.objects.get(pk=document.tenant.pk)
     # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
-    if envelope_status == "completed" and tenant.plan.use_ged:
+    if envelope_status == "completed":
         try:
             (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
                 data, envelope_dir
             )
             logger.debug(envelope_data)
 
-            # Get document related interview data to post to GED
-            interview = Interview.objects.get(pk=document.interview.pk)
-            document_type_pk = interview.document_type.pk
-            document_language = interview.language
+            if document:
+                if tenant.plan.use_ged:
+                    # Get document related interview data to post to GED
+                    interview = Interview.objects.get(pk=document.interview.pk)
+                    document_type_pk = interview.document_type.pk
+                    document_language = interview.language
 
-            # Post documents to GED
-            tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
-            mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
+                    # Post documents to GED
+                    tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
+                    mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
 
-            for pdf in envelope_data["pdf_documents"]:
-                response = mc.document_create(
-                    pdf["full_filename"],
-                    document_type_pk,
-                    pdf["filename"],
-                    document_language,
-                    pdf["description"],
+                    for pdf in envelope_data["pdf_documents"]:
+                        response = mc.document_create(
+                            pdf["full_filename"],
+                            document_type_pk,
+                            pdf["filename"],
+                            document_language,
+                            pdf["description"],
+                        )
+                        logger.debug("Posting document to GED: " + pdf["filename"])
+                        logger.debug(response.text)
+
+                if envelope_status in envelope_statuses.keys():
+                    document.status = envelope_statuses[envelope_status]
+                else:
+                    document.status = "não encontrado"
+
+                document.save()
+
+                log = ""
+                for pdf in envelope_data["pdf_documents"]:
+                    log += pdf["filename"] + "<br>"
+
+                log += "<br>"
+                esignature_log_documents = DocumentESignatureLog(
+                    esignature_log=log, document=document,
                 )
-                logger.debug("Posting document to GED: " + pdf["filename"])
-                logger.debug(response.text)
+                esignature_log_documents.save()
 
+                esignature_log_messages = DocumentESignatureLog(
+                    esignature_log=envelope_data["envelope_all_details_message"], document=document,
+                )
+                esignature_log_messages.save()
         except Exception as e:
             msg = str(e)
             logger.exception(msg)
             return HttpResponse(msg)
-
-    if envelope_status in envelope_statuses.keys():
-        document.status = envelope_statuses[envelope_status]
-    else:
-        document.status = "não encontrado"
-
-    if envelope_status == "completed":
-        log = ""
-        for pdf in envelope_data["pdf_documents"]:
-            log += pdf["filename"] + "<br>"
-
-        log += "<br>"
-        esignature_log_documents = DocumentESignatureLog(
-            esignature_log=log, document=document,
-        )
-        esignature_log_documents.save()
-
-    esignature_log_messages = DocumentESignatureLog(
-        esignature_log=envelope_data["envelope_all_details_message"], document=document,
-    )
-    esignature_log_messages.save()
-
-    document.save()
 
     return HttpResponse("Success!")
 
