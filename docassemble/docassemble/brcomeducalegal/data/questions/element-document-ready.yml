@@ -1,0 +1,63 @@
+include:
+  - element-esignature.yml
+---
+ga id: |
+  code: ga_id_end
+event: document_ready_screen
+section: Conclusão
+progress: 100
+back button: False
+question: |
+  % if plan_use_esignature:
+    Deseja enviar o documento para assinatura eletrônica?
+  % else:
+    Aqui está o seu documento!
+  % endif
+subquestion: |
+  % if plan_use_ged:
+    % if ged_response_status_code == 201:
+      O documento foi inserido com sucesso no GED - id: ${ ged_id }
+    % else:
+      <p>Houve erro ao inserir o documento no GED</p>
+      ${ ged_response }
+    % endif
+  % endif
+attachment:
+  name: ${ interview_label }
+  language: pt
+  filename: ${ custom_file_name }
+  variable name: generated_file
+  docx template file:
+    code: school_letterhead
+  valid formats:
+    - pdf
+    - docx
+action buttons:
+  code: |
+    button_list
+---
+code: |
+  esignature_button = {'action': 'submit_to_esignature',
+                       'label': 'Enviar para assinatura eletrônica',
+                       'color': 'info',
+                       'icon': 'signature'}
+---
+code: |
+  el_button = {'action': educalegal_url,
+                'label': 'Fim',
+                'color': 'success',
+                'icon': 'check'}
+---
+code: |
+  button_list = list()
+  if plan_use_esignature:
+    button_list.append(esignature_button)
+  button_list.append(el_button)
+---
+event: all_done
+back button: False
+question: Você já completou todas as etapas desta entrevista
+action buttons:
+  code: |
+    [el_button]
+---

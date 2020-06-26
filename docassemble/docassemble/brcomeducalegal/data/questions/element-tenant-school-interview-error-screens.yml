@@ -1,0 +1,89 @@
+event: invalid_tenant
+question: Cliente inválido
+subquestion: |
+  Não é possível criar a entrevista sem a definição de um cliente.
+  Contate nosso suporte para ajuda.
+  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
+buttons:
+  - Exit: exit
+---
+event: invalid_user
+question: Usuário inválido
+subquestion: |
+  O usuário não possui autorização para acessar a entrevista.
+  Contate nosso suporte para ajuda.
+  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
+buttons:
+  - Exit: exit
+---
+event: invalid_interview
+question: Entrevista inválida
+subquestion: |
+  Não foi definido nenhum tipo para a entrevista.
+  Contate nosso suporte para ajuda.
+  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
+buttons:
+  - Exit: exit
+---
+event: invalid_doc_uuid
+question: Documento inválido
+subquestion: |
+  Não foi gerado um registro de documento no Educa Legal.
+  Contate nosso suporte para ajuda.
+  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
+buttons:
+  - Exit: exit
+---
+event: invalid_elc
+question: API Educa Legal
+subquestion: |
+  Não foi possível conectar à API do Educa Legal.
+  Contate nosso suporte para ajuda.
+  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.<br/><br/>
+  Variáveis: ${ all_variables() }
+buttons:
+  - Exit: exit
+---
+event: invalid_ecm
+question: GED inválido
+subquestion: |
+  A empresa não possui dados de GED cadastrados.
+  Contate nosso suporte para ajuda.
+  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
+buttons:
+  - Exit: exit
+---
+event: invalid_esignature
+question: Assinatura eletrônica inválida
+subquestion: |
+  A empresa não possui dados de assinatura eletrônica cadastrados.
+  Contate nosso suporte para ajuda.
+  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
+buttons:
+  - Exit: exit
+---
+event: invalid_school
+question: Escolas
+subquestion: |
+  A empresa não possui escolas cadastradas.
+  [Clique aqui](${ school_registration_url }) para cadastrar uma escola.
+buttons:
+  - Exit: exit
+---
+event: invalid_ged_token
+question: Token de GED inválido
+subquestion: |
+  O token do usuário do Mayan está inválido ou não existe.
+  Contate nosso suporte para ajuda.
+  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
+buttons:
+  - Exit: exit
+---
+event: invalid_document_type
+question: Tipo de documento inválido
+subquestion: |
+  Não existe o tipo de documento com ID = ${ interview_document_type } cadastrado no Mayan.
+  Contate nosso suporte para ajuda.
+  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
+buttons:
+  - Exit: exit

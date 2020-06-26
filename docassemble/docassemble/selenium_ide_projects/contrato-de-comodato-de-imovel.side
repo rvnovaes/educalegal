@@ -1,0 +1,1450 @@
+{
+  "id": "e4e9b6c1-8cd0-4fb8-a9fd-465223709af0",
+  "version": "2.0",
+  "name": "contrato-de-comodato-de-imovel",
+  "url": "https://app.educalegal.com.br/",
+  "tests": [{
+    "id": "cb596dec-ce99-48e9-84e2-1f1d5dc3cbf7",
+    "name": "contrato-de-comodato-de-imovel",
+    "commands": [{
+      "id": "a2ae4218-54e2-4b88-ae86-50a1ceb61f2d",
+      "comment": "",
+      "command": "open",
+      "target": "https://app.educalegal.com.br/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "454a52ef-c774-4320-9ae4-691dddcd3b69",
+      "comment": "",
+      "command": "type",
+      "target": "id=id_login",
+      "targets": [
+        ["id=id_login", "id"],
+        ["name=login", "name"],
+        ["css=#id_login", "css:finder"],
+        ["xpath=//input[@id='id_login']", "xpath:attributes"],
+        ["xpath=//div[@id='div_id_login']/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "autotest@educalegal.com.br"
+    }, {
+      "id": "553e3332-95d3-407a-a407-70707e77f7aa",
+      "comment": "",
+      "command": "type",
+      "target": "id=id_password",
+      "targets": [
+        ["id=id_password", "id"],
+        ["name=password", "name"],
+        ["css=#id_password", "css:finder"],
+        ["xpath=//input[@id='id_password']", "xpath:attributes"],
+        ["xpath=//div[@id='div_id_password']/div/input", "xpath:idRelative"],
+        ["xpath=//div[2]/div/input", "xpath:position"]
+      ],
+      "value": "Silex2109"
+    }, {
+      "id": "9977c783-4c42-4155-8f76-35d9193bb789",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn",
+      "targets": [
+        ["css=.btn", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Entrar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "f3aab6c2-561d-4a0d-935e-62d482dfa57d",
+      "comment": "",
+      "command": "type",
+      "target": "id=id_name",
+      "targets": [
+        ["id=id_name", "id"],
+        ["name=name", "name"],
+        ["css=#id_name", "css:finder"],
+        ["xpath=//input[@id='id_name']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "AutotestProd_Contrato de comodato de imóvel"
+    }, {
+      "id": "fd090b7d-d98f-4274-826b-5a022232f4d5",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Buscar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "1f10f064-0bf3-4d1f-b073-257400f0f720",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn-success",
+      "targets": [
+        ["css=.btn-success", "css:finder"],
+        ["xpath=(//a[contains(text(),'Criar')])[2]", "xpath:link"],
+        ["xpath=//a[contains(@href, 'https://docs.educalegal.com.br/interview?i=docassemble.playground1Autotest%3Acontrato-de-comodato-de-imovel.yml&tid=7&ut=8f3aed8ca5854f5ae61038f19210c3f58112e055&intid=27&new_session=1')]", "xpath:href"],
+        ["xpath=//td[5]/a", "xpath:position"]
+      ],
+      "value": "",
+      "opensWindow": true,
+      "windowHandleName": "win7659",
+      "windowTimeout": 2000
+    }, {
+      "id": "e49542c5-5d60-45f6-900a-155457b55464",
+      "comment": "",
+      "command": "selectWindow",
+      "target": "handle=${win7659}",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0ebd4d42-9c8b-461f-a8dc-093ec7bcd7b4",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Escolha a escola')]", "xpath:innerText"]
+      ],
+      "value": "Escolha a escola"
+    }, {
+      "id": "a957265c-eb15-4566-9fdc-2e82962acb26",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/fieldset/div/div/label/span[2]",
+      "targets": [
+        ["css=.row:nth-child(2) > .col-md-12 .labelauty-unchecked", "css:finder"],
+        ["xpath=//form[@id='daform']/fieldset/div/div/label/span[2]", "xpath:idRelative"],
+        ["xpath=//label/span[2]", "xpath:position"],
+        ["xpath=//span[contains(.,'Autotest Colégio Bacana')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "b5b6268f-98d8-4864-834c-29e42ee9cf83",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset[2]/div/button", "xpath:idRelative"],
+        ["xpath=//fieldset[2]/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "6c32fdb3-74e3-409e-9ccc-0ce0a4a6be55",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Número de comodantes')]", "xpath:innerText"]
+      ],
+      "value": "Número de comodantes"
+    }, {
+      "id": "88c172fd-5e0c-44d9-896e-ee45f04aa15a",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=Y29tb2RhbnRlcy50YXJnZXRfbnVtYmVy", "id"],
+        ["name=Y29tb2RhbnRlcy50YXJnZXRfbnVtYmVy", "name"],
+        ["css=#Y29tb2RhbnRlcy50YXJnZXRfbnVtYmVy", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhbnRlcy50YXJnZXRfbnVtYmVy']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "2"
+    }, {
+      "id": "5e0c4d25-a511-4026-8685-8e6288eb89cb",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "1aee2e7b-24b3-40b9-a991-04f76daefc29",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Dados do(a) primeiro(a) comodantes(a)')]", "xpath:innerText"]
+      ],
+      "value": "Dados do(a) primeiro(a) comodantes(a)"
+    }, {
+      "id": "285eec30-94d0-4f20-baf2-cce3f2ff8ac5",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//label[contains(.,'Pessoa Física')]",
+      "targets": [
+        ["css=.form-group:nth-child(2) .btn-light:nth-child(3)", "css:finder"],
+        ["xpath=//form[@id='daform']/div[2]/div/fieldset/label", "xpath:idRelative"],
+        ["xpath=//fieldset/label", "xpath:position"],
+        ["xpath=//label[contains(.,'Pessoa Física')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "1f99ae99-2726-4869-9672-d6385c972cfa",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[3]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzE", "id"],
+        ["name=X2ZpZWxkXzE", "name"],
+        ["css=#X2ZpZWxkXzE", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzE']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[3]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "JOSUÉ SIGNATARIO"
+    }, {
+      "id": "d7ebba83-33a9-42e1-ae7c-4bda7d298014",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzI", "id"],
+        ["name=X2ZpZWxkXzI", "name"],
+        ["css=#X2ZpZWxkXzI", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzI']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[4]/div/div/input", "xpath:position"]
+      ],
+      "value": "099.264.116-06"
+    }, {
+      "id": "9d5ae8f1-3aa2-4409-b7f8-b6502dc27e0b",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzM", "id"],
+        ["name=X2ZpZWxkXzM", "name"],
+        ["css=#X2ZpZWxkXzM", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzM']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/div/input", "xpath:position"]
+      ],
+      "value": "4323423423423"
+    }, {
+      "id": "f74dfa0a-0efc-491b-a25d-24969f4754cb",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/div[7]/div/div/fieldset/label/span[2]",
+      "targets": [
+        ["css=.btn-light:nth-child(3) > .labelauty-unchecked", "css:finder"],
+        ["xpath=//form[@id='daform']/div[7]/div/div/fieldset/label/span[2]", "xpath:idRelative"],
+        ["xpath=//div[7]/div/div/fieldset/label/span[2]", "xpath:position"],
+        ["xpath=//span[contains(.,'solteiro(a)')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "5c3069ac-9f73-4852-9c23-b7109192e4b9",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[8]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzY", "id"],
+        ["name=X2ZpZWxkXzY", "name"],
+        ["css=#X2ZpZWxkXzY", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzY']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[8]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[8]/div/div/input", "xpath:position"]
+      ],
+      "value": "empresário"
+    }, {
+      "id": "afa016f5-3ec4-4c8b-bc0d-7d07d62fb50c",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[11]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzk", "id"],
+        ["name=X2ZpZWxkXzk", "name"],
+        ["css=#X2ZpZWxkXzk", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzk']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[11]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[11]/div/div/input", "xpath:position"]
+      ],
+      "value": "josue.signatario@gmail.com"
+    }, {
+      "id": "439db991-05d6-4561-810d-8697556ff60d",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "a0fc47a6-6a1f-4394-9a1b-146db076cc3f",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Endereço do(a) JOSUÉ SIGNATARIO')]", "xpath:innerText"]
+      ],
+      "value": "Endereço do(a) JOSUÉ SIGNATARIO"
+    }, {
+      "id": "07d95776-e25e-4590-ba62-3280fbdeca24",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA", "id"],
+        ["name=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA", "name"],
+        ["css=#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "30180-090"
+    }, {
+      "id": "577761c9-4bf5-46ee-b45a-bc5c83e632a7",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/input",
+      "targets": [
+        ["id=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0cmVldF9udW1iZXI", "id"],
+        ["name=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0cmVldF9udW1iZXI", "name"],
+        ["css=#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0cmVldF9udW1iZXI", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0cmVldF9udW1iZXI']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/input", "xpath:idRelative"],
+        ["xpath=//div[4]/div/input", "xpath:position"]
+      ],
+      "value": "683"
+    }, {
+      "id": "de77b55f-28d0-4c64-8a0a-b2928f8f0f35",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/input",
+      "targets": [
+        ["id=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnVuaXQ", "id"],
+        ["name=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnVuaXQ", "name"],
+        ["css=#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnVuaXQ", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnVuaXQ']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/input", "xpath:position"]
+      ],
+      "value": "APARTAMENTO 09"
+    }, {
+      "id": "6f50a987-68ae-44ed-8690-d7b18434c093",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "e777cf23-a3ef-4ef2-8408-3f521baa53a8",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Dados do(a) segundo(a) comodantes(a)')]", "xpath:innerText"]
+      ],
+      "value": "Dados do(a) segundo(a) comodantes(a)"
+    }, {
+      "id": "c9cc1a60-74e5-4af9-9002-de1b31842dbd",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/div[2]/div/fieldset/label[2]/span[2]",
+      "targets": [
+        ["css=.form-group:nth-child(2) .btn-light:nth-child(5) > .labelauty-unchecked", "css:finder"],
+        ["xpath=//form[@id='daform']/div[2]/div/fieldset/label[2]/span[2]", "xpath:idRelative"],
+        ["xpath=//label[2]/span[2]", "xpath:position"],
+        ["xpath=//span[contains(.,'Pessoa Jurídica')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "b9aac36d-5033-47bc-8348-904fb9aa7da6",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[9]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzc", "id"],
+        ["name=X2ZpZWxkXzc", "name"],
+        ["css=#X2ZpZWxkXzc", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzc']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[9]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[9]/div/div/input", "xpath:position"]
+      ],
+      "value": "EDUCA LEGAL 01"
+    }, {
+      "id": "8099218d-152e-4429-86c2-1bec172b0419",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[10]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzg", "id"],
+        ["name=X2ZpZWxkXzg", "name"],
+        ["css=#X2ZpZWxkXzg", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzg']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[10]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[10]/div/div/input", "xpath:position"]
+      ],
+      "value": "00.000.000/0001-91"
+    }, {
+      "id": "e0bc07e3-4ae2-4fdd-9141-ba9e160595f4",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[11]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzk", "id"],
+        ["name=X2ZpZWxkXzk", "name"],
+        ["css=#X2ZpZWxkXzk", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzk']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[11]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[11]/div/div/input", "xpath:position"]
+      ],
+      "value": "escola.educalegal@gmail.com"
+    }, {
+      "id": "997cfbfa-bd32-4705-9bf3-423acfd1e61c",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "4d996c6c-2bef-4887-8d3d-a94e9ea98037",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Endereço do(a) EDUCA LEGAL 01')]", "xpath:innerText"]
+      ],
+      "value": "Endereço do(a) EDUCA LEGAL 01"
+    }, {
+      "id": "28b2136f-5aa4-413f-9be9-2264c248da44",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA", "id"],
+        ["name=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA", "name"],
+        ["css=#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnppcA']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "30180-090"
+    }, {
+      "id": "e9c5a3f9-f918-4fac-9c49-29fb67ae899b",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/input",
+      "targets": [
+        ["id=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0cmVldF9udW1iZXI", "id"],
+        ["name=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0cmVldF9udW1iZXI", "name"],
+        ["css=#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0cmVldF9udW1iZXI", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnN0cmVldF9udW1iZXI']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/input", "xpath:idRelative"],
+        ["xpath=//div[4]/div/input", "xpath:position"]
+      ],
+      "value": "683"
+    }, {
+      "id": "cc4214e6-c394-4e0d-abf1-5a0da5b6159e",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/input",
+      "targets": [
+        ["id=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnVuaXQ", "id"],
+        ["name=Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnVuaXQ", "name"],
+        ["css=#Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnVuaXQ", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhbnRlc1tpXS5hZGRyZXNzLnVuaXQ']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/input", "xpath:position"]
+      ],
+      "value": "apartamento 09"
+    }, {
+      "id": "37273668-ca69-4c8c-bc22-4d75ed966c81",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7bea9ffc-f7f0-4646-bf39-a3f3b3978f8e",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Comodantes:')]", "xpath:innerText"]
+      ],
+      "value": "Comodantes:"
+    }, {
+      "id": "99a40eaa-d9ab-46cf-85d2-660e7458822a",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["name=dmFsaWRfY29tb2RhbnRlc190YWJsZQ", "name"],
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@name='dmFsaWRfY29tb2RhbnRlc190YWJsZQ']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ad673323-0f68-4384-ac2e-928142cb7f27",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Gestor do Contrato')]", "xpath:innerText"]
+      ],
+      "value": "Gestor do Contrato"
+    }, {
+      "id": "1552fbf3-1782-4c0e-82cc-40d296624e1e",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/div[2]/div/fieldset/label",
+      "targets": [
+        ["css=.btn-light:nth-child(3)", "css:finder"],
+        ["xpath=//form[@id='daform']/div[2]/div/fieldset/label", "xpath:idRelative"],
+        ["xpath=//fieldset/label", "xpath:position"],
+        ["xpath=//label[contains(.,'Sim')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "fe69df95-ff88-4826-a2d6-71791fcc720c",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[3]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzE", "id"],
+        ["name=X2ZpZWxkXzE", "name"],
+        ["css=#X2ZpZWxkXzE", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzE']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[3]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "Miguel Gestor 01"
+    }, {
+      "id": "194f6d5e-300d-4767-9102-b0f23e001728",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzI", "id"],
+        ["name=X2ZpZWxkXzI", "name"],
+        ["css=#X2ZpZWxkXzI", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzI']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[4]/div/div/input", "xpath:position"]
+      ],
+      "value": "miguel@gmail.com"
+    }, {
+      "id": "df4f2af9-3b32-4848-ad3e-1607b4d53a0b",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzM", "id"],
+        ["name=X2ZpZWxkXzM", "name"],
+        ["css=#X2ZpZWxkXzM", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzM']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/div/input", "xpath:position"]
+      ],
+      "value": "31982159000"
+    }, {
+      "id": "a9c6950c-c833-446d-b49b-11501a32a9c2",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "9c9f9df1-ea4d-4497-92eb-2ce39429c79f",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Número de Comodatárias')]", "xpath:innerText"]
+      ],
+      "value": "Número de Comodatárias"
+    }, {
+      "id": "204034d8-de55-4021-b179-b5df47829dcf",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=Y29tb2RhdGFyaWFzLnRhcmdldF9udW1iZXI", "id"],
+        ["name=Y29tb2RhdGFyaWFzLnRhcmdldF9udW1iZXI", "name"],
+        ["css=#Y29tb2RhdGFyaWFzLnRhcmdldF9udW1iZXI", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhdGFyaWFzLnRhcmdldF9udW1iZXI']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "2"
+    }, {
+      "id": "7340702a-59cf-4da1-9398-f7b3ca437dc2",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "d9cc6787-8703-47bc-9176-3d20509ea240",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Dados do(a) primeiro(a) comodatário(a)')]", "xpath:innerText"]
+      ],
+      "value": "Dados do(a) primeiro(a) comodatário(a)"
+    }, {
+      "id": "5ac679da-db07-4785-9423-f7f2f67dccca",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//label[contains(.,'Pessoa Física')]",
+      "targets": [
+        ["css=.form-group:nth-child(2) .btn-light:nth-child(3)", "css:finder"],
+        ["xpath=//form[@id='daform']/div[2]/div/fieldset/label", "xpath:idRelative"],
+        ["xpath=//fieldset/label", "xpath:position"],
+        ["xpath=//label[contains(.,'Pessoa Física')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "271819e1-6e1c-4c57-b00f-9b897a6252af",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[3]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzE", "id"],
+        ["name=X2ZpZWxkXzE", "name"],
+        ["css=#X2ZpZWxkXzE", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzE']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[3]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "Francisco"
+    }, {
+      "id": "c8d2c2e2-d2ed-446b-ad4c-ebe001464246",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzI", "id"],
+        ["name=X2ZpZWxkXzI", "name"],
+        ["css=#X2ZpZWxkXzI", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzI']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[4]/div/div/input", "xpath:position"]
+      ],
+      "value": "099.264.116-06"
+    }, {
+      "id": "a95a3b56-a547-442c-b4a8-67d249a720d6",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzM", "id"],
+        ["name=X2ZpZWxkXzM", "name"],
+        ["css=#X2ZpZWxkXzM", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzM']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/div/input", "xpath:position"]
+      ],
+      "value": "524354354534"
+    }, {
+      "id": "9e1ba185-4a61-4f30-8d7b-7cc59ec5635e",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/div[7]/div/div/fieldset/label",
+      "targets": [
+        ["css=.btn-light:nth-child(3)", "css:finder"],
+        ["xpath=//form[@id='daform']/div[7]/div/div/fieldset/label", "xpath:idRelative"],
+        ["xpath=//div[7]/div/div/fieldset/label", "xpath:position"],
+        ["xpath=//label[contains(.,'solteiro(a)')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "9b303913-e412-42ae-a214-70cdae0f2249",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[8]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzY", "id"],
+        ["name=X2ZpZWxkXzY", "name"],
+        ["css=#X2ZpZWxkXzY", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzY']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[8]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[8]/div/div/input", "xpath:position"]
+      ],
+      "value": "empresário"
+    }, {
+      "id": "f8c66f82-bd76-4ee8-83b8-91e78e34f763",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[11]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzk", "id"],
+        ["name=X2ZpZWxkXzk", "name"],
+        ["css=#X2ZpZWxkXzk", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzk']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[11]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[11]/div/div/input", "xpath:position"]
+      ],
+      "value": "fiador.educalegal@gmail.com"
+    }, {
+      "id": "abb34a17-e8f5-4ed3-97bc-48486179cdc2",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "e749f1fe-9aed-4b5c-8f64-aa73c191429c",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Endereço do(a) Francisco')]", "xpath:innerText"]
+      ],
+      "value": "Endereço do(a) Francisco"
+    }, {
+      "id": "b10a27f1-75da-4571-94c7-1ab88fd2cebe",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw", "id"],
+        ["name=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw", "name"],
+        ["css=#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "30180-090"
+    }, {
+      "id": "8e811c08-b3df-413e-8105-5a41babafb70",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/input",
+      "targets": [
+        ["id=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg", "id"],
+        ["name=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg", "name"],
+        ["css=#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/input", "xpath:idRelative"],
+        ["xpath=//div[4]/div/input", "xpath:position"]
+      ],
+      "value": "683"
+    }, {
+      "id": "91127283-c73d-4f73-8f64-1ba3cc889d16",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/input",
+      "targets": [
+        ["id=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MudW5pdA", "id"],
+        ["name=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MudW5pdA", "name"],
+        ["css=#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MudW5pdA", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MudW5pdA']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/input", "xpath:position"]
+      ],
+      "value": "apartamento 09"
+    }, {
+      "id": "a450b75f-c3cb-49ce-8520-feab149a2640",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "52366f9f-2b7d-47d5-9c43-1cf8f05383e3",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Dados do(a) segundo(a) comodatário(a)')]", "xpath:innerText"]
+      ],
+      "value": "Dados do(a) segundo(a) comodatário(a)"
+    }, {
+      "id": "35943f53-8a00-46f7-b5e0-864afd0f8e22",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/div[2]/div/fieldset/label[2]/span[2]",
+      "targets": [
+        ["css=.form-group:nth-child(2) .btn-light:nth-child(5) > .labelauty-unchecked", "css:finder"],
+        ["xpath=//form[@id='daform']/div[2]/div/fieldset/label[2]/span[2]", "xpath:idRelative"],
+        ["xpath=//label[2]/span[2]", "xpath:position"],
+        ["xpath=//span[contains(.,'Pessoa Jurídica')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "941843fc-7f12-4d99-b856-9c5de5621d5e",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[9]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzc", "id"],
+        ["name=X2ZpZWxkXzc", "name"],
+        ["css=#X2ZpZWxkXzc", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzc']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[9]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[9]/div/div/input", "xpath:position"]
+      ],
+      "value": "EDUCA LEGAL 02"
+    }, {
+      "id": "3275ebfa-90f7-41b7-afd4-43cb7eaad6f8",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[10]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzg", "id"],
+        ["name=X2ZpZWxkXzg", "name"],
+        ["css=#X2ZpZWxkXzg", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzg']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[10]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[10]/div/div/input", "xpath:position"]
+      ],
+      "value": "00.000.000/0001-91"
+    }, {
+      "id": "6904917d-188d-4d7d-adc8-58b0413133df",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[11]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzk", "id"],
+        ["name=X2ZpZWxkXzk", "name"],
+        ["css=#X2ZpZWxkXzk", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzk']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[11]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[11]/div/div/input", "xpath:position"]
+      ],
+      "value": "escola.educalegal@gmail.com"
+    }, {
+      "id": "cbf47de8-52c2-40ac-b8a3-d06f4fc52e30",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "daa29041-d508-4e54-978b-f18caf652c6d",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Endereço do(a) EDUCA LEGAL 02')]", "xpath:innerText"]
+      ],
+      "value": "Endereço do(a) EDUCA LEGAL 02"
+    }, {
+      "id": "a0357bfd-af02-41cf-a73b-d1ff4cfacbd6",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw", "id"],
+        ["name=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw", "name"],
+        ["css=#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muemlw']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "30180-090"
+    }, {
+      "id": "7f6feccc-1f6f-4894-a55c-a3466046036c",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/input",
+      "targets": [
+        ["id=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg", "id"],
+        ["name=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg", "name"],
+        ["css=#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3Muc3RyZWV0X251bWJlcg']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/input", "xpath:idRelative"],
+        ["xpath=//div[4]/div/input", "xpath:position"]
+      ],
+      "value": "683"
+    }, {
+      "id": "c5b87889-4feb-409e-b7fc-16afbda968d0",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/input",
+      "targets": [
+        ["id=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MudW5pdA", "id"],
+        ["name=Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MudW5pdA", "name"],
+        ["css=#Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MudW5pdA", "css:finder"],
+        ["xpath=//input[@id='Y29tb2RhdGFyaWFzW2ldLmFkZHJlc3MudW5pdA']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/input", "xpath:position"]
+      ],
+      "value": "Apartamento 09"
+    }, {
+      "id": "7fed02da-d885-4074-b4bb-86ea5584c160",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "953f4ab8-2a6e-4152-8ea9-b9280587cf2a",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Comodatárias:')]", "xpath:innerText"]
+      ],
+      "value": "Comodatárias:"
+    }, {
+      "id": "e866bb32-f0fe-45c6-afb6-6e12b9604fd2",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["name=dmFsaWRfY29tb2RhdGFyaWFzX3RhYmxl", "name"],
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@name='dmFsaWRfY29tb2RhdGFyaWFzX3RhYmxl']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "f9627963-ef19-4500-97a6-6f9872f51ac0",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Gestor do Contrato')]", "xpath:innerText"]
+      ],
+      "value": "Gestor do Contrato"
+    }, {
+      "id": "e135ac2c-d058-4444-bbba-e6c5448622e6",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/div[2]/div/fieldset/label/span[2]",
+      "targets": [
+        ["css=.btn-light:nth-child(3) > .labelauty-unchecked", "css:finder"],
+        ["xpath=//form[@id='daform']/div[2]/div/fieldset/label/span[2]", "xpath:idRelative"],
+        ["xpath=//label/span[2]", "xpath:position"],
+        ["xpath=//span[contains(.,'Sim')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "1d96f1ab-0f7f-4156-a7db-9948e9fe720a",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[3]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzE", "id"],
+        ["name=X2ZpZWxkXzE", "name"],
+        ["css=#X2ZpZWxkXzE", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzE']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[3]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "Paulo"
+    }, {
+      "id": "16df69ef-5b88-4559-9050-cc10d02e5c7d",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzI", "id"],
+        ["name=X2ZpZWxkXzI", "name"],
+        ["css=#X2ZpZWxkXzI", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzI']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[4]/div/div/input", "xpath:position"]
+      ],
+      "value": "valeriano@gmail.com"
+    }, {
+      "id": "493d5a7e-392d-42e2-9dba-9ce3c4e1d829",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/div/input",
+      "targets": [
+        ["id=X2ZpZWxkXzM", "id"],
+        ["name=X2ZpZWxkXzM", "name"],
+        ["css=#X2ZpZWxkXzM", "css:finder"],
+        ["xpath=//input[@id='X2ZpZWxkXzM']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/div/input", "xpath:position"]
+      ],
+      "value": "314543543"
+    }, {
+      "id": "0b83a5a7-02c4-4811-9765-477f6355f6b2",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "b366015c-7eb5-4185-a3a5-a9e3b4b9add3",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Dados do Imóvel')]", "xpath:innerText"]
+      ],
+      "value": "Dados do Imóvel"
+    }, {
+      "id": "b740d7f8-c156-41a9-be0b-592c7e8d6860",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=YXJlYV9pbW92ZWw", "id"],
+        ["name=YXJlYV9pbW92ZWw", "name"],
+        ["css=#YXJlYV9pbW92ZWw", "css:finder"],
+        ["xpath=//input[@id='YXJlYV9pbW92ZWw']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "4234"
+    }, {
+      "id": "76700990-f4be-4175-8df6-677767cd54ce",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[3]/div/input",
+      "targets": [
+        ["id=bnVtZXJvX21hdHJpY3VsYV9pbW92ZWw", "id"],
+        ["name=bnVtZXJvX21hdHJpY3VsYV9pbW92ZWw", "name"],
+        ["css=#bnVtZXJvX21hdHJpY3VsYV9pbW92ZWw", "css:finder"],
+        ["xpath=//input[@id='bnVtZXJvX21hdHJpY3VsYV9pbW92ZWw']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[3]/div/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div/input", "xpath:position"]
+      ],
+      "value": "4234234234"
+    }, {
+      "id": "813ceebc-bc5b-43c6-86b8-4e9a50da9e54",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[4]/div/textarea",
+      "targets": [
+        ["id=Y2FydG9yaW9fcmVnaXN0cm8", "id"],
+        ["name=Y2FydG9yaW9fcmVnaXN0cm8", "name"],
+        ["css=#Y2FydG9yaW9fcmVnaXN0cm8", "css:finder"],
+        ["xpath=//textarea[@id='Y2FydG9yaW9fcmVnaXN0cm8']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[4]/div/textarea", "xpath:idRelative"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "Cartório de ofício 4º"
+    }, {
+      "id": "fa108cd4-4ecb-4e0d-bbaf-0591ef7842dc",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[5]/div/input",
+      "targets": [
+        ["id=Y2VwX2ltb3ZlbA", "id"],
+        ["name=Y2VwX2ltb3ZlbA", "name"],
+        ["css=#Y2VwX2ltb3ZlbA", "css:finder"],
+        ["xpath=//input[@id='Y2VwX2ltb3ZlbA']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[5]/div/input", "xpath:idRelative"],
+        ["xpath=//div[5]/div/input", "xpath:position"]
+      ],
+      "value": "30180-090"
+    }, {
+      "id": "5b3b986c-f7c8-443b-8b13-5dfdff0fae4d",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[7]/div/input",
+      "targets": [
+        ["id=bnVtZXJvX2ltb3ZlbA", "id"],
+        ["name=bnVtZXJvX2ltb3ZlbA", "name"],
+        ["css=#bnVtZXJvX2ltb3ZlbA", "css:finder"],
+        ["xpath=//input[@id='bnVtZXJvX2ltb3ZlbA']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[7]/div/input", "xpath:idRelative"],
+        ["xpath=//div[7]/div/input", "xpath:position"]
+      ],
+      "value": "683"
+    }, {
+      "id": "ceba5382-98ed-4cff-bbef-437a23998fd8",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[8]/div/input",
+      "targets": [
+        ["id=Y29tcGxlbWVudG9faW1vdmVs", "id"],
+        ["name=Y29tcGxlbWVudG9faW1vdmVs", "name"],
+        ["css=#Y29tcGxlbWVudG9faW1vdmVs", "css:finder"],
+        ["xpath=//input[@id='Y29tcGxlbWVudG9faW1vdmVs']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[8]/div/input", "xpath:idRelative"],
+        ["xpath=//div[8]/div/input", "xpath:position"]
+      ],
+      "value": "Apartamento 01"
+    }, {
+      "id": "b2eebd6b-82c5-47a5-bf9a-15e3c30a88d0",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ddd4e45d-7ad9-4a2a-bbc4-7e0db92cdaf5",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Uso do Imóvel')]", "xpath:innerText"]
+      ],
+      "value": "Uso do Imóvel"
+    }, {
+      "id": "cb1b75d9-89fb-4152-80a5-40b7a08a316a",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/p/span/input",
+      "targets": [
+        ["id=YXRpdmlkYWRl", "id"],
+        ["name=YXRpdmlkYWRl", "name"],
+        ["css=#YXRpdmlkYWRl", "css:finder"],
+        ["xpath=//input[@id='YXRpdmlkYWRl']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/p/span/input", "xpath:idRelative"],
+        ["xpath=//span/input", "xpath:position"]
+      ],
+      "value": "de papelaria"
+    }, {
+      "id": "2efe44d1-a381-4d22-a77b-3d0acbb14bc5",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/div[3]/div/fieldset/label[2]",
+      "targets": [
+        ["css=.btn-light:nth-child(5)", "css:finder"],
+        ["xpath=//form[@id='daform']/div[3]/div/fieldset/label[2]", "xpath:idRelative"],
+        ["xpath=//label[2]", "xpath:position"],
+        ["xpath=//label[contains(.,'Não')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "71571642-d581-450f-b028-bb00b30cd574",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//fieldset/div/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "718a13fa-664a-43ea-ac6a-ae19ce4dd3d4",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["css=.da-page-header", "css:finder"],
+        ["xpath=//form[@id='daform']/div", "xpath:idRelative"],
+        ["xpath=//form/div", "xpath:position"]
+      ],
+      "value": "Prazo do Contrato"
+    }, {
+      "id": "406f31a7-cb80-4fd5-8f07-2a382300bc29",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=ZHVyYWNhb19jb250cmF0bw", "id"],
+        ["name=ZHVyYWNhb19jb250cmF0bw", "name"],
+        ["css=#ZHVyYWNhb19jb250cmF0bw", "css:finder"],
+        ["xpath=//input[@id='ZHVyYWNhb19jb250cmF0bw']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "20"
+    }, {
+      "id": "de498fac-18d1-4c69-8917-8678fdc44864",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[3]/div/input",
+      "targets": [
+        ["id=ZGF0YV9pbmljaW9fbG9jYWNhbw", "id"],
+        ["name=ZGF0YV9pbmljaW9fbG9jYWNhbw", "name"],
+        ["css=#ZGF0YV9pbmljaW9fbG9jYWNhbw", "css:finder"],
+        ["xpath=//input[@id='ZGF0YV9pbmljaW9fbG9jYWNhbw']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[3]/div/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div/input", "xpath:position"]
+      ],
+      "value": "2020-04-23"
+    }, {
+      "id": "3a6b4493-a980-423e-8383-542b200416d7",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//form[@id='daform']/div[4]/div/fieldset/label[2]",
+      "targets": [
+        ["css=.btn-light:nth-child(5)", "css:finder"],
+        ["xpath=//form[@id='daform']/div[4]/div/fieldset/label[2]", "xpath:idRelative"],
+        ["xpath=//label[2]", "xpath:position"],
+        ["xpath=//label[contains(.,'Não')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "8a3bdfa5-9052-492a-872b-627797755113",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-da:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "3159523b-dffc-4d74-85db-e56e4f195409",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Eleição do Foro')]", "xpath:innerText"]
+      ],
+      "value": "Eleição do Foro"
+    }, {
+      "id": "18fa023e-ef1f-420d-95d2-d3c20f662201",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/p/span/input",
+      "targets": [
+        ["id=Y2l0eQ", "id"],
+        ["name=Y2l0eQ", "name"],
+        ["css=#Y2l0eQ", "css:finder"],
+        ["xpath=//input[@id='Y2l0eQ']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/p/span/input", "xpath:idRelative"],
+        ["xpath=//span/input", "xpath:position"]
+      ],
+      "value": "Belo Horizonte"
+    }, {
+      "id": "23379306-e36d-4e34-a03e-7fd770274803",
+      "comment": "",
+      "command": "select",
+      "target": "xpath=//form[@id='daform']/div[2]/p/span[2]/select",
+      "targets": [],
+      "value": "label=MG"
+    }, {
+      "id": "2529c485-5784-4e61-8aaf-14f2869ae9d3",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "4398c53d-2af3-487a-ac8f-8f758a29befc",
+      "comment": "",
+      "command": "waitForText",
+      "target": "xpath=//h1",
+      "targets": [
+        ["id=daMainQuestion", "id"],
+        ["css=#daMainQuestion", "css:finder"],
+        ["xpath=//h1[@id='daMainQuestion']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Local e Data')]", "xpath:innerText"]
+      ],
+      "value": "Local e Data"
+    }, {
+      "id": "e5d23641-8d8c-41c5-80a3-4d2241503ff9",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//form[@id='daform']/div[2]/div/input",
+      "targets": [
+        ["id=c2lnbmF0dXJlX2xvY2Fs", "id"],
+        ["name=c2lnbmF0dXJlX2xvY2Fs", "name"],
+        ["css=#c2lnbmF0dXJlX2xvY2Fs", "css:finder"],
+        ["xpath=//input[@id='c2lnbmF0dXJlX2xvY2Fs']", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "Belo Horizonte"
+    }, {
+      "id": "c9eb7c60-a227-41fa-841e-271dc38b631c",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Continuar')]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='submit'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='daform']/fieldset/div/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "540ee461-4a63-4d74-85d0-b8fa1839a020",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["cb596dec-ce99-48e9-84e2-1f1d5dc3cbf7"]
+  }],
+  "urls": ["https://app.educalegal.com.br/"],
+  "plugins": []
+}

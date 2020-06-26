@@ -19,48 +19,15 @@
             Você não tem modelos disponíveis.
         </div>
     {% endif %}
-    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    {% include "snippets/messages.html" %}
+    <!-- ------------------------------------------ Welcome Modal -------------------------------------------------- -->
     {% if user.tenant.school_set.count == 0 %}
-        <div class="modal fade" id="tutorial_modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Bem-vindo à plataforma <b>Educa Legal!</b></h4>
-                    </div>
-                    <div class="modal-body">
-                        <p>Para iniciar o uso, é necessário primeiro cadastrar uma <b>Escola</b>.</p>
-                        <p>Os dados da <b>Escola</b> serão usados na criação dos contratos e documentos.</p>
-                        <p>O menu <b>Modelos</b> é usado para criar novos contratos e documentos.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="{% url 'school:school-list' %}" class="btn btn-primary btn-block">Criar Escola</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include "snippets/welcome_modal.html" %}
     {% endif %}
-    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
+    <!-- ------------------------------------------ Upgrade Modal -------------------------------------------------- -->
     {% if reached_document_limit %}
-        <div class="modal fade" id="plan_upgrade_modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Faça um upgrade do seu plano!</h5>
-                    </div>
-                    <div class="modal-body">
-                        <p>Foi atingido o limite mensal de geração de {{ document_limit }} documentos para o plano
-                            contratado.</p>
-                        <p>Entre em contato conosco e faça um upgrade de seu plano.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="https://www.educalegal.com.br/contato/" target="_blank" class="btn btn-primary">Entrar
-                            em contato</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include "snippets/upgrade_modal.html" %}
     {% endif %}
-    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">

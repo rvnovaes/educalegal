@@ -1,0 +1,55 @@
+---
+objects:
+  - part_manager: Individual
+  - counterpart_manager: Individual
+  - extrapart_manager: Individual
+---
+generic object: Individual
+section: Partes
+progress: 15
+question: |
+  % if x is part_manager:
+  Gestor do Contrato do(a) ${ part_name }
+  % elif x is counterpart_manager:
+  Gestor do Contrato do(a) ${ counterpart_name }
+  % elif x is extrapart_manager:
+  Gestor do Contrato do(a) ${ extrapart_name }
+  % endif
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': x.insert_manager
+    datatype: radio
+    choices:
+      - Sim: Sim
+      - Não: Não
+  - 'Nome:': x.name.first
+    required: True
+    datatype: text
+    show if:
+      variable: x.insert_manager
+      is: "Sim"
+  - 'E-mail:': x.email
+    required: False
+    datatype: email
+    show if:
+      variable: x.insert_manager
+      is: "Sim"
+  - 'Telefone:': x.telephone
+    required: False
+    datatype: text
+    show if:
+      variable: x.insert_manager
+      is: "Sim"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+
+        $('#X2ZpZWxkXzM').mask('(00) Z 0000-0000', {
+          translation: {
+            'Z': {
+              pattern: /[9]/, optional: true
+            }
+          }
+        });
+    });
+  </script>
+---

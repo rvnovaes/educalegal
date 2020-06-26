@@ -1,0 +1,210 @@
+metadata:
+  title: Termo de Uso e Responsabilidade - Iscool App
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Empregado
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "termo-de-uso-e-responsabilidade-iscool-app.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    employees.target_number = 1
+    for item in employees:
+      item.name.text
+    if plan_use_esignature:
+      valid_employees_table
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - employees: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+---
+code: |
+  employees[i].name.text
+  employees[i].address.street_name
+  employees[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+ga id: |
+  code: ga_id_begin
+section: Empregado
+progress: 5
+question: Número de Empregado(s)
+fields:
+  - Número: employees.target_number
+    datatype: integer
+    default: 1
+---
+section: Empregado
+progress: 60
+question: |
+  Dados do(a) Empregado
+fields:
+  - "Nome completo:": employees[i].name.text
+    required: True
+  - "Número do RG:": employees[i].rg
+    required: True
+  - "Nacionalidade:": employees[i].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado civil:": employees[i].marital_status
+    required: True
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    datatype: radio
+  - "Profissão:": employees[i].occupation
+    required: False
+  - "E-mail:": employees[i].email
+    help: ${ help_email_msg }
+    required: False
+    datatype: email
+---
+section: Empregado
+progress: 80
+question: |
+  Endereço do(a) ${ employees[i].name.text }
+fields:
+  - "CEP:": employees[i].address.zip
+    required: True
+  - "Logradouro:": employees[i].address.street_name
+    required: True
+  - "Número:": employees[i].address.street_number
+    required: True
+  - "Complemento:": employees[i].address.complement
+    required: False
+  - "Bairro:": employees[i].address.neighborhood
+    required: True
+  - "Cidade:": employees[i].address.city
+    required: True
+  - "Estado:": employees[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#ZW1wbG95ZWVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#ZW1wbG95ZWVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#ZW1wbG95ZWVzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#ZW1wbG95ZWVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#ZW1wbG95ZWVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#ZW1wbG95ZWVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#ZW1wbG95ZWVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Dados da Pessoa
+field: valid_employees_table
+question: |
+  Empregado:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ employees.table }
+buttons:
+  Continuar: continue
+---
+table: employees.table
+rows: employees
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+code: |
+  recipients = list()
+  for item in employees:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

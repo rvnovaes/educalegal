@@ -230,80 +230,76 @@ def docusign_webhook_listener(request):
         logger.exception(msg)
         return HttpResponse(msg)
 
-    document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
+    try:
+        document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
+    except Document.DoesNotExist:
+        document = None
+        message = 'O envelope {envelope_id} não existe.'.format(envelope_id=envelope_data["envelope_id"])
+        logger.debug(message)
+
     envelope_status = str(envelope_data["envelope_status"]).lower()
 
+    # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
     if envelope_status == "completed":
-        tenant = Tenant.objects.get(pk=document.tenant.pk)
-        # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
-        if tenant.plan.use_ged:
-            try:
-                (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
-                    data, envelope_dir
+        try:
+            (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
+                data, envelope_dir
+            )
+            logger.debug(envelope_data)
+
+            if document:
+                tenant = Tenant.objects.get(pk=document.tenant.pk)
+                if tenant.plan.use_ged:
+                    # Get document related interview data to post to GED
+                    interview = Interview.objects.get(pk=document.interview.pk)
+                    document_type_pk = interview.document_type.pk
+                    document_language = interview.language
+
+                    # Post documents to GED
+                    tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
+                    mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
+
+                    for pdf in envelope_data["pdf_documents"]:
+                        response = mc.document_create(
+                            pdf["full_filename"],
+                            document_type_pk,
+                            pdf["filename"],
+                            document_language,
+                            pdf["description"],
+                        )
+                        logger.debug("Posting document to GED: " + pdf["filename"])
+                        logger.debug(response.text)
+
+                if envelope_status in envelope_statuses.keys():
+                    document.status = envelope_statuses[envelope_status]
+                else:
+                    document.status = "não encontrado"
+
+                document.save()
+
+                esignature_log = DocumentESignatureLog(
+                    envelope_id=envelope_data['envelope_id'],
+                    status=envelope_data['envelope_status'],
+                    created_date=envelope_data['envelope_created'],
+                    sent_date=envelope_data['envelope_sent'],
+                    status_update_date=envelope_data['envelope_time_generated'],
+                    document=document,
                 )
-                logger.debug(envelope_data)
+                esignature_log.save()
 
-                # Get document related interview data to post to GED
-                interview = Interview.objects.get(pk=document.interview.pk)
-                document_type_pk = interview.document_type.pk
-                document_language = interview.language
-
-                # Post documents to GED
-                tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
-                mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
-
-                for pdf in envelope_data["pdf_documents"]:
-                    response = mc.document_create(
-                        pdf["full_filename"],
-                        document_type_pk,
-                        pdf["filename"],
-                        document_language,
-                        pdf["description"],
+                for recipient_status in recipient_statuses:
+                    singer_log = SignerLog(
+                        name=recipient_status['UserName'],
+                        email=recipient_status['Email'],
+                        status=recipient_status['Status'],
+                        document_esignature_log=esignature_log,
                     )
-                    logger.debug("Posting document to GED: " + pdf["filename"])
-                    logger.debug(response.text)
+                    singer_log.save()
 
-            except Exception as e:
-                msg = str(e)
-                logger.exception(msg)
-                return HttpResponse(msg)
-
-    if envelope_status in envelope_statuses.keys():
-        document.status = envelope_statuses[envelope_status]
-    else:
-        document.status = "não encontrado"
-
-    document.save()
-
-    # if envelope_status == "completed":
-    #     log = ""
-    #     for pdf in envelope_data["pdf_documents"]:
-    #         log += pdf["filename"] + "<br>"
-    #
-    #     log += "<br>"
-    #     esignature_log_documents = DocumentESignatureLog(
-    #         esignature_log=log, document=document,
-    #     )
-    #     esignature_log_documents.save()
-
-    esignature_log = DocumentESignatureLog(
-        envelope_id=envelope_data['envelope_id'],
-        status=envelope_data['envelope_status'],
-        created_date=envelope_data['envelope_created'],
-        sent_date=envelope_data['envelope_sent'],
-        status_update_date=envelope_data['envelope_time_generated'],
-        document=document,
-    )
-    esignature_log.save()
-
-    for recipient_status in recipient_statuses:
-        singer_log = SignerLog(
-            name=recipient_status['UserName'],
-            email=recipient_status['Email'],
-            status=recipient_status['Status'],
-            document_esignature_log=esignature_log,
-        )
-        singer_log.save()
+        except Exception as e:
+            msg = str(e)
+            logger.exception(msg)
+            return HttpResponse(msg)
 
     return HttpResponse("Success!")
 
@@ -364,6 +360,32 @@ class TenantSchoolViewSet(viewsets.ViewSet):
         queryset = School.objects.all()
         school = get_object_or_404(queryset, id=spk, tenant=pk)
         serializer = SchoolSerializer(school)
+        return Response(serializer.data)
+
+
+class TenantInterviewViewSet(viewsets.ViewSet):
+    def list(self, request, pk=None):
+        queryset = Interview.objects.filter(tenants=pk)
+        serializer = InterviewSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, spk=None):
+        queryset = Interview.objects.all()
+        interview = get_object_or_404(queryset, id=spk, tenants=pk)
+        serializer = SchoolSerializer(interview)
+        return Response(serializer.data)
+
+
+class TenantDocumentViewSet(viewsets.ViewSet):
+    def list(self, request, pk=None):
+        queryset = Document.objects.filter(tenant=pk)
+        serializer = DocumentSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, spk=None):
+        queryset = Document.objects.all()
+        interview = get_object_or_404(queryset, id=spk, tenant=pk)
+        serializer = DocumentSerializer(interview)
         return Response(serializer.data)
 
 

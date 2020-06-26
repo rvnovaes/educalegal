@@ -1,0 +1,296 @@
+metadata:
+  title: Acordo Individual - Redução de Jornada e Redução Salarial MP 936/2020
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Empregado
+  - Acordo
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "acordo-individual-reducao-de-jornada-e-reducao-salarial-mp-936-2020.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    workers.target_number = 1
+    for item in workers:
+      item.name.text
+    if plan_use_esignature:
+      valid_workers_table
+    pc_reducao
+    clausula_estabilidade
+    if clausula_estabilidade == "sindicato":
+      tempo_garantia_emprego
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  workers[i].name.text
+  workers[i].address.street_name
+  workers[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Empregado
+progress: 10
+question: Número de Empregados
+fields:
+  - Número: workers.target_number
+    datatype: integer
+    default: 1
+---
+ga id: |
+  code: ga_id_begin
+section: Empregado
+progress: 20
+question: |
+  Dados do(a) Empregado
+fields:
+  - "Nome completo:": workers[i].name.text
+    required: True
+  - "CPF:": workers[i].cpf
+    validate: validate_cpf
+    required: True
+  - "Número do RG:": workers[i].rg
+    required: True
+  - "Nacionalidade:": workers[i].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado civil:": workers[i].marital_status
+    required: True
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    datatype: radio
+  - "CTPS:": workers[i].ctps
+    required: True
+  - "Número de série:": workers[i].serie
+    required: True
+  - "E-mail:": workers[i].email
+    help: ${ help_email_msg }
+    required: False
+    datatype: email
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#d29ya2Vyc1tpXS5jcGY').mask('000.000.000-00', {reverse: true});
+    });
+  </script>
+---
+section: Empregado
+progress: 30
+question: |
+  Endereço do(a) ${ workers[i].name.text }
+fields:
+  - "CEP:": workers[i].address.zip
+    required: True
+  - "Logradouro:": workers[i].address.street_name
+    required: True
+  - "Número:": workers[i].address.street_number
+    required: True
+  - "Complemento:": workers[i].address.unit
+    required: False
+  - "Bairro:": workers[i].address.neighborhood
+    required: True
+  - "Cidade:": workers[i].address.city
+    required: True
+  - "Estado:": workers[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#d29ya2Vyc1tpXS5hZGRyZXNzLnppcA').mask('00000-000');
+  });
+
+  $("#d29ya2Vyc1tpXS5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#d29ya2Vyc1tpXS5hZGRyZXNzLnppcA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#d29ya2Vyc1tpXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#d29ya2Vyc1tpXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#d29ya2Vyc1tpXS5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#d29ya2Vyc1tpXS5hZGRyZXNzLnN0YXRl").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Empregado
+field: valid_workers_table
+progress: 40
+question: |
+  Empregado:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ workers.table }
+buttons:
+  Continuar: continue
+---
+table: workers.table
+rows: workers
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Acordo
+progress: 50
+question: |
+  Dados do acordo
+subquestion: |
+  1. Fica acordada entre as Partes, a redução salarial de [FIELD pc_reducao]%.
+
+  2. O EMPREGADOR pagará ao EMPREGADO ajuda compensatória mensal no valor de [FIELD valor].
+
+  3. O presente acordo terá um prazo de [FIELD prazo] dias.
+fields:
+  - Redução: pc_reducao
+    datatype: number
+    hint: 000,00
+    inline width: 5em
+    required: True
+  - Valor: valor
+    datatype: currency
+    hint: 0000,00
+    inline width: 10em
+    required: True
+  - Prazo: prazo
+    datatype: integer
+    required: true
+    min: 1
+    max: 90
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('#cGNfcmVkdWNhbw').mask("###0.00", {reverse: true});
+      $('#dmFsb3I').mask("###0.00", {reverse: true});
+    });
+  </script>
+---
+code: |
+  from num2words import num2words
+  valor_extenso = num2words(valor, lang='pt_BR', to='currency')
+  pc_reducao_extenso = num2words(pc_reducao, lang='pt_BR')
+  prazo_extenso = num2words(prazo, lang='pt_BR')
+---
+section: Acordo
+progress: 70
+question: |
+  Cláusula de estabilidade de emprego conforme padrão definido por:
+fields:
+  - "Tipo:": clausula_estabilidade
+    required: True
+    datatype: radio
+    choices:
+      - Medida Provisória: MP
+      - Sindicato: sindicato
+    default: MP
+---
+section: Acordo
+progress: 80
+question: |
+  Prazo de vigência
+subquestion: |
+  Fica assegurado ao EMPREGADO a garantia provisória no emprego [FIELD tempo_garantia_emprego].
+fields:
+  - Prazo: tempo_garantia_emprego
+    required: true
+    default: "até o final do ano letivo de 2020"
+    show if:
+      code: |
+        clausula_estabilidade == 'sindicato'
+---
+code: |
+  recipients = list()
+
+  for item in workers:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

@@ -1,0 +1,18 @@
+---
+code:  |
+  signature_date = today()
+---
+section: Assinatura
+progress: 90
+question: |
+  Local e Data
+fields:
+  - Local: signature_local
+    help: "Cidade onde o documento está sendo assinado"
+    default: |
+      ${ signature_local_default }
+  - Data: signature_date
+    datatype: date
+    default: |
+      ${ signature_date }
+---

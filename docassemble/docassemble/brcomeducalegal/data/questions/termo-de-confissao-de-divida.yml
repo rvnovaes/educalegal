@@ -1,0 +1,652 @@
+metadata:
+  title: Termo de Confissão de Dívida
+---
+sections:
+  - Partes
+  - Dívida Confessada
+  - Cláusulas
+  - Assinatura
+  - Conclusão
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+code:  |
+  content_document = "termo-de-confissao-de-divida.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    inserirDadosGestor
+    devedores.gather()
+    if plan_use_esignature:
+      valid_devedores_table
+    inserirDadosGestor1
+    if ha_fiador:
+      fiadores.gather()
+      if plan_use_esignature:
+        valid_fiadores_table
+      inserirDadosGestor2
+    else:
+      fiadores.target_number = 0
+    valor_Total
+    formaPagamento
+    has_payment_attachment
+    state
+    signature_local
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      ged_file
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+ga id: |
+  code: ga_id_begin
+section: Partes
+progress: 10
+question: Gestor do Contrato da Escola
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': inserirDadosGestor
+    datatype: yesnoradio
+  - 'Nome:': name_gestor
+    datatype: text
+    show if:
+      variable: inserirDadosGestor
+      is: true
+    required: True
+  - 'E-mail:': email_gestor
+    datatype: email
+    show if:
+      variable: inserirDadosGestor
+      is: true
+    required: False
+  - 'Telefone:': telefone_gestor
+    datatype: text
+    show if:
+      variable: inserirDadosGestor
+      is: true
+    required: False
+---
+objects:
+  - devedores: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  devedores[i].name.first
+  devedores[i].address_postal_code
+  devedores[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Partes
+progress: 30
+question: |
+  Número de devedores
+fields:
+  - Número: devedores.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+question: |
+  Dados do(a) ${ word(ordinal(i)) } Devedor
+fields:
+  - "Tipo:": devedores[i].person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome completo:": devedores[i].name.first
+    required: True
+    show if:
+      variable: devedores[i].person_type
+      is: individual
+  - "CPF:": devedores[i].cpf
+    validate: validate_cpf
+    required: True
+    show if:
+      variable: devedores[i].person_type
+      is: individual
+  - "Número identidade:": devedores[i].rg
+    required: True
+    datatype: text
+    show if:
+      variable: devedores[i].person_type
+      is: individual
+  - "Nacionalidade:": devedores[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if:
+      variable: devedores[i].person_type
+      is: individual
+  - "Estado civil:": devedores[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+    show if:
+      variable: devedores[i].person_type
+      is: individual
+  - "Profissão:": devedores[i].occupation
+    show if:
+      variable: devedores[i].person_type
+      is: individual
+  - "Razão social:": devedores[i].name.first
+    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
+    required: True
+    show if:
+      variable: devedores[i].person_type
+      is: organization
+  - "CNPJ:": devedores[i].cnpj
+    validate: validate_cnpj
+    required: True
+    show if:
+      variable: devedores[i].person_type
+      is: organization
+  - "E-mail:": devedores[i].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: False
+    js show if: |
+      val("devedores[i].person_type") == "individual" || val("devedores[i].person_type") == "organization"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+    });
+  </script>
+---
+question: |
+  Endereço do(a) ${ devedores[i] }
+fields:
+  - "CEP:": devedores[i].address_postal_code
+    required: True
+  - "Logradouro:": devedores[i].address_street_name
+    required: True
+  - "Número:": devedores[i].address_street_number
+    required: True
+  - "Complemento:": devedores[i].address_complement
+    required: False
+  - "Bairro:": devedores[i].address_neighborhood
+    required: True
+  - "Cidade:": devedores[i].address_city
+    required: True
+  - "Estado:": devedores[i].address_state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#ZGV2ZWRvcmVzW2ldLmFkZHJlc3NfcG9zdGFsX2NvZGU').mask('00000-000');
+  });
+
+  $("#ZGV2ZWRvcmVzW2ldLmFkZHJlc3NfcG9zdGFsX2NvZGU").focusout(function(){
+    var cep = $("#ZGV2ZWRvcmVzW2ldLmFkZHJlc3NfcG9zdGFsX2NvZGU").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#ZGV2ZWRvcmVzW2ldLmFkZHJlc3Nfc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#ZGV2ZWRvcmVzW2ldLmFkZHJlc3NfbmVpZ2hib3Job29k").val(data.bairro);
+          $("#ZGV2ZWRvcmVzW2ldLmFkZHJlc3NfY2l0eQ").val(data.localidade);
+          $("#ZGV2ZWRvcmVzW2ldLmFkZHJlc3Nfc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Dados da Pessoa
+field: valid_devedores_table
+question: |
+  Devedores:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ devedores.table }
+buttons:
+  Continuar: continue
+---
+table: devedores.table
+rows: devedores
+columns:
+  - Name: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Partes
+progress: 20
+question: Gestor do Contrato da parte Devedora
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': inserirDadosGestor1
+    datatype: yesnoradio
+  - 'Nome:': name_gestor1
+    datatype: text
+    show if:
+      variable: inserirDadosGestor1
+      is: true
+    required: True
+  - 'E-mail:': email_gestor1
+    datatype: email
+    show if:
+      variable: inserirDadosGestor1
+      is: true
+    required: False
+  - 'Telefone:': telefone_gestor1
+    datatype: text
+    show if:
+      variable: inserirDadosGestor1
+      is: true
+    required: False
+---
+objects:
+  - fiadores: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  fiadores[i].person_type
+  fiadores[i].address_postal_code
+  fiadores[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Partes
+progress: 40
+question: |
+  Há algum fiador da dívida?
+yesno: ha_fiador
+---
+section: Partes
+progress: 40
+question: |
+  Fiadores
+fields:
+  - Número: fiadores.target_number
+    datatype: integer
+    default: 1
+    min: 0
+---
+question: |
+  Dados do(a) ${ word(ordinal(i)) } Fiador
+fields:
+  - "Tipo:": fiadores[i].person_type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - "Nome completo:": fiadores[i].name.first
+    required: True
+    show if:
+      variable: fiadores[i].person_type
+      is: individual
+  - "CPF:": fiadores[i].cpf
+    validate: validate_cpf
+    required: True
+    show if:
+      variable: fiadores[i].person_type
+      is: individual
+  - "Número identidade:": fiadores[i].rg
+    required: True
+    datatype: text
+    show if:
+      variable: fiadores[i].person_type
+      is: individual
+  - "Nacionalidade:": fiadores[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if:
+      variable: fiadores[i].person_type
+      is: individual
+  - "Estado civil:": fiadores[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+    show if:
+      variable: fiadores[i].person_type
+      is: individual
+  - "Profissão:": fiadores[i].occupation
+    required: False
+    show if:
+      variable: fiadores[i].person_type
+      is: individual
+  - "Razão social:": fiadores[i].name.first
+    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
+    required: True
+    show if:
+      variable: fiadores[i].person_type
+      is: organization
+  - "CNPJ:": fiadores[i].cnpj
+    validate: validate_cnpj
+    required: True
+    show if:
+      variable: fiadores[i].person_type
+      is: organization
+  - "E-mail:": fiadores[i].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: False
+    js show if: |
+      val("fiadores[i].person_type") == "individual" || val("fiadores[i].person_type") == "organization"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+question: |
+  Endereço do(a) ${ fiadores[i] }
+fields:
+  - "CEP:": fiadores[i].address_postal_code
+    required: True
+  - "Logradouro:": fiadores[i].address_street_name
+    required: True
+  - "Número:": fiadores[i].address_street_number
+    required: True
+  - "Complemento:": fiadores[i].address_complement
+    required: False
+  - "Bairro:": fiadores[i].address_neighborhood
+    required: True
+  - "Cidade:": fiadores[i].address_city
+    required: True
+  - "Estado:": fiadores[i].address_state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#ZmlhZG9yZXNbaV0uYWRkcmVzc19wb3N0YWxfY29kZQ').mask('00000-000');
+  });
+
+  $("#ZmlhZG9yZXNbaV0uYWRkcmVzc19wb3N0YWxfY29kZQ").focusout(function(){
+    var cep = $("#ZmlhZG9yZXNbaV0uYWRkcmVzc19wb3N0YWxfY29kZQ").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#ZmlhZG9yZXNbaV0uYWRkcmVzc19zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#ZmlhZG9yZXNbaV0uYWRkcmVzc19uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#ZmlhZG9yZXNbaV0uYWRkcmVzc19jaXR5").val(data.localidade);
+          $("#ZmlhZG9yZXNbaV0uYWRkcmVzc19zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Dados da Pessoa
+field: valid_fiadores_table
+question: |
+  Fiadores:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ fiadores.table }
+buttons:
+  Continuar: continue
+---
+table: fiadores.table
+rows: fiadores
+columns:
+  - Name: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Partes
+progress: 20
+question: Gestor do Contrato da parte Fiadora
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': inserirDadosGestor2
+    datatype: yesnoradio
+  - 'Nome:': name_gestor2
+    datatype: text
+    show if:
+      variable: inserirDadosGestor2
+      is: true
+    required: True
+  - 'E-mail:': email_gestor2
+    datatype: email
+    show if:
+      variable: inserirDadosGestor2
+      is: true
+    required: False
+  - 'Telefone:': telefone_gestor2
+    datatype: text
+    show if:
+      variable: inserirDadosGestor2
+      is: true
+    required: False
+---
+section: Dívida Confessada
+progress: 50
+question: |
+  Dívida Confessada
+subquestion: |
+  O Devedor declara e se confessa devedor, perante o Credor, da importância total e devidamente atualizada de [FIELD valor_Total] (“Dívida Confessada”), decorrente do Contrato de [FIELD contrato], referente ao(a) Aluno(a) [FIELD aluno_Contrato] (“Contrato Principal”).
+fields:
+  - 'Valor:': valor_Total
+    datatype: currency
+    hint: 0000,00
+  - 'Contrato:': contrato
+    datatype: text
+    inline width: 20em
+    default: "Prestação de Serviços Educacionais"
+  - 'Nome do Aluno': aluno_Contrato
+    datatype: text
+    inline width: 20em
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#dmFsb3JfVG90YWw').mask('###0.00', {reverse: true});
+      });
+  </script>
+---
+code: |
+  anoLetivo = format_date(today(), format="YYYY")
+  proximoMes = word(month_of(today().plus(months=1), as_word=True))
+---
+section: Cláusulas
+progress: 60
+question: Forma de pagamento
+fields:
+  - 'Forma de pagamento': formaPagamento
+    datatype: radio
+    choices:
+      - à vista: à vista
+      - parcelado: parcelado
+  - 'Nº de parcelas:': nrParcelas
+    datatype: integer
+    show if:
+      variable: formaPagamento
+      is: parcelado
+  - 'Dia de vencimento das demais parcelas: ': vencimentoParcelas
+    datatype: text
+    default:
+      code: |
+        'dia 05 de cada mês a partir de ' + str(proximoMes) + ' de ' + str(anoLetivo)
+    show if:
+      variable: formaPagamento
+      is: parcelado
+  - 'O pagamento do Preço será realizado mediante:': tipoPagamento
+    choices:
+      - boleto bancário: boleto bancário
+      - conta corrente: conta corrente
+    datatype: radio
+  - 'Banco:': banco
+    datatype: text
+    help: 'Ex.: Banco do Brasil'
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - 'Agência:': agencia
+    datatype: text
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - 'Conta corrente:': contaCorrente
+    datatype: text
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - Tipo de pessoa: tipo_pessoa_cc
+    input type: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - 'CNPJ:': cnpj_cc
+    validate: validate_cnpj
+    datatype: text
+    show if:
+      variable: tipo_pessoa_cc
+      is: organization
+  - 'CPF:': cpf_cc
+    validate: validate_cpf
+    datatype: text
+    show if:
+      variable: tipo_pessoa_cc
+      is: individual
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzk').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+code: |
+  from num2words import num2words
+  valor_TotalExtenso = num2words(valor_Total, lang='pt_BR', to='currency')
+
+  if formaPagamento == 'parcelado':
+    nrParcelasExtenso = num2words(nrParcelas, lang='pt_BR')
+---
+section: Cláusulas
+progress: 70
+question: |
+  Anexo
+fields:
+  - 'Deseja inserir algum arquivo anexo? :': has_payment_attachment
+    datatype: yesnoradio
+  - 'Anexo (Formatos válidos: PDF, JPEG e PNG) :': payment_attachment
+    accept: |
+      "image/jpeg, image/png, application/pdf"
+    datatype: files
+    show if:
+      variable: has_payment_attachment
+      is: True
+---
+code: |
+  recipients = list()
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 1
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  for item in devedores:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.first
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  for item in fiadores:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.first
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---

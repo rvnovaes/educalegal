@@ -1,0 +1,8 @@
+.idea
+/venv/
+/docassemble/venv/
+/docassemble/bin/
+/docassemble/share/
+/docassemble/lib64/
+/docassemble/pyvenv.cfg
+/docassemble/lib64/
