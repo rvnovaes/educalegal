@@ -93,25 +93,6 @@ def docusign_xml_parser(data):
     else:
         envelope_data_translated["envelope_status"] = 'não encontrado'
 
-    # e_status_detail = (
-    #     "ID do envelope: "
-    #     + envelope_data_translated["envelope_id"]
-    #     + "<br>"
-    #     + "Status do envelope: "
-    #     + envelope_data_translated["envelope_status"]
-    #     + "<br>"
-    #     + "Data de criação: "
-    #     + envelope_data_translated["envelope_created"]
-    #     + "<br>"
-    #     + "Data de envio: "
-    #     + envelope_data_translated["envelope_sent"]
-    #     + "<br>"
-    #     + "Criação do envelope: "
-    #     + envelope_data_translated["envelope_time_generated"]
-    #     + "<br>"
-    # )
-    # envelope_data["envelope_status_detail_message"] = e_status_detail
-
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
 
     # translation of the type and status of the recipient
@@ -127,29 +108,6 @@ def docusign_xml_parser(data):
         else:
             recipient_status['Status'] = 'não encontrado'
 
-    # r_status_detail = ""
-    # for r in recipient_statuses:
-    #     r_status_detail += (
-    #         r["RoutingOrder"]
-    #         + " - "
-    #         + r["UserName"]
-    #         + " - "
-    #         + r["Email"]
-    #         + " - "
-    #         + r["Type"]
-    #         + " - "
-    #         + r["Status"]
-    #         + "<br>"
-    #     )
-    # envelope_data["envelope_recipient_status_detail_message"] = r_status_detail
-    # all_details = (
-    #     "<b> Detalhes do Envelope </b><br>"
-    #     + e_status_detail
-    #     + "<br>"
-    #     + "<b> Detalhes dos Destinatários </b><br>"
-    #     + r_status_detail
-    #     + "<br>"
-    # )
     # envelope_data["envelope_all_details_message"] = all_details
     return envelope_data, envelope_data_translated, recipient_statuses
 

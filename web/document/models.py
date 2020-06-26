@@ -103,7 +103,6 @@ class DocumentESignatureLog(TenantAwareModel):
 
 
 class DocumentTaskView(TenantAwareModel):
-
     name = models.CharField(max_length=512, verbose_name="Nome")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
