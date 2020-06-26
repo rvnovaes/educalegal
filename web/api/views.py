@@ -232,6 +232,7 @@ def docusign_webhook_listener(request):
     try:
         document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
     except Document.DoesNotExist:
+        document = None
         message = 'O envelope {envelope_id} não existe.'.format(envelope_id=envelope_data["envelope_id"])
         logger.debug(message)
     else:
