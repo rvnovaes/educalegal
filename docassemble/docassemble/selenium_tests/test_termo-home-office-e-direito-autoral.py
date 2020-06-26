@@ -12,7 +12,7 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
         "server,user,password,document_name",
         [
             ("https://test.educalegal.com.br/","autotest@educalegal.com.br", "Silex2109", "Autotest_Termo de Acordo - Mudança do Regime de Jornada e Cessão do Direito Autoral"),
-            ("https://generation.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Termo de Acordo - Mudança do Regime de Jornada e Cessão do Direito Autoral"),
+            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Termo de Acordo - Mudança do Regime de Jornada e Cessão do Direito Autoral"),
 
         ],
     )
@@ -80,10 +80,11 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
 
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "O regime de home office perdurará até a data:"))
-
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("21-05-2020")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
 
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Local e Data"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("BELO HORIZONTE")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         try:
