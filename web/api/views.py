@@ -108,7 +108,6 @@ def docusign_xml_parser(data):
         else:
             recipient_status['Status'] = 'não encontrado'
 
-    # envelope_data["envelope_all_details_message"] = all_details
     return envelope_data, envelope_data_translated, recipient_statuses
 
 
@@ -168,7 +167,6 @@ def docusign_webhook_listener(request):
         envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
         logger.debug(envelope_data["envelope_id"])
         logger.debug(envelope_data["envelope_time_generated"])
-        logger.debug(envelope_data["envelope_all_details_message"])
 
         # Store the XML file on disk
         envelope_dir = os.path.join(
