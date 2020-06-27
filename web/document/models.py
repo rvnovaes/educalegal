@@ -157,22 +157,22 @@ class DocumentTaskView(TenantAwareModel):
 
     task_name = models.CharField(
         null=True, max_length=255,
-        verbose_name='Nome da Task',
+        verbose_name='Nome da Tarefa',
         )
 
     task_status = models.CharField(
         max_length=50,
-        verbose_name="Status da Task",
+        verbose_name="Status da Tarefa",
     )
 
     task_created_date = models.DateTimeField(
         auto_now_add=True, db_index=True,
-        verbose_name= 'Criação da Task',
+        verbose_name= 'Criação da Tarefa',
 
     )
     task_done_date = models.DateTimeField(
         auto_now=True, db_index=True,
-        verbose_name='Término da Task'
+        verbose_name='Término da Tarefa'
     )
     traceback = models.TextField(
         blank=True, null=True,

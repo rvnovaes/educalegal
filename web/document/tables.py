@@ -78,6 +78,7 @@ class DocumentTaskViewTable(tables.Table):
             "school",
             "task_done_date",
             "submit_to_esignature",
+            "send_email",
             "document_status",
             "doc_uuid",
             "task_name",
