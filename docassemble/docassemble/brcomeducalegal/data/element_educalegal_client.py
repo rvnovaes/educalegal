@@ -132,6 +132,22 @@ class EducaLegalClient:
         response = self.session.patch(final_url, data=payload)
         return response.json()
 
+    def patch_document_with_email_data(
+        self,
+        doc_uuid,
+        send_email,
+        status="enviado por e-mail",
+    ):
+
+        payload = {
+            "doc_uuid": doc_uuid,
+            "send_email": send_email,
+            "status": status,
+        }
+        final_url = self.api_base_url + "/v1/documents/"
+        response = self.session.patch(final_url, data=payload)
+        return response.json()
+
     def patch_document_with_esignature_data(
         self,
         doc_uuid,
