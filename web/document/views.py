@@ -276,8 +276,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
                     el_document = Document(
                         tenant=tenant,
-                        name=interview.name + " _rascunho",
-                        status="rascunho - em lote",
+                        name=interview.name + " _rascunho_em_lote",
+                        status="rascunho",
                         description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
                         interview=interview,
                         school=school,
