@@ -475,6 +475,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         bulk_document_generation.save()
 
         payload = {
+            "success": True,
             "total_task_size": total_task_size,
             "bulk_status": bulk_document_generation.status,
             "message": "A tarefa foi enviada para execução"
@@ -482,9 +483,16 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         return HttpResponse(json.dumps(payload), content_type="application/json")
 
     except Exception as e:
-        message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
-        logger.error(message)
-        messages.error(request, message) #TODO tela de erro e tratamento do erro
+        error_message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
+        logger.error(error_message)
+
+        payload = {
+            "success": False,
+            "message":  error_message,
+        }
+
+        return HttpResponse(json.dumps(payload), content_type="application/json")
+
 
 
 @login_required

@@ -48,34 +48,36 @@
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"
             integrity="sha384-iQbqrrmrX47bVoYPufJoQUIvdMNZ9WwKie1bMaAjI4lnlw10H8nF90dzwHbH5BXL"
             crossorigin="anonymous"></script>
-
+    <!-- Jquery UI -->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
             integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+    <!-- Gets page cookie used on POST requests -->
     <script src="{% static 'tenant/js/jquery.cookie.js' %}"></script>
 
 </head>
+
 <body>
-{% if user.is_authenticated %}
-    {% include "snippets/navigation.html" %}
-{% endif %}
-<br/>
-<div id="app_body" class="container" style="margin-top: 15px">
-    {% block body_block %}
-    {% endblock %}
-</div>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
-        integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"
+    {% if user.is_authenticated %}
+        {% include "snippets/navigation.html" %}
+    {% endif %}
+    <br/>
+    <div id="app_body" class="container" style="margin-top: 15px">
+        {% block body_block %}
+        {% endblock %}
+    </div>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
+            integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"
         integrity="sha256-Kg2zTcFO9LXOc7IwcBx1YeUBJmekycsnTsq2RuFHSZU="
         crossorigin="anonymous"></script>
-{% block scripts %}
     <script type="text/javascript">
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })
     </script>
-{% endblock %}
+    {% block scripts %}
+    {% endblock %}
 </body>
 
 <footer class="page-footer font-small special-color-dark pt-4">

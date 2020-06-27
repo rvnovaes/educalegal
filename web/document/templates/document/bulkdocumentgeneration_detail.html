@@ -37,102 +37,95 @@
     {% endif %}
     <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
     {% if user.tenant.school_set.count == 0 %}
-        <div class="modal fade" id="tutorial_modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Bem-vindo à plataforma Educa Legal!</h4>
-                    </div>
-                    <div class="modal-body">
-                        <p>Para iniciar o uso, é necessário primeiro cadastrar uma <b>Escola</b>.</p>
-                        <p>Os dados da <b>Escola</b> serão usados na criação dos contratos e documentos.</p>
-                        <p>O menu <b>Documentos</b> é usado para listar os contratos e documentos já criados.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="{% url 'school:school-list' %}" class="btn btn-primary btn-block">Criar Escola</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include "snippets/welcome_modal.html" %}
     {% endif %}
-    <!-- -------------------------------------------------- Modal -------------------------------------------------- -->
 {% endblock %}
 {% block scripts %}
-    <script type="text/javascript">
-        const origin = window.location.origin
-        const bulk_status_text = $("#bulk_status_text");
-        const progress_bar = $("#progressbar");
-        const progress_label = $(".progress-label");
+<script type="text/javascript">
+    const origin = window.location.origin
+    const bulk_status_text = $("#bulk_status_text");
+    const progress_bar = $("#progressbar");
+    const progress_label = $(".progress-label");
 
-        $(window).on('load', function () {
-            let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
-            tutorial_modal.modal('show');
+    $(window).on('load', function () {
+        let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
+        tutorial_modal.modal('show');
 
-        });
+    });
 
-        function sleep(milliseconds) {
-            const date = Date.now();
-            let currentDate = null;
-            do {
-                currentDate = Date.now();
-            } while (currentDate - date < milliseconds);
-        }
+    function sleep(milliseconds) {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+            currentDate = Date.now();
+        } while (currentDate - date < milliseconds);
+    }
 
-        function update_progress_bar(total_task_size) {
-            $.get(origin + "/document/bulk_document_generation/generate/progress/" + {{ bulk_document_generation.pk }})
-                .done(function (data, status) {
-                    console.log(data);
-                    console.log(status);
-                    let processed_task_size = data["processed_task_size"];
+    function update_progress_bar(total_task_size) {
+        $.get(origin + "/document/bulk_document_generation/generate/progress/" + {{ bulk_document_generation.pk }})
+            .done(function (data, status) {
+                console.log(data);
+                console.log(status);
+                let processed_task_size = data["processed_task_size"];
 
-                    progress_bar.progressbar({
-                        max: total_task_size,
-                        value: processed_task_size,
-                        change: function () {
-                            progress_label.text(processed_task_size + " de " + total_task_size + " tarefas");
-                        },
-                        complete: function () {
-                            progress_label.text("Fim!");
-                            bulk_status_text.css("color", "black")
-                            bulk_status_text.text(data["bulk_status"]);
-                            sleep(3000);
-                            location.reload();
-                        }
-                    });
-                    if (processed_task_size < total_task_size) {
+                progress_bar.progressbar({
+                    max: total_task_size,
+                    value: processed_task_size,
+                    change: function () {
+                        progress_label.text(processed_task_size + " de " + total_task_size + " tarefas");
+                    },
+                    complete: function () {
+                        progress_label.text("Fim!");
+                        bulk_status_text.css("color", "black")
+                        bulk_status_text.text(data["bulk_status"]);
                         sleep(3000);
-                        update_progress_bar(total_task_size);
-                    } else {
-
+                        location.reload();
                     }
-                })
-                .fail(function (data, status) {
-                    console.log(data);
-                    console.log(status);
-                })
-        }
+                });
+                if (processed_task_size < total_task_size) {
+                    sleep(3000);
+                    update_progress_bar(total_task_size);
+                } else {
 
-        // Dispara a criação de documentos em lote/
-        const executar_button = $(".btn.btn-danger").click(function () {
-            executar_button.hide();
-            $(".start-hidden").css("visibility", "visible");
-            bulk_status_text.text("em andamento...");
-            bulk_status_text.css("color", "red")
-            // Cria uma barra com valor indeterminado
-            progress_bar.progressbar({value: 0});
+                }
+            })
+            .fail(function (data, status) {
+                console.log(data);
+                console.log(status);
+            })
+    }
 
-            // Representa o número de tarefas de criação de documentos + assinatura de documentos
-            let total_task_size = 0;
+    // Dispara a criação de documentos em lote/
+    const executar_button = $(".btn.btn-danger").click(function () {
+        executar_button.hide();
+        $(".start-hidden").css("visibility", "visible");
+        bulk_status_text.text("em andamento...");
+        bulk_status_text.css("color", "red")
+        // Cria uma barra com valor indeterminado
+        progress_bar.progressbar({value: 0});
 
-            $.get(origin + "/document/bulk_document_generation/generate/" + {{ bulk_document_generation.pk }})
-                .done(function (data, status) {
+        // Representa o número de tarefas de criação de documentos + assinatura de documentos
+        let total_task_size = 0;
+
+        $.get(origin + "/document/bulk_document_generation/generate/" + {{ bulk_document_generation.pk }})
+            .done(function (data, status) {
+                if (data["success"] === true) {
                     total_task_size = data["total_task_size"];
                     update_progress_bar(total_task_size);
-                })
-                .fail(function (data, status) {
-                    console.log(data);
-                    console.log(status);
-                });
-        });
-    </script>
+                } else {
+                    $("#app_body").append(
+                    "<div class=\"alert alert-danger alert-dismissable fade show\" role=\"alert\">\n" +
+                       data["message"] + "\n" +
+                    "  <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">\n" +
+                    "    <span aria-hidden=\"true\">&times;</span>\n" +
+                    "  </button>\n" +
+                    "</div>")
+                }
+            })
+            .fail(function (data, status) {
+                console.log(data);
+                console.log(status);
+            });
+    });
+</script>
 {% endblock %}

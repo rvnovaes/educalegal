@@ -45,7 +45,7 @@ code: |
     if plan_use_ged:
       ged_file
       el_document_patched_with_ged_data
-    if email_send:
+    if send_email:
       ged_file
       el_document_patched_with_email_data
     document_ready_screen
@@ -63,7 +63,7 @@ fields:
 progress: 20
 section: Envio de E-mail
 question: Deseja enviar e-mail pela API do Sendgrid?
-yesno: email_send
+yesno: send_email
 ---
 code: |
   recipients = list()
