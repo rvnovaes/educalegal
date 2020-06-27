@@ -76,6 +76,7 @@ class Document(TenantAwareModel):
     doc_uuid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="UUID")
     task_create_document = models.CharField(max_length=256, default="", verbose_name="Task de criação de documento")
     task_submit_to_esignature = models.CharField(max_length=256, default="", verbose_name="Task de assinatura")
+    task_send_email = models.CharField(max_length=256, default="", verbose_name="Task de envio de e-mail")
     submit_to_esignature = models.BooleanField(default=False, verbose_name="Enviar para assinatura eletrônica?")
     send_email = models.BooleanField(default=False, verbose_name="Enviar por e-mail?")
     mongo_uuid = models.CharField(
@@ -146,6 +147,7 @@ class DocumentTaskView(TenantAwareModel):
     doc_uuid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="UUID")
     task_create_document = models.CharField(max_length=256, default="", verbose_name="Task de criação de documento")
     task_submit_to_esignature = models.CharField(max_length=256, default="", verbose_name="Task de assinatura")
+    task_send_email = models.CharField(max_length=256, default="", verbose_name="Task de envio de e-mail")
     submit_to_esignature = models.BooleanField(default=False, verbose_name="Enviar para assinatura eletrônica?")
     send_email = models.BooleanField(default=False, verbose_name="Enviar por e-mail?")
 

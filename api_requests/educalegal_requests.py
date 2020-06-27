@@ -52,8 +52,8 @@ if __name__ == "__main__":
     # ged_uuid = "179dad8b-9bg6-4945-8f81-257d37050111"
     description = "Contrato de prestação de serviços educacionais entre aluno e escola. - 1.1 - 2020-01-23"
     tenant = 2
-    # school = 1
-    interview = 83
+    school = 2
+    interview = 82
     # related_documents = None
     # document_data = "test"
 
@@ -63,8 +63,8 @@ if __name__ == "__main__":
         status,
         description,
         tenant,
-        # school,
         interview,
+        school,
         # related_documents,
         # document_data,
     )

@@ -1,5 +1,6 @@
 include:
   - element-esignature.yml
+  - element-send-email.yml
 ---
 ga id: |
   code: ga_id_end
@@ -8,12 +9,16 @@ section: Conclusão
 progress: 100
 back button: False
 question: |
-  % if plan_use_esignature:
-    Deseja enviar o documento para assinatura eletrônica?
-  % else:
-    Aqui está o seu documento!
-  % endif
+  Seu documento foi gerado com sucesso!
 subquestion: |
+  ${ generated_file.pdf.filename }
+under: |
+  Você pode baixar os documentos:
+  [PDF](${ generated_file.pdf.url_for() })
+  ou
+  [DOCX](${ generated_file.docx.url_for() })
+
+
   % if plan_use_ged:
     % if ged_response_status_code == 201:
       O documento foi inserido com sucesso no GED - id: ${ ged_id }
@@ -22,16 +27,8 @@ subquestion: |
       ${ ged_response }
     % endif
   % endif
-attachment:
-  name: ${ interview_label }
-  language: pt
-  filename: ${ custom_file_name }
-  variable name: generated_file
-  docx template file:
-    code: school_letterhead
-  valid formats:
-    - pdf
-    - docx
+
+
 action buttons:
   code: |
     button_list
@@ -43,6 +40,12 @@ code: |
                        'icon': 'signature'}
 ---
 code: |
+  email_button = {'action': 'el_send_email',
+                       'label': 'Enviar por e-mail',
+                       'color': 'info',
+                       'icon': 'envelope'}
+---
+code: |
   el_button = {'action': educalegal_url,
                 'label': 'Fim',
                 'color': 'success',
@@ -50,9 +53,10 @@ code: |
 ---
 code: |
   button_list = list()
+  button_list.append(el_button)
+  button_list.append(email_button)
   if plan_use_esignature:
     button_list.append(esignature_button)
-  button_list.append(el_button)
 ---
 event: all_done
 back button: False

@@ -70,7 +70,6 @@ class EducaLegalClient:
         school=None,
         related_documents=None,
         document_data=None,
-        doc_uuid=None
     ):
 
         payload = {
@@ -82,7 +81,6 @@ class EducaLegalClient:
             "interview": interview,
             "related_documents": related_documents,
             "document_data": json.dumps(document_data),
-            "doc_uuid": doc_uuid
         }
         final_url = self.api_base_url + "/v1/documents/"
         response = self.session.post(final_url, data=payload)

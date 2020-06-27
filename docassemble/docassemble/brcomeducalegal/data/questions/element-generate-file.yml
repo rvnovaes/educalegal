@@ -1,0 +1,13 @@
+include:
+  - element-custom-file-name.yml
+---
+attachment:
+  name: ${ interview_label }
+  language: pt
+  filename: ${ custom_file_name }
+  variable name: generated_file
+  docx template file:
+    code: school_letterhead
+  valid formats:
+    - pdf
+    - docx

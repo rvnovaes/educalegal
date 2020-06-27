@@ -1,5 +1,7 @@
 {% if record.task_name == "document.tasks.create_document" %}
 geração
-{% else %}
-assinatura
+{% elif record.task_name == "document.tasks.send_email"  %}
+envio de e-mail
+{% elif record.task_name == "document.tasks.submit_to_esignature"  %}
+assinatura eletrônica
 {% endif %}
