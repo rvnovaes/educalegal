@@ -1,0 +1,7 @@
+selected_school#school_division#submit_to_esignature#el_send_email#notified_name_first#notified_cpf#notified_rg#notified_nationality#notified_marital_status#notified_occupation#notified_email#notified_address_postal_code#notified_address_street_number#notified_address_complement#notified_address_neighborhood#notified_address_city#notified_address_state#student_name#school_year#debit_value#financeiro_email
+StringField#StringField#BooleanField#BooleanField#StringField#StringField#StringField#StringField#StringField#StringField#EmailField#StringField#StringField#StringField#StringField#StringField#StringField#StringField#StringField#FloatField#EmailField
+true#true#true#true#true#true#true#true#true#true#true#true#true#false#true#true#true#true#true#true#true
+####notified#notified#notified#notified#notified#notified#notified#notified#notified#notified#notified#notified#notified####
+Escola#Unidade#Assinar Eletronicamente#Enviar por e-mail#Nome#CPF#RG#Nacionalidade#Estado Civil#Profissão#E-mail#CEP#Número#Complemento#Bairro#Cidade#UF#Nome do Aluno#Ano Escolar#Valor do Débito#E-mail do Financeiro
+Colégio Bacana#Super Bacana#false#true#Platão de Atenas#648.202.520-03#AT 234234#Ateniense#Casado#Filósofo#sistemas@educalegal.com.br#30220-260#232#Apto. 01#Academos#Atenas#Peloponeso#Aristóteles#2#15000#sistemas@educalegal.com.br
+Colégio Bacana#Super Bacana#false#true#Aristóteles de Estagira#109.618.380-35#AT 664354#Estagirita#Casado#Filósofo#sistemas@educalegal.com.br#30250-010#51#Casa#Liceu#Atenas#Peloponeso#Zenão#3#16000#sistemas@educalegal.com.br
