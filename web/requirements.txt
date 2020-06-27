@@ -50,3 +50,4 @@ future~=0.18.2
 pytest~=5.4.3
 # https://github.com/izimobil/django-rest-framework-datatables
 djangorestframework-datatables
+PySimpleGUI~=4.20.0
