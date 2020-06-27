@@ -8,21 +8,21 @@ from util.file_import import *
 
 @pytest.fixture
 def valid_csv():
-    with open(os.path.join(script_dir, "sample_data_sources/../bulk_import_util/sample_data_sources/valid.csv")) as csvfile:
+    with open(os.path.join(script_dir, "test_file_import_data_sources/valid.csv")) as csvfile:
         valid_data = pd.read_csv(csvfile, sep="#")
     return valid_data
 
 
 @pytest.fixture
 def only_headers():
-    with open(os.path.join(script_dir, "sample_data_sources/../bulk_import_util/sample_data_sources/only_headers.csv")) as csvfile:
+    with open(os.path.join(script_dir, "test_file_import_data_sources/only_headers.csv")) as csvfile:
         empty = pd.read_csv(csvfile, sep="#")
     return empty
 
 
 @pytest.fixture
 def empty_content():
-    with open(os.path.join(script_dir, "sample_data_sources/../bulk_import_util/sample_data_sources/empty_content.csv")) as csvfile:
+    with open(os.path.join(script_dir, "test_file_import_data_sources/empty_content.csv")) as csvfile:
         empty_content_fixture = pd.read_csv(csvfile, sep="#")
     return empty_content_fixture
 
@@ -30,7 +30,7 @@ def empty_content():
 @pytest.fixture
 def metadata_fixture():
     with open(os.path.join(script_dir,
-                           "sample_data_sources/../bulk_import_util/sample_data_sources/metadata_fixture.csv")) as csvfile:
+                           "test_file_import_data_sources/metadata_fixture.csv")) as csvfile:
         metadata_fixture = pd.read_csv(csvfile, sep="#")
     return metadata_fixture
 
@@ -38,14 +38,14 @@ def metadata_fixture():
 @pytest.fixture
 def no_school_name():
     with open(os.path.join(script_dir,
-                           "sample_data_sources/../bulk_import_util/sample_data_sources/no_school_name_columnn.csv")) as csvfile:
+                           "test_file_import_data_sources/no_school_name_columnn.csv")) as csvfile:
         no_school_name_fixture = pd.read_csv(csvfile, sep="#")
     return no_school_name_fixture
 
 @pytest.fixture
 def no_unidadeAluno():
     with open(os.path.join(script_dir,
-                           "sample_data_sources/../bulk_import_util/sample_data_sources/no_unidadeAluno_column.csv")) as csvfile:
+                           "test_file_import_data_sources/no_unidadeAluno_column.csv")) as csvfile:
         no_unidadeAluno_fixture = pd.read_csv(csvfile, sep="#")
     return no_unidadeAluno_fixture
 
