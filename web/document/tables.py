@@ -32,7 +32,6 @@ class DocumentTable(tables.Table):
             "altered_date",
             "submit_to_esignature",
             "status",
-            "signing_provider",
             "ged_link",
         )
 
@@ -83,6 +82,5 @@ class DocumentTaskViewTable(tables.Table):
             "doc_uuid",
             "task_name",
             "task_status",
-            "signing_provider",
             "ged_link",
         )

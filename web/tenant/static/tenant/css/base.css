@@ -54,3 +54,8 @@ footer{
 .ui-progressbar-value{
     color: #328838;
 }
+
+/* Separação entre os campos de busca em Documentos e Modelos*/
+.form-control{
+    margin-left: 5px;
+}
