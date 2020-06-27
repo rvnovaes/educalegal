@@ -1,5 +1,5 @@
 envelope_statuses = {
-    "sent": "enviado",
+    "sent": "enviado para assinatura",
     "delivered": "entregue",
     "completed": "finalizado",
     "declined": "recusado",
