@@ -1,0 +1,22 @@
+---
+modules:
+  - .element_educalegal_client
+  - .element_sendgrid
+
+---
+# Aqui podemos aproveitar as variaveis de element-ged.yml porque ele sempre deve ser executado antes
+code: |
+  from_email = "sistemas@educalegal.com.br"
+  to_emails = "sistemas@educalegal.com.br"
+  subject = "Teste de Envio de E-mail"
+  html_content = "<h1> Hello, world!</h1>"
+  category = "Development"
+  file_path = ged_file.pdf.path()
+  file_name = mayan_file_name
+  response_status_code, response_message = send_email_sendgrid(from_email, to_emails, subject, html_content, category, file_path, file_name)
+  if response_status_code == 202:
+    cd_send_email = True
+    cd_status = 'enviado por e-mail'
+    el_document_patched_with_email_data = elc.patch_document_with_email_data(doc_uuid, cd_send_email, cd_status)
+  else:
+    log(response_status_code + " " + response_message, "console")

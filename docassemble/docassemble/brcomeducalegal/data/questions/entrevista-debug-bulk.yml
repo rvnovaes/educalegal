@@ -8,6 +8,7 @@ include:
   - element-data-list.yml
   - element-educalegal-patch-document.yml
   - element-ged.yml
+  - element-send-email.yml
   - element-document-ready.yml
 ---
 modules:
@@ -44,6 +45,9 @@ code: |
     if plan_use_ged:
       ged_file
       el_document_patched_with_ged_data
+    if email_send:
+      ged_file
+      el_document_patched_with_email_data
     document_ready_screen
   all_done
 ---
@@ -55,6 +59,11 @@ fields:
   - 'Nome completo: ': nomeAluno
     datatype: text
     default: "Anton Bruckner"
+---
+progress: 20
+section: Envio de E-mail
+question: Deseja enviar e-mail pela API do Sendgrid?
+yesno: email_send
 ---
 code: |
   recipients = list()
