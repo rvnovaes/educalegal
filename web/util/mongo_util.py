@@ -20,6 +20,10 @@ def get_field(field_type, required):
         field = IntField()
     if field_type == "StringField":
         field = StringField()
+    if field_type == "CpfField":
+        field = StringField()
+    if field_type == "CnpjField":
+        field = StringField()
     if required:
         field.required = True
     return field

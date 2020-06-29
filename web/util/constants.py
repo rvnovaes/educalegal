@@ -5,4 +5,6 @@ VALID_FIELD_TYPES = [
     "FloatField",
     "IntField",
     "StringField",
+    "CpfField",
+    "CnpjField",
 ]
