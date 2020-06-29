@@ -8,6 +8,12 @@ from sendgrid.helpers.mail import Mail, Category, Attachment, FileContent, FileT
 
 
 def send_email_sendgrid(from_email, to_emails, subject, html_content, category, file_path, file_name):
+    # Sendgrid API returns 400 BAD REQUEST se você eviar emails duplicados. Por isso, convertemos a lista em conjunto e
+    # novamente em lista
+    if isinstance(to_emails, list):
+        s1 = set(to_emails)
+        to_emails = list(s1)
+
     message = Mail(
         from_email=from_email,
         to_emails=to_emails,
