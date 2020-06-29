@@ -102,3 +102,7 @@ code: |
   else:
     help_email_msg = "Digite um e-mail válido."
 ---
+code: |
+  email_subject = "Debug"
+  email_category = custom_file_name
+  email_html_content = "<h1>Debug</h1><p>Se você recebeu esse e-mail é pq funcionou.</p>"

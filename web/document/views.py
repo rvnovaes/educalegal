@@ -283,7 +283,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         school=school,
                         bulk_generation=bulk_generation,
                         mongo_uuid=mongo_document_data.id,
-                        submit_to_esignature=mongo_document_data.submit_to_esignature
+                        submit_to_esignature=mongo_document_data.submit_to_esignature,
+                        send_email=mongo_document_data.el_send_email
                     )
                     el_document_list.append(el_document)
 

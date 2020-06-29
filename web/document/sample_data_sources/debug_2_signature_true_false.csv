@@ -1,7 +1,0 @@
-selected_school,school_division,submit_to_esignature,send_email,nomeAluno
-StringField,StringField,BooleanField,BooleanField,StringField
-true,true,true,true,true
-,,,,
-Escola,Unidade,Assinar Eletronicamente,Enviar por e-mail,Nome
-Colégio Bacana,Super Bacana,false,true,Platão de Atenas
-Colégio Bacana,Super Bacana,false,true,Aristóteles de Estagira

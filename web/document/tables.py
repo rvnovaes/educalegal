@@ -31,6 +31,7 @@ class DocumentTable(tables.Table):
             "created_date",
             "altered_date",
             "submit_to_esignature",
+            "send_email",
             "status",
             "ged_link",
         )
