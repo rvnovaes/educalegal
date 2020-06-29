@@ -107,8 +107,9 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
     # Substitui os campos vazios, aos quais o Pandas havia atribuido nan, por None
     bulk_data = bulk_data.replace({np.nan: None})
 
-    # Cria dicionario para guardar o objeto de cada campo
+    # Cria dicionario para guardar o objeto (parent) de cada campo
     # A segunda linha do csv representa o objeto ao qual o campo pertence
+    # Por exemplo: {"name_text": "notified"} significa que a propriedade name_text é de um notified (objeto Person/Individual)
     parent_fields_dict = bulk_data.loc[2].to_dict()
 
     error_messages = list()
