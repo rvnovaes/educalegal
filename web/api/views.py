@@ -1,3 +1,6 @@
+import datetime as dt
+from datetime import datetime
+
 import os
 from pathlib import Path
 import base64
@@ -5,7 +8,6 @@ import xmltodict
 from requests import Session
 from retry_requests import retry
 import logging
-from datetime import datetime as dt
 
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
@@ -65,6 +67,17 @@ class MayanClient:
         return response
 
 
+def _iso8601_to_datetime(iso8601_date):
+    # tenta converter a data do docusign que vem no formato ISO 8601 para UTC
+    try:
+        converted_datetime = datetime.fromisoformat(iso8601_date)
+    except:
+        # se a data não veio no formato certo (ISO 8601), converte manualmente
+        converted_datetime = dt.datetime.strptime(iso8601_date, '%Y-%m-%dT%H:%M:%S.%f')
+
+    return converted_datetime
+
+
 def docusign_xml_parser(data):
     envelope_data = dict()
     xml = xmltodict.parse(data)["DocuSignEnvelopeInformation"]
@@ -74,18 +87,19 @@ def docusign_xml_parser(data):
     envelope_data["envelope_sent"] = xml["EnvelopeStatus"]["Sent"]
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
 
+    # tenta converter a data do docusign que vem no formato ISO 8601 para UTC
+    # formatting strings: 2020-04-15T11:20:19.693
+    envelope_data['envelope_created'] = _iso8601_to_datetime(envelope_data['envelope_created'])
+    envelope_data['envelope_sent'] = _iso8601_to_datetime(envelope_data['envelope_sent'])
+    envelope_data['envelope_time_generated'] = _iso8601_to_datetime(envelope_data['envelope_time_generated'])
+
     # copia com .copy() pra criar outro objeto
     envelope_data_translated = envelope_data.copy()
 
-    #formatting strings: 2020-04-15T11:20:19.693
-    envelope_data_translated['envelope_created'] = envelope_data_translated['envelope_created'].replace("T", " ").split(".")[0]
-    envelope_data_translated['envelope_sent'] = envelope_data_translated['envelope_sent'].replace("T", " ").split(".")[0]
-    envelope_data_translated['envelope_time_generated'] = envelope_data_translated['envelope_time_generated'].replace("T", " ").split(".")[0]
-
-    #converting US dates to Brazil dates
-    envelope_data_translated['envelope_created'] = str(dt.strptime(envelope_data_translated['envelope_created'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
-    envelope_data_translated['envelope_sent'] = str(dt.strptime(envelope_data_translated['envelope_sent'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
-    envelope_data_translated['envelope_time_generated'] = str(dt.strptime(envelope_data_translated['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
+    # converte datetime para formado brasileiro
+    envelope_data_translated['envelope_created'] = str(envelope_data['envelope_created'].strftime('%d/%m/%Y %H:%M:%S'))
+    envelope_data_translated['envelope_sent'] = str(envelope_data['envelope_sent'].strftime('%d/%m/%Y %H:%M:%S'))
+    envelope_data_translated['envelope_time_generated'] = str(envelope_data['envelope_time_generated'].strftime('%d/%m/%Y %H:%M:%S'))
 
     envelope_data_translated["envelope_status"] = str(envelope_data_translated["envelope_status"]).lower()
     if envelope_data_translated["envelope_status"] in envelope_statuses.keys():
@@ -168,6 +182,9 @@ def docusign_webhook_listener(request):
 
         logger.info('Imprimindo envelope_data')
         logger.info(envelope_data)
+
+        logger.info('Imprimindo envelope_data_translated')
+        logger.info(envelope_data_translated)
 
         # Store the XML file on disk
         envelope_dir = os.path.join(
