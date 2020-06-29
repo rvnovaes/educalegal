@@ -165,8 +165,9 @@ def docusign_webhook_listener(request):
     try:
         # Parses XML data and returns a dictionary and formated messages
         envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
-        logger.debug(envelope_data["envelope_id"])
-        logger.debug(envelope_data["envelope_time_generated"])
+
+        logger.debug('Imprimindo envelope_data')
+        logger.debug(envelope_data)
 
         # Store the XML file on disk
         envelope_dir = os.path.join(
@@ -176,7 +177,6 @@ def docusign_webhook_listener(request):
         filename = (
             envelope_data["envelope_time_generated"].replace(":", "_") + ".xml"
         )  # substitute _ for : for windows-land
-        logger.debug(envelope_data)
         filepath = os.path.join(envelope_dir, filename)
         with open(filepath, "wb") as xml_file:
             xml_file.write(data)
@@ -242,13 +242,16 @@ def docusign_webhook_listener(request):
 
         envelope_log = EnvelopeLog(
             envelope_id=envelope_data['envelope_id'],
-            status=envelope_data['envelope_status'],
+            status=envelope_data_translated['envelope_status'],
             created_date=envelope_data['envelope_created'],
             sent_date=envelope_data['envelope_sent'],
             status_update_date=envelope_data['envelope_time_generated'],
             document=document,
         )
         envelope_log.save()
+
+        logger.debug('Imprimindo recipient_statuses')
+        logger.debug(recipient_statuses)
 
         for recipient_status in recipient_statuses:
             singer_log = SignerLog(
