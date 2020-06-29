@@ -14,11 +14,18 @@ class DocumentESignatureLogSerializer(serializers.ModelSerializer):
 
 
 class DocumentSerializer(serializers.ModelSerializer):
-    interview = serializers.StringRelatedField()
-    school = serializers.StringRelatedField()
+    interview_name = serializers.SerializerMethodField()
+    school_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Document
         fields = "__all__"
+
+    def get_interview_name(self, obj):
+        return obj.interview.name if obj.interview else ''
+
+    def get_school_name(self, obj):
+        return obj.school.name if obj.school else ''
 
 
 class InterviewSerializer(serializers.ModelSerializer):

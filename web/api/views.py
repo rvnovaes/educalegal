@@ -10,7 +10,7 @@ from datetime import datetime as dt
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -18,10 +18,10 @@ from rest_framework import viewsets
 from django.conf import settings
 
 from billing.models import Plan
-from document.models import Document, DocumentESignatureLog, SignerLog
+from document.models import Document, EnvelopeLog, SignerLog
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData, ESignatureApp
+from tenant.models import Tenant, TenantGedData
 
 from .serializers import (
     DocumentSerializer,
@@ -233,7 +233,7 @@ def docusign_webhook_listener(request):
 
                 document.save()
 
-                esignature_log = DocumentESignatureLog(
+                envelope_log = EnvelopeLog(
                     envelope_id=envelope_data['envelope_id'],
                     status=envelope_data['envelope_status'],
                     created_date=envelope_data['envelope_created'],
@@ -241,14 +241,14 @@ def docusign_webhook_listener(request):
                     status_update_date=envelope_data['envelope_time_generated'],
                     document=document,
                 )
-                esignature_log.save()
+                envelope_log.save()
 
                 for recipient_status in recipient_statuses:
                     singer_log = SignerLog(
                         name=recipient_status['UserName'],
                         email=recipient_status['Email'],
                         status=recipient_status['Status'],
-                        document_esignature_log=esignature_log,
+                        document_esignature_log=envelope_log,
                     )
                     singer_log.save()
 

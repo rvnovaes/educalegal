@@ -3,12 +3,12 @@
 {% block body_block %}
     <h2>Documentos</h2>
     {% if documents %}
-        <table id="data_table" class="dataTable cell-border hover order-column row-border stripe">
+        <table id="data_table" class="dataTable cell-border hover order-column row-border stripe" style="width:100%">
             <thead>
             <tr>
                 <th data-data="name">Documento</th>
-                <th data-data="interview">Modelo</th>
-                <th data-data="school">Escola</th>
+                <th data-data="interview_name">Modelo</th>
+                <th data-data="school_name">Escola</th>
                 <th data-data="created_date">Criação</th>
                 <th data-data="altered_date">Alteração</th>
                 <th data-data="status">Status</th>
@@ -55,8 +55,8 @@
                             return '<a href="/document/document/' + data.id + '"' + ' target="_blank">' + data.name + '</a>'
                         }
                     },
-                    {data: "interview"},
-                    {data: "school"},
+                    {data: "interview_name"},
+                    {data: "school_name"},
                     {data: "created_date"},
                     {data: "altered_date"},
                     {data: "status"},
