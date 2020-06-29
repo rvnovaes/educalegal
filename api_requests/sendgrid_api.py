@@ -10,9 +10,8 @@ message = Mail(
     to_emails='sistemas@educalegal.com.br',
     subject='Sending with Twilio SendGrid is Fun',
     html_content='<strong>and easy to do anywhere, even with Python</strong>')
-message.category = Category("Desenvolvimento")
-message.custom_arg
-CustomArg("Cliente", "Educa Legal Desenvolvimento")
+message.category = Category("Nova")
+message.custom_arg = CustomArg("Cliente", "Educa Legal Desenvolvimento")
 file_path = "lorem-ipsum.pdf"
 with open(file_path, 'rb') as f:
     data = f.read()
@@ -27,7 +26,7 @@ message.attachment = attachment
 
 try:
     # sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-    sg = SendGridAPIClient('SG.SwlqsxA_TtmrbqF3-iiJew.CYzzrPYQpwFrEOMIJ9Xw6arfV0mSo1m3qFe-sVHg6o')
+    sg = SendGridAPIClient('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')
     response = sg.send(message)
     print(response.status_code)
     print(response.body)
