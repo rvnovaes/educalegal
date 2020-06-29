@@ -195,15 +195,17 @@ def docusign_webhook_listener(request):
 
     envelope_status = str(envelope_data["envelope_status"]).lower()
 
-    # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
-    if envelope_status == "completed":
-        try:
-            (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
-                data, envelope_dir
-            )
-            logger.debug(envelope_data)
+    # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test, por isso, não irá
+    # encontrar o documento no banco
+    if document:
+        # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
+        if envelope_status == "completed":
+            try:
+                (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
+                    data, envelope_dir
+                )
+                logger.debug(envelope_data)
 
-            if document:
                 tenant = Tenant.objects.get(pk=document.tenant.pk)
                 if tenant.plan.use_ged:
                     # Get document related interview data to post to GED
@@ -211,7 +213,7 @@ def docusign_webhook_listener(request):
                     document_type_pk = interview.document_type.pk
                     document_language = interview.language
 
-                    # Post documents to GED
+                    # Post documents to GED if envelope_status is completed
                     tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
                     mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
 
@@ -226,36 +228,36 @@ def docusign_webhook_listener(request):
                         logger.debug("Posting document to GED: " + pdf["filename"])
                         logger.debug(response.text)
 
-                if envelope_status in envelope_statuses.keys():
-                    document.status = envelope_statuses[envelope_status]
-                else:
-                    document.status = "não encontrado"
+            except Exception as e:
+                msg = str(e)
+                logger.exception(msg)
+                return HttpResponse(msg)
 
-                document.save()
+        if envelope_status in envelope_statuses.keys():
+            document.status = envelope_statuses[envelope_status]
+        else:
+            document.status = "não encontrado"
 
-                envelope_log = EnvelopeLog(
-                    envelope_id=envelope_data['envelope_id'],
-                    status=envelope_data['envelope_status'],
-                    created_date=envelope_data['envelope_created'],
-                    sent_date=envelope_data['envelope_sent'],
-                    status_update_date=envelope_data['envelope_time_generated'],
-                    document=document,
-                )
-                envelope_log.save()
+        document.save()
 
-                for recipient_status in recipient_statuses:
-                    singer_log = SignerLog(
-                        name=recipient_status['UserName'],
-                        email=recipient_status['Email'],
-                        status=recipient_status['Status'],
-                        document_esignature_log=envelope_log,
-                    )
-                    singer_log.save()
+        envelope_log = EnvelopeLog(
+            envelope_id=envelope_data['envelope_id'],
+            status=envelope_data['envelope_status'],
+            created_date=envelope_data['envelope_created'],
+            sent_date=envelope_data['envelope_sent'],
+            status_update_date=envelope_data['envelope_time_generated'],
+            document=document,
+        )
+        envelope_log.save()
 
-        except Exception as e:
-            msg = str(e)
-            logger.exception(msg)
-            return HttpResponse(msg)
+        for recipient_status in recipient_statuses:
+            singer_log = SignerLog(
+                name=recipient_status['UserName'],
+                email=recipient_status['Email'],
+                status=recipient_status['Status'],
+                document_esignature_log=envelope_log,
+            )
+            singer_log.save()
 
     return HttpResponse("Success!")
 
