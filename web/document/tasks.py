@@ -13,15 +13,8 @@ count_down = 5
 
 
 @shared_task(bind=True, max_retries=3)
-def create_document(
-    self,
-    base_url,
-    api_key,
-    secret,
-    interview_full_name,
-    interview_variables
-    # def create_document(base_url, api_key, secret, interview_full_name, interview_variables
-):
+def create_document(self, base_url, api_key, secret, interview_full_name, interview_variables):
+# def create_document(base_url, api_key, secret, interview_full_name, interview_variables):
     try:
         dac = DocassembleClient(base_url, api_key)
         logger.info(
@@ -220,7 +213,7 @@ def send_email(
         raise self.retry(e=e, countdown=count_down ** self.request.retries)
 
     except Exception as e:
-        message = "Houve um erro inespecífico na criação do documento | {e}".format(
+        message = "Houve um erro inespecífico na geração do e-mail documento | {e}".format(
             e=str(e)
         )
         logger.error(message)
