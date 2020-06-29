@@ -166,8 +166,8 @@ def docusign_webhook_listener(request):
         # Parses XML data and returns a dictionary and formated messages
         envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
 
-        logger.debug('Imprimindo envelope_data')
-        logger.debug(envelope_data)
+        logger.info('Imprimindo envelope_data')
+        logger.info(envelope_data)
 
         # Store the XML file on disk
         envelope_dir = os.path.join(
@@ -250,15 +250,15 @@ def docusign_webhook_listener(request):
         )
         envelope_log.save()
 
-        logger.debug('Imprimindo recipient_statuses')
-        logger.debug(recipient_statuses)
+        logger.info('Imprimindo recipient_statuses')
+        logger.info(recipient_statuses)
 
         for recipient_status in recipient_statuses:
             singer_log = SignerLog(
                 name=recipient_status['UserName'],
                 email=recipient_status['Email'],
                 status=recipient_status['Status'],
-                document_esignature_log=envelope_log,
+                envelope_log=envelope_log,
             )
             singer_log.save()
 
