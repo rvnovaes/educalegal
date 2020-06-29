@@ -30,13 +30,6 @@
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
-        $(window).on('load', function () {
-            const tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
-            tutorial_modal.modal('show');
-            const plan_upgrade_modal = $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
-            plan_upgrade_modal.modal('show');
-
-        });
         // Quando o usuário clica em um botão criar, um novo documento rascunho é criado.
         $(".btn.btn-success.btn-sm").click(function (event) {
             // Captura o cookie que contém o csrf token que será usado no post. Se não houver esse cookie, o post

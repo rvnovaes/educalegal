@@ -47,12 +47,6 @@
     const progress_bar = $("#progressbar");
     const progress_label = $(".progress-label");
 
-    $(window).on('load', function () {
-        let tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
-        tutorial_modal.modal('show');
-
-    });
-
     function sleep(milliseconds) {
         const date = Date.now();
         let currentDate = null;
@@ -78,7 +72,7 @@
                         progress_label.text("Fim!");
                         bulk_status_text.css("color", "black")
                         bulk_status_text.text(data["bulk_status"]);
-                        sleep(3000);
+                        sleep(1000);
                         location.reload();
                     }
                 });

@@ -76,6 +76,14 @@
             $('[data-toggle="tooltip"]').tooltip()
         })
     </script>
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            const tutorial_modal = $('#tutorial_modal').modal({backdrop: 'static', keyboard: false});
+            tutorial_modal.modal('show');
+            const plan_upgrade_modal = $('#plan_upgrade_modal').modal({backdrop: 'static', keyboard: false});
+            plan_upgrade_modal.modal('show');
+        });
+    </script>
     {% block scripts %}
     {% endblock %}
 </body>
