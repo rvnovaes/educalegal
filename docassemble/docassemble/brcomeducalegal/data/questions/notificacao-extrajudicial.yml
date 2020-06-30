@@ -72,12 +72,12 @@ fields:
     required: True
     validate: validate_cpf
   - "Número do RG:": notifieds[i].rg
-    required: True
+    required: False
   - "Nacionalidade:": notifieds[i].nationality
-    required: True
+    required: False
     default: brasileiro(a)
   - "Estado civil:": notifieds[i].marital_status
-    required: True
+    required: False
     datatype: radio
     choices:
       - solteiro(a)
