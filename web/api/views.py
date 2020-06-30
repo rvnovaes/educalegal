@@ -265,27 +265,41 @@ def docusign_webhook_listener(request):
 
         document.save()
 
-        envelope_log = EnvelopeLog(
-            envelope_id=envelope_data['envelope_id'],
-            status=envelope_data_translated['envelope_status'],
-            created_date=envelope_data['envelope_created'],
-            sent_date=envelope_data['envelope_sent'],
-            status_update_date=envelope_data['envelope_time_generated'],
-            document=document,
-        )
-        envelope_log.save()
-
-        logger.info('Imprimindo recipient_statuses')
-        logger.info(recipient_statuses)
+        # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
+        try:
+            envelope_log = EnvelopeLog.objects.get(envelope_id=envelope_data["envelope_id"])
+            envelope_log.envelope_status = envelope_data_translated['envelope_status']
+            envelope_log.envelope_time_generated = envelope_data['envelope_time_generated']
+            envelope_log.save(update_fields=['envelope_status', 'envelope_time_generated'])
+        except Document.DoesNotExist:
+            envelope_log = EnvelopeLog(
+                envelope_id=envelope_data['envelope_id'],
+                status=envelope_data_translated['envelope_status'],
+                created_date=envelope_data['envelope_created'],
+                sent_date=envelope_data['envelope_sent'],
+                status_update_date=envelope_data['envelope_time_generated'],
+                document=document,
+            )
+            envelope_log.save()
 
         for recipient_status in recipient_statuses:
-            singer_log = SignerLog(
-                name=recipient_status['UserName'],
-                email=recipient_status['Email'],
-                status=recipient_status['Status'],
-                envelope_log=envelope_log,
-            )
-            singer_log.save()
+            if recipient_status['Email'] in recipient_types_dict.keys():
+                recipient_status['Type'] = recipient_types_dict[recipient_status['Type']]
+            try:
+                # se já tem o status para o email e para o envelope_log, não salva outro igual
+                # só cria outro se o status do recipient mudou
+                singer_log = SignerLog.objects.get(
+                    envelope_log=envelope_log,
+                    email=recipient_status['Email'],
+                    status=recipient_status['Status'])
+            except Document.DoesNotExist:
+                singer_log = SignerLog(
+                    name=recipient_status['UserName'],
+                    email=recipient_status['Email'],
+                    status=recipient_status['Status'],
+                    envelope_log=envelope_log,
+                )
+                singer_log.save()
 
     return HttpResponse("Success!")
 
