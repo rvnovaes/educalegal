@@ -73,7 +73,12 @@ def _iso8601_to_datetime(iso8601_date):
         converted_datetime = datetime.fromisoformat(iso8601_date)
     except:
         # se a data não veio no formato certo (ISO 8601), converte manualmente
-        converted_datetime = dt.datetime.strptime(iso8601_date, '%Y-%m-%dT%H:%M:%S.%f')
+        # iso8601_date = iso8601_date.strftime('%d/%m/%Y %H:%M:%S.%f')
+        try:
+            converted_datetime = dt.datetime.strptime(iso8601_date, '%Y-%m-%dT%H:%M:%S.%f')
+        except:
+            logger.info('iso8601_date')
+            logger.info(iso8601_date)
 
     return converted_datetime
 
