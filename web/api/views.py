@@ -94,6 +94,9 @@ def docusign_xml_parser(data):
     envelope_data["envelope_sent"] = xml["EnvelopeStatus"]["Sent"]
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
 
+    logger.info('Imprimindo envelope_data antes do parse')
+    logger.info(envelope_data)
+
     # tenta converter a data do docusign que vem no formato ISO 8601 para UTC
     # formatting strings: 2020-04-15T11:20:19.693
     envelope_data['envelope_created'] = _iso8601_to_datetime(envelope_data['envelope_created'])
@@ -187,10 +190,10 @@ def docusign_webhook_listener(request):
         # Parses XML data and returns a dictionary and formated messages
         envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
 
-        logger.info('Imprimindo envelope_data')
+        logger.info('Imprimindo envelope_data depois do parse')
         logger.info(envelope_data)
 
-        logger.info('Imprimindo envelope_data_translated')
+        logger.info('Imprimindo envelope_data_translated depois do parse')
         logger.info(envelope_data_translated)
 
         # Store the XML file on disk
@@ -220,11 +223,14 @@ def docusign_webhook_listener(request):
 
     envelope_status = str(envelope_data["envelope_status"]).lower()
 
+    logger.info('passou aqui 1')
     # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test, por isso, não irá
     # encontrar o documento no banco
     if document:
+        logger.info('passou aqui 2')
         # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
         if envelope_status == "completed":
+            logger.info('passou aqui 3')
             try:
                 (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
                     data, envelope_dir
@@ -252,11 +258,13 @@ def docusign_webhook_listener(request):
                         )
                         logger.debug("Posting document to GED: " + pdf["filename"])
                         logger.debug(response.text)
+                logger.info('passou aqui 4')
 
             except Exception as e:
                 msg = str(e)
                 logger.exception(msg)
                 return HttpResponse(msg)
+                logger.info('passou aqui 5')
 
         if envelope_status in envelope_statuses.keys():
             document.status = envelope_statuses[envelope_status]
@@ -264,14 +272,17 @@ def docusign_webhook_listener(request):
             document.status = "não encontrado"
 
         document.save()
+        logger.info('passou aqui 6')
 
         # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
         try:
+            logger.info('passou aqui 7')
             envelope_log = EnvelopeLog.objects.get(envelope_id=envelope_data["envelope_id"])
             envelope_log.envelope_status = envelope_data_translated['envelope_status']
             envelope_log.envelope_time_generated = envelope_data['envelope_time_generated']
             envelope_log.save(update_fields=['envelope_status', 'envelope_time_generated'])
         except Document.DoesNotExist:
+            logger.info('passou aqui 8')
             envelope_log = EnvelopeLog(
                 envelope_id=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
@@ -283,8 +294,7 @@ def docusign_webhook_listener(request):
             envelope_log.save()
 
         for recipient_status in recipient_statuses:
-            if recipient_status['Email'] in recipient_types_dict.keys():
-                recipient_status['Type'] = recipient_types_dict[recipient_status['Type']]
+            logger.info('passou aqui 9')
             try:
                 # se já tem o status para o email e para o envelope_log, não salva outro igual
                 # só cria outro se o status do recipient mudou
@@ -293,6 +303,7 @@ def docusign_webhook_listener(request):
                     email=recipient_status['Email'],
                     status=recipient_status['Status'])
             except Document.DoesNotExist:
+                logger.info('passou aqui 10')
                 singer_log = SignerLog(
                     name=recipient_status['UserName'],
                     email=recipient_status['Email'],
@@ -301,6 +312,7 @@ def docusign_webhook_listener(request):
                 )
                 singer_log.save()
 
+    logger.info('passou aqui 11')
     return HttpResponse("Success!")
 
 
