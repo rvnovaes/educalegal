@@ -12,7 +12,7 @@ class TestAcordoIndividualReduodeJornadaeReduoSalarial(WebTest):
         "server,user,password,document_name",
         [
             ("https://test.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Acordo Individual de Trabalho - Redução de Jornada/Redução Salarial MP 936-2020"),
-            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Acordo Individual de Trabalho - Redução de Jornada/Redução Salarial MP 936-2020"),
+            # ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Acordo Individual de Trabalho - Redução de Jornada/Redução Salarial MP 936-2020"),
 
         ],
     )
