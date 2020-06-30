@@ -268,3 +268,4 @@ class TestContratodecomodatodeimovel(WebTest):
             print(" Tela final exibida com sucesso!")
         except NoSuchElementException:
             print(" Erro ao enviar o documento para o GED")
+            raise
