@@ -89,7 +89,7 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         try:
             self.driver.find_element(
-                By.XPATH, "//h5[contains(.,'Seu documento foi gerado com sucesso!')]"
+                By.XPATH, "//h1[contains(.,'Seu documento foi gerado com sucesso!')]"
             )
             print(" Tela final exibida com sucesso!")
         except NoSuchElementException:
