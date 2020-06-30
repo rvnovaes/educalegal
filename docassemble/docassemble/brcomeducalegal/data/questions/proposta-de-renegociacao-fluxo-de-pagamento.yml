@@ -58,7 +58,7 @@ fields:
   - "Nome completo:": fornecedor.name.first
     required: True
   - "E-mail:": fornecedor.email
-    help: "O e-mail informado será utilizado para o envio do documento"
+    help: ${ help_email_msg }
     datatype: email
     required: False
 script: |
@@ -113,3 +113,13 @@ code: |
       }
   ]
 ---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---
+code: |
+  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
+  email_category = interview_custom_file_name_string
+  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"

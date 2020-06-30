@@ -651,3 +651,7 @@ code: |
   else:
     help_email_msg = "Digite um e-mail válido."
 ---
+code: |
+  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
+  email_category = interview_custom_file_name_string
+  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"
