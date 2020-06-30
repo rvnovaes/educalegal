@@ -277,10 +277,7 @@ def docusign_webhook_listener(request):
         # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
         try:
             logger.info('passou aqui 7')
-            envelope_log = EnvelopeLog.objects.get(envelope_id=envelope_data["envelope_id"])
-            envelope_log.envelope_status = envelope_data_translated['envelope_status']
-            envelope_log.envelope_time_generated = envelope_data['envelope_time_generated']
-            envelope_log.save(update_fields=['envelope_status', 'envelope_time_generated'])
+            envelope_log = EnvelopeLog.objects.get(document=document)
         except Document.DoesNotExist:
             logger.info('passou aqui 8')
             envelope_log = EnvelopeLog(
@@ -291,7 +288,13 @@ def docusign_webhook_listener(request):
                 status_update_date=envelope_data['envelope_time_generated'],
                 document=document,
             )
-            envelope_log.save()
+        else:
+            logger.info('passou aqui 7-1')
+            envelope_log.envelope_status = envelope_data_translated['envelope_status']
+            envelope_log.envelope_time_generated = envelope_data['envelope_time_generated']
+            envelope_log.save(update_fields=['envelope_status', 'envelope_time_generated'])
+
+        envelope_log.save()
 
         for recipient_status in recipient_statuses:
             logger.info('passou aqui 9')
