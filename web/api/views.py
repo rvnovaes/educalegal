@@ -68,16 +68,19 @@ class MayanClient:
 
 
 def _iso8601_to_datetime(iso8601_date):
+    # tamanho máximo de casas dedimais aceitas pelo python é 6
+    # https://docs.python.org/3/library/datetime.html
+    # Microsecond as a decimal number, zero-padded on the left (accepts from one to six digits)
+    # quando vier mais do que 6, trunca em 6
+    # Ex.: '2020-06-29T19:03:46.4619595' >> '2020-06-29T19:03:46.461959'
+    iso8601_date = iso8601_date[:26]
     # tenta converter a data do docusign que vem no formato ISO 8601 para UTC
     try:
         converted_datetime = datetime.fromisoformat(iso8601_date)
     except:
         # se a data não veio no formato certo (ISO 8601), converte manualmente
         # iso8601_date = iso8601_date.strftime('%d/%m/%Y %H:%M:%S.%f')
-        try:
-            converted_datetime = dt.datetime.strptime(iso8601_date, '%Y-%m-%dT%H:%M:%S.%f')
-        except:
-            converted_datetime = None
+        converted_datetime = dt.datetime.strptime(iso8601_date, '%Y-%m-%dT%H:%M:%S.%f')
 
     return converted_datetime
 
@@ -90,15 +93,6 @@ def docusign_xml_parser(data):
     envelope_data["envelope_created"] = xml["EnvelopeStatus"]["Created"]
     envelope_data["envelope_sent"] = xml["EnvelopeStatus"]["Sent"]
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
-
-    logger.info('imprimindo envelope_data["envelope_created"]')
-    logger.info(envelope_data["envelope_created"])
-
-    logger.info('imprimindo envelope_data["envelope_sent"]')
-    logger.info(envelope_data["envelope_sent"])
-
-    logger.info('imprimindo envelope_data["envelope_time_generated"]')
-    logger.info(envelope_data["envelope_time_generated"])
 
     # tenta converter a data do docusign que vem no formato ISO 8601 para UTC
     # formatting strings: 2020-04-15T11:20:19.693
