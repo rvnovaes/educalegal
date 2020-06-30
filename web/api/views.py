@@ -198,8 +198,9 @@ def docusign_webhook_listener(request):
             settings.BASE_DIR, "media/docusign/", envelope_data["envelope_id"]
         )
         Path(envelope_dir).mkdir(parents=True, exist_ok=True)
+
         filename = (
-            envelope_data["envelope_time_generated"].replace(":", "_") + ".xml"
+            envelope_data["envelope_time_generated"].strftime("%Y%m%d_%H%M%S") + ".xml"
         )  # substitute _ for : for windows-land
         filepath = os.path.join(envelope_dir, filename)
         with open(filepath, "wb") as xml_file:
