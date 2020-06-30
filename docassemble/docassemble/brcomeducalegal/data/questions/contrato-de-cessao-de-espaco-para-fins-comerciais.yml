@@ -8,6 +8,7 @@ include:
   - element-foro.yml
   - element-data-list.yml
   - element-signature.yml
+  - element-generate-file.yml
   - element-educalegal-patch-document.yml
   - element-ged.yml
   - element-document-ready.yml
@@ -51,9 +52,9 @@ code: |
     payment_type
     if payment_type == "total" and payment_method == "parcelado":
       payment_attachment
+    generated_file
     el_document_patched_with_docassemble_data
     if plan_use_ged:
-      ged_file
       el_document_patched_with_ged_data
     document_ready_screen
   all_done

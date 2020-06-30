@@ -7,6 +7,7 @@ include:
   - element-roadmap.yml
   - element-data-list.yml
   - element-signature.yml
+  - element-generate-file.yml
   - element-educalegal-patch-document.yml
   - element-ged.yml
   - element-document-ready.yml
@@ -47,9 +48,9 @@ code: |
       if clausula_estabilidade == "sindicato":
         tempo_garantia_emprego
     signature_local
+    generated_file
     el_document_patched_with_docassemble_data
     if plan_use_ged:
-      ged_file
       el_document_patched_with_ged_data
     document_ready_screen
   all_done
