@@ -230,6 +230,9 @@ def docusign_webhook_listener(request):
     # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test, por isso, não irá
     # encontrar o documento no banco
     if document:
+        # variável para salvar o nome dos pdfs no signer_log
+        pdf_filenames = None
+
         # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
         if envelope_status == "completed":
             try:
@@ -259,6 +262,11 @@ def docusign_webhook_listener(request):
                         )
                         logger.debug("Posting document to GED: " + pdf["filename"])
                         logger.debug(response.text)
+
+                        pdf_filenames = [pdf["filename"]]
+
+                    # separa os documentos com ENTER
+                    pdf_filenames = chr(10).join(pdf_filenames)
 
             except Exception as e:
                 msg = str(e)
@@ -304,6 +312,7 @@ def docusign_webhook_listener(request):
                     email=recipient_status['Email'],
                     status=recipient_status['Status'],
                     sent_date=recipient_status['data_envio'],
+                    pdf_filenames=pdf_filenames,
                     envelope_log=envelope_log,
                 )
                 signer_log.save()

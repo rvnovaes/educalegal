@@ -185,6 +185,7 @@ class DocumentTaskView(TenantAwareModel):
 
 class EnvelopeLog(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
+    altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
     envelope_id = models.CharField(max_length=256, verbose_name="ID")
     status = models.CharField(max_length=256, verbose_name="Status")
     envelope_created_date = models.DateTimeField(verbose_name="Criação do envelope")
@@ -196,7 +197,7 @@ class EnvelopeLog(models.Model):
         Document,
         on_delete=models.CASCADE,
         verbose_name="Documento",
-        related_name="envelops_logs")
+        related_name="envelope_logs")
 
     class Meta:
         ordering = ["-envelope_created_date"]
@@ -215,14 +216,16 @@ class SignerLog(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     name = models.CharField(max_length=256, verbose_name="Nome")
     email = models.EmailField(max_length=256, verbose_name="E-mail")
+    type = models.CharField(max_length=256, verbose_name="Tipo")
     status = models.CharField(max_length=256, verbose_name="Status")
     sent_date = models.DateTimeField(null=True, blank=True, verbose_name="Envio")
+    pdf_filenames = models.TextField(blank=True, verbose_name="PDFs")
 
     envelope_log = models.ForeignKey(
         EnvelopeLog,
         on_delete=models.CASCADE,
         verbose_name="Andamento da Assinatura Eletrônica",
-        related_name="signers_logs")
+        related_name="signer_logs")
 
     class Meta:
         ordering = ["-sent_date"]

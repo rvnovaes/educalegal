@@ -12,11 +12,11 @@
                 <li class="list-group-item">
                     {# documentacao do django para formatacao de data no template #}
                     {# https://docs.djangoproject.com/en/3.0/ref/templates/builtins/#date #}
-                    <span class="font-weight-bold">Data de Criação: </span>{{ document.created_date|date:"d/m/Y H:i" }}
+                    <span class="font-weight-bold">Data de Criação: </span>{{ document.created_date|date:"d/m/Y H:i:s" }}
                 </li>
                 {% if user.tenant.plan.use_ged or user.tenant.plan.use_esignature %}
                     <li class="list-group-item">
-                        <span class="font-weight-bold">Data de Alteração: </span>{{ document.altered_date|date:"d/m/Y H:i" }}
+                        <span class="font-weight-bold">Data de Alteração: </span>{{ document.altered_date|date:"d/m/Y H:i:s" }}
                     </li>
                 {% endif %}
                 <li class="list-group-item">
@@ -34,14 +34,27 @@
                 {% endif %}
                 <li class="list-group-item">
                     <span class="font-weight-bold">Descrição: </span>{{ document.description }}</li>
-                {% if document.logs.all %}
+                {% if document.envelope_logs.all %}
                     <li class="list-group-item">
                     <br/>
                     <h5>Andamentos da Assinatura Eletrônica</h5>
                     <div class="card-footer">
                         <ul>
-                            {% for log in document.logs.all %}
-                                <li>{{ log.created_date|date:"d/m/Y H:i" }} <br> {{ log.esignature_log|safe }}</li>
+                            <b>Detalhes do Envelope</b>
+                            {% for log in document.envelope_logs.all %}
+                                <li>{{ log.created_date|date:"d/m/Y H:i:s" }} <br> {{ log.esignature_log|safe }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% if document.envelope_log.signer_logs.all %}
+                    <li class="list-group-item">
+                    <br/>
+                    <div class="card-footer">
+                        <ul>
+                            <b>Detalhes dos Destinatários</b>
+                            {% for log in document.envelope_logs.all %}
+                                <li>{{ log.created_date|date:"d/m/Y H:i:s" }} <br> {{ log.esignature_log|safe }}</li>
                             {% endfor %}
                         </ul>
                     </div>
