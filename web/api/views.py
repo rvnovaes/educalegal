@@ -227,14 +227,11 @@ def docusign_webhook_listener(request):
 
     envelope_status = str(envelope_data["envelope_status"]).lower()
 
-    logger.info('passou aqui 1')
     # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test, por isso, não irá
     # encontrar o documento no banco
     if document:
-        logger.info('passou aqui 2')
         # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
         if envelope_status == "completed":
-            logger.info('passou aqui 3')
             try:
                 (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
                     data, envelope_dir
@@ -262,13 +259,11 @@ def docusign_webhook_listener(request):
                         )
                         logger.debug("Posting document to GED: " + pdf["filename"])
                         logger.debug(response.text)
-                logger.info('passou aqui 4')
 
             except Exception as e:
                 msg = str(e)
                 logger.exception(msg)
                 return HttpResponse(msg)
-                logger.info('passou aqui 5')
 
         if envelope_status in envelope_statuses.keys():
             document.status = envelope_statuses[envelope_status]
@@ -276,14 +271,11 @@ def docusign_webhook_listener(request):
             document.status = "não encontrado"
 
         document.save()
-        logger.info('passou aqui 6')
 
         # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
         try:
-            logger.info('passou aqui 7')
             envelope_log = EnvelopeLog.objects.get(document=document)
         except EnvelopeLog.DoesNotExist:
-            logger.info('passou aqui 8')
             envelope_log = EnvelopeLog(
                 envelope_id=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
@@ -294,13 +286,11 @@ def docusign_webhook_listener(request):
             )
             envelope_log.save()
         else:
-            logger.info('passou aqui 7-1')
             envelope_log.status = envelope_data_translated['envelope_status']
             envelope_log.status_update_date = envelope_data['envelope_time_generated']
             envelope_log.save(update_fields=['status', 'status_update_date'])
 
         for recipient_status in recipient_statuses:
-            logger.info('passou aqui 9')
             try:
                 # se já tem o status para o email e para o envelope_log, não salva outro igual
                 # só cria outro se o status do recipient mudou
@@ -309,7 +299,6 @@ def docusign_webhook_listener(request):
                     email=recipient_status['Email'],
                     status=recipient_status['Status'])
             except SignerLog.DoesNotExist:
-                logger.info('passou aqui 10')
                 signer_log = SignerLog(
                     name=recipient_status['UserName'],
                     email=recipient_status['Email'],
@@ -319,29 +308,7 @@ def docusign_webhook_listener(request):
                 )
                 signer_log.save()
 
-    logger.info('passou aqui 11')
     return HttpResponse("Success!")
-
-
-# @require_POST
-# def create_draft_document(interview, tenant, school=None, doc_uuid=None):
-#     document = Document.objects.create(
-#         tenant=tenant,
-#         school=school,
-#         interview=interview,
-#         name=interview.custom_file_name + "_",
-#         description=interview.description + ' | ' + interview.version + ' | ' + str(interview.date_available),
-#         doc_uuid=doc_uuid,
-#         status="rascunho"
-#     )
-#
-#     document = document.save()
-#
-#     data = {
-#         doc_uuid: document.doc_uuid
-#     }
-#
-#     return JsonResponse(data)
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
