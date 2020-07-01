@@ -278,7 +278,7 @@ def docusign_webhook_listener(request):
         try:
             logger.info('passou aqui 7')
             envelope_log = EnvelopeLog.objects.get(document=document)
-        except Document.DoesNotExist:
+        except EnvelopeLog.DoesNotExist:
             logger.info('passou aqui 8')
             envelope_log = EnvelopeLog(
                 envelope_id=envelope_data['envelope_id'],
@@ -301,19 +301,19 @@ def docusign_webhook_listener(request):
             try:
                 # se já tem o status para o email e para o envelope_log, não salva outro igual
                 # só cria outro se o status do recipient mudou
-                singer_log = SignerLog.objects.get(
+                signer_log = SignerLog.objects.get(
                     envelope_log=envelope_log,
                     email=recipient_status['Email'],
                     status=recipient_status['Status'])
-            except Document.DoesNotExist:
+            except SignerLog.DoesNotExist:
                 logger.info('passou aqui 10')
-                singer_log = SignerLog(
+                signer_log = SignerLog(
                     name=recipient_status['UserName'],
                     email=recipient_status['Email'],
                     status=recipient_status['Status'],
                     envelope_log=envelope_log,
                 )
-                singer_log.save()
+                signer_log.save()
 
     logger.info('passou aqui 11')
     return HttpResponse("Success!")
