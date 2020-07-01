@@ -7,7 +7,7 @@ from validator_collection import validators, checkers, errors
 from validator_collection_br import validators_br, checkers_br
 import numpy as np
 
-from web.util.constants import VALID_FIELD_TYPES
+from util.constants import VALID_FIELD_TYPES
 
 logger = logging.getLogger(__name__)
 
