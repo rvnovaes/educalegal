@@ -74,7 +74,7 @@ def _iso8601_to_datetime(iso8601_date):
     # quando vier mais do que 6, trunca em 6
     # Ex.: '2020-06-29T19:03:46.4619595' >> '2020-06-29T19:03:46.461959'
     iso8601_date = iso8601_date[:26]
-    # tenta converter a data do docusign que vem no formato ISO 8601 para UTC
+    # tenta converter a data do docusign que vem no formato ISO 8601 para datetime
     try:
         converted_datetime = datetime.fromisoformat(iso8601_date)
     except:
@@ -97,8 +97,7 @@ def docusign_xml_parser(data):
     logger.info('Imprimindo envelope_data antes do parse')
     logger.info(envelope_data)
 
-    # tenta converter a data do docusign que vem no formato ISO 8601 para UTC
-    # formatting strings: 2020-04-15T11:20:19.693
+    # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
     envelope_data['envelope_created'] = _iso8601_to_datetime(envelope_data['envelope_created'])
     envelope_data['envelope_sent'] = _iso8601_to_datetime(envelope_data['envelope_sent'])
     envelope_data['envelope_time_generated'] = _iso8601_to_datetime(envelope_data['envelope_time_generated'])
@@ -288,13 +287,12 @@ def docusign_webhook_listener(request):
                 status_update_date=envelope_data['envelope_time_generated'],
                 document=document,
             )
+            envelope_log.save()
         else:
             logger.info('passou aqui 7-1')
-            envelope_log.envelope_status = envelope_data_translated['envelope_status']
-            envelope_log.envelope_time_generated = envelope_data['envelope_time_generated']
-            envelope_log.save(update_fields=['envelope_status', 'envelope_time_generated'])
-
-        envelope_log.save()
+            envelope_log.status = envelope_data_translated['envelope_status']
+            envelope_log.status_update_date = envelope_data['envelope_time_generated']
+            envelope_log.save(update_fields=['status', 'status_update_date'])
 
         for recipient_status in recipient_statuses:
             logger.info('passou aqui 9')
