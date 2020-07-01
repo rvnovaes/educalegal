@@ -216,7 +216,7 @@ class SignerLog(models.Model):
     name = models.CharField(max_length=256, verbose_name="Nome")
     email = models.EmailField(max_length=256, verbose_name="E-mail")
     status = models.CharField(max_length=256, verbose_name="Status")
-    sent_date = models.DateTimeField(verbose_name="Envio")
+    sent_date = models.DateTimeField(null=True, blank=True, verbose_name="Envio")
 
     envelope_log = models.ForeignKey(
         EnvelopeLog,
