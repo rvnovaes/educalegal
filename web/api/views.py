@@ -315,16 +315,23 @@ def docusign_webhook_listener(request):
                     status=recipient_status['Status'])
             except SignerLog.DoesNotExist:
                 logger.info('passou aqui 8')
-                signer_log = SignerLog(
-                    name=recipient_status['UserName'],
-                    email=recipient_status['Email'],
-                    status=recipient_status['Status'],
-                    sent_date=recipient_status['data_envio'],
-                    pdf_filenames=pdf_filenames,
-                    envelope_log=envelope_log,
-                )
-                signer_log.save()
-        logger.info('passou aqui 9')
+
+                try:
+                    signer_log = SignerLog(
+                        name=recipient_status['UserName'],
+                        email=recipient_status['Email'],
+                        status=recipient_status['Status'],
+                        sent_date=recipient_status['data_envio'],
+                        pdf_filenames=pdf_filenames,
+                        envelope_log=envelope_log,
+                    )
+                    signer_log.save()
+                except:
+                    message = 'Não foi possível salvar o SignerLog.'
+                    logger.debug(message)
+                    logger.info('passou aqui 9')
+
+        logger.info('passou aqui 10')
 
     return HttpResponse("Success!")
 
