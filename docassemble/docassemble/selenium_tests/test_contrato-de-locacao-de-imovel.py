@@ -270,8 +270,9 @@ class TestContratodeLocaodeImvel(WebTest):
         self.driver.find_element(By.XPATH, "//span[contains(.,'Continuar')]").click()
         try:
             self.driver.find_element(
-                By.XPATH, "//h5[contains(.,'Seu documento foi inserido no GED!')]"
+                By.XPATH, "//h1[contains(.,'Seu documento foi gerado com sucesso!')]"
             )
             print(" Tela final exibida com sucesso!")
         except NoSuchElementException:
             print(" Erro ao enviar o documento para o GED")
+            raise

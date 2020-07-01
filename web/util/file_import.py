@@ -4,9 +4,10 @@ import numbers
 import re
 import pandas as pd
 from validator_collection import validators, checkers, errors
+from validator_collection_br import validators_br, checkers_br
 import numpy as np
 
-from util.constants import VALID_FIELD_TYPES
+from web.util.constants import VALID_FIELD_TYPES
 
 logger = logging.getLogger(__name__)
 
@@ -267,7 +268,41 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                     )
                 )
 
-        return value, True
+            return value, True
+
+        if field_type_name == "CpfField":
+            is_valid = checkers_br.is_cpf(value)
+
+            if is_valid and checkers_br.is_cpf(value):
+                value = validators_br.cpf(value)
+            elif not is_valid:
+                raise ValueError(
+                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido.\n".format(
+                        column_name=column_name,
+                        row_index=row_index,
+                        value=value,
+                        field_type_name=field_type_name,
+                    )
+                )
+
+            return value, True
+
+        if field_type_name == "CnpjField":
+            is_valid = checkers_br.is_cnpj(value)
+
+            if is_valid and checkers_br.is_cnpj(value):
+                value = validators_br.cnpj(value)
+            elif not is_valid:
+                raise ValueError(
+                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} não é válido.\n".format(
+                        column_name=column_name,
+                        row_index=row_index,
+                        value=value,
+                        field_type_name=field_type_name,
+                    )
+                )
+
+            return value, True
 
 
 def string_date_format(value: str) -> datetime:

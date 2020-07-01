@@ -86,6 +86,8 @@ class TestNotificaoExtrajudicial(WebTest):
             )
         )
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
+        self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Notificado:"))
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element(
                 (By.XPATH, "//h1"), "Dados do contrato do aluno e valor do débito"
@@ -120,8 +122,9 @@ class TestNotificaoExtrajudicial(WebTest):
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         try:
             self.driver.find_element(
-                By.XPATH, "//h5[contains(.,'Seu documento foi inserido no GED!')]"
+                By.XPATH, "//h1[contains(.,'Seu documento foi gerado com sucesso!')]"
             )
             print(" Tela final exibida com sucesso!")
         except NoSuchElementException:
             print(" Erro ao enviar o documento para o GED")
+            raise

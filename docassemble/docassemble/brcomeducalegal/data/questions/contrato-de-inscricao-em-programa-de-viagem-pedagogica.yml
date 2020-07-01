@@ -8,6 +8,7 @@ include:
   - element-foro.yml
   - element-data-list.yml
   - element-signature.yml
+  - element-generate-file.yml
   - element-educalegal-patch-document.yml
   - element-ged.yml
   - element-document-ready.yml
@@ -41,9 +42,9 @@ code: |
     accommodation_type
     city
     signature_local
+    generated_file
     el_document_patched_with_docassemble_data
     if plan_use_ged:
-      ged_file
       el_document_patched_with_ged_data
     document_ready_screen
   all_done
@@ -427,3 +428,7 @@ code: |
   else:
     help_email_msg = "Digite um e-mail válido."
 ---
+code: |
+  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
+  email_category = interview_custom_file_name_string
+  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"
