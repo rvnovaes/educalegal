@@ -231,7 +231,7 @@ def docusign_webhook_listener(request):
     # encontrar o documento no banco
     if document:
         # variável para salvar o nome dos pdfs no signer_log
-        pdf_filenames = None
+        pdf_filenames = ''
 
         # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
         if envelope_status == "completed":
