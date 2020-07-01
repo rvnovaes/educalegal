@@ -7,17 +7,19 @@ modules:
 ---
 event: el_send_email
 code: |
-  from_email = school_email
-  to_emails = list()
-  for recipient in recipients:
-    to_emails.append(recipient["email"])
+  to_emails = recipients
   subject = email_subject
   html_content = email_html_content
   category = email_category
   file_path = generated_file.pdf.path()
   file_name = mayan_file_name
+  if el_log_to_console:
+    log("Enviando e-mail para {to_emails}".format(to_emails=to_emails), "console")
   log("Enviando e-mail para {to_emails}".format(to_emails=to_emails))
-  response_status_code, response_message = send_email_sendgrid(from_email, to_emails, subject, html_content, category, file_path, file_name)
+  response_status_code, response_message = send_email_sendgrid(to_emails, subject, html_content, category, file_path, file_name)
+  if el_log_to_console:
+    log("Sendgrid response status code: " + str(response_status_code), "console")
+    log("Sendgrid response message: " + response_message, "console")
   log("Sendgrid response status code: " + str(response_status_code))
   log("Sendgrid response message: " + response_message)
   if response_status_code == 202:
@@ -26,8 +28,9 @@ code: |
     el_document_patched_with_email_data = elc.patch_document_with_email_data(doc_uuid, cd_send_email, cd_status)
     email_success
   else:
+    if el_log_to_console:
+      log(str(response_status_code) + " " + response_message, "console")
     log(str(response_status_code) + " " + response_message)
-    log(str(response_status_code) + " " + response_message, "console")
     email_failure
 ---
 event: email_success
@@ -35,10 +38,14 @@ back button: False
 question: Documento enviado por e-mail com sucesso
 subquestion: |
   ####O documento foi enviado para o(s) seguinte(s) destinatário(s):
-  % for recipient in to_emails:
-    * ${ recipient }
-    ---
+  % for recipient in recipients:
+    % if recipient['email']:
+      * ${ recipient['name'] }
+      - ${ recipient['email'] }
+      ---
+    % endif
   % endfor
+
   Você também pode baixar os documentos:
   [PDF](${ generated_file.pdf.url_for() })
   ou
@@ -54,7 +61,7 @@ subquestion: |
 
   Dados enviados para o servidor:
   ${ from_email }
-  % for recipient in to_emails:
+  % for recipient in recipients:
       * ${ recipient }
       ---
   % endfor
