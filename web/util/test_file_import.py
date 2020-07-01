@@ -135,6 +135,7 @@ def test_string_date_format():
     # Test CpfField
     ('cpf', 3, 'CpfField', True, '099.264.116-06', False),
     ('cpf', 5, 'CpfField', False, None, False),
+    ('cpf', 6, 'CnpjField', True, '099.264.116-06', True),
     ('cpf', 7, 'CpfField', True, '099.264.116-05', True),
     ('cpf', 9, 'CpfField', True, '99.264.116-06', True),
     ('cpf', 11, 'CpfField', True, '0099.264.116.06', True),
@@ -149,6 +150,7 @@ def test_string_date_format():
     # Test CnpjField
     ('cnpj', 3, 'CnpjField', True, '33.000.167/0001-01', False),
     ('cnpj', 5, 'CnpjField', False, None, False),
+    ('cnpj', 6, 'CpfField', True, '33.000.167/0001-01', True),
     ('cnpj', 7, 'CnpjField', True, '33.000.167/0001-10', True),
     ('cnpj', 9, 'CnpjField', True, '3.000.167/0001-01', True),
     ('cnpj', 11, 'CnpjField', True, '133.000.167/0001-01', True),
