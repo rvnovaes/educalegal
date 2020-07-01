@@ -280,10 +280,13 @@ def docusign_webhook_listener(request):
 
         document.save()
 
+        logger.info('passou aqui 1')
         # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
         try:
+            logger.info('passou aqui 2')
             envelope_log = EnvelopeLog.objects.get(document=document)
         except EnvelopeLog.DoesNotExist:
+            logger.info('passou aqui 3')
             envelope_log = EnvelopeLog(
                 envelope_id=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
@@ -293,13 +296,17 @@ def docusign_webhook_listener(request):
                 document=document,
             )
             envelope_log.save()
+            logger.info('passou aqui 4')
         else:
+            logger.info('passou aqui 5')
             envelope_log.status = envelope_data_translated['envelope_status']
             envelope_log.status_update_date = envelope_data['envelope_time_generated']
             envelope_log.save(update_fields=['status', 'status_update_date'])
 
+        logger.info('passou aqui 6')
         for recipient_status in recipient_statuses:
             try:
+                logger.info('passou aqui 7')
                 # se já tem o status para o email e para o envelope_log, não salva outro igual
                 # só cria outro se o status do recipient mudou
                 signer_log = SignerLog.objects.get(
@@ -307,6 +314,7 @@ def docusign_webhook_listener(request):
                     email=recipient_status['Email'],
                     status=recipient_status['Status'])
             except SignerLog.DoesNotExist:
+                logger.info('passou aqui 8')
                 signer_log = SignerLog(
                     name=recipient_status['UserName'],
                     email=recipient_status['Email'],
@@ -316,6 +324,7 @@ def docusign_webhook_listener(request):
                     envelope_log=envelope_log,
                 )
                 signer_log.save()
+        logger.info('passou aqui 9')
 
     return HttpResponse("Success!")
 
