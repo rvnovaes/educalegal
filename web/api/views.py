@@ -131,7 +131,7 @@ def docusign_xml_parser(data):
         else:
             recipient_status['Status'] = 'não encontrado'
         # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
-        if recipient_status['Sent'] in recipient_status.keys():
+        if 'Sent' in recipient_status.keys():
             recipient_status['data_envio'] = _iso8601_to_datetime(recipient_status['Sent'])
         else:
             recipient_status['data_envio'] = None
