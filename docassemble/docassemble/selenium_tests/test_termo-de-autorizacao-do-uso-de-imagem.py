@@ -13,8 +13,8 @@ class TestTermodeautorizacaodousodeimagem(WebTest):
         [
             ("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
              "Autotest_Autorização de uso de imagem",),
-            # ("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
-            #  "Autorização de uso de imagem",),
+            ("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
+             "Autorização de uso de imagem",),
         ],
     )
     def test_termodeautorizacaodousodeimagem(self, server, user, password, document_name):

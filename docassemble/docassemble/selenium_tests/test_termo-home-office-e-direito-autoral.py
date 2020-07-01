@@ -12,7 +12,7 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
         "server,user,password,document_name",
         [
             ("https://test.educalegal.com.br/","autotest@educalegal.com.br", "Silex2109", "Autotest_Termo de Acordo - Mudança do Regime de Jornada e Cessão do Direito Autoral"),
-            # ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Termo para mudança de regime para Home Office e Cessão do Direito Autoral​"),
+            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Termo para mudança de regime para Home Office e Cessão do Direito Autoral​"),
 
         ],
     )

@@ -12,7 +12,7 @@ class TestAditivoaocontratodetrabalhobancodehoras(WebTest):
         "server,user,password,document_name",
         [
             ("https://test.educalegal.com.br/","autotest@educalegal.com.br", "Silex2109","Autotest_Aditivo ao contrato de trabalho - banco de horas"),
-            # ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Aditivo ao contrato de trabalho - banco de horas"),
+            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Aditivo ao contrato de trabalho - banco de horas"),
 
         ],
     )
