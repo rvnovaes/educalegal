@@ -45,7 +45,7 @@ validator-collection~=1.4.1
 validator-collection-br~=0.0.10
 # Celery
 celery~=4.4.4
-django-celery-makeresults~=1.2.1
+django-celery-results~=1.2.1
 future~=0.18.2
 # Tests
 pytest~=5.4.3
