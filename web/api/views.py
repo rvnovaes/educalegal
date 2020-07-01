@@ -130,6 +130,8 @@ def docusign_xml_parser(data):
             recipient_status['Status'] = recipient_statuses_dict[recipient_status['Status']]
         else:
             recipient_status['Status'] = 'não encontrado'
+        # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
+        recipient_status['data_envio'] = _iso8601_to_datetime(recipient_status['Sent'])
 
     return envelope_data, envelope_data_translated, recipient_statuses
 
@@ -282,7 +284,7 @@ def docusign_webhook_listener(request):
             envelope_log = EnvelopeLog(
                 envelope_id=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
-                created_date=envelope_data['envelope_created'],
+                envelope_created_date=envelope_data['envelope_created'],
                 sent_date=envelope_data['envelope_sent'],
                 status_update_date=envelope_data['envelope_time_generated'],
                 document=document,
@@ -309,6 +311,7 @@ def docusign_webhook_listener(request):
                     name=recipient_status['UserName'],
                     email=recipient_status['Email'],
                     status=recipient_status['Status'],
+                    sent_date=recipient_status['data_envio'],
                     envelope_log=envelope_log,
                 )
                 signer_log.save()

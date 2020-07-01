@@ -184,10 +184,10 @@ class DocumentTaskView(TenantAwareModel):
 
 
 class EnvelopeLog(models.Model):
-    imported_date = models.DateTimeField(auto_now_add=True, verbose_name="Importação")
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     envelope_id = models.CharField(max_length=256, verbose_name="ID")
     status = models.CharField(max_length=256, verbose_name="Status")
-    created_date = models.DateTimeField(verbose_name="Criação")
+    envelope_created_date = models.DateTimeField(verbose_name="Criação do envelope")
     sent_date = models.DateTimeField(null=True, verbose_name="Envio")
     # salva o TimeGenerated - Specifies the time of the status change.
     status_update_date = models.DateTimeField(verbose_name="Alteração do status")
@@ -199,7 +199,7 @@ class EnvelopeLog(models.Model):
         related_name="envelops_logs")
 
     class Meta:
-        ordering = ["-created_date"]
+        ordering = ["-envelope_created_date"]
         verbose_name = "Andamento da Assinatura Eletrônica"
         verbose_name_plural = "Andamentos da Assinatura Eletrônica"
         indexes = [
@@ -212,10 +212,11 @@ class EnvelopeLog(models.Model):
 
 
 class SignerLog(models.Model):
-    imported_date = models.DateTimeField(auto_now_add=True, verbose_name="Importação")
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     name = models.CharField(max_length=256, verbose_name="Nome")
     email = models.EmailField(max_length=256, verbose_name="E-mail")
     status = models.CharField(max_length=256, verbose_name="Status")
+    sent_date = models.DateTimeField(verbose_name="Envio")
 
     envelope_log = models.ForeignKey(
         EnvelopeLog,
@@ -224,7 +225,7 @@ class SignerLog(models.Model):
         related_name="signers_logs")
 
     class Meta:
-        ordering = ["-imported_date"]
+        ordering = ["-sent_date"]
         verbose_name = "Signatário"
         verbose_name_plural = "Signatários"
         indexes = [
