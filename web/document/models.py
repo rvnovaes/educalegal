@@ -194,7 +194,7 @@ class EnvelopeLog(models.Model):
     envelope_created_date = models.DateTimeField(verbose_name="Criação do envelope")
     sent_date = models.DateTimeField(null=True, verbose_name="Envio")
     # salva o TimeGenerated - Specifies the time of the status change.
-    status_update_date = models.DateTimeField(verbose_name="Alteração do status")
+    status_update_date = models.DateTimeField(null=True, verbose_name="Alteração do status")
 
     document = models.ForeignKey(
         Document,
