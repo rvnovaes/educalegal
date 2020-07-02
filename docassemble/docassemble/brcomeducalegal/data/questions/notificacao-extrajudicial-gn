@@ -24,7 +24,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "notificacao-extrajudicial.docx"
+  content_document = "notificacao-extrajudicial-gn.docx"
 ---
 id: logic
 mandatory: True
