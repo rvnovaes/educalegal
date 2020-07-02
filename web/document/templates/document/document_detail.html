@@ -12,20 +12,20 @@
                 <li class="list-group-item">
                     {# documentacao do django para formatacao de data no template #}
                     {# https://docs.djangoproject.com/en/3.0/ref/templates/builtins/#date #}
-                    <span class="font-weight-bold">Data de Criação: </span>{{ document.created_date|date:"d/m/Y H:i" }}
+                    <span class="font-weight-bold">Data de Criação: </span>{{ document.created_date|date:"d/m/Y H:i:s" }}
                 </li>
                 {% if user.tenant.plan.use_ged or user.tenant.plan.use_esignature %}
                     <li class="list-group-item">
-                        <span class="font-weight-bold">Data de Alteração: </span>{{ document.altered_date|date:"d/m/Y H:i" }}
+                        <span class="font-weight-bold">Data de Alteração: </span>{{ document.altered_date|date:"d/m/Y H:i:s" }}
                     </li>
                 {% endif %}
                 <li class="list-group-item">
                     <span class="font-weight-bold">Status: </span>{{ document.status }}</li>
                 {% if user.tenant.plan.use_esignature %}
                     <li class="list-group-item">
-                        <span class="font-weight-bold">Envelope ID: </span>{{ document.envelope_id }}</li>
+                        <span class="font-weight-bold">Envelope ID: </span>{{ document.envelope_id|default:"-" }}</li>
                     <li class="list-group-item">
-                        <span class="font-weight-bold">Provedor: </span>{{ document.signing_provider }}</li>
+                        <span class="font-weight-bold">Provedor: </span>{{ document.signing_provider|default:"-" }}</li>
                 {% endif %}
                 {% if user.tenant.plan.use_ged %}
                     <li class="list-group-item">
@@ -33,22 +33,63 @@
                                                                        target="_blank">{{ document.ged_link }}</a></li>
                 {% endif %}
                 <li class="list-group-item">
-                    <span class="font-weight-bold">Descrição: </span>{{ document.description }}</li>
-                {% if document.logs.all %}
+                    <span class="font-weight-bold">Descrição: </span>{{ document.description|default:"-" }}</li>
+
+                {% if document.envelope_logs.all %}
+                    <li class="card-header">
+                    <br/>
+                    <h4>Andamentos da Assinatura Eletrônica</h4></li>
+                    <li class="card-header">
+                    <br/>
+                    <h5>Detalhes do Envelope</h5></li>
+                    {% for envelope_log in document.envelope_logs.all %}
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Data de criação: </span>{{ envelope_log.envelope_created_date|date:"d/m/Y H:i:s" }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Data de alteração: </span>{{ envelope_log.status_update_date|date:"d/m/Y H:i:s"|default:"-" }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Data do envio: </span>{{ envelope_log.sent_date|date:"d/m/Y H:i:s"|default:"-" }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Status: </span>{{ envelope_log.status }}
+                        </li>
+                        <li class="card-header">
+                        <br/>
+                        <h5>Detalhes dos Destinatários</h5></li>
+                        {% for signer_log in envelope_log.signer_logs.all %}
+                            <li class="card-header">
+                                <span class="font-weight-bold">Nome: </span>{{ signer_log.name }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">E-mail: </span>{{ signer_log.email }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">Data de Criação: </span>{{ signer_log.created_date|date:"d/m/Y H:i:s" }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">Data do Envio: </span>{{ signer_log.sent_date|date:"d/m/Y H:i:s" }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">Status: </span>{{ signer_log.status }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">Tipo: </span>{{ signer_log.type }}
+                            </li>
+                            {% if signer_log.pdf_filenames %}
+                                <li class="list-group-item">
+                                    <span class="font-weight-bold">PDFs: </span>{{ signer_log.pdf_filenames|linebreaks }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if document.documents.all %}
                     <li class="list-group-item">
                     <br/>
-                    <h5>Andamentos da Assinatura Eletrônica</h5>
-                    <div class="card-footer">
-                        <ul>
-                            {% for log in document.logs.all %}
-                                <li>{{ log.created_date|date:"d/m/Y H:i" }} <br> {{ log.esignature_log|safe }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-                {% if document.documents.all %}
-                    <br/>
-                    <h5>Documentos Relacionados</h5>
+                    <h5>Documentos Relacionados</h5></li>
                     <div class="card-footer">
                         <ul>
                             {% for related_document in document.documents.all %}
