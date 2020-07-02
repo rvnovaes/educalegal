@@ -83,7 +83,10 @@ class Document(TenantAwareModel):
     )
 
     def __str__(self):
-        return self.name + " - " + self.school.name
+        if self.school is not None:
+            return self.name + ' - ' + self.school.name
+        else:
+            return self.name
 
 
 class DocumentESignatureLog(TenantAwareModel):
