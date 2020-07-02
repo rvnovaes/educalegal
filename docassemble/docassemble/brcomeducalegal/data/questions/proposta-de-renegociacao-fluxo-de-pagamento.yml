@@ -35,7 +35,9 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
-    fornecedor.name.first
+    fornecedores.target_number = 1
+    for item in fornecedores:
+      item.name.first
     parcelas
     signature_local
     generated_file
@@ -46,18 +48,33 @@ code: |
   all_done
 ---
 objects:
-  - fornecedor: Individual
+  - fornecedores: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  fornecedores[i].name.first
+  fornecedores[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Fornecedor
+progress: 25
+question: Número de Fornecedores
+fields:
+  - Número: fornecedores.target_number
+    datatype: integer
+    default: 1
 ---
 ga id: |
   code: ga_id_begin
 section: Fornecedor
-progress: 25
+progress: 50
 question: |
   Nome do Fornecedor
 fields:
-  - "Nome completo:": fornecedor.name.first
+  - "Nome completo:": fornecedores[i].name.first
     required: True
-  - "E-mail:": fornecedor.email
+  - "E-mail:": fornecedores[i].email
     help: ${ help_email_msg }
     datatype: email
     required: False
@@ -83,25 +100,27 @@ fields:
 ---
 code: |
   recipients = list()
-  notificante_recipient = dict()
-  notificante_recipient['name'] = school_legal_name
-  notificante_recipient['email'] = school_email
-  notificante_recipient['group'] = 'signers'
-  notificante_recipient['routingOrder'] = 1
-  notificante_recipient['tabs'] = [
+  for item in fornecedores:
+       if item.email:
+            new_recipient = dict()
+            new_recipient['name'] = item.name.first
+            new_recipient['email'] = item.email
+            new_recipient['group'] = 'certifiedDeliveries'
+            new_recipient['routingOrder'] = 1
+            recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
       {
           'type': 'signHere',
           'anchorString': generate_anchor('signHere', school_email)
       },
   ]
-  recipients.append(notificante_recipient)
-
-  fornecedor_recipient = dict()
-  fornecedor_recipient['name'] = fornecedor.name.first
-  fornecedor_recipient['email'] = fornecedor.email
-  fornecedor_recipient['group'] = 'certifiedDeliveries'
-  fornecedor_recipient['routingOrder'] = 2
-  recipients.append(fornecedor_recipient)
+  recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
 

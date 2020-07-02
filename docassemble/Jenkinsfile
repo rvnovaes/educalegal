@@ -180,6 +180,33 @@ pipeline {
                }
            }
        }
+       stage('test_proposta-de-renegociacao-contrato-de-locacao.py') {
+           steps {
+               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                   dir('docassemble/docassemble/selenium_tests/'){
+                       sh './jenkins_test_proposta-de-renegociacao-contrato-de-locacao.sh'
+                   }
+               }
+           }
+       }
+       stage('test_proposta-de-renegociacao-desconto-no-valor-devido.py') {
+           steps {
+               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                   dir('docassemble/docassemble/selenium_tests/'){
+                       sh './jenkins_test_proposta-de-renegociacao-desconto-no-valor-devido.sh'
+                   }
+               }
+           }
+       }
+       stage('test_proposta-de-renegociacao-fluxo-de-pagamento.py') {
+           steps {
+               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                   dir('docassemble/docassemble/selenium_tests/'){
+                       sh './jenkins_test_proposta-de-renegociacao-fluxo-de-pagamento.sh'
+                   }
+               }
+           }
+       }
    }
    post {
         always  {
