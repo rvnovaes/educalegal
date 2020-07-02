@@ -1,3 +1,4 @@
+# 0.55
 django~=3.0.7
 # API
 djangorestframework~=3.11.0
