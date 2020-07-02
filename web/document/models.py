@@ -234,7 +234,7 @@ class SignerLog(models.Model):
         related_name="signer_logs")
 
     class Meta:
-        ordering = ["-sent_date"]
+        ordering = ["-created_date"]
         verbose_name = "Signatário"
         verbose_name_plural = "Signatários"
         indexes = [
