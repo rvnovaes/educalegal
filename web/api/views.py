@@ -332,6 +332,10 @@ def docusign_webhook_listener(request):
                         pdf_filenames=pdf_filenames,
                         envelope_log=envelope_log,
                     )
+
+                    logger.info('imprimindo signer_log')
+                    logger.info(signer_log)
+
                     signer_log.save()
                 except:
                     message = 'Não foi possível salvar o SignerLog.'
