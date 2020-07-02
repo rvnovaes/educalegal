@@ -36,12 +36,12 @@
                     <span class="font-weight-bold">Descrição: </span>{{ document.description|default:"-" }}</li>
 
                 {% if document.envelope_logs.all %}
-                    <li class="list-group-item">
+                    <li class="card-header">
                     <br/>
-                    <h4>Andamentos da Assinatura Eletrônica</h4>
-                    <li class="list-group-item">
+                    <h4>Andamentos da Assinatura Eletrônica</h4></li>
+                    <li class="card-header">
                     <br/>
-                    <h5>Detalhes do Envelope</h5>
+                    <h5>Detalhes do Envelope</h5></li>
                     {% for envelope_log in document.envelope_logs.all %}
                         <li class="list-group-item">
                             <span class="font-weight-bold">Data de criação: </span>{{ envelope_log.envelope_created_date|date:"d/m/Y H:i:s" }}
@@ -55,21 +55,21 @@
                         <li class="list-group-item">
                             <span class="font-weight-bold">Status: </span>{{ envelope_log.status }}
                         </li>
-                        <li class="list-group-item">
+                        <li class="card-header">
                         <br/>
-                        <h5>Detalhes dos Destinatários</h5>
+                        <h5>Detalhes dos Destinatários</h5></li>
                         {% for signer_log in envelope_log.signer_logs.all %}
+                            <li class="card-header">
+                                <span class="font-weight-bold">Nome: </span>{{ signer_log.name }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">E-mail: </span>{{ signer_log.email }}
+                            </li>
                             <li class="list-group-item">
                                 <span class="font-weight-bold">Data de Criação: </span>{{ signer_log.created_date|date:"d/m/Y H:i:s" }}
                             </li>
                             <li class="list-group-item">
                                 <span class="font-weight-bold">Data do Envio: </span>{{ signer_log.sent_date|date:"d/m/Y H:i:s" }}
-                            </li>
-                            <li class="list-group-item">
-                                <span class="font-weight-bold">Nome: </span>{{ signer_log.name }}
-                            </li>
-                            <li class="list-group-item">
-                                <span class="font-weight-bold">E-mail: </span>{{ signer_log.email }}
                             </li>
                             <li class="list-group-item">
                                 <span class="font-weight-bold">Status: </span>{{ signer_log.status }}
@@ -87,8 +87,9 @@
                 {% endif %}
 
                 {% if document.documents.all %}
+                    <li class="list-group-item">
                     <br/>
-                    <h5>Documentos Relacionados</h5>
+                    <h5>Documentos Relacionados</h5></li>
                     <div class="card-footer">
                         <ul>
                             {% for related_document in document.documents.all %}
