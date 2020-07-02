@@ -38,38 +38,54 @@
                 {% if document.envelope_logs.all %}
                     <li class="list-group-item">
                     <br/>
-                    <h5>Andamentos da Assinatura Eletrônica</h5>
+                    <h4>Andamentos da Assinatura Eletrônica</h4>
                     <li class="list-group-item">
-                        <span class="font-weight-bold">Detalhes do Envelope</span></li>
-                    {% for log in document.envelope_logs.all %}
-                        console.log({{ log }});
+                    <br/>
+                    <h5>Detalhes do Envelope</h5>
+                    {% for envelope_log in document.envelope_logs.all %}
                         <li class="list-group-item">
-                            <span class="font-weight-bold">Data de criação: </span>{{ log.envelope_created_date|date:"d/m/Y H:i:s" }}
+                            <span class="font-weight-bold">Data de criação: </span>{{ envelope_log.envelope_created_date|date:"d/m/Y H:i:s" }}
                         </li>
                         <li class="list-group-item">
-                            <span class="font-weight-bold">Data de alteração: </span>{{ log.status_update_date|date:"d/m/Y H:i:s" }}
+                            <span class="font-weight-bold">Data de alteração: </span>{{ envelope_log.status_update_date|date:"d/m/Y H:i:s" }}
                         </li>
                         <li class="list-group-item">
-                            <span class="font-weight-bold">Data do envio: </span>{{ log.sent_date|date:"d/m/Y H:i:s" }}
+                            <span class="font-weight-bold">Data do envio: </span>{{ envelope_log.sent_date|date:"d/m/Y H:i:s" }}
                         </li>
                         <li class="list-group-item">
-                            <span class="font-weight-bold">Status: </span>{{ log.status }}
+                            <span class="font-weight-bold">Status: </span>{{ envelope_log.status }}
                         </li>
+                        <li class="list-group-item">
+                        <br/>
+                        <h5>Detalhes dos Destinatários</h5>
+                        {% for signer_log in envelope_log.signer_logs.all %}
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">Data de Criação: </span>{{ signer_log.created_date|date:"d/m/Y H:i:s" }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">Data do Envio: </span>{{ signer_log.sent_date|date:"d/m/Y H:i:s" }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">Nome: </span>{{ signer_log.name }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">E-mail: </span>{{ signer_log.email }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">Status: </span>{{ signer_log.status }}
+                            </li>
+                            <li class="list-group-item">
+                                <span class="font-weight-bold">Tipo: </span>{{ signer_log.type }}
+                            </li>
+                            {% if pdf_filenames %}
+                                <li class="list-group-item">
+                                    <span class="font-weight-bold">PDFs: </span>{{ signer_log.pdf_filenames }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
                 {% endif %}
 
-                {% if document.envelope_logs.all %}
-                    <li class="list-group-item">
-                    <br/>
-                    <div class="card-footer">
-                        <ul>
-                            <b>Detalhes dos Destinatários</b>
-                            {% for log in document.envelope_logs.all %}
-                                <li>{{ log.created_date|date:"d/m/Y H:i:s" }} <br> {{ log.esignature_log|safe }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
                 {% if document.documents.all %}
                     <br/>
                     <h5>Documentos Relacionados</h5>

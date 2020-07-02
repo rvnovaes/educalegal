@@ -94,7 +94,7 @@ def docusign_xml_parser(data):
     envelope_data["envelope_sent"] = xml["EnvelopeStatus"]["Sent"]
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
 
-    logger.info('Imprimindo envelope_data antes do parse')
+    logger.info('Envelope_data antes do parse')
     logger.info(envelope_data)
 
     # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
@@ -194,12 +194,6 @@ def docusign_webhook_listener(request):
         # Parses XML data and returns a dictionary and formated messages
         envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
 
-        logger.info('Imprimindo envelope_data depois do parse')
-        logger.info(envelope_data)
-
-        logger.info('Imprimindo envelope_data_translated depois do parse')
-        logger.info(envelope_data_translated)
-
         # Store the XML file on disk
         envelope_dir = os.path.join(
             settings.BASE_DIR, "media/docusign/", envelope_data["envelope_id"]
@@ -287,13 +281,10 @@ def docusign_webhook_listener(request):
 
         document.save()
 
-        logger.info('passou aqui 1')
         # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
         try:
-            logger.info('passou aqui 2')
             envelope_log = EnvelopeLog.objects.get(document=document)
         except EnvelopeLog.DoesNotExist:
-            logger.info('passou aqui 3')
             envelope_log = EnvelopeLog(
                 envelope_id=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
@@ -303,17 +294,13 @@ def docusign_webhook_listener(request):
                 document=document,
             )
             envelope_log.save()
-            logger.info('passou aqui 4')
         else:
-            logger.info('passou aqui 5')
             envelope_log.status = envelope_data_translated['envelope_status']
             envelope_log.status_update_date = envelope_data['envelope_time_generated']
             envelope_log.save(update_fields=['status', 'status_update_date'])
 
-        logger.info('passou aqui 6')
         for recipient_status in recipient_statuses:
             try:
-                logger.info('passou aqui 7')
                 # se já tem o status para o email e para o envelope_log, não salva outro igual
                 # só cria outro se o status do recipient mudou
                 signer_log = SignerLog.objects.get(
@@ -321,9 +308,10 @@ def docusign_webhook_listener(request):
                     email=recipient_status['Email'],
                     status=recipient_status['Status'])
             except SignerLog.DoesNotExist:
-                logger.info('passou aqui 8')
-
                 try:
+                    logger.info('imprimindo pdf_filenames antes do signer_log.save()')
+                    logger.info(pdf_filenames)
+
                     signer_log = SignerLog(
                         name=recipient_status['UserName'],
                         email=recipient_status['Email'],
@@ -333,16 +321,10 @@ def docusign_webhook_listener(request):
                         envelope_log=envelope_log,
                     )
 
-                    logger.info('imprimindo signer_log')
-                    logger.info(signer_log)
-
                     signer_log.save()
-                except:
-                    message = 'Não foi possível salvar o SignerLog.'
-                    logger.debug(message)
-                    logger.info('passou aqui 9')
-
-        logger.info('passou aqui 10')
+                except Exception as e:
+                    message = 'Não foi possível salvar o SignerLog: ' + str(e)
+                    logger.exception(message)
 
     return HttpResponse("Success!")
 
