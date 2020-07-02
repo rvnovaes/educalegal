@@ -118,6 +118,9 @@ def docusign_xml_parser(data):
 
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
 
+    logger.info('recipient_statuses antes do parse')
+    logger.info(recipient_statuses)
+
     # translation of the type and status of the recipient
     for recipient_status in recipient_statuses:
         recipient_status['Type'] = str(recipient_status['Type']).lower()
@@ -260,15 +263,8 @@ def docusign_webhook_listener(request):
 
                         pdf_filenames.append(pdf["filename"])
 
-                    logger.info('imprimindo pdf_filenames')
-                    logger.info(pdf_filenames)
-
                     # separa os documentos com ENTER
                     pdf_filenames = chr(10).join(pdf_filenames)
-
-                    logger.info('imprimindo pdf_filenames com enter')
-                    logger.info(pdf_filenames)
-
             except Exception as e:
                 msg = str(e)
                 logger.exception(msg)
@@ -309,14 +305,12 @@ def docusign_webhook_listener(request):
                     status=recipient_status['Status'])
             except SignerLog.DoesNotExist:
                 try:
-                    logger.info('imprimindo pdf_filenames antes do signer_log.save()')
-                    logger.info(pdf_filenames)
-
                     signer_log = SignerLog(
                         name=recipient_status['UserName'],
                         email=recipient_status['Email'],
                         status=recipient_status['Status'],
                         sent_date=recipient_status['data_envio'],
+                        type=recipient_status['Type'],
                         pdf_filenames=pdf_filenames,
                         envelope_log=envelope_log,
                     )

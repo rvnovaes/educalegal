@@ -77,9 +77,9 @@
                             <li class="list-group-item">
                                 <span class="font-weight-bold">Tipo: </span>{{ signer_log.type }}
                             </li>
-                            {% if pdf_filenames %}
+                            {% if signer_log.pdf_filenames %}
                                 <li class="list-group-item">
-                                    <span class="font-weight-bold">PDFs: </span>{{ signer_log.pdf_filenames }}
+                                    <span class="font-weight-bold">PDFs: </span>{{ signer_log.pdf_filenames|linebreaks }}
                                 </li>
                             {% endif %}
                         {% endfor %}
