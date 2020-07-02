@@ -252,6 +252,7 @@ def docusign_webhook_listener(request):
                     tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
                     mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
 
+                    pdf_filenames = list()
                     for pdf in envelope_data["pdf_documents"]:
                         response = mc.document_create(
                             pdf["full_filename"],
@@ -263,7 +264,7 @@ def docusign_webhook_listener(request):
                         logger.debug("Posting document to GED: " + pdf["filename"])
                         logger.debug(response.text)
 
-                        pdf_filenames = [pdf["filename"]]
+                        pdf_filenames.append(pdf["filename"])
 
                     logger.info('imprimindo pdf_filenames')
                     logger.info(pdf_filenames)
