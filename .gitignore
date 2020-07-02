@@ -148,4 +148,4 @@ dmypy.json
 /web/.direnv/*
 
 /web/.envrc
-/tools/upload_interviews_config
+/tools/upload_interviews/upload_interviews_config
