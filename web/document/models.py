@@ -76,8 +76,9 @@ class Document(TenantAwareModel):
     doc_uuid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="UUID")
     task_create_document = models.CharField(max_length=256, default="", verbose_name="Task de criação de documento")
     task_submit_to_esignature = models.CharField(max_length=256, default="", verbose_name="Task de assinatura")
-    submit_to_esignature = models.BooleanField(default=False, verbose_name="Enviar para assinatura eletrônica?")
-
+    task_send_email = models.CharField(max_length=256, default="", verbose_name="Task de envio de e-mail")
+    submit_to_esignature = models.BooleanField(default=False, verbose_name="A Elet")
+    send_email = models.BooleanField(default=False, verbose_name="E-mail?")
     mongo_uuid = models.CharField(
         max_length=256, default="", verbose_name="UUID do Mongo"
     )
@@ -145,7 +146,9 @@ class DocumentTaskView(TenantAwareModel):
     doc_uuid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="UUID")
     task_create_document = models.CharField(max_length=256, default="", verbose_name="Task de criação de documento")
     task_submit_to_esignature = models.CharField(max_length=256, default="", verbose_name="Task de assinatura")
-    submit_to_esignature = models.BooleanField(default=False, verbose_name="Enviar para assinatura eletrônica?")
+    task_send_email = models.CharField(max_length=256, default="", verbose_name="Task de envio de e-mail")
+    submit_to_esignature = models.BooleanField(default=False, verbose_name="A Elet")
+    send_email = models.BooleanField(default=False, verbose_name="E-mail")
 
     mongo_uuid = models.CharField(
         max_length=256, default="", verbose_name="UUID do Mongo"
@@ -153,22 +156,22 @@ class DocumentTaskView(TenantAwareModel):
 
     task_name = models.CharField(
         null=True, max_length=255,
-        verbose_name='Nome da Task',
+        verbose_name='Nome da Tarefa',
         )
 
     task_status = models.CharField(
         max_length=50,
-        verbose_name="Status da Task",
+        verbose_name="Status da Tarefa",
     )
 
     task_created_date = models.DateTimeField(
         auto_now_add=True, db_index=True,
-        verbose_name= 'Criação da Task',
+        verbose_name= 'Criação da Tarefa',
 
     )
     task_done_date = models.DateTimeField(
         auto_now=True, db_index=True,
-        verbose_name='Término da Task'
+        verbose_name='Término da Tarefa'
     )
     traceback = models.TextField(
         blank=True, null=True,

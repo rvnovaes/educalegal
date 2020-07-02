@@ -20,11 +20,13 @@
                                         data-toggle="tooltip" data-placement="bottom"
                                         title="Ver detalhes dos documentos que você já criou.">Documentos</a>
                 </li>
-                <li class="nav-item"><a class="nav-link text-white"
-                                        href="{% url 'document:bulk-document-generation-list' %}"
-                                        data-toggle="tooltip" data-placement="bottom"
-                                        title="Ver detalhes dos documentos que você já criou.">Geração em Lote</a>
-                </li>
+                {% if user.tenant.plan.use_bulk_interview %}
+                    <li class="nav-item"><a class="nav-link text-white"
+                                            href="{% url 'document:bulk-document-generation-list' %}"
+                                            data-toggle="tooltip" data-placement="bottom"
+                                            title="Ver detalhes dos documentos que você já criou.">Geração em Lote</a>
+                    </li>
+                {% endif %}
                 <li class="nav-item"><a class="nav-link text-white"
                                         href="{% url 'school:school-list' %}" data-toggle="tooltip"
                                         data-placement="bottom"

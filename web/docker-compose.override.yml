@@ -17,9 +17,16 @@ services:
       - ged
   docassemble:
     container_name: docassemble
-    image: rvnovaes/docassemble:0.3
+    image: jhpyle/docassemble:latest
     environment:
       - DAPYTHONVERSION=3
+      - TIMEZONE=America/Sao_Paulo
+      - LANGUAGE=pt
+      - LOCALE=pt_BR.utf8
+      - DAWEBSERVER=nginx
+      - SERVERADMIN=sistemas@educalegal.com.br
+      - PYTHONPACKAGES=docassemble-wrappers,num2words,validator-collection-br,retry-requests,sendgrid
+      - SENDGRID_API_KEY=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
     ports:
       - "80:80"
   ged:

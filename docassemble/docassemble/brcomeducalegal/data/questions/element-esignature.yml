@@ -15,7 +15,7 @@ code: |
     if el_log_to_console:
       log("Docusign data_received: {data_received}".format(data_received=data_received), "console")
     status = data_received['status'].lower()
-    envelope_statuses = {'sent': 'enviado',
+    envelope_statuses = {'sent': 'enviado para assinatura',
                        'delivered': 'entregue',
                        'completed': 'finalizado',
                        'declined': 'recusado',
@@ -38,7 +38,7 @@ event: signature_success
 back button: False
 question: Documento enviado para assinatura com sucesso
 subquestion: |
-  ####O documento foi enviado para os seguintes destinatários:
+  ####O documento foi enviado para o(s) seguinte(s) destinatário(s):
   % for recipient in recipients:
     % if recipient['email']:
       * ${ recipient['name'] }
@@ -46,6 +46,7 @@ subquestion: |
       ---
     % endif
   % endfor
+
     Você também pode baixar os documentos:
     [PDF](${ generated_file.pdf.url_for() })
     ou
@@ -54,8 +55,8 @@ action buttons:
   code: |
     [el_button]
 ---
-question: Tentativa de enviar o documento para assinatura falhou
 event: signature_fail
+question: Tentativa de enviar o documento para assinatura falhou
 subquestion: |
   Entre em contato com o suporte e forneça as informações abaixo:
 
@@ -66,4 +67,10 @@ subquestion: |
   ${ data_received }
 
   Código de status: ${ status_code }
+
+  Você também pode baixar os documentos:
+  [PDF](${ generated_file.pdf.url_for() })
+  ou
+  [DOCX](${ generated_file.docx.url_for() })
+
 ---

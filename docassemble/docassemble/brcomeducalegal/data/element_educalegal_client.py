@@ -70,7 +70,6 @@ class EducaLegalClient:
         school=None,
         related_documents=None,
         document_data=None,
-        doc_uuid=None
     ):
 
         payload = {
@@ -82,7 +81,6 @@ class EducaLegalClient:
             "interview": interview,
             "related_documents": related_documents,
             "document_data": json.dumps(document_data),
-            "doc_uuid": doc_uuid
         }
         final_url = self.api_base_url + "/v1/documents/"
         response = self.session.post(final_url, data=payload)
@@ -126,6 +124,22 @@ class EducaLegalClient:
             "ged_id": ged_id,
             "ged_link": ged_link,
             "ged_uuid": ged_uuid,
+            "status": status,
+        }
+        final_url = self.api_base_url + "/v1/documents/"
+        response = self.session.patch(final_url, data=payload)
+        return response.json()
+
+    def patch_document_with_email_data(
+        self,
+        doc_uuid,
+        send_email,
+        status="enviado por e-mail",
+    ):
+
+        payload = {
+            "doc_uuid": doc_uuid,
+            "send_email": send_email,
             "status": status,
         }
         final_url = self.api_base_url + "/v1/documents/"

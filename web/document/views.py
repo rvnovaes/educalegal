@@ -28,7 +28,7 @@ from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
 from .models import Document, BulkDocumentGeneration, DocumentTaskView
-from .tasks import create_document, submit_to_esignature
+from .tasks import create_document, submit_to_esignature, send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
 logger = logging.getLogger(__name__)
@@ -276,14 +276,15 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
                     el_document = Document(
                         tenant=tenant,
-                        name=interview.name + " _rascunho",
-                        status="rascunho - em lote",
+                        name=interview.name + " _rascunho_em_lote",
+                        status="rascunho",
                         description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
                         interview=interview,
                         school=school,
                         bulk_generation=bulk_generation,
                         mongo_uuid=mongo_document_data.id,
-                        submit_to_esignature=mongo_document_data.submit_to_esignature
+                        submit_to_esignature=mongo_document_data.submit_to_esignature,
+                        send_email=mongo_document_data.el_send_email
                     )
                     el_document_list.append(el_document)
 
@@ -427,7 +428,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         for i, interview_variables in enumerate(interview_variables_list):
             # Recupera o registro do documento no Educa Legal e passa o doc_uuid como url_args
             el_document = Document.objects.get(mongo_uuid=interview_variables["mongo_uuid"])
-            url_args["doc_uuid"] = el_document.doc_uuid
+            url_args["doc_uuid"] = str(el_document.doc_uuid)
             interview_variables["url_args"] = url_args
             interview_variables["interview_data"] = interview_data
             interview_variables["plan_data"] = plan_data
@@ -438,6 +439,10 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                     n=str(i + 1), t=len(interview_variables_list)
                 )
             )
+
+            # Se for enviar por e-mail nao enviar para Docusign
+            if interview_variables["el_send_email"] == True:
+                interview_variables["submit_to_esignature"] = False
 
             if interview_variables["submit_to_esignature"]:
                 result = chain(
@@ -457,8 +462,28 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 el_document.task_submit_to_esignature = result.id
                 total_task_size += 2
 
+            elif interview_variables["el_send_email"]:
+                result = chain(
+                    create_document.s(
+                        base_url,
+                        api_key,
+                        secret,
+                        interview_full_name,
+                        interview_variables,
+                    ),
+                    send_email.s(
+                        base_url, api_key, secret, interview_full_name
+                    ),
+                )()
+                result_description = "Criação do documento: {parent_id} | Envio por e-mail: {child_id}".format(
+                    parent_id=result.parent.id, child_id=result.id)
+                el_document.task_create_document = result.parent.id
+                el_document.task_send_email = result.id
+                total_task_size += 2
+
             else:
                 result = create_document.delay(
+                # result = create_document(
                     base_url, api_key, secret, interview_full_name, interview_variables,
                 )
                 result_description = "Criação do documento: {id}".format(id=result.id)
@@ -475,6 +500,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         bulk_document_generation.save()
 
         payload = {
+            "success": True,
             "total_task_size": total_task_size,
             "bulk_status": bulk_document_generation.status,
             "message": "A tarefa foi enviada para execução"
@@ -482,9 +508,16 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         return HttpResponse(json.dumps(payload), content_type="application/json")
 
     except Exception as e:
-        message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
-        logger.error(message)
-        messages.error(request, message) #TODO tela de erro e tratamento do erro
+        error_message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
+        logger.error(error_message)
+
+        payload = {
+            "success": False,
+            "message":  error_message,
+        }
+
+        return HttpResponse(json.dumps(payload), content_type="application/json")
+
 
 
 @login_required

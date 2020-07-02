@@ -12,6 +12,10 @@ class DocassembleAPIException(Exception):
     pass
 
 
+class DocumentNotGeneratedException(Exception):
+    pass
+
+
 class DocassembleClient:
     def __init__(self, base_url, admin_key):
         self.api_base_url = base_url

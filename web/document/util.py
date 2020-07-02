@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class DocumentType(Enum):
     PRESTACAO_SERVICOS_ESCOLARES = 2
+    NOTIFICACAO_EXTRAJUDICIAL = 8
     ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
 
 
@@ -87,6 +88,24 @@ def dict_to_docassemble_objects(documents, interview_type_id):
                 _create_address_obj(document, person, 0)
 
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
+
+        elif interview_type_id == DocumentType.NOTIFICACAO_EXTRAJUDICIAL.value:
+            # tipos de pessoa no contrato de prestacao de servicos
+            person_types = ['notifieds']
+
+            for person in person_types:
+                # cria hierarquia para endereço da pessoa
+                _build_address_dict(document, person)
+
+                # Cria a representacao do objeto Individual da pessoa
+                _create_person_obj(document, "f", person, 0)
+
+                # Cria a representacao do objeto Address da pessoa
+                _create_address_obj(document, person, 0)
+
+            document["content_document"] = "notificacao-extrajudicial.docx"
+
+
         elif interview_type_id == DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['workers']

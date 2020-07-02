@@ -3,26 +3,26 @@ import os
 
 script_dir = os.path.dirname(__file__)
 
-from util.file_import import *
+from web.util.file_import import *
 
 
 @pytest.fixture
 def valid_csv():
-    with open(os.path.join(script_dir, "sample_data_sources/../bulk_import_util/sample_data_sources/valid.csv")) as csvfile:
+    with open(os.path.join(script_dir, "test_file_import_data_sources/valid.csv")) as csvfile:
         valid_data = pd.read_csv(csvfile, sep="#")
     return valid_data
 
 
 @pytest.fixture
 def only_headers():
-    with open(os.path.join(script_dir, "sample_data_sources/../bulk_import_util/sample_data_sources/only_headers.csv")) as csvfile:
+    with open(os.path.join(script_dir, "test_file_import_data_sources/only_headers.csv")) as csvfile:
         empty = pd.read_csv(csvfile, sep="#")
     return empty
 
 
 @pytest.fixture
 def empty_content():
-    with open(os.path.join(script_dir, "sample_data_sources/../bulk_import_util/sample_data_sources/empty_content.csv")) as csvfile:
+    with open(os.path.join(script_dir, "test_file_import_data_sources/empty_content.csv")) as csvfile:
         empty_content_fixture = pd.read_csv(csvfile, sep="#")
     return empty_content_fixture
 
@@ -30,7 +30,7 @@ def empty_content():
 @pytest.fixture
 def metadata_fixture():
     with open(os.path.join(script_dir,
-                           "sample_data_sources/../bulk_import_util/sample_data_sources/metadata_fixture.csv")) as csvfile:
+                           "test_file_import_data_sources/metadata_fixture.csv")) as csvfile:
         metadata_fixture = pd.read_csv(csvfile, sep="#")
     return metadata_fixture
 
@@ -38,14 +38,14 @@ def metadata_fixture():
 @pytest.fixture
 def no_school_name():
     with open(os.path.join(script_dir,
-                           "sample_data_sources/../bulk_import_util/sample_data_sources/no_school_name_columnn.csv")) as csvfile:
+                           "test_file_import_data_sources/no_school_name_columnn.csv")) as csvfile:
         no_school_name_fixture = pd.read_csv(csvfile, sep="#")
     return no_school_name_fixture
 
 @pytest.fixture
 def no_unidadeAluno():
     with open(os.path.join(script_dir,
-                           "sample_data_sources/../bulk_import_util/sample_data_sources/no_unidadeAluno_column.csv")) as csvfile:
+                           "test_file_import_data_sources/no_unidadeAluno_column.csv")) as csvfile:
         no_unidadeAluno_fixture = pd.read_csv(csvfile, sep="#")
     return no_unidadeAluno_fixture
 
@@ -131,14 +131,44 @@ def test_string_date_format():
         string_date_format("2020-05-01")
 
 
+@pytest.mark.parametrize('column_name, row_index, field_type_name, field_required, value, fails', [
+    # Test CpfField
+    ('cpf', 3, 'CpfField', True, '099.264.116-06', False),
+    ('cpf', 5, 'CpfField', False, None, False),
+    ('cpf', 6, 'CnpjField', True, '099.264.116-06', True),
+    ('cpf', 7, 'CpfField', True, '099.264.116-05', True),
+    ('cpf', 9, 'CpfField', True, '99.264.116-06', True),
+    ('cpf', 11, 'CpfField', True, '0099.264.116.06', True),
+    ('cpf', 13, 'CpfField', True, '09926411606', True),
+    ('cpf', 15, 'CpfField', True, 99264116066, True),
+    ('cpf', 17, 'CpfField', True, '333.333.333-33', True),
+    ('cpf', 19, 'CpfField', True, 'not-an-cpf', True),
+    ('cpf', 21, 'CpfField', True, '', True),
+    ('cpf', 23, 'CpfField', True, None, True),
+    ('cpf', 25, 'CpfField', False, '', True),
+    ('cpf', 27, 'CpfField', False, ' ', True),
+    # Test CnpjField
+    ('cnpj', 3, 'CnpjField', True, '33.000.167/0001-01', False),
+    ('cnpj', 5, 'CnpjField', False, None, False),
+    ('cnpj', 6, 'CpfField', True, '33.000.167/0001-01', True),
+    ('cnpj', 7, 'CnpjField', True, '33.000.167/0001-10', True),
+    ('cnpj', 9, 'CnpjField', True, '3.000.167/0001-01', True),
+    ('cnpj', 11, 'CnpjField', True, '133.000.167/0001-01', True),
+    ('cnpj', 13, 'CnpjField', True, '33000167000101', True),
+    ('cnpj', 15, 'CnpjField', True, 33000167000101, True),
+    ('cnpj', 17, 'CnpjField', True, '11.111.111/1111-11', True),
+    ('cnpj', 19, 'CnpjField', True, 'not-an-cnpj', True),
+    ('cnpj', 21, 'CnpjField', True, '', True),
+    ('cnpj', 23, 'CnpjField', True, None, True),
+    ('cnpj', 25, 'CnpjField', False, '', True),
+    ('cnpj', 27, 'CnpjField', False, ' ', True),
 
-
-
-
-
-
-
-
-
-
-
+])
+def test_validate_field(column_name, row_index, field_type_name, field_required, value, fails):
+    if not fails:
+        expects = value, not fails
+        result = validate_field(column_name, row_index, field_type_name, field_required, value)
+        assert result == expects
+    else:
+        with pytest.raises(ValueError):
+            validate_field(column_name, row_index, field_type_name, field_required, value)

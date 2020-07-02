@@ -21,9 +21,6 @@ if __name__ == "__main__":
     # Dados do GED do Tenant
     print(elc.tenants_ged_read(2))
 
-    # Dados de ESignature do Tenant
-    print(elc.tenants_esignature_read(2))
-
     # Dados das Escolas de um Tenant
     print(elc.tenants_schools_list(2))
 
@@ -55,8 +52,8 @@ if __name__ == "__main__":
     # ged_uuid = "179dad8b-9bg6-4945-8f81-257d37050111"
     description = "Contrato de prestação de serviços educacionais entre aluno e escola. - 1.1 - 2020-01-23"
     tenant = 2
-    # school = 1
-    interview = 83
+    school = 2
+    interview = 82
     # related_documents = None
     # document_data = "test"
 
@@ -66,12 +63,13 @@ if __name__ == "__main__":
         status,
         description,
         tenant,
-        # school,
         interview,
+        school,
         # related_documents,
         # document_data,
     )
     el_document_created_id = response["id"]
+    el_document_created_doc_uuid = response["doc_uuid"]
     print(el_document_created_id)
 
     # Atualizacao de documento com dados do GED (Depende do valor para a ID do documento criado no método anterior
@@ -79,8 +77,13 @@ if __name__ == "__main__":
     ged_link = "ged_link"
     ged_uuid = "010101010101"
 
+    response = elc.patch_document_with_email_data(
+        el_document_created_doc_uuid, send_email=True, status="enviado por e-mail"
+    )
+    print(response)
+
     response = elc.patch_document_with_ged_data(
-        el_document_created_id, ged_id, ged_link, ged_uuid, status="Inserido no GED",
+        el_document_created_doc_uuid, ged_id, ged_link, ged_uuid, status="inserido no GED",
     )
 
     print(response)
@@ -92,6 +95,6 @@ if __name__ == "__main__":
     new_envelope_id = "035322ff-6acc-4c1d-992d-a6a68ca6b68a"
     new_signing_provider = "Docusign"
     response = elc.patch_document_with_esignature_data(
-        el_document_created_id, new_status, new_envelope_id, new_signing_provider
+        el_document_created_doc_uuid, new_status, new_envelope_id, new_signing_provider, submit_to_esignature=False
     )
     print(response)

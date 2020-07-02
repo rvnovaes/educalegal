@@ -31,8 +31,8 @@ class DocumentTable(tables.Table):
             "created_date",
             "altered_date",
             "submit_to_esignature",
+            "send_email",
             "status",
-            "signing_provider",
             "ged_link",
         )
 
@@ -79,10 +79,10 @@ class DocumentTaskViewTable(tables.Table):
             "school",
             "task_done_date",
             "submit_to_esignature",
+            "send_email",
             "document_status",
             "doc_uuid",
             "task_name",
             "task_status",
-            "signing_provider",
             "ged_link",
         )

@@ -42,6 +42,7 @@ mongoengine~=0.20.0
 PyJWT
 # Validations
 validator-collection~=1.4.1
+validator-collection-br~=0.0.10
 # Celery
 celery~=4.4.4
 django-celery-results~=1.2.1
