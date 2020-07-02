@@ -7,10 +7,10 @@ from sendgrid.helpers.mail import Mail, Category, Attachment, FileContent, FileT
 
 message = Mail(
     from_email='sistemas@educalegal.com.br',
-    to_emails='sistemas@educalegal.com.br',
-    subject='Sending with Twilio SendGrid is Fun',
-    html_content='<strong>and easy to do anywhere, even with Python</strong>')
-message.category = Category("Nova")
+    to_emails=['sistemas@educalegal.com.br', 'roberto.novaes@educalegal.com.br'],
+    subject='Teste de envio de Email',
+    html_content='<h1>Hello, World!</h1>')
+message.category = Category("Desenvolvimento")
 message.custom_arg = CustomArg("Cliente", "Educa Legal Desenvolvimento")
 file_path = "lorem-ipsum.pdf"
 with open(file_path, 'rb') as f:

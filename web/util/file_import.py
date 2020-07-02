@@ -302,7 +302,7 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                     )
                 )
 
-            return value, True
+        return value, True
 
 
 def string_date_format(value: str) -> datetime:
