@@ -1,16 +1,10 @@
 from rest_framework import serializers
 
 from billing.models import Plan
-from document.models import Document, DocumentESignatureLog
+from document.models import Document
 from interview.models import Interview
 from school.models import School
 from tenant.models import Tenant, TenantGedData, ESignatureApp
-
-
-class DocumentESignatureLogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DocumentESignatureLog
-        fields = "__all__"
 
 
 class DocumentSerializer(serializers.ModelSerializer):

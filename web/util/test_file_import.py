@@ -3,7 +3,7 @@ import os
 
 script_dir = os.path.dirname(__file__)
 
-from web.util.file_import import *
+from .file_import import *
 
 
 @pytest.fixture

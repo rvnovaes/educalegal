@@ -7,7 +7,7 @@ from validator_collection import validators, checkers, errors
 from validator_collection_br import validators_br, checkers_br
 import numpy as np
 
-from util.constants import VALID_FIELD_TYPES
+from .constants import VALID_FIELD_TYPES
 
 logger = logging.getLogger(__name__)
 
@@ -195,8 +195,6 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                     )
                 )
 
-            return value, True
-
         if field_type_name == "DateTimeField":
 
             value = string_date_format(value)
@@ -215,8 +213,6 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                     )
                 )
 
-            return value, True
-
         if field_type_name == "EmailField":
 
             is_valid = checkers.is_email(value, coerce_value=False)
@@ -232,8 +228,6 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                         field_type_name=field_type_name,
                     )
                 )
-
-            return value, True
 
         if field_type_name == "FloatField":
             value = float(value.replace(".", "").replace(",", "."))
@@ -251,8 +245,6 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                     )
                 )
 
-            return value, True
-
         if field_type_name == "IntField":
             is_valid = checkers.is_integer(value, coerce_value=False)
 
@@ -268,8 +260,6 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                     )
                 )
 
-            return value, True
-
         if field_type_name == "CpfField":
             is_valid = checkers_br.is_cpf(value)
 
@@ -284,8 +274,6 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                         field_type_name=field_type_name,
                     )
                 )
-
-            return value, True
 
         if field_type_name == "CnpjField":
             is_valid = checkers_br.is_cnpj(value)

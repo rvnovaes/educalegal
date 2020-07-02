@@ -218,15 +218,14 @@ def docusign_webhook_listener(request):
     try:
         document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
     except Document.DoesNotExist:
-        document = None
         message = 'O envelope {envelope_id} não existe.'.format(envelope_id=envelope_data["envelope_id"])
         logger.debug(message)
+        return HttpResponse(message)
+    else:
+        # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test, por isso, não irá
+        # encontrar o documento no banco
+        envelope_status = str(envelope_data["envelope_status"]).lower()
 
-    envelope_status = str(envelope_data["envelope_status"]).lower()
-
-    # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test, por isso, não irá
-    # encontrar o documento no banco
-    if document:
         # variável para salvar o nome dos pdfs no signer_log
         pdf_filenames = ''
 
