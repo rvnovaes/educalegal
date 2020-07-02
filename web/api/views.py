@@ -265,8 +265,14 @@ def docusign_webhook_listener(request):
 
                         pdf_filenames = [pdf["filename"]]
 
+                    logger.info('imprimindo pdf_filenames')
+                    logger.info(pdf_filenames)
+
                     # separa os documentos com ENTER
                     pdf_filenames = chr(10).join(pdf_filenames)
+
+                    logger.info('imprimindo pdf_filenames com enter')
+                    logger.info(pdf_filenames)
 
             except Exception as e:
                 msg = str(e)
