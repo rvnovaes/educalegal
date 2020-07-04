@@ -244,4 +244,4 @@ class SignerLog(models.Model):
         ]
 
     def __str__(self):
-        return self.status + " | " + str(self.imported_date)
+        return self.status + " | " + str(self.created_date)
