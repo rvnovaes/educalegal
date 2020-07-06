@@ -70,11 +70,11 @@
               <div class="row">
                 {% for signer_log in envelope_log.signer_logs.all %}
                   <div class="col-sm-4">
-                    <div class="status">
+                    <div class="card mb-3 border-{{ signer_log.status|title }}">
                       <div class="card-header">
                         {{ signer_log.status|title }}
                       </div>
-                      <div class="card-body text-primary">
+                      <div class="card-body body-{{ signer_log.status|title }}">
                         <h5 class="card-title">{{ signer_log.name }}</h5>
                         <p class="card-text">E-mail: {{ signer_log.email }}</p>
                         <p class="card-text">Criação: {{ signer_log.created_date|date:"d/m/Y H:i:s" }}</p>
@@ -105,10 +105,14 @@
             </ul>
         {% endif %}
     </div>
-
     <script type="text/javascript">
-        $(window).each(function () {
-            $("status").addClass("card border-primary mb-3");
+        $('.border-Criado').each(function () {
+          $( this ).removeClass("border-Criado");
+          $( this ).addClass("border-primary");
+        });
+        $('.body-Criado').each(function () {
+          $( this ).removeClass("body-Criado");
+          $( this ).addClass("text-primary");
         });
     </script>
 {% endblock %}
