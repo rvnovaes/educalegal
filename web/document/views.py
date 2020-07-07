@@ -12,6 +12,7 @@ from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse
+from django.utils.safestring import mark_safe
 from django.views import View
 
 from tenant.models import Tenant
@@ -27,7 +28,7 @@ from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
-from .models import Document, BulkDocumentGeneration, DocumentTaskView
+from .models import Document, BulkDocumentGeneration, DocumentTaskView, EnvelopeLog, SignerLog
 from .tasks import create_document, submit_to_esignature, send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
@@ -37,6 +38,34 @@ logger = logging.getLogger(__name__)
 class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
     model = Document
     context_object_name = "document"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        document = Document.objects.get(pk=self.kwargs["pk"])
+
+        try:
+            envelope_logs = EnvelopeLog.objects.filter(document=document)
+        except EnvelopeLog.DoesNotExist:
+            pass
+        else:
+            try:
+                for envelope_log in envelope_logs:
+                    signer_log = SignerLog.objects.filter(envelope_log=envelope_log)
+            except SignerLog.DoesNotExist:
+                pass
+            else:
+                statuses = signer_log.order_by().values('status').distinct()
+                signer_statuses = list()
+                for status in statuses:
+                    signer_statuses.append(status['status'])
+
+                # Explicitly mark a string as safe for (HTML) output purposes. The returned object can be used
+                # everywhere a string is appropriate.
+                # https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.safestring.mark_safe
+                context['signer_statuses'] = mark_safe(signer_statuses)
+
+        # retorna uma lista com os status dos signatarios
+        return context
 
 
 class DocumentListView(LoginRequiredMixin, TenantAwareViewMixin, ListView):
