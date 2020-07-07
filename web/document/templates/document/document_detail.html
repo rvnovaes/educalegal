@@ -71,10 +71,10 @@
                 {% for signer_log in envelope_log.signer_logs.all %}
                   <div class="col-sm-4">
                     <div class="card mb-3 border-{{ signer_log.status }}">
-                      <div class="card-header">
-                        {{ signer_log.status|title }}
+                      <div class="card-header header-{{ signer_log.status }}">
+                        <b>{{ signer_log.status|title }}</b>
                       </div>
-                      <div class="card-body body-{{ signer_log.status }}">
+                      <div class="card-body">
                         <h5 class="card-title">{{ signer_log.name }}</h5>
                         <p class="card-text">E-mail: {{ signer_log.email }}</p>
                         <p class="card-text">Criação: {{ signer_log.created_date|date:"d/m/Y H:i:s" }}</p>
@@ -110,15 +110,24 @@
         $.each({{ signer_statuses }}, function(index, signer_status) {
           if (signer_status == 'criado') {
             $(".border-criado").addClass("border-primary");
-            $(".body-criado").addClass("text-primary");
+            $(".header-criado").addClass("bg-primary");
           } else if (signer_status == 'enviado') {
-            $(".border-enviado").addClass("border-success");
-            $(".body-enviado").addClass("text-success");
-          } else {
-            //  block of code to be executed if the condition1 is false and condition2 is false
+            $(".border-enviado").addClass("border-info");
+            $(".header-enviado").addClass("bg-info");
+          } else if (signer_status == 'entregue') {
+            $(".border-entregue").addClass("border-warning");
+            $(".header-entregue").addClass("bg-warning");
+          } else if (signer_status == 'finalizado') {
+            $(".border-finalizado").addClass("border-success");
+            $(".header-finalizado").addClass("bg-success");
+          } else if (signer_status == 'recusado' || signer_status == 'inválido') {
+            $(".border-recusado").addClass("border-danger");
+            $(".header-recusado").addClass("bg-danger");
+            $(".border-inválido").addClass("border-danger");
+            $(".header-inválido").addClass("bg-danger");
           }
           $(".border-" + signer_status).removeClass("border-" + signer_status);
-          $(".body-" + signer_status).removeClass("body-" + signer_status);
+          $(".header-" + signer_status).removeClass("header-" + signer_status);
         });
     </script>
 {% endblock %}

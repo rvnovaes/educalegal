@@ -62,9 +62,9 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
                 # Explicitly mark a string as safe for (HTML) output purposes. The returned object can be used
                 # everywhere a string is appropriate.
                 # https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.safestring.mark_safe
+                # retorna uma lista com os status dos signatarios
                 context['signer_statuses'] = mark_safe(signer_statuses)
 
-        # retorna uma lista com os status dos signatarios
         return context
 
 
