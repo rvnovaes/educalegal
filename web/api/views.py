@@ -229,6 +229,7 @@ def docusign_webhook_listener(request):
         # variável para salvar o nome dos pdfs no signer_log
         pdf_filenames = ''
 
+        tenant = Tenant.objects.get(pk=document.tenant.pk)
         # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
         if envelope_status == "completed":
             try:
@@ -237,7 +238,6 @@ def docusign_webhook_listener(request):
                 )
                 logger.debug(envelope_data)
 
-                tenant = Tenant.objects.get(pk=document.tenant.pk)
                 if tenant.plan.use_ged:
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
@@ -287,6 +287,7 @@ def docusign_webhook_listener(request):
                 sent_date=envelope_data['envelope_sent'],
                 status_update_date=envelope_data['envelope_time_generated'],
                 document=document,
+                tenant=tenant,
             )
             envelope_log.save()
         else:
@@ -312,6 +313,7 @@ def docusign_webhook_listener(request):
                         type=recipient_status['Type'],
                         pdf_filenames=pdf_filenames,
                         envelope_log=envelope_log,
+                        tenant=tenant,
                     )
 
                     signer_log.save()
