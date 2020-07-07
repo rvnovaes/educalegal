@@ -1,0 +1,286 @@
+metadata:
+  title: Termo de Compromisso e Rescisao Contratual da Prestação de Serviços Educacionais
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Compromitentes
+  - Aluno
+  - Dados Contratuais
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "termo-de-compromisso-e-rescisao-contratual-da-prestacao-de-servicos-educacionais.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    if len(school_units_list) == 0:
+      # nao pode ser usado school_unit pq essa variavel foi usada no endereco da escola
+      school_division = None
+    elif len(school_units_list) == 1:
+      school_division = school_units_list[0]
+    else:
+      school_division
+    compromising.gather()
+    if plan_use_esignature:
+      valid_contractors_table
+    students.target_number = 1
+    for item in students:
+      item.name.text
+    for item in installments:
+      item.name.text
+    signature_local
+    generated_file
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - compromising: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+---
+code: |
+  compromising[i].name.text
+  compromising[i].complete = True
+---
+ga id: |
+  code: ga_id_begin
+progress: 10
+section: Compromitentes
+question: |
+  Número de Compromitentes
+fields:
+  - Número: compromising.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 20
+section: Compromitentes
+question: Dados do(a) ${word(ordinal(i)) } Contratante
+fields:
+  - 'Nome completo: ': compromising[i].name.text
+    datatype: text
+  - 'CPF: ': compromising[i].cpf
+    datatype: text
+    validate: validate_cpf
+  - 'Número do RG: ': compromising[i].rg
+    datatype: text
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#Y29udHJhY3RvcnNbaV0uY3Bm').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+section: Compromitentes
+field: valid_contractors_table
+question: |
+  Compromitentes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ compromising.table }
+buttons:
+  Continuar: continue
+---
+table: compromising.table
+rows: compromising
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+objects:
+  - students: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+---
+code: |
+  students[i].name.text
+  students[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Aluno
+progress: 40
+question: Número de Alunos
+fields:
+  - Número: students.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 60
+section: Aluno(a)
+question: Dados do(a) Aluno(a)
+fields:
+  - 'Nome completo: ': students[i].name.text
+    datatype: text
+    required: True
+  - 'Número do RG: ': students[i].rg
+    datatype: text
+  - 'Data de nascimento: ': students[i].birthday
+    datatype: date
+  - 'Série: ': students[i].grade
+    choices:
+    - 1º série do ensino infantil: 1ª série do ensino infantil
+    - 2º série do ensino infantil: 2ª série do ensino infantil
+    - 3º série do ensino infantil: 3ª série do ensino infantil
+    - 1º série do ensino fundamental: 1ª série do ensino fundamental
+    - 2º série do ensino fundamental: 2ª série do ensino fundamental
+    - 3º série do ensino fundamental: 3ª série do ensino fundamental
+    - 4ª série do ensino fundamental: 4ª série do ensino fundamental
+    - 5ª série do ensino fundamental: 5ª série do ensino fundamental
+    - 6ª série do ensino fundamental: 6ª série do ensino fundamental
+    - 7ª série do ensino fundamental: 7ª série do ensino fundamental
+    - 8ª série do ensino fundamental: 8ª série do ensino fundamental
+    - 9ª série do ensino fundamental: 9ª série do ensino fundamental
+---
+objects:
+  -  regional_board_education: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+---
+code: |
+  regional_board_education[i].name.text
+  regional_board_education[i].address.street_name
+  regional_board_education[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Diretoria Regional
+progress: 70
+question: Número de Diretoria(s)
+fields:
+  - Número: regional_board_education.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 80
+section: Diretoria Regional
+question: Dados do(a) Aluno(a)
+fields:
+  - 'Nome completo: ': regional_board_education[i].name.text
+    datatype: text
+  - 'CEP: ': students[i].address.zip
+    datatype: text
+  - 'Logradouro: ': students[i].address.street_name
+    datatype: text
+    address autocomplete: True
+  - 'Número: ': students[i].address.street_number
+    datatype: text
+  - 'Complemento: ': students[i].address.unit
+    datatype: text
+    required: False
+  - 'Bairro: ': students[i].address.neighborhood
+    datatype: text
+  - 'Município: ': students[i].address.city
+    datatype: text
+  - 'Estado: ': students[i].address.state
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+  });
+
+  $("#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+code: |
+  recipients = list()
+  for item in compromising:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 2
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 3
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---
+code: |
+  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
+  email_category = interview_custom_file_name_string
+  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"
+---
