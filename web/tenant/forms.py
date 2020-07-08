@@ -34,7 +34,6 @@ class EducaLegalSignupForm(SignupForm):
 
     def save(self, request):
         essential_plan = Plan.objects.get(pk=1)
-        demo_esignature_app = ESignatureApp.objects.get(pk=1)
 
         tenant = Tenant.objects.create(
             name=self.cleaned_data.get("tenant_name"),
@@ -42,25 +41,9 @@ class EducaLegalSignupForm(SignupForm):
             eua_agreement=self.cleaned_data.get("eua"),
             plan=essential_plan,
             auto_enrolled=True,
-            esignature_app=demo_esignature_app
+            esignature_app=None
         )
         tenant.save()
-        tenant_ged_data = TenantGedData.objects.create(
-            tenant=tenant,
-            url="",
-            token="",
-            database="",
-            database_user="",
-            database_user_password="",
-            database_host="",
-            database_port="",
-            storage_secret_key="",
-            storage_bucket_name="",
-            storage_default_acl="",
-            storage_endpoint_url="",
-            storage_region_name=""
-        )
-        tenant_ged_data.save()
         # Selects every freemium interview and adds to newly created tenant
         freemium_interviews = Interview.objects.filter(is_freemium=True)
         # https://docs.djangoproject.com/en/3.0/ref/models/relations/#django.db.models.fields.related.RelatedManager.add
