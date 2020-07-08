@@ -109,22 +109,22 @@
     <script type="text/javascript">
         $.each({{ signer_statuses }}, function(index, signer_status) {
           if (signer_status == 'criado') {
-            $(".border-criado").addClass("border-primary");
-            $(".header-criado").addClass("bg-primary");
+            $(".border-criado").addClass("el-border-primary");
+            $(".header-criado").addClass("el-bg-primary");
           } else if (signer_status == 'enviado') {
-            $(".border-enviado").addClass("border-info");
-            $(".header-enviado").addClass("bg-info");
+            $(".border-enviado").addClass("el-border-info");
+            $(".header-enviado").addClass("el-bg-info");
           } else if (signer_status == 'entregue') {
-            $(".border-entregue").addClass("border-warning");
-            $(".header-entregue").addClass("bg-warning");
+            $(".border-entregue").addClass("el-border-warning");
+            $(".header-entregue").addClass("el-bg-warning");
           } else if (signer_status == 'finalizado') {
-            $(".border-finalizado").addClass("border-success");
+            $(".border-finalizado").addClass("el-border-success");
             $(".header-finalizado").addClass("el-bg-success");
           } else if (signer_status == 'recusado' || signer_status == 'inválido') {
-            $(".border-recusado").addClass("border-danger");
-            $(".header-recusado").addClass("bg-danger");
-            $(".border-inválido").addClass("border-danger");
-            $(".header-inválido").addClass("bg-danger");
+            $(".border-recusado").addClass("el-border-danger");
+            $(".header-recusado").addClass("el-bg-danger");
+            $(".border-inválido").addClass("el-border-danger");
+            $(".header-inválido").addClass("el-bg-danger");
           }
           $(".border-" + signer_status).removeClass("border-" + signer_status);
           $(".header-" + signer_status).removeClass("header-" + signer_status);
