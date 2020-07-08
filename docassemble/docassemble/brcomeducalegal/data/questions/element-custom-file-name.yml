@@ -1,4 +1,4 @@
 ---
 code: |
-  custom_file_name = today(format = 'YYYYMMdd') + '_' + format_time(last_access_time(), format='hhmmss') + '_' + interview_custom_file_name_string
+  custom_file_name = today(format = 'YYYYMMdd') + '-' + format_time(last_access_time(), format='hhmmss') + '-' + interview_custom_file_name_string
 ---
