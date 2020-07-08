@@ -1,0 +1,299 @@
+metadata:
+  title: Termo de Compromisso e Rescisão do Contrato de Prestação de Serviços Educacionais
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Rescindentes
+  - Aluno
+  - Dados Contratuais
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "termo-de-compromisso-e-rescisao-do-contrato-de-prestacao-de-servicos-educacionais.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    if len(school_units_list) == 0:
+      # nao pode ser usado school_unit pq essa variavel foi usada no endereco da escola
+      school_division = None
+    elif len(school_units_list) == 1:
+      school_division = school_units_list[0]
+    else:
+      school_division
+    rescindentes.target_number = 1
+    if plan_use_esignature:
+      valid_rescindente_table
+    students.gather()
+    regional_board_education.target_number = 1
+    for item in regional_board_education:
+      item.name.text
+    signature_local
+    generated_file
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - rescindentes: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+---
+code: |
+  rescindentes[i].name.text
+  rescindentes[i].complete = True
+---
+ga id: |
+  code: ga_id_begin
+progress: 10
+section: Rescindentes
+question: |
+  Número de Rescindentes
+fields:
+  - Número: rescindentes.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 20
+section: Rescindentes
+question: Dados do(a) Rescindente
+fields:
+  - 'Nome completo: ': rescindentes[i].name.text
+    datatype: text
+  - 'CPF: ': rescindentes[i].cpf
+    datatype: text
+    validate: validate_cpf
+  - 'Número do RG: ': rescindentes[i].rg
+    datatype: text
+  - 'E-mail: ': rescindentes[i].email
+    help: ${ help_email_msg }
+    datatype: email
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#cmVzY2luZGVudGVzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+section: Rescindentes
+field: valid_rescindente_table
+question: |
+  Rescindente(s):
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ rescindentes.table }
+buttons:
+  Continuar: continue
+---
+table: rescindentes.table
+rows: rescindentes
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+objects:
+  - students: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+---
+code: |
+  students[i].name.text
+  students[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Aluno
+progress: 40
+question: Número de Alunos
+fields:
+  - Número: students.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 60
+section: Aluno(a)
+question: Dados do(a) ${word(ordinal(i)) } Aluno(a)
+fields:
+  - 'Nome completo: ': students[i].name.text
+    datatype: text
+    required: True
+  - 'Número do RG: ': students[i].rg
+    datatype: text
+    required: False
+  - 'Data de nascimento: ': students[i].birthday
+    datatype: date
+  - 'Ano Letivo: ': students[i].school_year
+    datatype: text
+  - 'Série: ': students[i].grade
+    choices:
+    - 1º ano do ensino infantil: 1º ano do ensino infantil
+    - 2º ano do ensino infantil: 2º ano do ensino infantil
+    - 3º ano do ensino infantil: 3º ano do ensino infantil
+    - 1º ano do ensino fundamental: 1º ano do ensino fundamental
+    - 2º ano do ensino fundamental: 2º ano do ensino fundamental
+    - 3º ano do ensino fundamental: 3º ano do ensino fundamental
+    - 4º ano do ensino fundamental: 4º ano do ensino fundamental
+    - 5º ano do ensino fundamental: 5º ano do ensino fundamental
+    - 6º ano do ensino fundamental: 6º ano do ensino fundamental
+    - 7º ano do ensino fundamental: 7º ano do ensino fundamental
+    - 8º ano do ensino fundamental: 8º ano do ensino fundamental
+    - 9º ano do ensino fundamental: 9º ano do ensino fundamental
+    - 1º ano do ensino médio: 1º ano do ensino médio
+    - 2º ano do ensino médio: 2º ano do ensino médio
+    - 3º ano do ensino médio: 3º ano do ensino médio
+---
+objects:
+  -  regional_board_education: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+---
+code: |
+  regional_board_education[i].name.text
+  regional_board_education[i].address.street_name
+  regional_board_education[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Diretoria Regional
+progress: 70
+question: Número de Diretoria(s)
+fields:
+  - Número: regional_board_education.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 80
+section: Diretoria Regional
+question: Diretoria de Ensino da Regional
+fields:
+  - 'Região: ': regional_board_education[i].name.text
+    datatype: text
+---
+progress: 80
+section: Diretoria Regional
+question: Endereço da Diretoria de Ensino da Regional de(o) ${ regional_board_education[i].name.text }
+fields:
+  - 'CEP: ': regional_board_education[i].address.zip
+    datatype: text
+  - 'Logradouro: ': regional_board_education[i].address.street_name
+    datatype: text
+    address autocomplete: True
+  - 'Número: ': regional_board_education[i].address.street_number
+    datatype: text
+  - 'Complemento: ': regional_board_education[i].address.unit
+    datatype: text
+    required: False
+  - 'Bairro: ': regional_board_education[i].address.neighborhood
+    datatype: text
+  - 'Município: ': regional_board_education[i].address.city
+    datatype: text
+  - 'Estado: ': regional_board_education[i].address.state
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+code: |
+  recipients = list()
+  for item in rescindentes:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---
+code: |
+  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
+  email_category = interview_custom_file_name_string
+  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"
+---
