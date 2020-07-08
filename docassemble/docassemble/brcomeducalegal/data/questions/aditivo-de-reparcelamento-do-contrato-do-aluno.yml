@@ -1,5 +1,5 @@
 metadata:
-  title: Aditivo de Reparcelamento da Anuidade Escolar - Coronavirus
+  title: Aditivo de Reparcelamento do Contrato do Aluno
 ---
 include:
   - element-tenant-school-interview.yml
@@ -23,7 +23,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "aditivo-de-reparcelamento-da-anuidade-escolar-coronavirus.docx"
+  content_document = "aditivo-de-reparcelamento-do-contrato-do-aluno.docx"
 ---
 id: logic
 mandatory: True
@@ -49,6 +49,10 @@ code: |
     for item in students:
       item.name.first
     installments_list = list()
+    if method_payment == 'à vista':
+      single_installment_date = format_date(single_installment_date, format='dd/MM/yyyy')
+    if has_input_value:
+      input_date = format_date(input_date, format='dd/MM/yyyy')
     for v in range(0, quantity_installments):
       installments = dict()
       installments_due = installments_date.plus(months=v)
@@ -285,6 +289,10 @@ script: |
         $('#dmFsb3JBbnVhbA').mask('000000000000000.00', {reverse: true});
       });
   </script>
+---
+mandatory: True
+code: |
+
 ---
 code: |
   recipients = list()
