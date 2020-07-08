@@ -65,7 +65,7 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
 	                    where
  	                        s1.envelope_log_id = s2.envelope_log_id and 
 	                        s1.email = s2.email 
-                );""".format(envelope_id=envelope_log.id))
+                ) order by s1.created_date desc;""".format(envelope_id=envelope_log.id))
         except:
             pass
         else:
