@@ -66,10 +66,10 @@
               <h5>Detalhes dos Destinatários</h5>
             </div>
             <br/>
-            <div class="card-deck">
+            <div class="card-deck ml-1 mr-1">
               <div class="row">
-                {% for signer_log in envelope_log.signer_logs.all %}
-                  <div class="col-sm-4">
+                {% for signer_log in signer_logs %}
+                  <div class="col-sm">
                     <div class="card mb-3 border-{{ signer_log.status }}">
                       <div class="card-header header-{{ signer_log.status }}">
                         <b>{{ signer_log.status|title }}</b>

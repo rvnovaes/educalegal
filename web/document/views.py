@@ -44,26 +44,41 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
         document = Document.objects.get(pk=self.kwargs["pk"])
 
         try:
-            envelope_logs = EnvelopeLog.objects.filter(document=document)
+            envelope_log = EnvelopeLog.objects.filter(document=document).first()
         except EnvelopeLog.DoesNotExist:
             pass
-        else:
-            try:
-                for envelope_log in envelope_logs:
-                    signer_log = SignerLog.objects.filter(envelope_log=envelope_log)
-            except SignerLog.DoesNotExist:
-                pass
-            else:
-                statuses = signer_log.order_by().values('status').distinct()
-                signer_statuses = list()
-                for status in statuses:
-                    signer_statuses.append(status['status'])
 
-                # Explicitly mark a string as safe for (HTML) output purposes. The returned object can be used
-                # everywhere a string is appropriate.
-                # https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.safestring.mark_safe
-                # retorna uma lista com os status dos signatarios
-                context['signer_statuses'] = mark_safe(signer_statuses)
+        try:
+            # busca somente o último signer_log de cada email do envelope
+            signer_logs = SignerLog.objects.raw(
+                """select
+                    s1.* 
+                   from
+                    document_signerlog s1
+                   where
+                    s1.envelope_log_id = {envelope_id} and
+                    s1.created_date = (
+	                    select
+	                        max(created_date)
+	                    from
+	                        document_signerlog s2
+	                    where
+ 	                        s1.envelope_log_id = s2.envelope_log_id and 
+	                        s1.email = s2.email 
+                );""".format(envelope_id=envelope_log.id))
+        except:
+            pass
+        else:
+            context['signer_logs'] = list(signer_logs)
+            signer_statuses = list()
+            for signer_log in signer_logs:
+                signer_statuses.append(signer_log.status)
+
+            # Explicitly mark a string as safe for (HTML) output purposes. The returned object can be used
+            # everywhere a string is appropriate.
+            # https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.safestring.mark_safe
+            # retorna uma lista com os status dos signatarios
+            context['signer_statuses'] = mark_safe(signer_statuses)
 
         return context
 
