@@ -1,5 +1,5 @@
 metadata:
-  title: Termo de Compromisso e Rescisão Contratual da Prestação de Serviços Educacionais
+  title: Termo de Compromisso e Rescisão do Contrato de Prestação de Serviços Educacionais
 ---
 include:
   - element-tenant-school-interview.yml
@@ -16,14 +16,14 @@ modules:
   - docassemble_wrappers.validator_collection_br
 ---
 sections:
-  - Compromitentes
+  - Rescindentes
   - Aluno
   - Dados Contratuais
   - Assinatura
   - Conclusão
 ---
 code:  |
-  content_document = "termo-de-compromisso-e-rescisao-contratual-da-prestacao-de-servicos-educacionais.docx"
+  content_document = "termo-de-compromisso-e-rescisao-do-contrato-de-prestacao-de-servicos-educacionais.docx"
 ---
 id: logic
 mandatory: True
@@ -42,9 +42,9 @@ code: |
       school_division = school_units_list[0]
     else:
       school_division
-    compromising.target_number = 1
+    rescindentes.target_number = 1
     if plan_use_esignature:
-      valid_compromising_table
+      valid_rescindente_table
     students.gather()
     regional_board_education.target_number = 1
     for item in regional_board_education:
@@ -58,58 +58,58 @@ code: |
   all_done
 ---
 objects:
-  - compromising: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+  - rescindentes: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
 ---
 code: |
-  compromising[i].name.text
-  compromising[i].complete = True
+  rescindentes[i].name.text
+  rescindentes[i].complete = True
 ---
 ga id: |
   code: ga_id_begin
 progress: 10
-section: Compromitentes
+section: Rescindentes
 question: |
-  Número de Compromitentes
+  Número de Rescindentes
 fields:
-  - Número: compromising.target_number
+  - Número: rescindentes.target_number
     datatype: integer
     default: 1
     min: 1
 ---
 progress: 20
-section: Compromitentes
-question: Dados do(a) ${word(ordinal(i)) } Contratante
+section: Rescindentes
+question: Dados do(a) Rescindente
 fields:
-  - 'Nome completo: ': compromising[i].name.text
+  - 'Nome completo: ': rescindentes[i].name.text
     datatype: text
-  - 'CPF: ': compromising[i].cpf
+  - 'CPF: ': rescindentes[i].cpf
     datatype: text
     validate: validate_cpf
-  - 'Número do RG: ': compromising[i].rg
+  - 'Número do RG: ': rescindentes[i].rg
     datatype: text
-  - 'E-mail: ': compromising[i].email
+  - 'E-mail: ': rescindentes[i].email
     help: ${ help_email_msg }
     datatype: email
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#Y29tcHJvbWlzaW5nW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
+        $('#cmVzY2luZGVudGVzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
       });
   </script>
 ---
-section: Compromitentes
-field: valid_compromising_table
+section: Rescindentes
+field: valid_rescindente_table
 question: |
-  Compromitentes:
+  Rescindente(s):
 subquestion: |
   Confira os e-mails dos destinatários abaixo, pois estes serão usados
   no envio para a assinatura eletrônica.
-  ${ compromising.table }
+  ${ rescindentes.table }
 buttons:
   Continuar: continue
 ---
-table: compromising.table
-rows: compromising
+table: rescindentes.table
+rows: rescindentes
 columns:
   - Name: |
       row_item.name.text
@@ -139,15 +139,18 @@ fields:
 ---
 progress: 60
 section: Aluno(a)
-question: Dados do(a) Aluno(a)
+question: Dados do(a) ${word(ordinal(i)) } Aluno(a)
 fields:
   - 'Nome completo: ': students[i].name.text
     datatype: text
     required: True
   - 'Número do RG: ': students[i].rg
     datatype: text
+    required: False
   - 'Data de nascimento: ': students[i].birthday
     datatype: date
+  - 'Ano Letivo: ': students[i].school_year
+    datatype: text
   - 'Série: ': students[i].grade
     choices:
     - 1ª série do ensino infantil: 1ª série do ensino infantil
@@ -185,16 +188,16 @@ fields:
 ---
 progress: 80
 section: Diretoria Regional
-question: Diretoria Regional de Educação
+question: Diretoria de Ensino da Regional
 fields:
   - 'Região: ': regional_board_education[i].name.text
     datatype: text
 ---
 progress: 80
 section: Diretoria Regional
-question: Endereço da Diretoria Regional de Educação de(a) ${ regional_board_education[i].name.text }
+question: Endereço da Diretoria de Ensino da Regional de(o) ${ regional_board_education[i].name.text }
 fields:
-  - 'CEP: ': students[i].address.zip
+  - 'CEP: ': regional_board_education[i].address.zip
     datatype: text
   - 'Logradouro: ': regional_board_education[i].address.street_name
     datatype: text
@@ -213,11 +216,11 @@ fields:
 script: |
   <script type="text/javascript">
   $(document).ready(function(){
-    $('#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+    $('#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muemlw').mask('00000-000');
   });
 
-  $("#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA").focusout(function(){
-    var cep = $("#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA").val();
+  $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muemlw").val();
     cep = cep.replace ("-","");
     if (cep != ""){
       var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
@@ -227,10 +230,10 @@ script: |
         type: "get",
         dataType: "json",
         success: function(data){
-          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
-          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
-          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
-          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+          $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#cmVnaW9uYWxfYm9hcmRfZWR1Y2F0aW9uW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
         },
         error: function(erro){
           console.log(erro);
@@ -242,13 +245,13 @@ script: |
 ---
 code: |
   recipients = list()
-  for item in compromising:
+  for item in rescindentes:
       if item.email:
           new_recipient = dict()
           new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 2
+          new_recipient['routingOrder'] = 1
           new_recipient['tabs'] = [
               {
                   'type': 'signHere',
@@ -261,7 +264,7 @@ code: |
   new_recipient['name'] = school_legal_name
   new_recipient['email'] = school_email
   new_recipient['group'] = 'signers'
-  new_recipient['routingOrder'] = 3
+  new_recipient['routingOrder'] = 2
   new_recipient['tabs'] = [
       {
           'type': 'signHere',
