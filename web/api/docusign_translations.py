@@ -1,9 +1,9 @@
 envelope_statuses = {
     "sent": "enviado para assinatura",
-    "delivered": "entregue",
-    "completed": "finalizado",
-    "declined": "recusado",
-    "voided": "inválido",
+    "delivered": "entregue ao destinatário",
+    "completed": "assinado",
+    "declined": "assinatura recusada/inválida",
+    "voided": "assinatura recusada/inválida",
 }
 
 recipient_statuses_dict = {
