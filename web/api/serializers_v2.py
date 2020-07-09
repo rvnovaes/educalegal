@@ -19,9 +19,6 @@ class PlanSerializer(serializers.ModelSerializer):
 class DocumentSerializer(serializers.ModelSerializer):
     interview_name = serializers.SerializerMethodField()
     school_name = serializers.SerializerMethodField()
-    owner = serializers.HiddenField(
-        default=serializers.CurrentUserDefault()
-    )
 
     class Meta:
         model = Document
@@ -33,15 +30,6 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     def get_school_name(self, obj):
         return obj.school.name if obj.school else ''
-
-    def validate(self, attrs):
-        tenant_id = self.context["request"].user.tenant.id
-        # a instância representa o objeto da consulta.
-        # se a instância for nula a chamada é para criar a entidade (?)
-        if self.instance:
-            if tenant_id != self.instance.tenant.id:
-                raise serializers.ValidationError("O documento não foi encontrado na base de documentos do cliente do usuário.")
-        return attrs
 
 
 class InterviewSerializer(serializers.ModelSerializer):
