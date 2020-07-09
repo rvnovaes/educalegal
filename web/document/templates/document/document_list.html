@@ -32,6 +32,11 @@
         $(document).ready(function () {
             const table_data_url = "/v1/tenants/" + {{ user.tenant.pk  }} +"/documents/?format=datatables"
             $("#data_table").DataTable({
+                serverSide: true,
+                ajax: {
+                    url: table_data_url,
+                    method: "GET",
+                },
                 info: true,
                 dom: 'Blfrtip',
                 buttons: [
@@ -39,10 +44,6 @@
                     'csvHtml5',
                     'pdfHtml5'
                 ],
-                ajax: {
-                    url: table_data_url,
-                    method: "GET",
-                },
                 columns: [
                     {
                         data: null, render: function (data, type, row) {
