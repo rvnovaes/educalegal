@@ -71,10 +71,12 @@
                         },
                     }
                 ],
+
                 columnDefs: [
                     {
+                        type: 'datetime-moment',
                         targets: [3, 4], "width": "14%", render: function (data) {
-                            return moment(data).format('DD/MM/YYYY HH:mm');
+                            return '<span'+moment(data).format('YYYYMMDDHHmm')+'>'+moment(data).format('DD/MM/YYYY HH:mm')+'</span>'
                         },
                     },
                 ],
