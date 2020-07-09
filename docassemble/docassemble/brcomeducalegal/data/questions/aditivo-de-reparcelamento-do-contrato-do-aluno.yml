@@ -48,18 +48,19 @@ code: |
     students.target_number = 1
     for item in students:
       item.name.first
-    installments_list = list()
-    if method_payment == 'à vista':
-      single_installment_date = format_date(single_installment_date, format='dd/MM/yyyy')
-    if has_input_value:
-      input_date = format_date(input_date, format='dd/MM/yyyy')
-    for v in range(0, quantity_installments):
-      installments = dict()
-      installments_due = installments_date.plus(months=v)
-      installments_due = format_date(installments_due, format='dd/MM/yyyy')
-      installments['installments_due'] = installments_due
-      installments['installments_value'] = installments_value
-      installments_list.append(installments)
+    if method_payment == 'a vista':
+      single_installment_date_format = format_date(single_installment_date, format='dd/MM/yyyy')
+    if method_payment == 'parcelado':
+      if has_input_value == 'sim':
+        input_date_format = format_date(input_date, format='dd/MM/yyyy')
+      installments_list = list()
+      for v in range(0, quantity_installments):
+        installments = dict()
+        installments_due = installments_date.plus(months=v)
+        installments_due = format_date(installments_due, format='dd/MM/yyyy')
+        installments['installments_due'] = installments_due
+        installments['installments_value'] = installments_value
+        installments_list.append(installments)
     signature_local
     generated_file
     el_document_patched_with_docassemble_data
@@ -240,17 +241,17 @@ fields:
   - 'Forma de pagamento:': method_payment
     datatype: radio
     choices:
-      - à vista: à vista
+      - à vista: a vista
       - parcelado: parcelado
   - 'Valor da parcela única:': single_installment_value
     datatype: currency
     hint: 0000,00
     js show if: |
-      val("method_payment") == "à vista"
+      val("method_payment") == "a vista"
   - 'Data do vencimento da parcela única:': single_installment_date
     datatype: date
     js show if: |
-      val("method_payment") == "à vista"
+      val("method_payment") == "a vista"
   - 'Haverá parcela de entrada:': has_input_value
     datatype: radio
     choices:
@@ -284,15 +285,11 @@ fields:
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#dmFsb3JBbnVhbA').mask('000000000000000.00', {reverse: true});
-        $('#dmFsb3JBbnVhbA').mask('000000000000000.00', {reverse: true});
-        $('#dmFsb3JBbnVhbA').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzE').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzQ').mask('000000000000000.00', {reverse: true});
       });
   </script>
----
-mandatory: True
-code: |
-
 ---
 code: |
   recipients = list()

@@ -189,6 +189,15 @@ pipeline {
                }
            }
        }
+       stage('test_termo-de-compromisso-e-rescisao-do-contrato-de-prestacao-de-servicos-educacionais.py') {
+           steps {
+               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                   dir('docassemble/docassemble/selenium_tests/'){
+                       sh './jenkins_test_termo-de-compromisso-e-rescisao-do-contrato-de-prestacao-de-servicos-educacionais.sh'
+                   }
+               }
+           }
+       }
    }
    post {
         always  {

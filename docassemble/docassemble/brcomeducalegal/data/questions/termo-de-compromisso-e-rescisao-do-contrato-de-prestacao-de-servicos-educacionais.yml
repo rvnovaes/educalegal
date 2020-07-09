@@ -191,10 +191,14 @@ fields:
 ---
 progress: 80
 section: Diretoria Regional
-question: Diretoria de Ensino da Regional
+question: |
+    Diretoria Regional de Ensino
+subquestion: |
+    O rescindente deverá comparecer à Diretoria de Ensino da Regional de(o) [FIELD regional_board_education[i].name.text] para solicitar vaga em uma escola pública.
 fields:
-  - 'Região: ': regional_board_education[i].name.text
+  - 'Nome da Diretoria:': regional_board_education[i].name.text
     datatype: text
+    inline width: 30em
 ---
 progress: 80
 section: Diretoria Regional
