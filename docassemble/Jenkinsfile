@@ -180,6 +180,15 @@ pipeline {
                }
            }
        }
+       stage('test_aditivo-de-reparcelamento-do-contrato-do-aluno.py') {
+           steps {
+               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                   dir('docassemble/docassemble/selenium_tests/'){
+                       sh './jenkins_test_aditivo-de-reparcelamento-do-contrato-do-aluno.sh'
+                   }
+               }
+           }
+       }
    }
    post {
         always  {
