@@ -1,19 +1,31 @@
 from rest_framework import serializers
+from rest_framework.fields import CurrentUserDefault
+
 
 from billing.models import Plan
-from document.models import Document
+from document.models import Document, BulkDocumentGeneration, DocumentTaskView, EnvelopeLog, SignerLog
 from interview.models import Interview
 from school.models import School
 from tenant.models import Tenant, TenantGedData, ESignatureApp
 
 
+class PlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        ref_name = "Plan v2"
+        model = Plan
+        fiels = "__all__"
+
+
 class DocumentSerializer(serializers.ModelSerializer):
     interview_name = serializers.SerializerMethodField()
     school_name = serializers.SerializerMethodField()
+    owner = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
 
     class Meta:
         model = Document
-        ref_name = "Document v1"
+        ref_name = "Document v2"
         fields = "__all__"
 
     def get_interview_name(self, obj):
@@ -22,18 +34,27 @@ class DocumentSerializer(serializers.ModelSerializer):
     def get_school_name(self, obj):
         return obj.school.name if obj.school else ''
 
+    def validate(self, attrs):
+        tenant_id = self.context["request"].user.tenant.id
+        # a instância representa o objeto da consulta.
+        # se a instância for nula a chamada é para criar a entidade (?)
+        if self.instance:
+            if tenant_id != self.instance.tenant.id:
+                raise serializers.ValidationError("O documento não foi encontrado na base de documentos do cliente do usuário.")
+        return attrs
+
 
 class InterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
-        ref_name = "Interview v1"
+        ref_name = "Interview v2"
         fields = "__all__"
 
 
 class PlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plan
-        ref_name = "Plan v1"
+        ref_name = "Plan v2"
         fields = "__all__"
 
 
@@ -45,21 +66,21 @@ class SchoolSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = School
-        ref_name = "School v1"
+        ref_name = "School v2"
         fields = "__all__"
 
 
 class TenantGedDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantGedData
-        ref_name = "TenantGedData v1"
+        ref_name = "TenantGedData v2"
         fields = "__all__"
 
 
 class ESignatureAppSerializer(serializers.ModelSerializer):
     class Meta:
         model = ESignatureApp
-        ref_name = "ESignatureApp v1"
+        ref_name = "ESignatureApp v2"
         fields = "__all__"
 
 
@@ -68,5 +89,5 @@ class TenantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tenant
-        ref_name = "Tenant v1"
+        ref_name = "Tenant v2"
         fields = "__all__"
