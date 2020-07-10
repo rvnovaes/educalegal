@@ -12,6 +12,7 @@ from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse
+from django.utils.safestring import mark_safe
 from django.views import View
 
 from tenant.models import Tenant
@@ -27,7 +28,7 @@ from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
-from .models import Document, BulkDocumentGeneration, DocumentTaskView
+from .models import Document, BulkDocumentGeneration, DocumentTaskView, EnvelopeLog, SignerLog
 from .tasks import create_document, submit_to_esignature, send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
@@ -37,6 +38,49 @@ logger = logging.getLogger(__name__)
 class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
     model = Document
     context_object_name = "document"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        document = Document.objects.get(pk=self.kwargs["pk"])
+
+        try:
+            envelope_log = EnvelopeLog.objects.filter(document=document).first()
+        except EnvelopeLog.DoesNotExist:
+            pass
+
+        try:
+            # busca somente o último signer_log de cada email do envelope
+            signer_logs = SignerLog.objects.raw(
+                """select
+                    s1.* 
+                   from
+                    document_signerlog s1
+                   where
+                    s1.envelope_log_id = {envelope_id} and
+                    s1.created_date = (
+	                    select
+	                        max(created_date)
+	                    from
+	                        document_signerlog s2
+	                    where
+ 	                        s1.envelope_log_id = s2.envelope_log_id and 
+	                        s1.email = s2.email 
+                ) order by s1.created_date desc;""".format(envelope_id=envelope_log.id))
+        except:
+            pass
+        else:
+            context['signer_logs'] = list(signer_logs)
+            signer_statuses = list()
+            for signer_log in signer_logs:
+                signer_statuses.append(signer_log.status)
+
+            # Explicitly mark a string as safe for (HTML) output purposes. The returned object can be used
+            # everywhere a string is appropriate.
+            # https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.safestring.mark_safe
+            # retorna uma lista com os status dos signatarios
+            context['signer_statuses'] = mark_safe(signer_statuses)
+
+        return context
 
 
 class DocumentListView(LoginRequiredMixin, TenantAwareViewMixin, ListView):

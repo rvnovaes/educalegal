@@ -1,3 +1,6 @@
+import datetime as dt
+from datetime import datetime
+
 import os
 from pathlib import Path
 import base64
@@ -5,12 +8,11 @@ import xmltodict
 from requests import Session
 from retry_requests import retry
 import logging
-from datetime import datetime as dt
 
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -18,10 +20,10 @@ from rest_framework import viewsets
 from django.conf import settings
 
 from billing.models import Plan
-from document.models import Document, DocumentESignatureLog
+from document.models import Document, EnvelopeLog, SignerLog
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData, ESignatureApp
+from tenant.models import Tenant, TenantGedData
 
 from .serializers import (
     DocumentSerializer,
@@ -65,6 +67,24 @@ class MayanClient:
         return response
 
 
+def _iso8601_to_datetime(iso8601_date):
+    # tamanho máximo de casas dedimais aceitas pelo python é 6
+    # https://docs.python.org/3/library/datetime.html
+    # Microsecond as a decimal number, zero-padded on the left (accepts from one to six digits)
+    # quando vier mais do que 6, trunca em 6
+    # Ex.: '2020-06-29T19:03:46.4619595' >> '2020-06-29T19:03:46.461959'
+    iso8601_date = iso8601_date[:26]
+    # tenta converter a data do docusign que vem no formato ISO 8601 para datetime
+    try:
+        converted_datetime = datetime.fromisoformat(iso8601_date)
+    except:
+        # se a data não veio no formato certo (ISO 8601), converte manualmente
+        # iso8601_date = iso8601_date.strftime('%d/%m/%Y %H:%M:%S.%f')
+        converted_datetime = dt.datetime.strptime(iso8601_date, '%Y-%m-%dT%H:%M:%S.%f')
+
+    return converted_datetime
+
+
 def docusign_xml_parser(data):
     envelope_data = dict()
     xml = xmltodict.parse(data)["DocuSignEnvelopeInformation"]
@@ -74,17 +94,21 @@ def docusign_xml_parser(data):
     envelope_data["envelope_sent"] = xml["EnvelopeStatus"]["Sent"]
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
 
+    logger.info('Envelope_data antes do parse')
+    logger.info(envelope_data)
+
+    # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
+    envelope_data['envelope_created'] = _iso8601_to_datetime(envelope_data['envelope_created'])
+    envelope_data['envelope_sent'] = _iso8601_to_datetime(envelope_data['envelope_sent'])
+    envelope_data['envelope_time_generated'] = _iso8601_to_datetime(envelope_data['envelope_time_generated'])
+
+    # copia com .copy() pra criar outro objeto
     envelope_data_translated = envelope_data.copy()
 
-    #formatting strings: 2020-04-15T11:20:19.693
-    envelope_data_translated['envelope_created'] = envelope_data_translated['envelope_created'].replace("T", " ").split(".")[0]
-    envelope_data_translated['envelope_sent'] = envelope_data_translated['envelope_sent'].replace("T", " ").split(".")[0]
-    envelope_data_translated['envelope_time_generated'] = envelope_data_translated['envelope_time_generated'].replace("T", " ").split(".")[0]
-
-    #converting US dates to Brazil dates
-    envelope_data_translated['envelope_created'] = str(dt.strptime(envelope_data_translated['envelope_created'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
-    envelope_data_translated['envelope_sent'] = str(dt.strptime(envelope_data_translated['envelope_sent'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
-    envelope_data_translated['envelope_time_generated'] = str(dt.strptime(envelope_data_translated['envelope_time_generated'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S'))
+    # converte datetime para formado brasileiro
+    envelope_data_translated['envelope_created'] = str(envelope_data['envelope_created'].strftime('%d/%m/%Y %H:%M:%S'))
+    envelope_data_translated['envelope_sent'] = str(envelope_data['envelope_sent'].strftime('%d/%m/%Y %H:%M:%S'))
+    envelope_data_translated['envelope_time_generated'] = str(envelope_data['envelope_time_generated'].strftime('%d/%m/%Y %H:%M:%S'))
 
     envelope_data_translated["envelope_status"] = str(envelope_data_translated["envelope_status"]).lower()
     if envelope_data_translated["envelope_status"] in envelope_statuses.keys():
@@ -92,25 +116,10 @@ def docusign_xml_parser(data):
     else:
         envelope_data_translated["envelope_status"] = 'não encontrado'
 
-    e_status_detail = (
-        "ID do envelope: "
-        + envelope_data_translated["envelope_id"]
-        + "<br>"
-        + "Status do envelope: "
-        + envelope_data_translated["envelope_status"]
-        + "<br>"
-        + "Data de criação: "
-        + envelope_data_translated["envelope_created"]
-        + "<br>"
-        + "Data de envio: "
-        + envelope_data_translated["envelope_sent"]
-        + "<br>"
-        + "Criação do envelope: "
-        + envelope_data_translated["envelope_time_generated"]
-        + "<br>"
-    )
-    envelope_data["envelope_status_detail_message"] = e_status_detail
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
+
+    logger.info('recipient_statuses antes do parse')
+    logger.info(recipient_statuses)
 
     # translation of the type and status of the recipient
     for recipient_status in recipient_statuses:
@@ -124,32 +133,13 @@ def docusign_xml_parser(data):
             recipient_status['Status'] = recipient_statuses_dict[recipient_status['Status']]
         else:
             recipient_status['Status'] = 'não encontrado'
+        # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
+        if 'Sent' in recipient_status.keys():
+            recipient_status['data_envio'] = _iso8601_to_datetime(recipient_status['Sent'])
+        else:
+            recipient_status['data_envio'] = None
 
-    r_status_detail = ""
-    for r in recipient_statuses:
-        r_status_detail += (
-            r["RoutingOrder"]
-            + " - "
-            + r["UserName"]
-            + " - "
-            + r["Email"]
-            + " - "
-            + r["Type"]
-            + " - "
-            + r["Status"]
-            + "<br>"
-        )
-    envelope_data["envelope_recipient_status_detail_message"] = r_status_detail
-    all_details = (
-        "<b> Detalhes do Envelope </b><br>"
-        + e_status_detail
-        + "<br>"
-        + "<b> Detalhes dos Destinatários </b><br>"
-        + r_status_detail
-        + "<br>"
-    )
-    envelope_data["envelope_all_details_message"] = all_details
-    return envelope_data
+    return envelope_data, envelope_data_translated, recipient_statuses
 
 
 def docusign_pdf_files_saver(data, envelope_dir):
@@ -204,22 +194,18 @@ def docusign_webhook_listener(request):
     logger.debug(request.content_type)
     data = request.body  # This is the entire incoming POST content in Django
     try:
-        envelope_data = docusign_xml_parser(
-            data
-        )  # Parses XML data and returns a dictionary and formated messages
-        logger.debug(envelope_data["envelope_id"])
-        logger.debug(envelope_data["envelope_time_generated"])
-        logger.debug(envelope_data["envelope_all_details_message"])
+        # Parses XML data and returns a dictionary and formated messages
+        envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
 
         # Store the XML file on disk
         envelope_dir = os.path.join(
             settings.BASE_DIR, "media/docusign/", envelope_data["envelope_id"]
         )
         Path(envelope_dir).mkdir(parents=True, exist_ok=True)
+
         filename = (
-            envelope_data["envelope_time_generated"].replace(":", "_") + ".xml"
+            envelope_data["envelope_time_generated"].strftime("%Y%m%d_%H%M%S") + ".xml"
         )  # substitute _ for : for windows-land
-        logger.debug(envelope_data)
         filepath = os.path.join(envelope_dir, filename)
         with open(filepath, "wb") as xml_file:
             xml_file.write(data)
@@ -232,33 +218,37 @@ def docusign_webhook_listener(request):
     try:
         document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
     except Document.DoesNotExist:
-        document = None
         message = 'O envelope {envelope_id} não existe.'.format(envelope_id=envelope_data["envelope_id"])
         logger.debug(message)
+        return HttpResponse(message)
     else:
+        # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test, por isso, não irá
+        # encontrar o documento no banco
+        envelope_status = str(envelope_data["envelope_status"]).lower()
+
+        # variável para salvar o nome dos pdfs no signer_log
+        pdf_filenames = ''
+
         tenant = Tenant.objects.get(pk=document.tenant.pk)
+        # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
+        if envelope_status == "completed":
+            try:
+                (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
+                    data, envelope_dir
+                )
+                logger.debug(envelope_data)
 
-    envelope_status = str(envelope_data["envelope_status"]).lower()
-
-    # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
-    if envelope_status == "completed":
-        try:
-            (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
-                data, envelope_dir
-            )
-            logger.debug(envelope_data)
-
-            if document:
                 if tenant.plan.use_ged:
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
                     document_type_pk = interview.document_type.pk
                     document_language = interview.language
 
-                    # Post documents to GED
+                    # Post documents to GED if envelope_status is completed
                     tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
                     mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
 
+                    pdf_filenames = list()
                     for pdf in envelope_data["pdf_documents"]:
                         response = mc.document_create(
                             pdf["full_filename"],
@@ -270,54 +260,68 @@ def docusign_webhook_listener(request):
                         logger.debug("Posting document to GED: " + pdf["filename"])
                         logger.debug(response.text)
 
-                if envelope_status in envelope_statuses.keys():
-                    document.status = envelope_statuses[envelope_status]
-                else:
-                    document.status = "não encontrado"
+                        pdf_filenames.append(pdf["filename"])
 
-                document.save()
+                    # separa os documentos com ENTER
+                    pdf_filenames = chr(10).join(pdf_filenames)
+            except Exception as e:
+                msg = str(e)
+                logger.exception(msg)
+                return HttpResponse(msg)
 
-                log = ""
-                for pdf in envelope_data["pdf_documents"]:
-                    log += pdf["filename"] + "<br>"
+        if envelope_status in envelope_statuses.keys():
+            document.status = envelope_statuses[envelope_status]
+        else:
+            document.status = "não encontrado"
 
-                log += "<br>"
-                esignature_log_documents = DocumentESignatureLog(
-                    esignature_log=log, document=document,
-                )
-                esignature_log_documents.save()
+        document.save()
 
-                esignature_log_messages = DocumentESignatureLog(
-                    esignature_log=envelope_data["envelope_all_details_message"], document=document,
-                )
-                esignature_log_messages.save()
-        except Exception as e:
-            msg = str(e)
-            logger.exception(msg)
-            return HttpResponse(msg)
+        # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
+        try:
+            envelope_log = EnvelopeLog.objects.get(document=document)
+        except EnvelopeLog.DoesNotExist:
+            envelope_log = EnvelopeLog(
+                envelope_id=envelope_data['envelope_id'],
+                status=envelope_data_translated['envelope_status'],
+                envelope_created_date=envelope_data['envelope_created'],
+                sent_date=envelope_data['envelope_sent'],
+                status_update_date=envelope_data['envelope_time_generated'],
+                document=document,
+                tenant=tenant,
+            )
+            envelope_log.save()
+        else:
+            envelope_log.status = envelope_data_translated['envelope_status']
+            envelope_log.status_update_date = envelope_data['envelope_time_generated']
+            envelope_log.save(update_fields=['status', 'status_update_date'])
+
+        for recipient_status in recipient_statuses:
+            try:
+                # se já tem o status para o email e para o envelope_log, não salva outro igual
+                # só cria outro se o status do recipient mudou
+                signer_log = SignerLog.objects.get(
+                    envelope_log=envelope_log,
+                    email=recipient_status['Email'],
+                    status=recipient_status['Status'])
+            except SignerLog.DoesNotExist:
+                try:
+                    signer_log = SignerLog(
+                        name=recipient_status['UserName'],
+                        email=recipient_status['Email'],
+                        status=recipient_status['Status'],
+                        sent_date=recipient_status['data_envio'],
+                        type=recipient_status['Type'],
+                        pdf_filenames=pdf_filenames,
+                        envelope_log=envelope_log,
+                        tenant=tenant,
+                    )
+
+                    signer_log.save()
+                except Exception as e:
+                    message = 'Não foi possível salvar o SignerLog: ' + str(e)
+                    logger.exception(message)
 
     return HttpResponse("Success!")
-
-
-# @require_POST
-# def create_draft_document(interview, tenant, school=None, doc_uuid=None):
-#     document = Document.objects.create(
-#         tenant=tenant,
-#         school=school,
-#         interview=interview,
-#         name=interview.custom_file_name + "_",
-#         description=interview.description + ' | ' + interview.version + ' | ' + str(interview.date_available),
-#         doc_uuid=doc_uuid,
-#         status="rascunho"
-#     )
-#
-#     document = document.save()
-#
-#     data = {
-#         doc_uuid: document.doc_uuid
-#     }
-#
-#     return JsonResponse(data)
 
 
 class DocumentViewSet(viewsets.ModelViewSet):

@@ -1,0 +1,39 @@
+.el-bg-primary {
+    background-color: #00a6ed !important;
+}
+
+.el-bg-info {
+    background-color: #398FFC !important;
+}
+
+.el-bg-warning {
+    background-color: #fcc739 !important;
+}
+
+.el-bg-success {
+    background-color: #63b000 !important;
+}
+
+.el-bg-danger {
+    background-color: #f03a00 !important;
+}
+
+.el-border-primary {
+    border-color: #00a6ed !important;
+}
+
+.el-border-info {
+    border-color: #398FFC !important;
+}
+
+.el-border-warning {
+    border-color: #fcc739 !important;
+}
+
+.el-border-success {
+    border-color: #63b000 !important;
+}
+
+.el-border-danger {
+    border-color: #f03a00 !important;
+}

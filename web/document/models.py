@@ -84,9 +84,12 @@ class Document(TenantAwareModel):
     )
 
     def __str__(self):
-        return self.name + " - " + self.school.name
+        if self.school is not None:
+            return self.name + ' - ' + self.school.name
+        else:
+            return self.name
 
-
+# DEPRECATED - Um dia vamos apagar você - Huahauahauha TODO
 class DocumentESignatureLog(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     esignature_log = models.TextField(
@@ -186,23 +189,24 @@ class DocumentTaskView(TenantAwareModel):
         db_table = 'document_task'
 
 
-class EnvelopeLog(models.Model):
-    imported_date = models.DateTimeField(auto_now_add=True, verbose_name="Importação")
+class EnvelopeLog(TenantAwareModel):
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
+    altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
     envelope_id = models.CharField(max_length=256, verbose_name="ID")
     status = models.CharField(max_length=256, verbose_name="Status")
-    created_date = models.DateTimeField(verbose_name="Criação")
+    envelope_created_date = models.DateTimeField(verbose_name="Criação do envelope")
     sent_date = models.DateTimeField(null=True, verbose_name="Envio")
     # salva o TimeGenerated - Specifies the time of the status change.
-    status_update_date = models.DateTimeField(verbose_name="Alteração do status")
+    status_update_date = models.DateTimeField(null=True, verbose_name="Alteração do status")
 
     document = models.ForeignKey(
         Document,
         on_delete=models.CASCADE,
         verbose_name="Documento",
-        related_name="envelops_logs")
+        related_name="envelope_logs")
 
     class Meta:
-        ordering = ["-created_date"]
+        ordering = ["-envelope_created_date"]
         verbose_name = "Andamento da Assinatura Eletrônica"
         verbose_name_plural = "Andamentos da Assinatura Eletrônica"
         indexes = [
@@ -214,20 +218,23 @@ class EnvelopeLog(models.Model):
         return self.status + " | " + str(self.created_date)
 
 
-class SignerLog(models.Model):
-    imported_date = models.DateTimeField(auto_now_add=True, verbose_name="Importação")
+class SignerLog(TenantAwareModel):
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     name = models.CharField(max_length=256, verbose_name="Nome")
     email = models.EmailField(max_length=256, verbose_name="E-mail")
+    type = models.CharField(max_length=256, verbose_name="Tipo")
     status = models.CharField(max_length=256, verbose_name="Status")
+    sent_date = models.DateTimeField(null=True, blank=True, verbose_name="Envio")
+    pdf_filenames = models.TextField(blank=True, verbose_name="PDFs")
 
     envelope_log = models.ForeignKey(
         EnvelopeLog,
         on_delete=models.CASCADE,
         verbose_name="Andamento da Assinatura Eletrônica",
-        related_name="signers_logs")
+        related_name="signer_logs")
 
     class Meta:
-        ordering = ["-imported_date"]
+        ordering = ["-created_date"]
         verbose_name = "Signatário"
         verbose_name_plural = "Signatários"
         indexes = [
@@ -237,4 +244,4 @@ class SignerLog(models.Model):
         ]
 
     def __str__(self):
-        return self.status + " | " + str(self.imported_date)
+        return self.status + " | " + str(self.created_date)

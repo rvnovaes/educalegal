@@ -4,22 +4,27 @@ import os
 import base64
 
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Category, Attachment, FileContent, FileType, FileName, Disposition
+from sendgrid.helpers.mail import Mail, Category, Attachment, FileContent, FileType, FileName, Disposition, To, From, Bcc
 
 
-def send_email_sendgrid(from_email, to_emails, subject, html_content, category, file_path, file_name):
-    # Sendgrid API returns 400 BAD REQUEST se você eviar emails duplicados. Por isso, convertemos a lista em conjunto e
-    # novamente em lista
-    if isinstance(to_emails, list):
-        s1 = set(to_emails)
-        to_emails = list(s1)
-
+def send_email_sendgrid(to_emails, subject, html_content, category, file_path, file_name):
     message = Mail(
-        from_email=from_email,
-        to_emails=to_emails,
         subject=subject,
         html_content=html_content)
-
+    message.from_email = From("automacao@educalegal.com.br", "Educa Legal")
+    message.bcc = Bcc("sistemas@educalegal.com.br", "Sistemas Educa Legal")
+    to_emails_names = list()
+    to_emails_deduplication = list()
+    # Sendgrid API returns 400 BAD REQUEST se você eviar emails duplicados.
+    # Por isso, testamos se o email esta na lista de deduplicacao
+    for i in to_emails:
+        current_email = i["email"]
+        current_name = i["name"]
+        if current_email not in to_emails_deduplication:
+            recipient = To(current_email, current_name)
+            to_emails_names.append(recipient)
+        to_emails_deduplication.append(current_email)
+    message.to = to_emails_names
     message.category = Category(category)
     file_path = file_path
     with open(file_path, 'rb') as f:
@@ -35,6 +40,7 @@ def send_email_sendgrid(from_email, to_emails, subject, html_content, category, 
 
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        # sg = SendGridAPIClient('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')
         response = sg.send(message)
         if response.status_code == 202:
             success_message = "E-mail enviado com sucesso!"
@@ -48,5 +54,10 @@ def send_email_sendgrid(from_email, to_emails, subject, html_content, category, 
 
 
 if __name__ == "__main__":
-    send_email_sendgrid("sistemas@educalegal.com.br", "sistemas@educalegal.com.br", "TESTE", "<h1>Hello World",
-                        "Desenvolvimento", "lorem-ipsum.pdf", "lorem-ipsum.pdf")
+    recipients = [{"email": "rvnovaes@gmail.com", "name": "Roberto"},
+                  {"email": "rvnovaes@gmail.com", "name": "Roberto"},
+                  {"email": "roberto.novaes@educalegal.com.br", "name": "Roberto EducaLegal"}]
+
+
+    print(send_email_sendgrid(recipients, "TESTE", "<h1>Hello World",
+                        "Desenvolvimento", "lorem-ipsum.pdf", "lorem-ipsum.pdf"))

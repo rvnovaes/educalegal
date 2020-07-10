@@ -9,8 +9,8 @@ class DocumentTable(tables.Table):
     ged_link = tables.TemplateColumn(
         template_name="document/download_button.html", verbose_name="Baixar"
     )
-    created_date = tables.DateTimeColumn(format="d/m/Y H:i")
-    altered_date = tables.DateTimeColumn(format="d/m/Y H:i")
+    created_date = tables.DateTimeColumn(format="d/m/Y H:i:s")
+    altered_date = tables.DateTimeColumn(format="d/m/Y H:i:s")
 
     def before_render(self, request):
         if not request.user.tenant.plan.use_esignature:
@@ -38,7 +38,7 @@ class DocumentTable(tables.Table):
 
 
 class BulkDocumentGenerationTable(tables.Table):
-    created_date = tables.DateTimeColumn(format="d/m/Y H:i")
+    created_date = tables.DateTimeColumn(format="d/m/Y H:i:s")
     tarefas = tables.TemplateColumn(
         template_name="document/lote_button.html", verbose_name="Lote"
     )

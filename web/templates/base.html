@@ -11,6 +11,7 @@
     <link rel="shortcut icon" href="{% static 'tenant/favicon.ico' %}"/>
     <!-- ----------------------------------------------- CSS  ------------------------------------------------------ -->
     <link rel="stylesheet" type="text/css" href="{% static 'tenant/css/base.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'tenant/css/card.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'tenant/css/data_tables.css' %}"/>
     <link rel="stylesheet" type="text/css"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -31,6 +32,10 @@
     <!-- Datatables -->
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"
             integrity="sha384-RxzVJNpULMjRDJ3nd+aAVYb11VBDmhgIonMdvYdLxYvylOdEl6pprk4R4PK0t3xG"
+            crossorigin="anonymous"></script>
+    <!-- Datatables sorting datetime -->
+    <script src="https://cdn.datatables.net/plug-ins/1.10.21/sorting/datetime-moment.js"
+            integrity="sha384-tVTbd6QP6WhDQT0tXD3txbw/78zFP8zF45xVDbkGr7ULYmKMuHdZKekVQ2CbXAoC"
             crossorigin="anonymous"></script>
     <!-- Datatables data export -->
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"
@@ -91,7 +96,7 @@
 <footer class="page-footer font-small special-color-dark pt-4">
     <div class="footer-copyright text-center py-3">©
         <script type="text/javascript">document.write(new Date().getFullYear());</script>
-        Copyright - Versão: 1.5.0
+        Copyright - Versão: 1.6.0
     </div>
 </footer>
 </html>

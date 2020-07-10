@@ -9,7 +9,7 @@
         <div class="card-body">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <span class="font-weight-bold">Data de Criação: </span>{{ bulk_document_generation.created_date|date:"d/m/Y H:i" }}
+                    <span class="font-weight-bold">Data de Criação: </span>{{ bulk_document_generation.created_date|date:"d/m/Y H:i:s" }}
                 </li>
                 <li class="list-group-item">
                     <span class="font-weight-bold">Modelo: </span>{{ bulk_document_generation.interview.name }}

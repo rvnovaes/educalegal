@@ -24,7 +24,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "notificacao-extrajudicial.docx"
+  content_document = "gn-notificacao-extrajudicial.docx"
 ---
 id: logic
 mandatory: True
@@ -249,6 +249,7 @@ code: |
     help_email_msg = "Digite um e-mail válido."
 ---
 code: |
-  email_subject = "IMPORTANTE: " + school_name + " | Notificação Extrajudicial"
+  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
   email_category = interview_custom_file_name_string
-  email_html_content = "<h1>Notificação Extrajudicial</h1><p>Leia, com atenção o documento em anexo.</p>"
+  email_signature = "<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=ABeeZee&display=swap'> <style> body { font-family: 'ABeeZee', sans-serif; font-size: 12px; } </style></head><body><table cellspacing='0' width='470' cellpadding='0' border='0'> <tr> <td style='padding: 0 12px 0 0;vertical-align: top;' valign='top' width='100'> <img alt='Educa Legal' width='100' style='width:100px;moz-border-radius:0%;khtml-border-radius:0%;o-border-radius:0%;webkit-border-radius:0%;ms-border-radius:0%;border-radius:0%;' src='https://www.educalegal.com.br/wp-content/uploads/2020/03/logo_vertical_425x180.png' /></td><td style='font-size:1em;padding:0 0 0 12px;vertical-align: top;border-left: 1px solid #3d85c6;' valign='top'> <table cellspacing='0' cellpadding='0' border='0' style='line-height: 1.4;font-family:'ABeeZee', sans-serif;font-size:80%;color: #000001;'> <tr> <td style='padding-bottom: 8px;'> <span style='font: 600 1.3em 'ABeeZee', sans-serif;color:#3d85c6;'>Isabela Barbosa</span></td></tr> <tr> <td style='color:#000001;padding-bottom: 8px;'><div style='font-family:'ABeeZee', sans-serif;'>Consultora Jurídica </div></td></tr> <tr> <td> <div style='font-family:'ABeeZee', sans-serif;'>+55 31 99846-8882 </div></td></tr><tr><td> <div style='font-family:'ABeeZee', sans-serif; padding-bottom: 8px'>isabela.barbosa@educalegal.com.br </div></td></tr><tr> <td style='padding: 8px 0 0 0;'> <div style='font-family:'ABeeZee', sans-serif;'> <a href='https://www.educalegal.com.br/' style='color:#3d85c6;' target='_blank'>www.educalegal.com.br</a> </div> </td></tr><tr> <td style='padding-top: 12px;'> <table cellspacing='0' cellpadding='0' border='0'> <tr> <td style='font-family: 'ABeeZee', sans-serif;padding: 0 5px 0 0;'><a href='https://fb.me/educalegaldigital'><img alt='' style='width:22px;' width='22' src='https://www.educalegal.com.br/wp-content/uploads/2020/02/facebook_email.png'></a></td><td style='font-family: 'ABeeZee', sans-serif;padding: 0 5px 0 0;'><a href='https://www.instagram.com/educalegal/'><img alt='' style='width:22px;' width='22' src='https://www.educalegal.com.br/wp-content/uploads/2020/02/instagram_email.png'></a></td><td style='font-family: 'ABeeZee', sans-serif;padding: 0 5px 0 0;'><a href='https://www.linkedin.com/company/educalegal'><img alt='' style='width:22px;' width='22' src='https://www.educalegal.com.br/wp-content/uploads/2020/02/linkedin_email.png'></a></td></tr></table></td></tr></table></td></tr></table>"
+  email_html_content = "<h1>" + interview_label + "</h1><p>" + school_name + ", vem, por meio de seus advogados, notificá-lo(a), conforme documento em anexo.</p><p>Solicitamos que entre em contato conosco pelo e-mail isabela.barbosa@educalegal.com.br ou pelo telefone/WhatsApp (31) 99846-8882.</p>" + email_signature
