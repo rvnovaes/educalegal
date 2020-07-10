@@ -1,9 +1,11 @@
 import logging
 import json
 import pandas as pd
+
 from mongoengine.errors import ValidationError
 from celery import chain
 
+from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableView
@@ -33,6 +35,18 @@ from .tasks import create_document, submit_to_esignature, send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
 logger = logging.getLogger(__name__)
+
+
+DOCUMENT_COLUMNS = (
+    (0, 'document_name'),
+    (1, 'interview_name'),
+    (2, 'school_name'),
+    (3, 'created_date'),
+    (4, 'altered_date'),
+    (5, 'status'),
+    (6, 'submit_to_esignature'),
+    (7, 'send_email'),
+)
 
 
 class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
@@ -600,6 +614,37 @@ def bulk_generation_progress(request, bulk_document_generation_id):
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
 
+def query_documents_by_args(pk=None, **kwargs):
+    draw = int(kwargs.get('draw', None)[0])
+    length = int(kwargs.get('length', None)[0])
+    start = int(kwargs.get('start', None)[0])
+    search_value = kwargs.get('search[value]', None)[0]
+    order_column = int(kwargs.get('order[0][column]', None)[0])
+    order = kwargs.get('order[0][dir]', None)[0]
 
+    order_column = DOCUMENT_COLUMNS[order_column]
+    # django orm '-' -> desc
+    if order == 'desc':
+        order_column = '-' + order_column[1]
 
+    queryset = Document.objects.filter(tenant=pk)
+    total = queryset.count()
 
+    if search_value:
+        queryset = queryset.filter(Q(name__unaccent__icontains=search_value) |
+                                   Q(interview__name__unaccent__icontains=search_value) |
+                                   Q(school__name__unaccent__icontains=search_value) |
+                                   Q(created_date__icontains=search_value) |
+                                   Q(altered_date__icontains=search_value) |
+                                   Q(status__unaccent__icontains=search_value) |
+                                   Q(submit_to_esignature__icontains=search_value) |
+                                   Q(send_email__icontains=search_value))
+
+    count = queryset.count()
+    queryset = queryset.order_by(order_column)[start:start + length]
+    return {
+        'items': queryset,
+        'count': count,
+        'total': total,
+        'draw': draw
+    }

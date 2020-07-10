@@ -15,12 +15,13 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 
 from django.conf import settings
 
 from billing.models import Plan
 from document.models import Document, EnvelopeLog, SignerLog
+from document.views import query_documents_by_args
 from interview.models import Interview
 from school.models import School
 from tenant.models import Tenant, TenantGedData
@@ -376,10 +377,20 @@ class TenantInterviewViewSet(viewsets.ViewSet):
 
 
 class TenantDocumentViewSet(viewsets.ViewSet):
-    def list(self, request, pk=None):
-        queryset = Document.objects.filter(tenant=pk)
-        serializer = DocumentSerializer(queryset, many=True)
-        return Response(serializer.data)
+    def list(self, request, **kwargs):
+        try:
+            document = query_documents_by_args(self.kwargs['pk'], **request.query_params)
+
+            serializer = DocumentSerializer(document['items'], many=True)
+            result = dict()
+            result['data'] = serializer.data
+            result['draw'] = document['draw']
+            result['recordsTotal'] = document['total']
+            result['recordsFiltered'] = document['count']
+            return Response(result, status=status.HTTP_200_OK, template_name=None, content_type=None)
+
+        except Exception as e:
+            return Response(e, status=status.HTTP_404_NOT_FOUND, template_name=None, content_type=None)
 
     def retrieve(self, request, pk=None, spk=None):
         queryset = Document.objects.all()

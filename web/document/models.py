@@ -89,6 +89,7 @@ class Document(TenantAwareModel):
         else:
             return self.name
 
+
 # DEPRECATED - Um dia vamos apagar você - Huahauahauha TODO
 class DocumentESignatureLog(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
