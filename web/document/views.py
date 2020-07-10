@@ -630,6 +630,7 @@ def query_documents_by_args(pk=None, **kwargs):
     queryset = Document.objects.filter(tenant=pk)
     total = queryset.count()
 
+    # 'columns[7][search][value]'
     if search_value:
         queryset = queryset.filter(Q(name__unaccent__icontains=search_value) |
                                    Q(interview__name__unaccent__icontains=search_value) |
