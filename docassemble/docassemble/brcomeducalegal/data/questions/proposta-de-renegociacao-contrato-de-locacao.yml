@@ -38,8 +38,8 @@ code: |
     school
     locadores.target_number = 1
     for item in locadores:
-      item.name.first
-    address_zip
+      item.name.text
+    property_address_zip
     discount_value
     signature_local
     generated_file
@@ -53,8 +53,7 @@ objects:
   - locadores: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
 ---
 code: |
-  locadores[i].name.first
-  locadores[i].address.street_number
+  locadores[i].name.text
   locadores[i].complete = True
 comment: |
   1. A ordem informada nesse bloco é a ordem que aparece na entrevista
@@ -75,7 +74,7 @@ progress: 25
 question: |
   Nome do Locador
 fields:
-  - "Nome completo:": locadores[i].name.first
+  - "Nome completo:": locadores[i].name.text
     required: True
   - "E-mail:": locadores[i].email
     help: ${ help_email_msg }
@@ -93,29 +92,29 @@ progress: 35
 question: |
   Endereço do Imóvel objeto do Contrato
 fields:
-  - "CEP:": locadores[i].address.zip
+  - "CEP:": property_address_zip
     required: True
-  - "Logradouro:": locadores[i].address.street_name
+  - "Logradouro:": property_address_street_name
     required: True
-  - "Número:": locadores[i].address.street_number
+  - "Número:": property_address_street_number
     required: True
-  - "Complemento:": locadores[i].address.unit
+  - "Complemento:": property_address_unit
     required: False
-  - "Bairro:": locadores[i].address.neighborhood
+  - "Bairro:": property_address_neighborhood
     required: True
-  - "Cidade:": locadores[i].address.city
+  - "Cidade:": property_address_city
     required: True
-  - "Estado:": locadores[i].address.state
+  - "Estado:": property_address_state
     required: True
     code: state_initials_list
 script: |
   <script type="text/javascript">
   $(document).ready(function(){
-    $('#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+    $('#cHJvcGVydHlfYWRkcmVzc196aXA').mask('00000-000');
   });
 
-  $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
-    var cep = $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw").val();
+  $("#cHJvcGVydHlfYWRkcmVzc196aXA").focusout(function(){
+    var cep = $("#cHJvcGVydHlfYWRkcmVzc196aXA").val();
     cep = cep.replace ("-","");
     if (cep != ""){
       var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
@@ -125,10 +124,10 @@ script: |
         type: "get",
         dataType: "json",
         success: function(data){
-          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
-          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
-          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
-          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+          $("#cHJvcGVydHlfYWRkcmVzc19zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#cHJvcGVydHlfYWRkcmVzc19uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#cHJvcGVydHlfYWRkcmVzc19jaXR5").val(data.localidade);
+          $("#cHJvcGVydHlfYWRkcmVzc19zdGF0ZQ").val(data.uf);
         },
         error: function(erro){
           console.log(erro);
@@ -166,7 +165,7 @@ code: |
   for item in locadores:
        if item.email:
             new_recipient = dict()
-            new_recipient['name'] = item.name.first
+            new_recipient['name'] = item.name.text
             new_recipient['email'] = item.email
             new_recipient['group'] = 'certifiedDeliveries'
             new_recipient['routingOrder'] = 1

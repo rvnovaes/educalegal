@@ -37,7 +37,7 @@ code: |
     school
     fornecedores.target_number = 1
     for item in fornecedores:
-      item.name.first
+      item.name.text
     discount_value
     signature_local
     generated_file
@@ -51,7 +51,7 @@ objects:
   - fornecedores: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
 ---
 code: |
-  fornecedores[i].name.first
+  fornecedores[i].name.text
   fornecedores[i].complete = True
 comment: |
   1. A ordem informada nesse bloco é a ordem que aparece na entrevista
@@ -72,7 +72,7 @@ progress: 50
 question: |
   Nome do Fornecedor
 fields:
-  - "Nome completo:": fornecedores[i].name.first
+  - "Nome completo:": fornecedores[i].name.text
     required: True
   - "E-mail:": fornecedores[i].email
     help: ${ help_email_msg }
@@ -113,7 +113,7 @@ code: |
   for item in fornecedores:
        if item.email:
             new_recipient = dict()
-            new_recipient['name'] = item.name.first
+            new_recipient['name'] = item.name.text
             new_recipient['email'] = item.email
             new_recipient['group'] = 'certifiedDeliveries'
             new_recipient['routingOrder'] = 1
