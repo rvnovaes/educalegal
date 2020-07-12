@@ -36,6 +36,7 @@
                 serverSide: true,
                 processing: true,
                 order: [[ 4, "desc" ]],
+                lengthMenu: [ 10, 50, 100, 500, 1000],
                 ajax: {
                     url: table_data_url,
                     method: "GET",
@@ -43,9 +44,18 @@
                 info: true,
                 dom: 'Blfrtip',
                 buttons: [
-                    'excelHtml5',
-                    'csvHtml5',
-                    'pdfHtml5'
+                    {
+                        extend: 'excelHtml5',
+                        title: 'documentos_lista'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        title: 'documentos_lista'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        title: 'documentos_lista'
+                    },
                 ],
                 columns: [
                     {data: "id"},
