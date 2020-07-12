@@ -387,10 +387,10 @@ class TenantDocumentViewSet(viewsets.ViewSet):
             result['draw'] = document['draw']
             result['recordsTotal'] = document['total']
             result['recordsFiltered'] = document['count']
-            return Response(result, status=status.HTTP_200_OK, template_name=None, content_type=None)
+            return Response(result, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response(e, status=status.HTTP_404_NOT_FOUND, template_name=None, content_type=None)
+            return Response(e)
 
     def retrieve(self, request, pk=None, spk=None):
         queryset = Document.objects.all()

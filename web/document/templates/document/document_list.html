@@ -6,6 +6,7 @@
         <table id="data_table" class="dataTable cell-border hover order-column row-border stripe">
             <thead>
             <tr>
+                <th data-data="name">ID</th>
                 <th data-data="name">Documento</th>
                 <th data-data="interview_name">Modelo</th>
                 <th data-data="school_name">Escola</th>
@@ -34,7 +35,7 @@
             $("#data_table").DataTable({
                 serverSide: true,
                 processing: true,
-                order: [[ 3, "desc" ]],
+                order: [[ 4, "desc" ]],
                 ajax: {
                     url: table_data_url,
                     method: "GET",
@@ -47,9 +48,11 @@
                     'pdfHtml5'
                 ],
                 columns: [
+                    {data: "id"},
                     {
-                        data: null, render: function (data, type, row) {
-                            return '<a href="/document/document/' + data.id + '"' + ' target="_blank">' + data.name + '</a>'
+                        data: "name",
+                        render: function (data, type, row) {
+                            return '<a href="/document/document/' + row.id + '"' + ' target="_blank">' + data + '</a>';
                         }
                     },
                     {data: "interview_name"},
@@ -65,7 +68,8 @@
                             }
                         },
                     },
-                    {data: "send_email", render: function (data, type, row) {
+                    {
+                        data: "send_email", render: function (data, type, row) {
                             if (data === true) {
                                 return "sim"
                             } else {
@@ -77,8 +81,12 @@
 
                 columnDefs: [
                     {
+                        targets: [0],
+            			"visible": false
+                    },
+                    {
                         type: 'datetime-moment',
-                        targets: [3, 4], "width": "14%", render: function (data) {
+                        targets: [4, 5], "width": "14%", render: function (data) {
                             return '<span'+moment(data).format('YYYYMMDDHHmm')+'>'+moment(data).format('DD/MM/YYYY HH:mm')+'</span>'
                         },
                     },

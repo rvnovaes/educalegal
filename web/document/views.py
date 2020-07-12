@@ -38,14 +38,15 @@ logger = logging.getLogger(__name__)
 
 
 DOCUMENT_COLUMNS = (
-    (0, 'document_name'),
-    (1, 'interview_name'),
-    (2, 'school_name'),
-    (3, 'created_date'),
-    (4, 'altered_date'),
-    (5, 'status'),
-    (6, 'submit_to_esignature'),
-    (7, 'send_email'),
+    (0, 'id'),
+    (1, 'name'),
+    (2, 'interview'),
+    (3, 'school'),
+    (4, 'created_date'),
+    (5, 'altered_date'),
+    (6, 'status'),
+    (7, 'submit_to_esignature'),
+    (8, 'send_email'),
 )
 
 
@@ -626,6 +627,8 @@ def query_documents_by_args(pk=None, **kwargs):
     # django orm '-' -> desc
     if order == 'desc':
         order_column = '-' + order_column[1]
+    else:
+        order_column = order_column[1]
 
     queryset = Document.objects.filter(tenant=pk)
     total = queryset.count()
@@ -643,9 +646,10 @@ def query_documents_by_args(pk=None, **kwargs):
 
     count = queryset.count()
     queryset = queryset.order_by(order_column)[start:start + length]
-    return {
+    data = {
         'items': queryset,
         'count': count,
         'total': total,
-        'draw': draw
+        'draw': draw,
     }
+    return data
