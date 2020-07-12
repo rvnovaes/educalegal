@@ -638,15 +638,14 @@ def query_documents_by_args(pk=None, **kwargs):
             boolean_search_value = False
         elif search_value == 'sim':
             boolean_search_value = True
-
         try:
             if boolean_search_value or not boolean_search_value:
                 queryset = queryset.filter(Q(name__unaccent__icontains=search_value) |
                                            Q(interview__name__unaccent__icontains=search_value) |
                                            Q(school__name__unaccent__icontains=search_value) |
                                            Q(status__unaccent__icontains=search_value) |
-                                           Q(submit_to_esignature__icontains=boolean_search_value) |
-                                           Q(send_email__icontains=boolean_search_value))
+                                           Q(submit_to_esignature=boolean_search_value) |
+                                           Q(send_email=boolean_search_value))
         except NameError:
             queryset = queryset.filter(Q(name__unaccent__icontains=search_value) |
                                        Q(interview__name__unaccent__icontains=search_value) |
