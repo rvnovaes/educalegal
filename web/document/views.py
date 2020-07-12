@@ -644,8 +644,6 @@ def query_documents_by_args(pk=None, **kwargs):
                 queryset = queryset.filter(Q(name__unaccent__icontains=search_value) |
                                            Q(interview__name__unaccent__icontains=search_value) |
                                            Q(school__name__unaccent__icontains=search_value) |
-                                           Q(created_date__icontains=search_value) |
-                                           Q(altered_date__icontains=search_value) |
                                            Q(status__unaccent__icontains=search_value) |
                                            Q(submit_to_esignature__icontains=boolean_search_value) |
                                            Q(send_email__icontains=boolean_search_value))
@@ -653,8 +651,6 @@ def query_documents_by_args(pk=None, **kwargs):
             queryset = queryset.filter(Q(name__unaccent__icontains=search_value) |
                                        Q(interview__name__unaccent__icontains=search_value) |
                                        Q(school__name__unaccent__icontains=search_value) |
-                                       Q(created_date__icontains=search_value) |
-                                       Q(altered_date__icontains=search_value) |
                                        Q(status__unaccent__icontains=search_value))
 
     count = queryset.count()
