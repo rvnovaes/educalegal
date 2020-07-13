@@ -2,8 +2,7 @@ import xmltodict
 
 from datetime import datetime as dt
 
-from web.api.docusign_translations import envelope_statuses, recipient_statuses_dict, recipient_types_dict
-
+from web.api.docusign_helpers import envelope_statuses, recipient_statuses_dict, recipient_types_dict
 
 def docusign_xml_parser(data):
     envelope_data = dict()

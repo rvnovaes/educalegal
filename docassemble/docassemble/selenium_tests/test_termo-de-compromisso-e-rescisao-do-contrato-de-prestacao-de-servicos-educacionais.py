@@ -81,7 +81,7 @@ class TestTermodecompromissoerescisaodocontratodeprestacaodeservicoseducacionais
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[4]/div/input").send_keys("2020-03-18")
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[5]/div/input").send_keys("2020")
         dropdown = self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[6]/div/select")
-        dropdown.find_element(By.XPATH, "//option[. = '1ª série do ensino fundamental']").click()
+        dropdown.find_element(By.XPATH, "//option[. = '1º ano do ensino infantil']").click()
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Dados do(a) segundo(a) Aluno(a)"))
@@ -90,11 +90,11 @@ class TestTermodecompromissoerescisaodocontratodeprestacaodeservicoseducacionais
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[4]/div/input").send_keys("2020-07-09")
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[5]/div/input").send_keys("2020")
         dropdown = self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[6]/div/select")
-        dropdown.find_element(By.XPATH, "//option[. = '9ª série do ensino fundamental']").click()
+        dropdown.find_element(By.XPATH, "//option[. = '7º ano do ensino fundamental']").click()
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
-            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Diretoria de Ensino da Regional"))
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("LAVRAS")
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Diretoria Regional de Ensino"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/p/span/input").send_keys("LAVRAS")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"),
                                                                                                   "Endereço da Diretoria de Ensino da Regional de(o) LAVRAS"))
