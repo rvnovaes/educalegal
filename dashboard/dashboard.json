@@ -1,0 +1,505 @@
+{
+    "dashboards": [
+        {
+            "__Dashboard__": {
+                "css": "",
+                "dashboard_title": "Educa Legal",
+                "description": null,
+                "json_metadata": "{\"timed_refresh_immune_slices\": [], \"expanded_slices\": {}, \"refresh_frequency\": 0, \"default_filters\": \"{\\\"95\\\": {\\\"__time_range\\\": \\\"No filter\\\"}}\", \"color_scheme\": \"googleCategory20c\", \"label_colors\": {\"Essential\": \"#3366cc\", \"Corporate\": \"#dc3912\", \"Standard\": \"#ff9900\", \"Corporate - GED\": \"#109618\", \"Acordos Individuais Trabalhistas - Coronavirus\": \"#990099\", \"Acordo Individual de Trabalho - Redu\\u00e7\\u00e3o de Jornada/Redu\\u00e7\\u00e3o Salarial MP 936-2020\": \"#0099c6\", \"Notifica\\u00e7\\u00e3o Extrajudicial\": \"#dd4477\", \"Termo de confiss\\u00e3o de d\\u00edvida\": \"#66aa00\", \"Notifica\\u00e7\\u00e3o de cobran\\u00e7a\": \"#b82e2e\", \"Termo de confidencialidade - NDA\": \"#316395\", \"Contrato de consultoria\": \"#994499\", \"Contrato do aluno\": \"#22aa99\", \"Contrato de presta\\u00e7\\u00e3o de servi\\u00e7os\": \"#aaaa11\", \"Termo de Uso e Responsabilidade - Iscool App\": \"#6633cc\", \"Aditivo ao contrato de trabalho - banco de horas\": \"#e67300\", \"Autoriza\\u00e7\\u00e3o de uso de imagem\": \"#8b0707\", \"finalizado\": \"#3366cc\", \"enviado por e-mail\": \"#dc3912\", \"inserido no GED\": \"#ff9900\", \"rascunho - em lote\": \"#109618\", \"criado\": \"#990099\", \"enviado\": \"#0099c6\", \"rascunho\": \"#dd4477\", \"completado\": \"#66aa00\", \"inv\\u00e1lido\": \"#b82e2e\", \"enviado para assinatura\": \"#316395\", \"entregue\": \"#994499\", \"COUNT(*)\": \"#3366cc\", \"False\": \"#3366cc\", \"True\": \"#dc3912\", \"Bahema\": \"#ff9900\", \"Casa da Gente\": \"#109618\", \"Escola Canto Vivo Ltda\": \"#990099\", \"Escola Mais\": \"#0099c6\", \"Escola Viva\": \"#dd4477\", \"Guimar\\u00e3es Neto Advogados\": \"#66aa00\", \"MKT4EDU\": \"#b82e2e\", \"Morais\": \"#316395\", \"Wagner DJR\": \"#994499\"}, \"filter_scopes\": {\"95\": {\"tenant\": {\"scope\": [\"ROOT_ID\"], \"immune\": []}, \"__time_range\": {\"scope\": [\"ROOT_ID\"], \"immune\": []}}}, \"remote_id\": 7}",
+                "position_json": "{\"CHART-1NymuPhTJP\":{\"children\":[],\"id\":\"CHART-1NymuPhTJP\",\"meta\":{\"chartId\":95,\"height\":28,\"sliceName\":\"Filtro\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-2A-XFm7B4D\"],\"type\":\"CHART\"},\"CHART-7zLWjemSfK\":{\"children\":[],\"id\":\"CHART-7zLWjemSfK\",\"meta\":{\"chartId\":91,\"height\":28,\"sliceName\":\"Docs gerados m\\u00eas anterior\",\"width\":2},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-2A-XFm7B4D\"],\"type\":\"CHART\"},\"CHART-OHv_A__dQS\":{\"children\":[],\"id\":\"CHART-OHv_A__dQS\",\"meta\":{\"chartId\":86,\"height\":28,\"sliceName\":\"Documentos gerados\",\"width\":2},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-2A-XFm7B4D\"],\"type\":\"CHART\"},\"CHART-YI4IRXkJu4\":{\"children\":[],\"id\":\"CHART-YI4IRXkJu4\",\"meta\":{\"chartId\":85,\"height\":45,\"sliceName\":\"Docs por cliente (total)\",\"width\":12},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"TABS-PV9yZkELMf\",\"TAB-fjeW4RIV7y\",\"ROW-zdEtyjbn2\"],\"type\":\"CHART\"},\"CHART-ZbkNijPzwL\":{\"children\":[],\"id\":\"CHART-ZbkNijPzwL\",\"meta\":{\"chartId\":88,\"height\":45,\"sliceName\":\"Documentos por cliente (tempo)\",\"width\":12},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"TABS-PV9yZkELMf\",\"TAB--J8laXFMy\",\"ROW-A7GryCW2a\"],\"type\":\"CHART\"},\"CHART-mFScnMcwFF\":{\"children\":[],\"id\":\"CHART-mFScnMcwFF\",\"meta\":{\"chartId\":92,\"height\":50,\"sliceName\":\"Status dos Documentos\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-nKjwa65FG\"],\"type\":\"CHART\"},\"CHART-mj4aOXzpKp\":{\"children\":[],\"id\":\"CHART-mj4aOXzpKp\",\"meta\":{\"chartId\":84,\"height\":30,\"sliceName\":\"Novos Clientes\",\"width\":12},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-b-gV0wS3_\"],\"type\":\"CHART\"},\"CHART-tBxk-BsgDh\":{\"children\":[],\"id\":\"CHART-tBxk-BsgDh\",\"meta\":{\"chartId\":82,\"height\":28,\"sliceName\":\"Clientes\",\"width\":2},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-2A-XFm7B4D\"],\"type\":\"CHART\"},\"CHART-vkFARGt0QF\":{\"children\":[],\"id\":\"CHART-vkFARGt0QF\",\"meta\":{\"chartId\":93,\"height\":50,\"sliceName\":\"Docs por tipo\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-nKjwa65FG\"],\"type\":\"CHART\"},\"CHART-w5TLF3J0-h\":{\"children\":[],\"id\":\"CHART-w5TLF3J0-h\",\"meta\":{\"chartId\":89,\"height\":50,\"sliceName\":\"Planos\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-nKjwa65FG\"],\"type\":\"CHART\"},\"CHART-xoPf-x5qtG\":{\"children\":[],\"id\":\"CHART-xoPf-x5qtG\",\"meta\":{\"chartId\":90,\"height\":28,\"sliceName\":\"Escolas\",\"width\":2},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-2A-XFm7B4D\"],\"type\":\"CHART\"},\"DASHBOARD_VERSION_KEY\":\"v2\",\"GRID_ID\":{\"children\":[\"ROW-2A-XFm7B4D\",\"ROW-b-gV0wS3_\",\"ROW-nKjwa65FG\",\"TABS-PV9yZkELMf\"],\"id\":\"GRID_ID\",\"parents\":[\"ROOT_ID\"],\"type\":\"GRID\"},\"HEADER_ID\":{\"id\":\"HEADER_ID\",\"meta\":{\"text\":\"Educa Legal\"},\"type\":\"HEADER\"},\"ROOT_ID\":{\"children\":[\"GRID_ID\"],\"id\":\"ROOT_ID\",\"type\":\"ROOT\"},\"ROW-2A-XFm7B4D\":{\"children\":[\"CHART-1NymuPhTJP\",\"CHART-tBxk-BsgDh\",\"CHART-xoPf-x5qtG\",\"CHART-OHv_A__dQS\",\"CHART-7zLWjemSfK\"],\"id\":\"ROW-2A-XFm7B4D\",\"meta\":{\"background\":\"BACKGROUND_TRANSPARENT\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\"],\"type\":\"ROW\"},\"ROW-A7GryCW2a\":{\"children\":[\"CHART-ZbkNijPzwL\"],\"id\":\"ROW-A7GryCW2a\",\"meta\":{\"background\":\"BACKGROUND_TRANSPARENT\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"TABS-PV9yZkELMf\",\"TAB--J8laXFMy\"],\"type\":\"ROW\"},\"ROW-b-gV0wS3_\":{\"children\":[\"CHART-mj4aOXzpKp\"],\"id\":\"ROW-b-gV0wS3_\",\"meta\":{\"background\":\"BACKGROUND_TRANSPARENT\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\"],\"type\":\"ROW\"},\"ROW-nKjwa65FG\":{\"children\":[\"CHART-w5TLF3J0-h\",\"CHART-mFScnMcwFF\",\"CHART-vkFARGt0QF\"],\"id\":\"ROW-nKjwa65FG\",\"meta\":{\"background\":\"BACKGROUND_TRANSPARENT\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\"],\"type\":\"ROW\"},\"ROW-zdEtyjbn2\":{\"children\":[\"CHART-YI4IRXkJu4\"],\"id\":\"ROW-zdEtyjbn2\",\"meta\":{\"background\":\"BACKGROUND_TRANSPARENT\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"TABS-PV9yZkELMf\",\"TAB-fjeW4RIV7y\"],\"type\":\"ROW\"},\"TAB--J8laXFMy\":{\"children\":[\"ROW-A7GryCW2a\"],\"id\":\"TAB--J8laXFMy\",\"meta\":{\"text\":\"Docs por cliente (tempo)\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"TABS-PV9yZkELMf\"],\"type\":\"TAB\"},\"TAB-fjeW4RIV7y\":{\"children\":[\"ROW-zdEtyjbn2\"],\"id\":\"TAB-fjeW4RIV7y\",\"meta\":{\"text\":\"Docs por cliente (total)\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"TABS-PV9yZkELMf\"],\"type\":\"TAB\"},\"TABS-PV9yZkELMf\":{\"children\":[\"TAB-fjeW4RIV7y\",\"TAB--J8laXFMy\"],\"id\":\"TABS-PV9yZkELMf\",\"meta\":{},\"parents\":[\"ROOT_ID\",\"GRID_ID\"],\"type\":\"TABS\"}}",
+                "slices": [
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_tenants",
+                            "datasource_type": "table",
+                            "id": 82,
+                            "params": "{\"adhoc_filters\": [], \"datasource\": \"15__table\", \"granularity_sqla\": \"created_date\", \"header_font_size\": 0.4, \"metric\": \"count\", \"queryFields\": {\"metric\": \"metrics\"}, \"slice_id\": 82, \"subheader\": \"\", \"subheader_font_size\": 0.15, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"big_number_total\", \"y_axis_format\": \"~g\", \"remote_id\": 82, \"datasource_name\": \"dashboard_tenants\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Clientes",
+                            "viz_type": "big_number_total"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_tenants",
+                            "datasource_type": "table",
+                            "id": 84,
+                            "params": "{\"adhoc_filters\": [], \"annotation_layers\": [], \"bottom_margin\": \"auto\", \"color_scheme\": \"googleCategory20c\", \"comparison_type\": \"values\", \"contribution\": false, \"datasource\": \"15__table\", \"granularity_sqla\": \"created_date\", \"groupby\": null, \"label_colors\": {\"Acordo Individual de Trabalho - Redu\\u00e7\\u00e3o de Jornada/Redu\\u00e7\\u00e3o Salarial MP 936-2020\": \"#0099c6\", \"Acordos Individuais Trabalhistas - Coronavirus\": \"#990099\", \"Aditivo ao contrato de trabalho - banco de horas\": \"#e67300\", \"Autoriza\\u00e7\\u00e3o de uso de imagem\": \"#8b0707\", \"Bahema\": \"#ff9900\", \"COUNT(*)\": \"#3366cc\", \"Casa da Gente\": \"#109618\", \"Contrato de consultoria\": \"#994499\", \"Contrato de presta\\u00e7\\u00e3o de servi\\u00e7os\": \"#aaaa11\", \"Contrato do aluno\": \"#22aa99\", \"Corporate\": \"#dc3912\", \"Corporate - GED\": \"#109618\", \"Escola Canto Vivo Ltda\": \"#990099\", \"Escola Mais\": \"#0099c6\", \"Escola Viva\": \"#dd4477\", \"Essential\": \"#3366cc\", \"False\": \"#3366cc\", \"Guimar\\u00e3es Neto Advogados\": \"#66aa00\", \"MKT4EDU\": \"#b82e2e\", \"Morais\": \"#316395\", \"Notifica\\u00e7\\u00e3o Extrajudicial\": \"#dd4477\", \"Notifica\\u00e7\\u00e3o de cobran\\u00e7a\": \"#b82e2e\", \"Standard\": \"#ff9900\", \"Termo de Uso e Responsabilidade - Iscool App\": \"#6633cc\", \"Termo de confidencialidade - NDA\": \"#316395\", \"Termo de confiss\\u00e3o de d\\u00edvida\": \"#66aa00\", \"True\": \"#dc3912\", \"Wagner DJR\": \"#994499\", \"completado\": \"#66aa00\", \"criado\": \"#990099\", \"entregue\": \"#994499\", \"enviado\": \"#0099c6\", \"enviado para assinatura\": \"#316395\", \"enviado por e-mail\": \"#dc3912\", \"finalizado\": \"#3366cc\", \"inserido no GED\": \"#ff9900\", \"inv\\u00e1lido\": \"#b82e2e\", \"rascunho\": \"#dd4477\", \"rascunho - em lote\": \"#109618\"}, \"limit\": null, \"line_interpolation\": \"linear\", \"metrics\": [\"count\"], \"order_desc\": false, \"queryFields\": {\"groupby\": \"groupby\", \"metrics\": \"metrics\"}, \"resample_method\": null, \"resample_rule\": null, \"rich_tooltip\": false, \"rolling_type\": \"None\", \"row_limit\": 5000, \"show_brush\": \"no\", \"show_controls\": false, \"show_legend\": true, \"slice_id\": 84, \"stacked_style\": \"stack\", \"time_grain_sqla\": \"P1W\", \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"timeseries_limit_metric\": null, \"url_params\": {}, \"viz_type\": \"area\", \"x_axis_format\": \"smart_date\", \"x_axis_label\": \"M\\u00eas\", \"x_axis_showminmax\": true, \"x_ticks_layout\": \"auto\", \"y_axis_bounds\": [null, null], \"y_axis_format\": \"~g\", \"y_log_scale\": false, \"remote_id\": 84, \"datasource_name\": \"dashboard_tenants\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Novos Clientes",
+                            "viz_type": "area"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_documents",
+                            "datasource_type": "table",
+                            "id": 85,
+                            "params": "{\"adhoc_filters\": [], \"bar_stacked\": false, \"bottom_margin\": \"auto\", \"color_scheme\": \"SUPERSET_DEFAULT\", \"columns\": null, \"contribution\": false, \"datasource\": \"14__table\", \"granularity_sqla\": \"document_created\", \"groupby\": [\"tenant\"], \"label_colors\": {\"Bahema\": \"#5AC189\", \"Casa da Gente\": \"#FF7F44\", \"Escola Canto Vivo Ltda\": \"#666666\", \"Escola Mais\": \"#E04355\", \"Escola Viva\": \"#FCC700\", \"False\": \"#1FA8C9\", \"Guimar\\u00e3es Neto Advogados\": \"#A868B7\", \"MKT4EDU\": \"#3CCCCB\", \"Morais\": \"#A38F79\", \"True\": \"#454E7C\", \"Wagner DJR\": \"#8FD3E4\"}, \"metrics\": [\"count\"], \"order_bars\": false, \"queryFields\": {\"columns\": \"groupby\", \"groupby\": \"groupby\", \"metrics\": \"metrics\"}, \"reduce_x_ticks\": false, \"row_limit\": 10000, \"show_bar_value\": true, \"show_controls\": false, \"show_legend\": false, \"slice_id\": 85, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"dist_bar\", \"x_axis_label\": \"\", \"x_ticks_layout\": \"auto\", \"y_axis_format\": \"SMART_NUMBER\", \"y_axis_label\": \"\", \"remote_id\": 85, \"datasource_name\": \"dashboard_documents\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Docs por cliente (total)",
+                            "viz_type": "dist_bar"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_documents",
+                            "datasource_type": "table",
+                            "id": 86,
+                            "params": "{\"adhoc_filters\": [], \"datasource\": \"14__table\", \"header_font_size\": 0.4, \"metric\": \"count\", \"queryFields\": {\"metric\": \"metrics\"}, \"slice_id\": 86, \"subheader\": \"\", \"subheader_font_size\": 0.15, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"big_number_total\", \"y_axis_format\": \".4r\", \"remote_id\": 86, \"datasource_name\": \"dashboard_documents\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Documentos gerados",
+                            "viz_type": "big_number_total"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_documents",
+                            "datasource_type": "table",
+                            "id": 88,
+                            "params": "{\"adhoc_filters\": [], \"annotation_layers\": [], \"bottom_margin\": \"auto\", \"color_scheme\": \"googleCategory20c\", \"comparison_type\": \"values\", \"contribution\": false, \"datasource\": \"14__table\", \"granularity_sqla\": \"document_created\", \"groupby\": [\"tenant\"], \"label_colors\": {\"Bahema\": \"#ff9900\", \"Casa da Gente\": \"#109618\", \"Escola Canto Vivo Ltda\": \"#990099\", \"Escola Mais\": \"#0099c6\", \"Escola Viva\": \"#dd4477\", \"False\": \"#3366cc\", \"Guimar\\u00e3es Neto Advogados\": \"#66aa00\", \"MKT4EDU\": \"#b82e2e\", \"Morais\": \"#316395\", \"True\": \"#dc3912\", \"Wagner DJR\": \"#994499\"}, \"left_margin\": \"auto\", \"limit\": null, \"line_interpolation\": \"linear\", \"metrics\": [\"count\"], \"order_desc\": true, \"queryFields\": {\"groupby\": \"groupby\", \"metrics\": \"metrics\"}, \"resample_method\": null, \"resample_rule\": null, \"rich_tooltip\": true, \"rolling_type\": \"None\", \"row_limit\": 10000, \"send_time_range\": false, \"show_brush\": \"auto\", \"show_legend\": true, \"show_markers\": false, \"slice_id\": 88, \"time_grain_sqla\": \"P1D\", \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"timeseries_limit_metric\": null, \"url_params\": {}, \"viz_type\": \"line\", \"x_axis_format\": \"smart_date\", \"x_axis_label\": \"\", \"x_axis_showminmax\": false, \"x_ticks_layout\": \"auto\", \"y_axis_bounds\": [null, null], \"y_axis_format\": \"SMART_NUMBER\", \"y_axis_label\": \"\", \"y_axis_showminmax\": false, \"y_log_scale\": false, \"remote_id\": 88, \"datasource_name\": \"dashboard_documents\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Documentos por cliente (tempo)",
+                            "viz_type": "line"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_tenants",
+                            "datasource_type": "table",
+                            "id": 89,
+                            "params": "{\"adhoc_filters\": [], \"color_scheme\": \"googleCategory20c\", \"datasource\": \"15__table\", \"donut\": false, \"granularity_sqla\": \"created_date\", \"groupby\": [\"name\"], \"label_colors\": {\"Acordo Individual de Trabalho - Redu\\u00e7\\u00e3o de Jornada/Redu\\u00e7\\u00e3o Salarial MP 936-2020\": \"#0099c6\", \"Acordos Individuais Trabalhistas - Coronavirus\": \"#990099\", \"Aditivo ao contrato de trabalho - banco de horas\": \"#e67300\", \"Autoriza\\u00e7\\u00e3o de uso de imagem\": \"#8b0707\", \"Bahema\": \"#ff9900\", \"COUNT(*)\": \"#3366cc\", \"Casa da Gente\": \"#109618\", \"Contrato de consultoria\": \"#994499\", \"Contrato de presta\\u00e7\\u00e3o de servi\\u00e7os\": \"#aaaa11\", \"Contrato do aluno\": \"#22aa99\", \"Corporate\": \"#dc3912\", \"Corporate - GED\": \"#109618\", \"Escola Canto Vivo Ltda\": \"#990099\", \"Escola Mais\": \"#0099c6\", \"Escola Viva\": \"#dd4477\", \"Essential\": \"#3366cc\", \"False\": \"#3366cc\", \"Guimar\\u00e3es Neto Advogados\": \"#66aa00\", \"MKT4EDU\": \"#b82e2e\", \"Morais\": \"#316395\", \"Notifica\\u00e7\\u00e3o Extrajudicial\": \"#dd4477\", \"Notifica\\u00e7\\u00e3o de cobran\\u00e7a\": \"#b82e2e\", \"Standard\": \"#ff9900\", \"Termo de Uso e Responsabilidade - Iscool App\": \"#6633cc\", \"Termo de confidencialidade - NDA\": \"#316395\", \"Termo de confiss\\u00e3o de d\\u00edvida\": \"#66aa00\", \"True\": \"#dc3912\", \"Wagner DJR\": \"#994499\", \"completado\": \"#66aa00\", \"criado\": \"#990099\", \"entregue\": \"#994499\", \"enviado\": \"#0099c6\", \"enviado para assinatura\": \"#316395\", \"enviado por e-mail\": \"#dc3912\", \"finalizado\": \"#3366cc\", \"inserido no GED\": \"#ff9900\", \"inv\\u00e1lido\": \"#b82e2e\", \"rascunho\": \"#dd4477\", \"rascunho - em lote\": \"#109618\"}, \"labels_outside\": true, \"metric\": \"count\", \"number_format\": \"SMART_NUMBER\", \"pie_label_type\": \"key_value\", \"queryFields\": {\"groupby\": \"groupby\", \"metric\": \"metrics\"}, \"row_limit\": 10000, \"show_labels\": true, \"show_legend\": true, \"slice_id\": 89, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {\"preselect_filters\": \"{\\\"94\\\": {\\\"tenant\\\": [\\\"Escola Viva\\\"], \\\"__time_range\\\": \\\"No filter\\\"}}\"}, \"viz_type\": \"pie\", \"remote_id\": 89, \"datasource_name\": \"dashboard_tenants\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Planos",
+                            "viz_type": "pie"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_schools",
+                            "datasource_type": "table",
+                            "id": 90,
+                            "params": "{\"adhoc_filters\": [], \"datasource\": \"16__table\", \"granularity_sqla\": null, \"header_font_size\": 0.4, \"metric\": \"count\", \"queryFields\": {\"metric\": \"metrics\"}, \"subheader_font_size\": 0.15, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"big_number_total\", \"y_axis_format\": \"SMART_NUMBER\", \"remote_id\": 90, \"datasource_name\": \"dashboard_schools\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Escolas",
+                            "viz_type": "big_number_total"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_documents",
+                            "datasource_type": "table",
+                            "id": 91,
+                            "params": "{\"adhoc_filters\": [], \"color_picker\": {\"a\": 1, \"b\": 135, \"g\": 122, \"r\": 0}, \"compare_lag\": 1, \"datasource\": \"14__table\", \"granularity_sqla\": \"document_created\", \"header_font_size\": 0.4, \"metric\": \"count\", \"queryFields\": {\"metric\": \"metrics\"}, \"rolling_type\": \"None\", \"show_trend_line\": true, \"slice_id\": 91, \"start_y_axis_at_zero\": true, \"subheader_font_size\": 0.15, \"time_grain_sqla\": \"P1M\", \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"big_number\", \"y_axis_format\": \"SMART_NUMBER\", \"remote_id\": 91, \"datasource_name\": \"dashboard_documents\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Docs gerados m\u00eas anterior",
+                            "viz_type": "big_number"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_documents",
+                            "datasource_type": "table",
+                            "id": 92,
+                            "params": "{\"adhoc_filters\": [], \"color_scheme\": \"googleCategory20c\", \"datasource\": \"14__table\", \"donut\": false, \"granularity_sqla\": \"document_created\", \"groupby\": [\"document_status\"], \"label_colors\": {\"Acordo Individual de Trabalho - Redu\\u00e7\\u00e3o de Jornada/Redu\\u00e7\\u00e3o Salarial MP 936-2020\": \"#0099c6\", \"Acordos Individuais Trabalhistas - Coronavirus\": \"#990099\", \"Aditivo ao contrato de trabalho - banco de horas\": \"#e67300\", \"Autoriza\\u00e7\\u00e3o de uso de imagem\": \"#8b0707\", \"Bahema\": \"#ff9900\", \"COUNT(*)\": \"#3366cc\", \"Casa da Gente\": \"#109618\", \"Contrato de consultoria\": \"#994499\", \"Contrato de presta\\u00e7\\u00e3o de servi\\u00e7os\": \"#aaaa11\", \"Contrato do aluno\": \"#22aa99\", \"Corporate\": \"#dc3912\", \"Corporate - GED\": \"#109618\", \"Escola Canto Vivo Ltda\": \"#990099\", \"Escola Mais\": \"#0099c6\", \"Escola Viva\": \"#dd4477\", \"Essential\": \"#3366cc\", \"False\": \"#3366cc\", \"Guimar\\u00e3es Neto Advogados\": \"#66aa00\", \"MKT4EDU\": \"#b82e2e\", \"Morais\": \"#316395\", \"Notifica\\u00e7\\u00e3o Extrajudicial\": \"#dd4477\", \"Notifica\\u00e7\\u00e3o de cobran\\u00e7a\": \"#b82e2e\", \"Standard\": \"#ff9900\", \"Termo de Uso e Responsabilidade - Iscool App\": \"#6633cc\", \"Termo de confidencialidade - NDA\": \"#316395\", \"Termo de confiss\\u00e3o de d\\u00edvida\": \"#66aa00\", \"True\": \"#dc3912\", \"Wagner DJR\": \"#994499\", \"completado\": \"#66aa00\", \"criado\": \"#990099\", \"entregue\": \"#994499\", \"enviado\": \"#0099c6\", \"enviado para assinatura\": \"#316395\", \"enviado por e-mail\": \"#dc3912\", \"finalizado\": \"#3366cc\", \"inserido no GED\": \"#ff9900\", \"inv\\u00e1lido\": \"#b82e2e\", \"rascunho\": \"#dd4477\", \"rascunho - em lote\": \"#109618\"}, \"labels_outside\": true, \"metric\": \"count\", \"number_format\": \"~g\", \"pie_label_type\": \"key_value\", \"queryFields\": {\"groupby\": \"groupby\", \"metric\": \"metrics\"}, \"row_limit\": 10000, \"show_labels\": true, \"show_legend\": true, \"slice_id\": 92, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"pie\", \"remote_id\": 92, \"datasource_name\": \"dashboard_documents\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Status dos Documentos",
+                            "viz_type": "pie"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_documents",
+                            "datasource_type": "table",
+                            "id": 93,
+                            "params": "{\"adhoc_filters\": [{\"clause\": \"HAVING\", \"comparator\": null, \"expressionType\": \"SQL\", \"filterOptionName\": \"filter_zg0pu6q4qwb_1f2nqx9x68d\", \"isExtra\": false, \"isNew\": false, \"operator\": null, \"sqlExpression\": \"COUNT(*) > 5\", \"subject\": null}], \"color_scheme\": \"supersetColors\", \"datasource\": \"14__table\", \"donut\": false, \"groupby\": [\"interview\"], \"label_colors\": {}, \"labels_outside\": true, \"metric\": \"count\", \"number_format\": \"SMART_NUMBER\", \"pie_label_type\": \"key_value\", \"queryFields\": {\"groupby\": \"groupby\", \"metric\": \"metrics\"}, \"row_limit\": 50000, \"show_labels\": true, \"show_legend\": true, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"pie\", \"remote_id\": 93, \"datasource_name\": \"dashboard_documents\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Docs por tipo",
+                            "viz_type": "pie"
+                        }
+                    },
+                    {
+                        "__Slice__": {
+                            "cache_timeout": null,
+                            "datasource_name": "dashboard_tenants",
+                            "datasource_type": "table",
+                            "id": 95,
+                            "params": "{\"adhoc_filters\": [], \"datasource\": \"15__table\", \"date_filter\": true, \"filter_configs\": [{\"asc\": true, \"clearable\": true, \"column\": \"tenant\", \"key\": \"EGixuOc24\", \"multiple\": true, \"searchAllOptions\": false}], \"granularity_sqla\": \"created_date\", \"instant_filtering\": false, \"queryFields\": {}, \"show_druid_time_granularity\": false, \"show_druid_time_origin\": false, \"show_sqla_time_column\": false, \"show_sqla_time_granularity\": false, \"slice_id\": 95, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"filter_box\", \"remote_id\": 95, \"datasource_name\": \"dashboard_tenants\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "slice_name": "Filtro",
+                            "viz_type": "filter_box"
+                        }
+                    }
+                ],
+                "slug": null
+            }
+        }
+    ],
+    "datasources": [
+        {
+            "__SqlaTable__": {
+                "cache_timeout": null,
+                "columns": [
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "column_name": "tenant",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 442,
+                            "is_active": true,
+                            "is_dttm": false,
+                            "python_date_format": null,
+                            "table_id": 14,
+                            "type": "VARCHAR(255)",
+                            "verbose_name": null
+                        }
+                    },
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "column_name": "interview",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 443,
+                            "is_active": true,
+                            "is_dttm": false,
+                            "python_date_format": null,
+                            "table_id": 14,
+                            "type": "VARCHAR(512)",
+                            "verbose_name": null
+                        }
+                    },
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "column_name": "document_created",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 444,
+                            "is_active": true,
+                            "is_dttm": true,
+                            "python_date_format": null,
+                            "table_id": 14,
+                            "type": "TIMESTAMP WITH TIME ZONE",
+                            "verbose_name": null
+                        }
+                    },
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "column_name": "document_status",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 445,
+                            "is_active": true,
+                            "is_dttm": false,
+                            "python_date_format": null,
+                            "table_id": 14,
+                            "type": "VARCHAR(256)",
+                            "verbose_name": null
+                        }
+                    }
+                ],
+                "database_id": 2,
+                "default_endpoint": null,
+                "description": null,
+                "fetch_values_predicate": null,
+                "filter_select_enabled": false,
+                "main_dttm_col": "document_created",
+                "metrics": [
+                    {
+                        "__SqlMetric__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T17:52:24"
+                            },
+                            "d3format": null,
+                            "description": null,
+                            "expression": "COUNT(*)",
+                            "id": 22,
+                            "metric_name": "count",
+                            "metric_type": "count",
+                            "table_id": 14,
+                            "verbose_name": "COUNT(*)",
+                            "warning_text": null
+                        }
+                    }
+                ],
+                "offset": 0,
+                "params": "{\"remote_id\": 14, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                "schema": null,
+                "sql": null,
+                "table_name": "dashboard_documents",
+                "template_params": null
+            }
+        },
+        {
+            "__SqlaTable__": {
+                "cache_timeout": null,
+                "columns": [
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "column_name": "tenant",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 446,
+                            "is_active": true,
+                            "is_dttm": false,
+                            "python_date_format": null,
+                            "table_id": 15,
+                            "type": "VARCHAR(255)",
+                            "verbose_name": null
+                        }
+                    },
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "column_name": "created_date",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 447,
+                            "is_active": true,
+                            "is_dttm": true,
+                            "python_date_format": null,
+                            "table_id": 15,
+                            "type": "TIMESTAMP WITH TIME ZONE",
+                            "verbose_name": null
+                        }
+                    },
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "column_name": "auto_enrolled",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 448,
+                            "is_active": true,
+                            "is_dttm": false,
+                            "python_date_format": null,
+                            "table_id": 15,
+                            "type": "BOOLEAN",
+                            "verbose_name": null
+                        }
+                    },
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "column_name": "name",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 449,
+                            "is_active": true,
+                            "is_dttm": false,
+                            "python_date_format": null,
+                            "table_id": 15,
+                            "type": "VARCHAR(255)",
+                            "verbose_name": null
+                        }
+                    }
+                ],
+                "database_id": 2,
+                "default_endpoint": null,
+                "description": null,
+                "fetch_values_predicate": null,
+                "filter_select_enabled": false,
+                "main_dttm_col": "created_date",
+                "metrics": [
+                    {
+                        "__SqlMetric__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T18:17:29"
+                            },
+                            "d3format": null,
+                            "description": null,
+                            "expression": "COUNT(*)",
+                            "id": 23,
+                            "metric_name": "count",
+                            "metric_type": "count",
+                            "table_id": 15,
+                            "verbose_name": "COUNT(*)",
+                            "warning_text": null
+                        }
+                    }
+                ],
+                "offset": 0,
+                "params": "{\"remote_id\": 15, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                "schema": null,
+                "sql": null,
+                "table_name": "dashboard_tenants",
+                "template_params": null
+            }
+        },
+        {
+            "__SqlaTable__": {
+                "cache_timeout": null,
+                "columns": [
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T19:10:43"
+                            },
+                            "column_name": "tenant",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T19:10:43"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 450,
+                            "is_active": true,
+                            "is_dttm": false,
+                            "python_date_format": null,
+                            "table_id": 16,
+                            "type": "VARCHAR(255)",
+                            "verbose_name": null
+                        }
+                    },
+                    {
+                        "__TableColumn__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T19:10:43"
+                            },
+                            "column_name": "name",
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T19:10:43"
+                            },
+                            "description": null,
+                            "expression": null,
+                            "filterable": true,
+                            "groupby": true,
+                            "id": 451,
+                            "is_active": true,
+                            "is_dttm": false,
+                            "python_date_format": null,
+                            "table_id": 16,
+                            "type": "VARCHAR(255)",
+                            "verbose_name": null
+                        }
+                    }
+                ],
+                "database_id": 2,
+                "default_endpoint": null,
+                "description": null,
+                "fetch_values_predicate": null,
+                "filter_select_enabled": false,
+                "main_dttm_col": null,
+                "metrics": [
+                    {
+                        "__SqlMetric__": {
+                            "changed_by_fk": 1,
+                            "changed_on": {
+                                "__datetime__": "2020-07-13T19:10:43"
+                            },
+                            "created_by_fk": 1,
+                            "created_on": {
+                                "__datetime__": "2020-07-13T19:10:43"
+                            },
+                            "d3format": null,
+                            "description": null,
+                            "expression": "COUNT(*)",
+                            "id": 24,
+                            "metric_name": "count",
+                            "metric_type": "count",
+                            "table_id": 16,
+                            "verbose_name": "COUNT(*)",
+                            "warning_text": null
+                        }
+                    }
+                ],
+                "offset": 0,
+                "params": "{\"remote_id\": 16, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                "schema": null,
+                "sql": null,
+                "table_name": "dashboard_schools",
+                "template_params": null
+            }
+        }
+    ]
+}
