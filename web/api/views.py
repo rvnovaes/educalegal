@@ -6,7 +6,6 @@ from rest_framework import viewsets, status
 
 from billing.models import Plan
 from document.models import Document
-from document.models import Document, EnvelopeLog, SignerLog
 from document.views import query_documents_by_args
 from interview.models import Interview
 from school.models import School
