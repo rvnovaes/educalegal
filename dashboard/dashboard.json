@@ -47,7 +47,7 @@
                             "datasource_name": "dashboard_documents",
                             "datasource_type": "table",
                             "id": 86,
-                            "params": "{\"adhoc_filters\": [], \"datasource\": \"14__table\", \"header_font_size\": 0.4, \"metric\": \"count\", \"queryFields\": {\"metric\": \"metrics\"}, \"slice_id\": 86, \"subheader\": \"\", \"subheader_font_size\": 0.15, \"time_range\": \"2020-07-01T00:00:00 : 2020-07-13T00:00:00\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {\"preselect_filters\": \"{\\\"95\\\": {\\\"__time_range\\\": \\\"No filter\\\"}}\"}, \"viz_type\": \"big_number_total\", \"y_axis_format\": \"~g\", \"remote_id\": 86, \"datasource_name\": \"dashboard_documents\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
+                            "params": "{\"adhoc_filters\": [], \"datasource\": \"14__table\", \"header_font_size\": 0.4, \"metric\": \"count\", \"queryFields\": {\"metric\": \"metrics\"}, \"slice_id\": 86, \"subheader\": \"\", \"subheader_font_size\": 0.15, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {\"preselect_filters\": \"{\\\"95\\\": {\\\"__time_range\\\": \\\"No filter\\\"}}\"}, \"viz_type\": \"big_number_total\", \"y_axis_format\": \"~g\", \"remote_id\": 86, \"datasource_name\": \"dashboard_documents\", \"schema\": null, \"database_name\": \"Educa Legal Produ\\u00e7\\u00e3o\"}",
                             "slice_name": "Documentos gerados",
                             "viz_type": "big_number_total"
                         }
