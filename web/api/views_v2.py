@@ -90,6 +90,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
         """
         Cria um novo documento.
 
+        Nõa é necessário informar o tenant no corpo da requisição. O sistema usa o cliente do usuário ao qual o usuário está vinculado.
+
         400 BAD REQUEST: Se for tentada a criação de um documento em um cliente (tenant) distinto daquele ao qual o usuário está vinculado.
             => "Somente é permitida a criação de documentos no seu cliente (tenant)."
         """
@@ -99,6 +101,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 message = "Somente é permitida a criação de documentos no seu cliente (tenant)."
                 logger.info(message)
                 raise ValidationError(message)
+        else:
+            request.data["tenant"] = tenant_id
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
