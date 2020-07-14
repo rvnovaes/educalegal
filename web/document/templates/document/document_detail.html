@@ -34,14 +34,15 @@
                 {% endif %}
                 <li class="list-group-item">
                     <span class="font-weight-bold">Descrição: </span>{{ document.description|default:"-" }}</li>
+            </ul>
+        </div>
 
-                {% if document.envelope_logs.all %}
-                    <li class="card-header">
-                    <br/>
-                    <h4>Andamentos da Assinatura Eletrônica</h4></li>
-                    <li class="card-header">
-                    <br/>
-                    <h5>Detalhes do Envelope</h5></li>
+        {% if document.envelope_logs.all %}
+            <div class="card-header">
+                <h5>Detalhes do Envelope</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
                     {% for envelope_log in document.envelope_logs.all %}
                         <li class="list-group-item">
                             <span class="font-weight-bold">Data de criação: </span>{{ envelope_log.envelope_created_date|date:"d/m/Y H:i:s" }}
@@ -55,51 +56,78 @@
                         <li class="list-group-item">
                             <span class="font-weight-bold">Status: </span>{{ envelope_log.status }}
                         </li>
-                        <li class="card-header">
-                        <br/>
-                        <h5>Detalhes dos Destinatários</h5></li>
-                        {% for signer_log in envelope_log.signer_logs.all %}
-                            <li class="card-header">
-                                <span class="font-weight-bold">Nome: </span>{{ signer_log.name }}
-                            </li>
-                            <li class="list-group-item">
-                                <span class="font-weight-bold">E-mail: </span>{{ signer_log.email }}
-                            </li>
-                            <li class="list-group-item">
-                                <span class="font-weight-bold">Data de Criação: </span>{{ signer_log.created_date|date:"d/m/Y H:i:s" }}
-                            </li>
-                            <li class="list-group-item">
-                                <span class="font-weight-bold">Data do Envio: </span>{{ signer_log.sent_date|date:"d/m/Y H:i:s" }}
-                            </li>
-                            <li class="list-group-item">
-                                <span class="font-weight-bold">Status: </span>{{ signer_log.status }}
-                            </li>
-                            <li class="list-group-item">
-                                <span class="font-weight-bold">Tipo: </span>{{ signer_log.type }}
-                            </li>
-                            {% if signer_log.pdf_filenames %}
-                                <li class="list-group-item">
-                                    <span class="font-weight-bold">PDFs: </span>{{ signer_log.pdf_filenames|linebreaks }}
-                                </li>
-                            {% endif %}
-                        {% endfor %}
                     {% endfor %}
-                {% endif %}
+                </ul>
+            </div>
+        {% endif %}
 
-                {% if document.documents.all %}
-                    <li class="list-group-item">
-                    <br/>
-                    <h5>Documentos Relacionados</h5></li>
-                    <div class="card-footer">
-                        <ul>
-                            {% for related_document in document.documents.all %}
-                                <li><a href="{% url 'document:document-detail' pk=related_document.pk %}"
-                                       target="_blank">{{ related_document.name }}</a></li>
-                            {% endfor %}
-                        </ul>
+        {% for envelope_log in document.envelope_logs.all %}
+            <div class="card-header">
+              <h5>Detalhes dos Destinatários</h5>
+            </div>
+            <br/>
+            <div class="card-deck ml-1 mr-1">
+              <div class="row">
+                {% for signer_log in signer_logs %}
+                  <div class="col-sm">
+                    <div class="card mb-3 border-{{ signer_log.status }}">
+                      <div class="card-header header-{{ signer_log.status }}">
+                        <b>{{ signer_log.status|title }}</b>
+                      </div>
+                      <div class="card-body">
+                        <h5 class="card-title">{{ signer_log.name }}</h5>
+                        <p class="card-text">E-mail: {{ signer_log.email }}</p>
+                        <p class="card-text">Criação: {{ signer_log.created_date|date:"d/m/Y H:i:s" }}</p>
+                        <p class="card-text">Envio: {{ signer_log.sent_date|date:"d/m/Y H:i:s"|default:"-" }}</p>
+                        <p class="card-text">Tipo: {{ signer_log.type }}</p>
+                        {% if signer_log.pdf_filenames %}
+                          <p class="card-text">PDFs: {{ signer_log.pdf_filenames|linebreaks }}</p>
+                        {% endif %}
+                      </div>
                     </div>
-                {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+        {% endfor %}
+
+        <br/>
+        {% if document.documents.all %}
+            <div class="card-header">
+                <h5>Documentos Relacionados</h5>
+            </div>
+            <br/>
+            <ul>
+                {% for related_document in document.documents.all %}
+                    <li><a href="{% url 'document:document-detail' pk=related_document.pk %}"
+                           target="_blank">{{ related_document.name }}</a></li>
+                {% endfor %}
             </ul>
-        </div>
+        {% endif %}
     </div>
+
+    <script type="text/javascript">
+        $.each({{ signer_statuses }}, function(index, signer_status) {
+          if (signer_status == 'criado') {
+            $(".border-criado").addClass("el-border-primary");
+            $(".header-criado").addClass("el-bg-primary");
+          } else if (signer_status == 'enviado') {
+            $(".border-enviado").addClass("el-border-info");
+            $(".header-enviado").addClass("el-bg-info");
+          } else if (signer_status == 'entregue') {
+            $(".border-entregue").addClass("el-border-warning");
+            $(".header-entregue").addClass("el-bg-warning");
+          } else if (signer_status == 'finalizado') {
+            $(".border-finalizado").addClass("el-border-success");
+            $(".header-finalizado").addClass("el-bg-success");
+          } else if (signer_status == 'recusado' || signer_status == 'inválido') {
+            $(".border-recusado").addClass("el-border-danger");
+            $(".header-recusado").addClass("el-bg-danger");
+            $(".border-inválido").addClass("el-border-danger");
+            $(".header-inválido").addClass("el-bg-danger");
+          }
+          $(".border-" + signer_status).removeClass("border-" + signer_status);
+          $(".header-" + signer_status).removeClass("header-" + signer_status);
+        });
+    </script>
 {% endblock %}

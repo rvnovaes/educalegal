@@ -89,6 +89,7 @@ class Document(TenantAwareModel):
         else:
             return self.name
 
+
 # DEPRECATED - Um dia vamos apagar você - Huahauahauha TODO
 class DocumentESignatureLog(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
@@ -189,7 +190,7 @@ class DocumentTaskView(TenantAwareModel):
         db_table = 'document_task'
 
 
-class EnvelopeLog(models.Model):
+class EnvelopeLog(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
     envelope_id = models.CharField(max_length=256, verbose_name="ID")
@@ -218,7 +219,7 @@ class EnvelopeLog(models.Model):
         return self.status + " | " + str(self.created_date)
 
 
-class SignerLog(models.Model):
+class SignerLog(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     name = models.CharField(max_length=256, verbose_name="Nome")
     email = models.EmailField(max_length=256, verbose_name="E-mail")
@@ -244,4 +245,4 @@ class SignerLog(models.Model):
         ]
 
     def __str__(self):
-        return self.status + " | " + str(self.imported_date)
+        return self.status + " | " + str(self.created_date)

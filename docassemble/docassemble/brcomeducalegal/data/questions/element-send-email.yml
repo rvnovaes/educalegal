@@ -60,7 +60,6 @@ subquestion: |
   Entre em contato com o suporte e forneça as informações abaixo:
 
   Dados enviados para o servidor:
-  ${ from_email }
   % for recipient in recipients:
       * ${ recipient }
       ---

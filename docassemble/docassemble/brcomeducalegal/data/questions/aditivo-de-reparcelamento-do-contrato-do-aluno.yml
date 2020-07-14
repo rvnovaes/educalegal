@@ -1,0 +1,344 @@
+metadata:
+  title: Aditivo de Reparcelamento do Contrato do Aluno
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Contratantes
+  - Aluno
+  - Dados Contratuais
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "aditivo-de-reparcelamento-do-contrato-do-aluno.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    if len(school_units_list) == 0:
+      # nao pode ser usado school_unit pq essa variavel foi usada no endereco da escola
+      school_division = None
+    elif len(school_units_list) == 1:
+      school_division = school_units_list[0]
+    else:
+      school_division
+    contractors.gather()
+    if plan_use_esignature:
+      valid_contractors_table
+    students.target_number = 1
+    for item in students:
+      item.name.first
+    if method_payment == 'a vista':
+      single_installment_date_format = format_date(single_installment_date, format='dd/MM/yyyy')
+    if method_payment == 'parcelado':
+      if has_input_value == 'sim':
+        input_date_format = format_date(input_date, format='dd/MM/yyyy')
+      installments_list = list()
+      for v in range(0, quantity_installments):
+        installments = dict()
+        installments_due = installments_date.plus(months=v)
+        installments_due = format_date(installments_due, format='dd/MM/yyyy')
+        installments['installments_due'] = installments_due
+        installments['installments_value'] = installments_value
+        installments_list.append(installments)
+    signature_local
+    generated_file
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - contractors: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  contractors[i].name.text
+  contractors[i].address.street_name
+  contractors[i].complete = True
+---
+ga id: |
+  code: ga_id_begin
+progress: 10
+section: Contratantes
+question: |
+  Número de Contratantes
+fields:
+  - Número: contractors.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 20
+section: Contratantes
+question: Dados do(a) ${word(ordinal(i)) } Contratante
+fields:
+  - 'Nome completo: ': contractors[i].name.text
+    datatype: text
+  - 'CPF: ': contractors[i].cpf
+    datatype: text
+    validate: validate_cpf
+  - 'Número do RG: ': contractors[i].rg
+    datatype: text
+  - 'Orgão Expedidor: ': contractors[i].originator
+    datatype: text
+  - 'Nacionalidade:': contractors[i].nationality
+    datatype: text
+    default: brasileiro(a)
+  - 'Estado Civil: ': contractors[i].marital_status
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+  - 'Profissão: ': contractors[i].occupation
+    datatype: text
+    required: False
+  - 'E-mail: ': contractors[i].email
+    help: ${ help_email_msg }
+    datatype: email
+  - 'Celular: ': contractors[i].cel_number
+    datatype: text
+    required: False
+  - 'Telefone: ': contractors[i].phone_number
+    datatype: text
+    required: False
+  - 'Whatsapp:': contractors[i].whatsapp_number
+    datatype: text
+    required: False
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#Y29udHJhY3RvcnNbaV0uY3Bm').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+progress: 20
+section: Contratantes
+question: Endereço de ${ contractors[i].name.text }
+fields:
+  - 'CEP: ': contractors[i].address.zip
+    datatype: text
+  - 'Logradouro: ': contractors[i].address.street_name
+    datatype: text
+  - 'Número': contractors[i].address.street_number
+    datatype: text
+  - 'Complemento: ': contractors[i].address.unit
+    datatype: text
+    required: False
+  - 'Bairro: ': contractors[i].address.neighborhood
+    datatype: text
+  - 'Município: ': contractors[i].address.city
+    datatype: text
+  - 'Estado: ': contractors[i].address.state
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+  });
+
+  $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Contratantes
+field: valid_contractors_table
+question: |
+  Contratantes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ contractors.table }
+buttons:
+  Continuar: continue
+---
+table: contractors.table
+rows: contractors
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+objects:
+  - students: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  students[i].name.first
+  students[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Aluno
+progress: 40
+question: Número de Alunos
+fields:
+  - Número: students.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 60
+section: Aluno(a)
+question: Dados do(a) Aluno(a)
+fields:
+  - 'Nome completo: ': students[i].name.first
+    datatype: text
+    required: True
+  - 'Curso:': students[i].course
+    datatype: text
+    required: True
+---
+progress: 70
+section: Dados Contratuais
+question: Preço e Forma de Pagamento
+fields:
+  - 'Forma de pagamento:': method_payment
+    datatype: radio
+    choices:
+      - à vista: a vista
+      - parcelado: parcelado
+  - 'Valor da parcela única:': single_installment_value
+    datatype: currency
+    hint: 0000,00
+    js show if: |
+      val("method_payment") == "a vista"
+  - 'Data do vencimento da parcela única:': single_installment_date
+    datatype: date
+    js show if: |
+      val("method_payment") == "a vista"
+  - 'Haverá parcela de entrada:': has_input_value
+    datatype: radio
+    choices:
+      - sim: sim
+      - não: não
+    js show if: |
+      val("method_payment") == "parcelado"
+  - 'Valor da parcela de entrada': input_value
+    datatype: currency
+    hint: 0000,00
+    js show if: |
+      val("has_input_value") == "sim"
+  - 'Data do vencimento da parcela de entrada': input_date
+    datatype: date
+    js show if: |
+      val("has_input_value") == "sim"
+  - 'Quantidade das demais parcelas: ': quantity_installments
+    datatype: integer
+    min: 2
+    js show if: |
+      val("method_payment") == "parcelado"
+  - 'Valor da parcela:': installments_value
+    datatype: currency
+    hint: 0000,00
+    js show if: |
+      val("method_payment") == "parcelado"
+  - 'Data de vencimento da primeira parcela: ': installments_date
+    datatype: date
+    js show if: |
+      val("method_payment") == "parcelado"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzE').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzQ').mask('000000000000000.00', {reverse: true});
+      });
+  </script>
+---
+code: |
+  recipients = list()
+  for item in contractors:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 2
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 3
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]
+---
+code: |
+  if plan_use_esignature:
+    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
+  else:
+    help_email_msg = "Digite um e-mail válido."
+---
+code: |
+  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
+  email_category = interview_custom_file_name_string
+  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"
+---

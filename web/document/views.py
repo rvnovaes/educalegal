@@ -1,9 +1,11 @@
 import logging
 import json
 import pandas as pd
+
 from mongoengine.errors import ValidationError
 from celery import chain
 
+from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableView
@@ -12,6 +14,7 @@ from django.contrib.messages import get_messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse
+from django.utils.safestring import mark_safe
 from django.views import View
 
 from tenant.models import Tenant
@@ -27,16 +30,72 @@ from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
-from .models import Document, BulkDocumentGeneration, DocumentTaskView
+from .models import Document, BulkDocumentGeneration, DocumentTaskView, EnvelopeLog, SignerLog
 from .tasks import create_document, submit_to_esignature, send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
 logger = logging.getLogger(__name__)
 
 
+DOCUMENT_COLUMNS = (
+    (0, 'id'),
+    (1, 'name'),
+    (2, 'interview'),
+    (3, 'school'),
+    (4, 'created_date'),
+    (5, 'altered_date'),
+    (6, 'status'),
+    (7, 'submit_to_esignature'),
+    (8, 'send_email'),
+)
+
+
 class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
     model = Document
     context_object_name = "document"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        document = Document.objects.get(pk=self.kwargs["pk"])
+
+        try:
+            envelope_log = EnvelopeLog.objects.filter(document=document).first()
+        except EnvelopeLog.DoesNotExist:
+            pass
+
+        try:
+            # busca somente o último signer_log de cada email do envelope
+            signer_logs = SignerLog.objects.raw(
+                """select
+                    s1.* 
+                   from
+                    document_signerlog s1
+                   where
+                    s1.envelope_log_id = {envelope_id} and
+                    s1.created_date = (
+	                    select
+	                        max(created_date)
+	                    from
+	                        document_signerlog s2
+	                    where
+ 	                        s1.envelope_log_id = s2.envelope_log_id and 
+	                        s1.email = s2.email 
+                ) order by s1.created_date desc;""".format(envelope_id=envelope_log.id))
+        except:
+            pass
+        else:
+            context['signer_logs'] = list(signer_logs)
+            signer_statuses = list()
+            for signer_log in signer_logs:
+                signer_statuses.append(signer_log.status)
+
+            # Explicitly mark a string as safe for (HTML) output purposes. The returned object can be used
+            # everywhere a string is appropriate.
+            # https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.safestring.mark_safe
+            # retorna uma lista com os status dos signatarios
+            context['signer_statuses'] = mark_safe(signer_statuses)
+
+        return context
 
 
 class DocumentListView(LoginRequiredMixin, TenantAwareViewMixin, ListView):
@@ -556,6 +615,49 @@ def bulk_generation_progress(request, bulk_document_generation_id):
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
 
+def query_documents_by_args(pk=None, **kwargs):
+    draw = int(kwargs.get('draw', None)[0])
+    length = int(kwargs.get('length', None)[0])
+    start = int(kwargs.get('start', None)[0])
+    search_value = kwargs.get('search[value]', None)[0]
+    order_column = int(kwargs.get('order[0][column]', None)[0])
+    order = kwargs.get('order[0][dir]', None)[0]
 
+    order_column = DOCUMENT_COLUMNS[order_column]
+    # django orm '-' -> desc
+    if order == 'desc':
+        order_column = '-' + order_column[1]
+    else:
+        order_column = order_column[1]
 
+    queryset = Document.objects.filter(tenant=pk)
+    total = queryset.count()
 
+    if search_value:
+        if search_value == 'não' or search_value == 'nao':
+            boolean_search_value = False
+        elif search_value == 'sim':
+            boolean_search_value = True
+        try:
+            if boolean_search_value or not boolean_search_value:
+                queryset = queryset.filter(Q(name__unaccent__icontains=search_value) |
+                                           Q(interview__name__unaccent__icontains=search_value) |
+                                           Q(school__name__unaccent__icontains=search_value) |
+                                           Q(status__unaccent__icontains=search_value) |
+                                           Q(submit_to_esignature=boolean_search_value) |
+                                           Q(send_email=boolean_search_value))
+        except NameError:
+            queryset = queryset.filter(Q(name__unaccent__icontains=search_value) |
+                                       Q(interview__name__unaccent__icontains=search_value) |
+                                       Q(school__name__unaccent__icontains=search_value) |
+                                       Q(status__unaccent__icontains=search_value))
+
+    count = queryset.count()
+    queryset = queryset.order_by(order_column)[start:start + length]
+    data = {
+        'items': queryset,
+        'count': count,
+        'total': total,
+        'draw': draw,
+    }
+    return data

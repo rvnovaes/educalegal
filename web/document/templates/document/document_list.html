@@ -6,6 +6,7 @@
         <table id="data_table" class="dataTable cell-border hover order-column row-border stripe">
             <thead>
             <tr>
+                <th data-data="name">ID</th>
                 <th data-data="name">Documento</th>
                 <th data-data="interview_name">Modelo</th>
                 <th data-data="school_name">Escola</th>
@@ -32,21 +33,36 @@
         $(document).ready(function () {
             const table_data_url = "/v1/tenants/" + {{ user.tenant.pk  }} +"/documents/?format=datatables"
             $("#data_table").DataTable({
-                info: true,
-                dom: 'Blfrtip',
-                buttons: [
-                    'excelHtml5',
-                    'csvHtml5',
-                    'pdfHtml5'
-                ],
+                serverSide: true,
+                processing: true,
+                order: [[ 4, "desc" ]],
+                lengthMenu: [ 10, 50, 100, 500, 1000],
                 ajax: {
                     url: table_data_url,
                     method: "GET",
                 },
-                columns: [
+                info: true,
+                dom: 'Blfrtip',
+                buttons: [
                     {
-                        data: null, render: function (data, type, row) {
-                            return '<a href="/document/document/' + data.id + '"' + ' target="_blank">' + data.name + '</a>'
+                        extend: 'excelHtml5',
+                        title: 'documentos_lista'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        title: 'documentos_lista'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        title: 'documentos_lista'
+                    },
+                ],
+                columns: [
+                    {data: "id"},
+                    {
+                        data: "name",
+                        render: function (data, type, row) {
+                            return '<a href="/document/document/' + row.id + '"' + ' target="_blank">' + data + '</a>';
                         }
                     },
                     {data: "interview_name"},
@@ -62,7 +78,8 @@
                             }
                         },
                     },
-                    {data: "send_email", render: function (data, type, row) {
+                    {
+                        data: "send_email", render: function (data, type, row) {
                             if (data === true) {
                                 return "sim"
                             } else {
@@ -71,10 +88,16 @@
                         },
                     }
                 ],
+
                 columnDefs: [
                     {
-                        targets: [3, 4], "width": "14%", render: function (data) {
-                            return moment(data).format('DD/MM/YYYY HH:mm');
+                        targets: [0],
+            			"visible": false
+                    },
+                    {
+                        type: 'datetime-moment',
+                        targets: [4, 5], "width": "14%", render: function (data) {
+                            return '<span'+moment(data).format('YYYYMMDDHHmm')+'>'+moment(data).format('DD/MM/YYYY HH:mm')+'</span>'
                         },
                     },
                 ],

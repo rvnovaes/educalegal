@@ -10,9 +10,10 @@ from .views import (
     TenantInterviewViewSet,
     TenantSchoolViewSet,
     TenantViewSet,
-    TenantGedDataViewSet,
-    docusign_webhook_listener
+    TenantGedDataViewSet
 )
+
+from .docusign_helpers import docusign_webhook_listener
 
 API_TITLE = "Educa Legal API"
 API_DESCRIPTION = (
