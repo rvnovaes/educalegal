@@ -46,4 +46,4 @@ subquestion: |
 
   Erro: ${ el_document_patched_with_ged_data }
 buttons:
-  - Exit: exit
+  - Sair: exit
