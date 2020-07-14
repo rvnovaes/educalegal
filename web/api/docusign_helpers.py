@@ -28,6 +28,14 @@ envelope_statuses = {
     "voided": "inválido",
 }
 
+envelope_vs_document_statuses = {
+    "sent": DocumentStatus.ENVIADO_ASS_ELET,
+    "delivered": "entregue",
+    "completed": DocumentStatus.ASSINADO,
+    "declined": DocumentStatus.RECUSADO_INVALIDO,
+    "voided": DocumentStatus.RECUSADO_INVALIDO,
+}
+
 recipient_statuses_dict = {
     "created": "criado",
     "sent": "enviado",
@@ -254,8 +262,8 @@ def docusign_webhook_listener(request):
                 logger.exception(msg)
                 return HttpResponse(msg)
 
-        if envelope_status in envelope_statuses.keys():
-            document.status = envelope_statuses[envelope_status]
+        if envelope_status in envelope_vs_document_statuses.keys():
+            document.status = envelope_vs_document_statuses[envelope_status]
         else:
             document.status = DocumentStatus.NAO_ENCONTRADO
 
