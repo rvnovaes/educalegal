@@ -201,7 +201,7 @@ def document_download(request, identifier):
         => "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
     403 FORBIDDEN: O cliente deve possuir GED para poder baixar documentos
-        => "Somente clientes que possuem GED podem baixar documentos."
+        => "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
 
     404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente
         (tenant) ao qual o usuário da requisição está vinculado.
@@ -222,7 +222,7 @@ def document_download(request, identifier):
     """
     tenant = request.user.tenant
     if not tenant.plan.use_ged:
-        message = "Somente clientes que possuem GED podem baixar documentos."
+        message = "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
         logger.info(message)
         raise PermissionDenied(message)
     else:
