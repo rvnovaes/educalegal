@@ -5,7 +5,7 @@ subquestion: |
   Contate nosso suporte para ajuda.
   Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
 buttons:
-  - Exit: exit
+  - Sair: exit
 ---
 event: invalid_user
 question: Usuário inválido
@@ -14,7 +14,7 @@ subquestion: |
   Contate nosso suporte para ajuda.
   Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
 buttons:
-  - Exit: exit
+  - Sair: exit
 ---
 event: invalid_interview
 question: Entrevista inválida
@@ -23,7 +23,7 @@ subquestion: |
   Contate nosso suporte para ajuda.
   Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
 buttons:
-  - Exit: exit
+  - Sair: exit
 ---
 event: invalid_doc_uuid
 question: Documento inválido
@@ -32,7 +32,7 @@ subquestion: |
   Contate nosso suporte para ajuda.
   Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
 buttons:
-  - Exit: exit
+  - Sair: exit
 ---
 event: invalid_elc
 question: API Educa Legal
@@ -42,7 +42,7 @@ subquestion: |
   Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.<br/><br/>
   Variáveis: ${ all_variables() }
 buttons:
-  - Exit: exit
+  - Sair: exit
 ---
 event: invalid_ecm
 question: GED inválido
@@ -51,14 +51,14 @@ subquestion: |
   Contate nosso suporte para ajuda.
   Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
 buttons:
-  - Exit: exit
+  - Sair: exit
 ---
 event: buy_esignature
 question: Quer enviar o seu documento com assinatura eletrônica?
 subquestion: |
   Entre em <a href="https://www.educalegal.com.br/contato/" target="_blank">contato</a> com a nossa equipe e adquira um plano de assinatura.
 buttons:
-  - Exit: exit
+  - Sair: exit
 ---
 event: invalid_school
 question: Escolas
@@ -66,7 +66,7 @@ subquestion: |
   A empresa não possui escolas cadastradas.
   [Clique aqui](${ school_registration_url }) para cadastrar uma escola.
 buttons:
-  - Exit: exit
+  - Sair: exit
 ---
 event: invalid_ged_token
 question: Token de GED inválido
@@ -75,7 +75,7 @@ subquestion: |
   Contate nosso suporte para ajuda.
   Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
 buttons:
-  - Exit: exit
+  - Sair: exit
 ---
 event: invalid_document_type
 question: Tipo de documento inválido
@@ -84,4 +84,4 @@ subquestion: |
   Contate nosso suporte para ajuda.
   Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
 buttons:
-  - Exit: exit
+  - Sair: exit

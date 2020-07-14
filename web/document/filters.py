@@ -1,17 +1,6 @@
 import django_filters
 
-from .models import Document, School
-
-
-# https://django-filter.readthedocs.io/en/stable/ref/filters.html#choicefilter
-STATUS_CHOICES = (
-    ("rascunho", "rascunho"),
-    ("criado", "criado"),
-    ("inserido no GED", "inserido no GED"),
-    ("enviado", "enviado"),
-    ("finalizado", "finalizado"),
-    ("rascunho - em lote", "rascunho - em lote")
-)
+from .models import Document, School, DocumentStatus
 
 
 # https://django-filter.readthedocs.io/en/stable/guide/usage.html#filtering-the-related-queryset-for-modelchoicefilter
@@ -25,7 +14,7 @@ def schools(request):
 
 class DocumentFilter(django_filters.FilterSet):
     school = django_filters.ModelChoiceFilter(queryset=schools, label="Escola")
-    status = django_filters.ChoiceFilter(choices=STATUS_CHOICES)
+    status = django_filters.ChoiceFilter(choices=DocumentStatus.choices())
 
     class Meta:
         model = Document

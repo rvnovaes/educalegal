@@ -4,6 +4,8 @@ from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
+from document.models import DocumentStatus
+
 
 class EducaLegalClient:
     def __init__(self, api_base_url, token):
@@ -116,7 +118,7 @@ class EducaLegalClient:
         ged_id,
         ged_link,
         ged_uuid,
-        status="inserido no GED",
+        status=DocumentStatus.INSERIDO_GED,
     ):
 
         payload = {
@@ -134,7 +136,7 @@ class EducaLegalClient:
         self,
         doc_uuid,
         send_email,
-        status="enviado por e-mail",
+        status=DocumentStatus.ENVIADO_EMAIL,
     ):
 
         payload = {
