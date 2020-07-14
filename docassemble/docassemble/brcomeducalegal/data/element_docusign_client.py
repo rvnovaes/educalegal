@@ -5,7 +5,6 @@ import time
 import jwt
 import json
 import base64
-import hashlib
 import re
 from docassemble.base.util import (
     DAError,
@@ -321,10 +320,7 @@ def make_document_base64(document_path):
         return base64.b64encode(document.read()).decode("utf-8")
 
 
-def generate_anchor(tab_type, email, uid=""):
-    """Generate standard anchor using SHA1 hash of email and standard abbreviation"""
-    return (
-        hashlib.sha1(email.encode("utf-8")).hexdigest()[:10]
-        + TAB_TYPES[tab_type]["abbreviation"]
-        + uid
-    )
+def generate_anchor(tab_type, email):
+    """Generate 15 numeric anchor using hash of tab_type and email"""
+    text = str(tab_type) + email
+    return abs(hash(text)) % (10 ** 15)
