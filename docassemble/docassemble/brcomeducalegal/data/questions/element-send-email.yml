@@ -12,7 +12,7 @@ code: |
   html_content = email_html_content
   category = email_category
   file_path = generated_file.pdf.path()
-  file_name = mayan_file_name
+  file_name = custom_file_name + '.pdf'
   if el_log_to_console:
     log("Enviando e-mail para {to_emails}".format(to_emails=to_emails), "console")
   log("Enviando e-mail para {to_emails}".format(to_emails=to_emails))

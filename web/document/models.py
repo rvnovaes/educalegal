@@ -1,10 +1,31 @@
+import uuid
+
+from enum import Enum
+
 from django.db import models
 from django.contrib.postgres.fields import JSONField
-import uuid
 
 from tenant.models import TenantAwareModel
 from interview.models import Interview
 from school.models import School
+
+
+class DocumentStatus(Enum):
+    RASCUNHO = "rascunho"
+    CRIADO = "criado"
+    INSERIDO_GED = "inserido no GED"
+    ENVIADO_EMAIL = "enviado por e-mail"
+    ENVIADO_ASS_ELET = "enviado para assinatura"
+    ASSINADO = "assinado"
+    RECUSADO_INVALIDO = "assinatura recusada/inválida"
+    NAO_ENCONTRADO = "não encontrado"
+
+    def __str__(self):
+        return str(self.value.lower())
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
 
 
 class BulkDocumentGeneration(TenantAwareModel):

@@ -1,16 +1,17 @@
-import os
-from pathlib import Path
 import base64
-import xmltodict
-import datetime as dt
+import dateparser
 import logging
+import os
+import xmltodict
+
+from pathlib import Path
 
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.conf import settings
 
-from document.models import Document, EnvelopeLog, SignerLog
+from document.models import Document, EnvelopeLog, SignerLog, DocumentStatus
 from interview.models import Interview
 from tenant.models import Tenant, TenantGedData
 
@@ -21,11 +22,19 @@ logger = logging.getLogger(__name__)
 
 
 envelope_statuses = {
-    "sent": "enviado para assinatura",
+    "sent": "enviado",
     "delivered": "entregue",
     "completed": "finalizado",
     "declined": "recusado",
     "voided": "inválido",
+}
+
+envelope_vs_document_statuses = {
+    "sent": DocumentStatus.ENVIADO_ASS_ELET,
+    "delivered": "entregue",
+    "completed": DocumentStatus.ASSINADO,
+    "declined": DocumentStatus.RECUSADO_INVALIDO,
+    "voided": DocumentStatus.RECUSADO_INVALIDO,
 }
 
 recipient_statuses_dict = {
@@ -52,24 +61,6 @@ recipient_types_dict = {
 }
 
 
-def _iso8601_to_datetime(iso8601_date):
-    # tamanho máximo de casas dedimais aceitas pelo python é 6
-    # https://docs.python.org/3/library/datetime.html
-    # Microsecond as a decimal number, zero-padded on the left (accepts from one to six digits)
-    # quando vier mais do que 6, trunca em 6
-    # Ex.: '2020-06-29T19:03:46.4619595' >> '2020-06-29T19:03:46.461959'
-    iso8601_date = iso8601_date[:26]
-    # tenta converter a data do docusign que vem no formato ISO 8601 para datetime
-    try:
-        converted_datetime = dt.datetime.fromisoformat(iso8601_date)
-    except:
-        # se a data não veio no formato certo (ISO 8601), converte manualmente
-        # iso8601_date = iso8601_date.strftime('%d/%m/%Y %H:%M:%S.%f')
-        converted_datetime = dt.datetime.strptime(iso8601_date, '%Y-%m-%dT%H:%M:%S.%f')
-
-    return converted_datetime
-
-
 def docusign_xml_parser(data):
     envelope_data = dict()
     xml = xmltodict.parse(data)["DocuSignEnvelopeInformation"]
@@ -83,9 +74,9 @@ def docusign_xml_parser(data):
     logger.info(envelope_data)
 
     # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
-    envelope_data['envelope_created'] = _iso8601_to_datetime(envelope_data['envelope_created'])
-    envelope_data['envelope_sent'] = _iso8601_to_datetime(envelope_data['envelope_sent'])
-    envelope_data['envelope_time_generated'] = _iso8601_to_datetime(envelope_data['envelope_time_generated'])
+    envelope_data['envelope_created'] = dateparser.parse(envelope_data['envelope_created'])
+    envelope_data['envelope_sent'] = dateparser.parse(envelope_data['envelope_sent'])
+    envelope_data['envelope_time_generated'] = dateparser.parse(envelope_data['envelope_time_generated'])
 
     # copia com .copy() pra criar outro objeto
     envelope_data_translated = envelope_data.copy()
@@ -99,7 +90,7 @@ def docusign_xml_parser(data):
     if envelope_data_translated["envelope_status"] in envelope_statuses.keys():
         envelope_data_translated["envelope_status"] = envelope_statuses[envelope_data_translated["envelope_status"]]
     else:
-        envelope_data_translated["envelope_status"] = 'não encontrado'
+        envelope_data_translated["envelope_status"] = DocumentStatus.NAO_ENCONTRADO
 
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
 
@@ -120,7 +111,7 @@ def docusign_xml_parser(data):
             recipient_status['Status'] = 'não encontrado'
         # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
         if 'Sent' in recipient_status.keys():
-            recipient_status['data_envio'] = _iso8601_to_datetime(recipient_status['Sent'])
+            recipient_status['data_envio'] = dateparser.parse(recipient_status['Sent'])
         else:
             recipient_status['data_envio'] = None
 
@@ -254,10 +245,10 @@ def docusign_webhook_listener(request):
                 logger.exception(msg)
                 return HttpResponse(msg)
 
-        if envelope_status in envelope_statuses.keys():
-            document.status = envelope_statuses[envelope_status]
+        if envelope_status in envelope_vs_document_statuses.keys():
+            document.status = envelope_vs_document_statuses[envelope_status]
         else:
-            document.status = "não encontrado"
+            document.status = DocumentStatus.NAO_ENCONTRADO
 
         document.save()
 

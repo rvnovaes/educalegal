@@ -30,7 +30,7 @@ from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
-from .models import Document, BulkDocumentGeneration, DocumentTaskView, EnvelopeLog, SignerLog
+from .models import Document, BulkDocumentGeneration, DocumentTaskView, EnvelopeLog, SignerLog, DocumentStatus
 from .tasks import create_document, submit_to_esignature, send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
@@ -335,8 +335,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
                     el_document = Document(
                         tenant=tenant,
-                        name=interview.name + " _rascunho_em_lote",
-                        status="rascunho",
+                        name=interview.name + "-rascunho-em-lote",
+                        status=DocumentStatus.RASCUNHO,
                         description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
                         interview=interview,
                         school=school,
