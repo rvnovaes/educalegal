@@ -62,7 +62,7 @@
             // Monta o payload do post com os valores constantes e toma o tid e intid do href do botão
             const payload = {
                 name: "---",
-                status: "rascunho",
+                status: "{{ document_status }}",
                 description: "Documento em elaboração...",
                 tenant: urlParams.get("tid"),
                 interview: urlParams.get("intid")

@@ -7,7 +7,7 @@ from django_tables2 import SingleTableMixin
 from django_filters.views import FilterView
 
 from tenant.models import Tenant
-from document.models import Document
+from document.models import Document, DocumentStatus
 
 from .models import Interview
 from .tables import InterviewTable
@@ -39,6 +39,7 @@ class InterviewListView(LoginRequiredMixin, SingleTableMixin, FilterView):
             context['document_limit'] = document_limit
 
         context['reached_document_limit'] = reached_document_limit
+        context['document_status'] = DocumentStatus.RASCUNHO
         return context
 
     def _reached_document_limit(self):
