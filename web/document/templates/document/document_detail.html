@@ -34,6 +34,9 @@
                 {% endif %}
                 <li class="list-group-item">
                     <span class="font-weight-bold">Descrição: </span>{{ document.description|default:"-" }}</li>
+                <li class="list-group-item">
+                    <span class="font-weight-bold">Doc UUID: </span>{{ document.doc_uuid|default:"-" }}</li>
+
             </ul>
         </div>
 

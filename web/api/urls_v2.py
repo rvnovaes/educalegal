@@ -5,6 +5,7 @@ from django.urls import path, include
 from .views_v2 import (
     PlanViewSet,
     DocumentViewSet,
+    document_download,
     InterviewViewSet,
     # TenantDocumentViewSet,
     # TenantInterviewViewSet,
@@ -28,6 +29,7 @@ urlpatterns = [
     path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
     path("documents/", DocumentViewSet.as_view({"post": "create", "patch": "partial_update", "get": "list"})),
     path("documents/<str:identifier>", DocumentViewSet.as_view({"get": "retrieve", "delete": "destroy"})),
+    path("documents/<str:identifier>/download", document_download),
 
     path("interviews/", InterviewViewSet.as_view({"get": "list"})),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),

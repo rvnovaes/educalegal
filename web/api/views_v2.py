@@ -1,14 +1,17 @@
 import logging
-import re
+import io
 
 from django.shortcuts import get_object_or_404
-from django.http import Http404
+from django.http import FileResponse, Http404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
 from rest_framework.views import APIView
-from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
 from rest_framework import status
+from rest_framework.decorators import api_view
+
+
 
 from validator_collection import checkers, validators
 
@@ -18,6 +21,7 @@ from document.models import *
 from interview.models import *
 from school.models import *
 from tenant.models import *
+from .mayan_helpers import MayanClient
 
 from .serializers_v2 import (
     PlanSerializer,
@@ -184,6 +188,39 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 message = "Somente usuários administradores podem excluir documentos."
                 logger.info(message)
                 raise PermissionDenied(message)
+
+
+@api_view(["GET"])
+def document_download(request, identifier):
+    tenant = request.user.tenant
+    if not tenant.plan.use_ged:
+        message = "Somente clientes que possuem GED podem baixar documentos."
+        logger.info(message)
+        raise PermissionDenied(message)
+    else:
+        queryset = Document.objects.all()
+        # Pode ser passada a id ou o doc_uuid.
+        if checkers.is_integer(identifier, coerce_value=True):
+            document = get_object_or_404(queryset, pk=identifier, tenant=tenant.id)
+        elif checkers.is_uuid(identifier):
+            document = get_object_or_404(queryset, doc_uuid=identifier, tenant=tenant.id)
+        else:
+            message = "O doc_uuid ou o id do documento não é um valor válido."
+            logger.info(message)
+            raise ValidationError(message)
+        tenand_ged_data = TenantGedData.objects.get(tenant=tenant)
+        ged_url = tenand_ged_data.url
+        tenant_ged_token = tenand_ged_data.token
+        mc = MayanClient(ged_url, tenant_ged_token)
+        response = mc.document_simple_read(document.ged_id)
+        if response.status_code == 404:
+            message = "O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal."
+            logger.info(message)
+            raise NotFound(message)
+        response = mc.document_download(document.ged_id)
+        f = io.BytesIO(response.content)
+        return FileResponse(f, as_attachment=True, filename=document.name)
+
 
 
 class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
