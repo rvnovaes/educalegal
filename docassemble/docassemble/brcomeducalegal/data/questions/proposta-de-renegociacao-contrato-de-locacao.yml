@@ -36,8 +36,10 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
-    locador.name.first
-    address_zip
+    locadores.target_number = 1
+    for item in locadores:
+      item.name.text
+    property_address_zip
     discount_value
     signature_local
     generated_file
@@ -48,7 +50,22 @@ code: |
   all_done
 ---
 objects:
-  - locador: Individual
+  - locadores: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  locadores[i].name.text
+  locadores[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Fornecedor
+progress: 25
+question: Número de locadores
+fields:
+  - Número: locadores.target_number
+    datatype: integer
+    default: 1
 ---
 ga id: |
   code: ga_id_begin
@@ -57,9 +74,9 @@ progress: 25
 question: |
   Nome do Locador
 fields:
-  - "Nome completo:": locador.name.first
+  - "Nome completo:": locadores[i].name.text
     required: True
-  - "E-mail:": locador.email
+  - "E-mail:": locadores[i].email
     help: ${ help_email_msg }
     datatype: email
     required: False
@@ -75,29 +92,29 @@ progress: 35
 question: |
   Endereço do Imóvel objeto do Contrato
 fields:
-  - "CEP:": address_zip
+  - "CEP:": property_address_zip
     required: True
-  - "Logradouro:": address_street_name
+  - "Logradouro:": property_address_street_name
     required: True
-  - "Número:": address_street_number
+  - "Número:": property_address_street_number
     required: True
-  - "Complemento:": address_complement
+  - "Complemento:": property_address_unit
     required: False
-  - "Bairro:": address_neighborhood
+  - "Bairro:": property_address_neighborhood
     required: True
-  - "Cidade:": address_city
+  - "Cidade:": property_address_city
     required: True
-  - "Estado:": address_state
+  - "Estado:": property_address_state
     required: True
     code: state_initials_list
 script: |
   <script type="text/javascript">
   $(document).ready(function(){
-    $('#YWRkcmVzc196aXA').mask('00000-000');
+    $('#cHJvcGVydHlfYWRkcmVzc196aXA').mask('00000-000');
   });
 
-  $("#YWRkcmVzc196aXA").focusout(function(){
-    var cep = $("#YWRkcmVzc196aXA").val();
+  $("#cHJvcGVydHlfYWRkcmVzc196aXA").focusout(function(){
+    var cep = $("#cHJvcGVydHlfYWRkcmVzc196aXA").val();
     cep = cep.replace ("-","");
     if (cep != ""){
       var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
@@ -107,10 +124,10 @@ script: |
         type: "get",
         dataType: "json",
         success: function(data){
-          $("#YWRkcmVzc19zdHJlZXRfbmFtZQ").val(data.logradouro);
-          $("#YWRkcmVzc19uZWlnaGJvcmhvb2Q").val(data.bairro);
-          $("#YWRkcmVzc19jaXR5").val(data.localidade);
-          $("#YWRkcmVzc19zdGF0ZQ").val(data.uf);
+          $("#cHJvcGVydHlfYWRkcmVzc19zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#cHJvcGVydHlfYWRkcmVzc19uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#cHJvcGVydHlfYWRkcmVzc19jaXR5").val(data.localidade);
+          $("#cHJvcGVydHlfYWRkcmVzc19zdGF0ZQ").val(data.uf);
         },
         error: function(erro){
           console.log(erro);
@@ -145,25 +162,27 @@ script: |
 ---
 code: |
   recipients = list()
-  notificante_recipient = dict()
-  notificante_recipient['name'] = school_legal_name
-  notificante_recipient['email'] = school_email
-  notificante_recipient['group'] = 'signers'
-  notificante_recipient['routingOrder'] = 1
-  notificante_recipient['tabs'] = [
+  for item in locadores:
+       if item.email:
+            new_recipient = dict()
+            new_recipient['name'] = item.name.text
+            new_recipient['email'] = item.email
+            new_recipient['group'] = 'certifiedDeliveries'
+            new_recipient['routingOrder'] = 1
+            recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
       {
           'type': 'signHere',
           'anchorString': generate_anchor('signHere', school_email)
       },
   ]
-  recipients.append(notificante_recipient)
-
-  locador_recipient = dict()
-  locador_recipient['name'] = locador.name.first
-  locador_recipient['email'] = locador.email
-  locador_recipient['group'] = 'certifiedDeliveries'
-  locador_recipient['routingOrder'] = 2
-  recipients.append(locador_recipient)
+  recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
 
