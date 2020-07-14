@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.conf import settings
 
-from document.models import Document, EnvelopeLog, SignerLog
+from document.models import Document, EnvelopeLog, SignerLog, DocumentStatus
 from interview.models import Interview
 from tenant.models import Tenant, TenantGedData
 
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 envelope_statuses = {
-    "sent": "enviado para assinatura",
+    "sent": "enviado",
     "delivered": "entregue",
     "completed": "finalizado",
     "declined": "recusado",
@@ -99,7 +99,7 @@ def docusign_xml_parser(data):
     if envelope_data_translated["envelope_status"] in envelope_statuses.keys():
         envelope_data_translated["envelope_status"] = envelope_statuses[envelope_data_translated["envelope_status"]]
     else:
-        envelope_data_translated["envelope_status"] = 'não encontrado'
+        envelope_data_translated["envelope_status"] = DocumentStatus.NAO_ENCONTRADO
 
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
 
@@ -257,7 +257,7 @@ def docusign_webhook_listener(request):
         if envelope_status in envelope_statuses.keys():
             document.status = envelope_statuses[envelope_status]
         else:
-            document.status = "não encontrado"
+            document.status = DocumentStatus.NAO_ENCONTRADO
 
         document.save()
 
