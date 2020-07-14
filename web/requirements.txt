@@ -1,37 +1,37 @@
-# 0.55
-django~=3.0.7
+# 0.56
+django~=3.0.8
 # API
 djangorestframework~=3.11.0
-django-cors-headers~=3.3.0
+django-cors-headers~=3.4.0
 drf-yasg~=1.17.1
 django-rest-auth~=0.9.5
-retry-requests
+retry-requests~=1.0.1
 # Formating of forms
 django-crispy-forms~=1.9.1
 # Database Access
 psycopg2-binary~=2.8.5
 # Authentication
-django-allauth
+django-allauth~=0.42.0
 # Used to create tables and filtering
-django-tables2
+django-tables2~=2.3.1
 django-filter~=2.3.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.13.24
+boto3~=1.14.19
 # Production server
-gunicorn
+gunicorn~=20.0.4
 # Misc
 lxml~=4.5.1
 xmltodict~=0.12.0
-Pillow
+Pillow~=7.2.0
 pyyaml~=5.3.1
-django-bootstrap4~=2.0.1
+django-bootstrap4~=2.2.0
 # Debug
 django-debug-toolbar~=2.2
 # API Debugging
 django-silk~=4.0.1
 # Read csv
-pandas~=1.0.4
+pandas~=1.0.5
 # Django models currency
 django-money~=1.1
 # Google Analytics
@@ -40,16 +40,16 @@ django-money~=1.1
 pymongo~=3.10.1
 mongoengine~=0.20.0
 # Used to test docusign requests
-PyJWT
+PyJWT~=1.7.1
 # Validations
-validator-collection~=1.4.1
+validator-collection~=1.4.2
 validator-collection-br~=0.0.10
 # Celery
-celery~=4.4.4
+celery~=4.4.6
 django-celery-results~=1.2.1
 future~=0.18.2
 # Tests
 pytest~=5.4.3
 # https://github.com/izimobil/django-rest-framework-datatables
 djangorestframework-datatables
-PySimpleGUI~=4.20.0
+PySimpleGUI~=4.24.0

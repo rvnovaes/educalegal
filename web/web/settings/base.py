@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.postgres',
     # 3rd party ==========================================
     # Nice Boostrap Forms
     "crispy_forms",
