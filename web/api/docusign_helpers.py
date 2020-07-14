@@ -1,9 +1,10 @@
-import os
-from pathlib import Path
 import base64
-import xmltodict
-import datetime as dt
+import dateparser
 import logging
+import os
+import xmltodict
+
+from pathlib import Path
 
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
@@ -60,24 +61,6 @@ recipient_types_dict = {
 }
 
 
-def _iso8601_to_datetime(iso8601_date):
-    # tamanho máximo de casas dedimais aceitas pelo python é 6
-    # https://docs.python.org/3/library/datetime.html
-    # Microsecond as a decimal number, zero-padded on the left (accepts from one to six digits)
-    # quando vier mais do que 6, trunca em 6
-    # Ex.: '2020-06-29T19:03:46.4619595' >> '2020-06-29T19:03:46.461959'
-    iso8601_date = iso8601_date[:26]
-    # tenta converter a data do docusign que vem no formato ISO 8601 para datetime
-    try:
-        converted_datetime = dt.datetime.fromisoformat(iso8601_date)
-    except:
-        # se a data não veio no formato certo (ISO 8601), converte manualmente
-        # iso8601_date = iso8601_date.strftime('%d/%m/%Y %H:%M:%S.%f')
-        converted_datetime = dt.datetime.strptime(iso8601_date, '%Y-%m-%dT%H:%M:%S.%f')
-
-    return converted_datetime
-
-
 def docusign_xml_parser(data):
     envelope_data = dict()
     xml = xmltodict.parse(data)["DocuSignEnvelopeInformation"]
@@ -91,9 +74,9 @@ def docusign_xml_parser(data):
     logger.info(envelope_data)
 
     # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
-    envelope_data['envelope_created'] = _iso8601_to_datetime(envelope_data['envelope_created'])
-    envelope_data['envelope_sent'] = _iso8601_to_datetime(envelope_data['envelope_sent'])
-    envelope_data['envelope_time_generated'] = _iso8601_to_datetime(envelope_data['envelope_time_generated'])
+    envelope_data['envelope_created'] = dateparser.parse(envelope_data['envelope_created'])
+    envelope_data['envelope_sent'] = dateparser.parse(envelope_data['envelope_sent'])
+    envelope_data['envelope_time_generated'] = dateparser.parse(envelope_data['envelope_time_generated'])
 
     # copia com .copy() pra criar outro objeto
     envelope_data_translated = envelope_data.copy()
@@ -128,7 +111,7 @@ def docusign_xml_parser(data):
             recipient_status['Status'] = 'não encontrado'
         # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
         if 'Sent' in recipient_status.keys():
-            recipient_status['data_envio'] = _iso8601_to_datetime(recipient_status['Sent'])
+            recipient_status['data_envio'] = dateparser.parse(recipient_status['Sent'])
         else:
             recipient_status['data_envio'] = None
 
