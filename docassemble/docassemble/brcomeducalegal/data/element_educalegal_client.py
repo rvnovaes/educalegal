@@ -118,7 +118,7 @@ class EducaLegalClient:
         ged_id,
         ged_link,
         ged_uuid,
-        status=DocumentStatus.INSERIDO_GED,
+        status=DocumentStatus.INSERIDO_GED.value,
     ):
 
         payload = {
@@ -136,7 +136,7 @@ class EducaLegalClient:
         self,
         doc_uuid,
         send_email,
-        status=DocumentStatus.ENVIADO_EMAIL,
+        status=DocumentStatus.ENVIADO_EMAIL.value,
     ):
 
         payload = {

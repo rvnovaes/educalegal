@@ -39,7 +39,7 @@ class InterviewListView(LoginRequiredMixin, SingleTableMixin, FilterView):
             context['document_limit'] = document_limit
 
         context['reached_document_limit'] = reached_document_limit
-        context['document_status'] = DocumentStatus.RASCUNHO
+        context['document_status'] = DocumentStatus.RASCUNHO.value
         return context
 
     def _reached_document_limit(self):
