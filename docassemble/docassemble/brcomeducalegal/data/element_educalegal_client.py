@@ -1,10 +1,21 @@
 import json
+
+from enum import Enum
 from requests import Session
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
-from document.models import DocumentStatus
+
+class DocumentStatus(Enum):
+    RASCUNHO = "rascunho"
+    CRIADO = "criado"
+    INSERIDO_GED = "inserido no GED"
+    ENVIADO_EMAIL = "enviado por e-mail"
+    ENVIADO_ASS_ELET = "enviado para assinatura"
+    ASSINADO = "assinado"
+    RECUSADO_INVALIDO = "assinatura recusada/inválida"
+    NAO_ENCONTRADO = "não encontrado"
 
 
 class EducaLegalClient:
