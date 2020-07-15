@@ -31,7 +31,7 @@ envelope_statuses = {
 
 envelope_vs_document_statuses = {
     "sent": DocumentStatus.ENVIADO_ASS_ELET,
-    "delivered": "entregue",
+    "delivered": DocumentStatus.ENVIADO_ASS_ELET,
     "completed": DocumentStatus.ASSINADO,
     "declined": DocumentStatus.RECUSADO_INVALIDO,
     "voided": DocumentStatus.RECUSADO_INVALIDO,
