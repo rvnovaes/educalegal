@@ -215,8 +215,6 @@ script: |
     });
   </script>
 ---
-Esse prazo poderá
-
 code: |
   from num2words import num2words
   valor_extenso = num2words(valor, lang='pt_BR', to='currency')
