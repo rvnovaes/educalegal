@@ -102,6 +102,7 @@ fields:
     datatype: text
   - 'Orgão Expedidor: ': contractors[i].originator
     datatype: text
+    required: False
   - 'Nacionalidade:': contractors[i].nationality
     datatype: text
     default: brasileiro(a)
@@ -233,6 +234,7 @@ fields:
   - 'Curso:': students[i].course
     datatype: text
     required: True
+    help: "Gentileza, informar a série do aluno."
 ---
 progress: 70
 section: Dados Contratuais
