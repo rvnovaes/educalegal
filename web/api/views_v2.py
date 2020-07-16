@@ -40,6 +40,8 @@ UUID = "([a-z]|[0-9]){8}-([a-z]|[0-9]){4}-([a-z]|[0-9]){4}-([a-z]|[0-9]){4}-([a-
 class PlanViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Retorna dados dos planos disponíveis para contratação. Disponível apenas para administradores.
+
+    200 Sucesso
     """
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
@@ -84,6 +86,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
         Lista todos os documentos do cliente (tenant).
 
         Somente documetos que pertencem ao cliente ao qual o usuário está associado são listados.
+
+        200 Sucesso
         """
         tenant_id = request.user.tenant.id
         queryset = self.queryset.filter(tenant_id=tenant_id)
@@ -190,51 +194,12 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 raise PermissionDenied(message)
 
 
-@api_view(["GET"])
-def document_download(request, identifier):
-    """
-    Baixa o documento do GED.
-
-    Download requer como parâmetro doc_uuid (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
-
-    400 BAD REQUEST: Se o campo doc_uuid não for válido:
-        => "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-
-    403 FORBIDDEN: O cliente deve possuir GED para poder baixar documentos
-        => "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
-
-    404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente
-        (tenant) ao qual o usuário da requisição está vinculado.
-
-    404 NOT FOUND: Se o documento existir no Educa Legal mas não for encontrado no GED. Pode ocorrer de um usuário excluir o documento diretamente no GED.
-        => "O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal.  Verifique a lixeira no GED."
-
-    500 INTERNAL SERVER ERROR: Se o cliente estiver num plano que possui GED mas não há GED configurado para ele.
-        => "O cliente está cadastrado num plano que possui GED mas mão há GED configurado para ele."
-
-    500 INTERNAL SERVER ERROR: Se há GED cadastrado para o cliente mas não há URL ou TOKEN cadastrados.
-        => "O GED do cliente não possui uma URL válida ou não possui token configurado"
-
-
-    :param request: HttpRequest
-    :param identifier: id ou doc_uui do documento no Educa Legal
-    :return: O arquivo do documento no GED
-    """
-    tenant = request.user.tenant
+def validate_tenant_plan_ged(tenant):
     if not tenant.plan.use_ged:
         message = "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
         logger.info(message)
         raise PermissionDenied(message)
     else:
-        queryset = Document.objects.all()
-        # Pode ser passada a id ou o doc_uuid.
-        if not checkers.is_uuid(identifier):
-            message = "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-            logger.info(message)
-            raise ValidationError(message)
-        elif checkers.is_uuid(identifier):
-            document = get_object_or_404(queryset, doc_uuid=identifier, tenant=tenant.id)
-
         try:
             tenand_ged_data = TenantGedData.objects.get(tenant=tenant)
             ged_url = tenand_ged_data.url
@@ -246,10 +211,62 @@ def document_download(request, identifier):
 
         # Aqui preferimos testar o tamanho da URL ao invés de fazer o checker.is_url, uma vez que, em ambiente de dev,
         # se usar, eg, http://ged:8000 a validação falha
+
         if not len(ged_url) or len(tenant_ged_token) == 0:
             message = "O GED do cliente não possui uma URL válida ou não possui token configurado"
             logger.info(message)
             raise APIException(message)
+
+        return ged_url, tenant_ged_token
+
+
+class DocumentDownloadView(APIView):
+
+    queryset = Document.objects.all()
+
+    def get(self, request, identifier):
+
+        """
+        Baixa o documento do GED.
+
+        Download requer como parâmetro doc_uuid (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+
+        400 BAD REQUEST: Se o campo doc_uuid não for válido:
+            => "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+        403 FORBIDDEN: O cliente deve possuir GED para poder baixar documentos
+            => "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
+
+        404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente
+            (tenant) ao qual o usuário da requisição está vinculado.
+
+        404 NOT FOUND: Se o documento existir no Educa Legal mas não for encontrado no GED. Pode ocorrer de um usuário excluir o documento diretamente no GED.
+            => "O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal.  Verifique a lixeira no GED."
+
+        500 INTERNAL SERVER ERROR: Se o cliente estiver num plano que possui GED mas não há GED configurado para ele.
+            => "O cliente está cadastrado num plano que possui GED mas mão há GED configurado para ele."
+
+        500 INTERNAL SERVER ERROR: Se há GED cadastrado para o cliente mas não há URL ou TOKEN cadastrados.
+            => "O GED do cliente não possui uma URL válida ou não possui token configurado"
+
+        500 INTERNAL SERVER ERROR: Se houver problemas na conexão com o GED (não está disponível, por exemplo).
+            => "Failed to establish a new connection: [Errno 111] Connection refused"
+
+
+        :param request: HttpRequest
+        :param identifier: id ou doc_uui do documento no Educa Legal
+        :return: O arquivo do documento no GED
+        """
+        tenant = request.user.tenant
+
+        if not checkers.is_uuid(identifier):
+            message = "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+            logger.info(message)
+            raise ValidationError(message)
+        elif checkers.is_uuid(identifier):
+            document = get_object_or_404(self.queryset, doc_uuid=identifier, tenant=tenant.id)
+
+        ged_url, tenant_ged_token = validate_tenant_plan_ged(tenant)
 
         mc = MayanClient(ged_url, tenant_ged_token)
         response = mc.document_simple_read(document.ged_id)
@@ -258,11 +275,79 @@ def document_download(request, identifier):
             message = "O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal. Verifique a lixeira no GED."
             logger.info(message)
             raise NotFound(message)
+
         response = mc.document_download(document.ged_id)
         f = io.BytesIO(response.content)
 
         return FileResponse(f, as_attachment=True, filename=document.name)
 
+    def delete(self, request, identifier):
+
+        """
+        Exclui o documento do Educa Legal e do GED.
+
+        Download requer como parâmetro doc_uuid (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+
+        204 Sucesso
+
+        400 BAD REQUEST: Se o campo doc_uuid não for válido:
+            => "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+        403 FORBIDDEN: O cliente deve possuir GED para poder baixar documentos
+            => "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
+
+        404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente
+            (tenant) ao qual o usuário da requisição está vinculado.
+
+        404 NOT FOUND: Se o documento existir no Educa Legal mas não for encontrado no GED. Pode ocorrer de um usuário excluir o documento diretamente no GED.
+            => "O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal.  Verifique a lixeira no GED."
+
+        500 INTERNAL SERVER ERROR: Se o cliente estiver num plano que possui GED mas não há GED configurado para ele.
+            => "O cliente está cadastrado num plano que possui GED mas mão há GED configurado para ele."
+
+        500 INTERNAL SERVER ERROR: Se há GED cadastrado para o cliente mas não há URL ou TOKEN cadastrados.
+            => "O GED do cliente não possui uma URL válida ou não possui token configurado"
+
+        500 INTERNAL SERVER ERROR: Se houver problemas na conexão com o GED (não está disponível, por exemplo).
+            => "Failed to establish a new connection: [Errno 111] Connection refused"
+
+
+        :param request: HttpRequest
+        :param identifier: id ou doc_uui do documento no Educa Legal
+        :return: O arquivo do documento no GED
+        """
+
+        tenant = request.user.tenant
+
+        if not checkers.is_uuid(identifier):
+            message = "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+            logger.info(message)
+            raise ValidationError(message)
+        elif checkers.is_uuid(identifier):
+            document = get_object_or_404(self.queryset, doc_uuid=identifier, tenant=tenant.id)
+
+        ged_url, tenant_ged_token = validate_tenant_plan_ged(tenant)
+
+        mc = MayanClient(ged_url, tenant_ged_token)
+
+        try:
+            response = mc.document_delete(document.ged_id)
+        except Exception as e:
+            message = "Houve algum erro de comunicação ou de processamento com o GED: {e}".format(e=e)
+            logger.info(message)
+            raise APIException(message)
+
+        if response.status_code == 404:
+            message = "O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal. Verifique a lixeira no GED."
+            logger.info(message)
+            raise NotFound(message)
+        elif response.status_code != 204:
+            message = "Não foi possível excluir o documento do GED: {status_code} | {response}".format(status_code=response.status_code, response=response.json())
+            logger.info(message)
+            raise APIException(message)
+        else:
+            document.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class InterviewViewSet(viewsets.ReadOnlyModelViewSet):

@@ -121,6 +121,11 @@ class MayanClient:
         response = self.session.get(final_url)
         return response
 
+    def document_delete(self, document_id):
+        final_url = self.api_base_url + "/api/documents/{id}".format(id=document_id)
+        response = self.session.delete(final_url)
+        return response
+
     def document_type_read(self, document_type_id):
         final_url = self.api_base_url + "/api/document_types/{id}".format(id=document_type_id)
         response = self.session.get(final_url).json()
