@@ -206,7 +206,7 @@ fields:
     datatype: integer
     required: true
     min: 1
-    max: 90
+    max: 120
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
@@ -215,6 +215,8 @@ script: |
     });
   </script>
 ---
+Esse prazo poderá
+
 code: |
   from num2words import num2words
   valor_extenso = num2words(valor, lang='pt_BR', to='currency')
