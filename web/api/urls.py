@@ -1,9 +1,9 @@
-from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
-from django.urls import path, include
+from django.urls import path
 
 from .views import (
     DocumentViewSet,
+    EnvelopeLogViewSet,
     InterviewViewSet,
     PlanViewSet,
     TenantDocumentViewSet,
@@ -26,6 +26,8 @@ urlpatterns = [
     path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
     path("documents/", DocumentViewSet.as_view({"post": "create", "patch": "partial_update"}),),
     path("documents/<int:pk>", DocumentViewSet.as_view({"get": "retrieve"}),),
+    path("documents/<int:uuid>/envelope_logs/", EnvelopeLogViewSet.as_view({"post": "create"}),),
+    path("envelope_logs/<int:id>/signer_logs/", EnvelopeLogViewSet.as_view({"post": "create"}),),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
     path("tenants/", TenantViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>", TenantViewSet.as_view({"get": "retrieve"})),

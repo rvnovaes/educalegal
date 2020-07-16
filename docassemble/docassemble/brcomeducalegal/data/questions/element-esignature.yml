@@ -8,10 +8,11 @@ ga id: |
 event: submit_to_esignature
 code: |
   log("Executando element-esignature.yml")
-  if tenant_esignature_provider ==  'Docusign':
+  if tenant_esignature_provider == 'Docusign':
     dsc = DocuSignClient(tenant_client_id, tenant_impersonated_user_guid, tenant_test_mode, tenant_private_key)
     data_sent, data_received, e_signature_response_status_code = dsc.send_to_docusign(recipients, documents, send_immediately=True, email_subject="Documento para sua assinatura")
     log("Docusign data_received: {data_received}".format(data_received=data_received))
+    el_log_to_console = get_config('el log to console')
     if el_log_to_console:
       log("Docusign data_received: {data_received}".format(data_received=data_received), "console")
     status = data_received['status'].lower()
@@ -29,6 +30,13 @@ code: |
   log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
   if el_log_to_console:
     log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
+
+  # cria envelope_log para recipients
+  # el_post_envelope_log = elc.post_envelope_log(doc_uuid, data_received)
+
+  # cria signers_log para recipients
+  # el_post_signers_log = elc.post_signers_log(recipients, documents)
+
   if e_signature_response_status_code == 201:
     signature_success
   else:

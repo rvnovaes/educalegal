@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from billing.models import Plan
-from document.models import Document
+from document.models import Document, EnvelopeLog, SignerLog
 from interview.models import Interview
 from school.models import School
 from tenant.models import Tenant, TenantGedData, ESignatureApp
@@ -21,6 +21,20 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     def get_school_name(self, obj):
         return obj.school.name if obj.school else ''
+
+
+class EnvelopeLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnvelopeLog
+        ref_name = "EnvelopeLog v1"
+        fields = "__all__"
+
+
+class SignerLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SignerLog
+        ref_name = "SignerLog v1"
+        fields = "__all__"
 
 
 class InterviewSerializer(serializers.ModelSerializer):

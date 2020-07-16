@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 
 from billing.models import Plan
-from document.models import Document
+from document.models import Document, EnvelopeLog, SignerLog
 from document.views import query_documents_by_args
 from interview.models import Interview
 from school.models import School
@@ -13,9 +13,11 @@ from tenant.models import Tenant, TenantGedData
 
 from .serializers import (
     DocumentSerializer,
+    EnvelopeLogSerializer,
     InterviewSerializer,
     PlanSerializer,
     SchoolSerializer,
+    SignerLogSerializer,
     TenantSerializer,
     TenantGedDataSerializer
 )
@@ -37,6 +39,42 @@ class DocumentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class EnvelopeLogViewSet(viewsets.ModelViewSet):
+    queryset = EnvelopeLog.objects.all()
+    serializer_class = EnvelopeLogSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Cria um novo log do envelope (envelope log).
+
+        Busca o documento a partir do seu uuid.
+        """
+        document = Document.objects.get(doc_uuid=request.data['doc_uuid'])
+        request.data['document'] = document
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class SignerLogViewSet(viewsets.ModelViewSet):
+    queryset = SignerLog.objects.all()
+    serializer_class = SignerLogSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Cria um novo log do assinante (signer log).
+        """
+        envelope_log = EnvelopeLog.objects.get(pk=request.data['id'])
+        request.data['envelope_log'] = envelope_log
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
