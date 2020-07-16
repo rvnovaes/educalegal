@@ -16,10 +16,10 @@ code: |
       log("Docusign data_received: {data_received}".format(data_received=data_received), "console")
     status = data_received['status'].lower()
     envelope_statuses = {'sent': 'enviado para assinatura',
-                       'delivered': 'entregue',
-                       'completed': 'finalizado',
-                       'declined': 'recusado',
-                       'voided': 'inválido'}
+                       'delivered': 'enviado para assinatura',
+                       'completed': 'assinado',
+                       'declined': 'assinatura recusada/inválida',
+                       'voided': 'assinatura recusada/inválida'}
     if status in envelope_statuses.keys():
         status = envelope_statuses[status]
     else:

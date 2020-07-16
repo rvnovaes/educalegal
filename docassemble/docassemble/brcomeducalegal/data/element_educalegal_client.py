@@ -1,10 +1,21 @@
 import json
+
+from enum import Enum
 from requests import Session
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
-from document.models import DocumentStatus
+
+class DocumentStatus(Enum):
+    RASCUNHO = "rascunho"
+    CRIADO = "criado"
+    INSERIDO_GED = "inserido no GED"
+    ENVIADO_EMAIL = "enviado por e-mail"
+    ENVIADO_ASS_ELET = "enviado para assinatura"
+    ASSINADO = "assinado"
+    RECUSADO_INVALIDO = "assinatura recusada/inválida"
+    NAO_ENCONTRADO = "não encontrado"
 
 
 class EducaLegalClient:
@@ -118,7 +129,7 @@ class EducaLegalClient:
         ged_id,
         ged_link,
         ged_uuid,
-        status=DocumentStatus.INSERIDO_GED,
+        status=DocumentStatus.INSERIDO_GED.value,
     ):
 
         payload = {
@@ -136,7 +147,7 @@ class EducaLegalClient:
         self,
         doc_uuid,
         send_email,
-        status=DocumentStatus.ENVIADO_EMAIL,
+        status=DocumentStatus.ENVIADO_EMAIL.value,
     ):
 
         payload = {

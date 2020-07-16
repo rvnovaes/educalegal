@@ -336,7 +336,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     el_document = Document(
                         tenant=tenant,
                         name=interview.name + "-rascunho-em-lote",
-                        status=DocumentStatus.RASCUNHO,
+                        status=DocumentStatus.RASCUNHO.value,
                         description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
                         interview=interview,
                         school=school,

@@ -22,19 +22,11 @@ logger = logging.getLogger(__name__)
 
 
 envelope_statuses = {
-    "sent": "enviado",
-    "delivered": "entregue",
-    "completed": "finalizado",
-    "declined": "recusado",
-    "voided": "inválido",
-}
-
-envelope_vs_document_statuses = {
-    "sent": DocumentStatus.ENVIADO_ASS_ELET,
-    "delivered": "entregue",
-    "completed": DocumentStatus.ASSINADO,
-    "declined": DocumentStatus.RECUSADO_INVALIDO,
-    "voided": DocumentStatus.RECUSADO_INVALIDO,
+    "sent": {"docusign": "enviado", "el": DocumentStatus.ENVIADO_ASS_ELET.value},
+    "delivered": {"docusign": "entregue", "el": DocumentStatus.ENVIADO_ASS_ELET.value},
+    "completed": {"docusign": "finalizado", "el": DocumentStatus.ASSINADO.value},
+    "declined": {"docusign": "recusado", "el": DocumentStatus.RECUSADO_INVALIDO.value},
+    "voided": {"docusign": "inválido", "el": DocumentStatus.RECUSADO_INVALIDO.value},
 }
 
 recipient_statuses_dict = {
@@ -88,9 +80,9 @@ def docusign_xml_parser(data):
 
     envelope_data_translated["envelope_status"] = str(envelope_data_translated["envelope_status"]).lower()
     if envelope_data_translated["envelope_status"] in envelope_statuses.keys():
-        envelope_data_translated["envelope_status"] = envelope_statuses[envelope_data_translated["envelope_status"]]
+        envelope_data_translated["envelope_status"] = envelope_statuses[envelope_data_translated["envelope_status"]]['docusign']
     else:
-        envelope_data_translated["envelope_status"] = DocumentStatus.NAO_ENCONTRADO
+        envelope_data_translated["envelope_status"] = DocumentStatus.NAO_ENCONTRADO.value
 
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
 
@@ -245,10 +237,10 @@ def docusign_webhook_listener(request):
                 logger.exception(msg)
                 return HttpResponse(msg)
 
-        if envelope_status in envelope_vs_document_statuses.keys():
-            document.status = envelope_vs_document_statuses[envelope_status]
+        if envelope_status in envelope_statuses.keys():
+            document.status = envelope_statuses[envelope_status]['el']
         else:
-            document.status = DocumentStatus.NAO_ENCONTRADO
+            document.status = DocumentStatus.NAO_ENCONTRADO.value
 
         document.save()
 
