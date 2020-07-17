@@ -44,32 +44,41 @@ class DocumentViewSet(viewsets.ModelViewSet):
 class EnvelopeLogViewSet(viewsets.ModelViewSet):
     queryset = EnvelopeLog.objects.all()
     serializer_class = EnvelopeLogSerializer
+    logging.info('api 0')
 
     def create(self, request, *args, **kwargs):
+        logging.info('api 01')
         """
         Cria um novo log do envelope (envelope log), caso não exista.
         Se já existir, retorna o envelope log encontrado.
-
-        Busca o documento a partir do seu uuid.
         """
+
         try:
-            document = Document.objects.get(doc_uuid=self.kwargs['uuid'])
-        except Document.DoesNotExist:
+            document = Document.objects.filter(doc_uuid=self.kwargs['uuid']).first()
+            logging.info('api 1')
+            logging.info(document.id)
+        except Exception as e:
             message = 'O documento {doc_uuid} não existe.'.format(doc_uuid=self.kwargs['uuid'])
             logger.debug(message)
+            logger.debug(e)
+            logging.info('api 2')
         else:
-            try:
-                envelope_log = EnvelopeLog.objects.filter(document=document).first()
-                serializer = self.get_serializer()
+            envelope_log = EnvelopeLog.objects.filter(document=document).first()
+            # insere o id do documento no dict do envelope
+            data_complete = request.data.copy()
+            data_complete['document'] = document.id
+            serializer = self.get_serializer(data=data_complete)
+            serializer.is_valid(raise_exception=True)
+            logging.info('api 3')
+
+            if envelope_log:
+                logging.info('api 4')
+                logging.info(envelope_log)
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            except EnvelopeLog.DoesNotExist:
-                request.data['document'] = document.id
-                serializer = self.get_serializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
+            else:
+                logging.info('api 5')
                 self.perform_create(serializer)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                logging.info(e)
 
 
 class SignerLogViewSet(viewsets.ModelViewSet):

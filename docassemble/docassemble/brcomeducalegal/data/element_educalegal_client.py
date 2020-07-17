@@ -207,25 +207,29 @@ class EducaLegalClient:
     def post_envelope_log(self, tenant_id, doc_uuid, data_received):
         """Cria registro com o log do envio do email para cada assinante"""
 
+        # formato da data YYYY-MM-DDThh:mm[:ss[.uuuuuu]]
         payload = {
             "envelope_id": data_received['envelopeId'],
-            "status": 'enviado para assinatura',
-            "envelope_created_date": data_received['statusDateTime'],
-            "sent_date": data_received['statusDateTime'],
+            "status": "enviado para assinatura",
+            "envelope_created_date": data_received['statusDateTime'][:26],
+            "sent_date": data_received['statusDateTime'][:26],
+            'status_update_date': '',
             "tenant": tenant_id,
         }
         final_url = self.api_base_url + "/v1/documents/{uuid}/envelope_logs/".format(uuid=doc_uuid)
         log("final_url: " + final_url, "console")
 
         try:
-            response = self.session.post(final_url, data=json.dumps(payload))
+            response = self.session.post(final_url, data=payload)
             log("passou aqui 3", "console")
+            log(json.dumps(payload), "console")
         except Exception as e:
             log("passou aqui 4", "console")
             log(payload, "console")
             log(e, "console")
 
         log("passou aqui 5", "console")
+        log(response.json(), "console")
         return response.json()
 
     def post_signers_log(self, tenant_id, recipients, documents, envelope_log):
@@ -250,15 +254,10 @@ class EducaLegalClient:
                     final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log)
                 except:
                     log("post_signers_log payload :", "console")
-                    # logger.info("post_signers_log payload : ")
-                    # logger.info(payload)
-                    # logger.info("post_signers_log final_url : " + final_url)
 
         try:
             response = self.session.post(final_url, data=payload)
         except:
             log("post_signers_log response :", "console")
-            # logger.info("post_signers_log response : ")
-            # logger.info(response.json())
         return response.json()
 
