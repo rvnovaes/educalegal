@@ -7,22 +7,23 @@ from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
-envelope_statuses = {'sent': 'enviado para assinatura',
-                     'delivered': 'enviado para assinatura',
-                     'completed': 'assinado',
-                     'declined': 'assinatura recusada/inválida',
-                     'voided': 'assinatura recusada/inválida'}
+envelope_statuses = {
+    'sent': 'enviado para assinatura',
+    'delivered': 'enviado para assinatura',
+    'completed': 'assinado',
+    'declined': 'assinatura recusada/inválida',
+    'voided': 'assinatura recusada/inválida'}
 
 recipient_group_types_dict = {
-    "agents": "agent",
-    "carbonCopies": "carboncopy",
-    "certifiedDeliveries": "certifieddelivery",
-    "editors": "editor",
-    "inPersonSigners": "inpersonsigner",
-    "intermediaries": "intermediary",
-    "seals": "seal",
-    "signers": "signer",
-    "witness": "witness"
+    "agents": {'type': "agent", 'pt-br': 'agente'},
+    "carbonCopies": {'type': "carboncopy", 'pt-br': 'em cópia'},
+    "certifiedDeliveries": {'type': "certifieddelivery", 'pt-br': 'entrega certificada'},
+    "editors": {'type': "editor", 'pt-br': 'editor'},
+    "inPersonSigners": {'type': "inpersonsigner", 'pt-br': 'assinatura presencial'},
+    "intermediaries": {'type': "intermediary", 'pt-br': 'intermediário'},
+    "seals": {'type': "seal", 'pt-br': 'selo'},
+    "signers": {'type': "signer", 'pt-br': 'signatário'},
+    "witness": {'type': "witness", 'pt-br': 'testemunha'}
 }
 
 
@@ -247,8 +248,8 @@ class EducaLegalClient:
                     payload = {
                         "name": recipient['name'],
                         "email": recipient['email'],
-                        "type": recipient_group_types_dict[recipient['group']],
-                        "status": 'enviado para assinatura',
+                        "type": recipient_group_types_dict[recipient['group']]['pt-br'],
+                        "status": 'gerado',
                         "sent_date": '',
                         "pdf_filenames": pdf_filenames,
                         "tenant": tenant_id,
@@ -259,10 +260,9 @@ class EducaLegalClient:
                     log("Erro ao gerar o payload do signers_log", "console")
                     log(e, "console")
 
-        try:
-            response = self.session.post(final_url, data=payload)
-        except Exception as e:
-            log("Erro ao gravar o signers_log", "console")
-            log(e, "console")
-        return response.json(), response.status_code
-
+                try:
+                    response = self.session.post(final_url, data=payload)
+                except Exception as e:
+                    log("Erro ao gravar o signers_log", "console")
+                    log(e, "console")
+                return response.json(), response.status_code

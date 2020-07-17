@@ -34,12 +34,14 @@ code: |
   # cria envelope_log para recipients
   envelope_log_response, status_code = elc.post_envelope_log(tid, doc_uuid, data_received)
 
-  # cria signers_log para o documento
   if status_code == 200 or status_code == 201:
     log("Criado envelope_log o documento")
-    el_post_signers_log, status_code = elc.post_signers_log(tid, el_recipients, documents, envelope_log_response['id'])
-    if status_code == 201:
-      log("Criado signers_log para recipients")
+
+    # cria signers_log para o documento
+    if len(el_recipients) > 0:
+      el_post_signers_log, status_code = elc.post_signers_log(tid, el_recipients, documents, envelope_log_response['id'])
+      if status_code == 201:
+        log("Criado signers_log para recipients")
 
   if e_signature_response_status_code == 201:
     signature_success
