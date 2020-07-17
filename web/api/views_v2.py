@@ -220,11 +220,11 @@ def validate_tenant_plan_ged(tenant):
         return ged_url, tenant_ged_token
 
 
-class DocumentDownloadView(APIView):
+class DocumentDownloadViewSet(viewsets.ModelViewSet):
 
     queryset = Document.objects.all()
 
-    def get(self, request, identifier):
+    def retrieve(self, request, identifier):
 
         """
         Baixa o documento do GED.
@@ -281,7 +281,7 @@ class DocumentDownloadView(APIView):
 
         return FileResponse(f, as_attachment=True, filename=document.name)
 
-    def delete(self, request, identifier):
+    def destroy(self, request, identifier):
 
         """
         Exclui o documento do Educa Legal e do GED.
