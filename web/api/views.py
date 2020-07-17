@@ -74,7 +74,9 @@ class EnvelopeLogViewSet(viewsets.ModelViewSet):
             if envelope_log:
                 logging.info('api 4')
                 logging.info(envelope_log)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                data_complete = serializer.data.copy()
+                data_complete['id'] = envelope_log.id
+                return Response(data_complete, status=status.HTTP_200_OK)
             else:
                 logging.info('api 5')
                 self.perform_create(serializer)
@@ -89,8 +91,6 @@ class SignerLogViewSet(viewsets.ModelViewSet):
         """
         Cria um novo log do assinante (signer log).
         """
-        envelope_log = EnvelopeLog.objects.get(pk=request.data['id'])
-        request.data['envelope_log'] = envelope_log
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

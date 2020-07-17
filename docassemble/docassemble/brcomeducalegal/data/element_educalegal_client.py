@@ -7,6 +7,12 @@ from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
+envelope_statuses = {'sent': 'enviado para assinatura',
+                     'delivered': 'enviado para assinatura',
+                     'completed': 'assinado',
+                     'declined': 'assinatura recusada/inválida',
+                     'voided': 'assinatura recusada/inválida'}
+
 recipient_group_types_dict = {
     "agents": "agent",
     "carbonCopies": "carboncopy",
@@ -184,6 +190,13 @@ class EducaLegalClient:
 
         if related_documents is None:
             related_documents = []
+
+        # traduz o status
+        if status in envelope_statuses.keys():
+            status = envelope_statuses[status]
+        else:
+            status = 'não encontrado'
+
         payload = {
             "doc_uuid": doc_uuid,
             "status": status,
@@ -196,50 +209,38 @@ class EducaLegalClient:
         response = self.session.patch(final_url, data=payload)
         return response.json()
 
-
-    # "data_received": {
-    #   "envelopeId": "1fb88796-8ef0-42a6-b74d-cfb841328e76",
-    #   "status": "sent",
-    #   "statusDateTime": "2020-07-16T14:29:13.0821781Z",
-    #   "uri": "/envelopes/1fb88796-8ef0-42a6-b74d-cfb841328e76"
-    # },
-
     def post_envelope_log(self, tenant_id, doc_uuid, data_received):
         """Cria registro com o log do envio do email para cada assinante"""
 
         # formato da data YYYY-MM-DDThh:mm[:ss[.uuuuuu]]
         payload = {
             "envelope_id": data_received['envelopeId'],
-            "status": "enviado para assinatura",
+            "status": "enviado",
             "envelope_created_date": data_received['statusDateTime'][:26],
             "sent_date": data_received['statusDateTime'][:26],
             'status_update_date': '',
             "tenant": tenant_id,
         }
         final_url = self.api_base_url + "/v1/documents/{uuid}/envelope_logs/".format(uuid=doc_uuid)
-        log("final_url: " + final_url, "console")
 
         try:
             response = self.session.post(final_url, data=payload)
-            log("passou aqui 3", "console")
-            log(json.dumps(payload), "console")
         except Exception as e:
-            log("passou aqui 4", "console")
-            log(payload, "console")
             log(e, "console")
 
-        log("passou aqui 5", "console")
-        log(response.json(), "console")
-        return response.json()
+        return response.json(), response.status_code
 
-    def post_signers_log(self, tenant_id, recipients, documents, envelope_log):
+    def post_signers_log(self, tenant_id, recipients, documents, envelope_log_id):
         """Cria registro com o log do envio do email para cada assinante"""
 
         for recipient in recipients:
             if recipient['email']:
                 pdf_filenames = ''
-                for document in documents:
-                    pdf_filenames = chr(10).join(document['name'])
+                for index, document in enumerate(documents):
+                    if index > 0:
+                        pdf_filenames += ' | ' + document['name']
+                    else:
+                        pdf_filenames = document['name']
 
                 try:
                     payload = {
@@ -247,17 +248,18 @@ class EducaLegalClient:
                         "email": recipient['email'],
                         "type": recipient_group_types_dict[recipient['group']],
                         "status": 'enviado para assinatura',
+                        "sent_date": '',
                         "pdf_filenames": pdf_filenames,
                         "tenant": tenant_id,
-                        "envelope_log": envelope_log,
+                        "envelope_log": envelope_log_id,
                     }
-                    final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log)
-                except:
-                    log("post_signers_log payload :", "console")
+                    final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log_id)
+                except Exception as e:
+                    log(e, "console")
 
         try:
             response = self.session.post(final_url, data=payload)
-        except:
-            log("post_signers_log response :", "console")
-        return response.json()
+        except Exception as e:
+            log(e, "console")
+        return response.json(), response.status_code
 

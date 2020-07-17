@@ -7,24 +7,24 @@ ga id: |
   code: ga_id_e_signature
 event: submit_to_esignature
 code: |
+  import copy
+
   log("Executando element-esignature.yml")
   if tenant_esignature_provider == 'Docusign':
     dsc = DocuSignClient(tenant_client_id, tenant_impersonated_user_guid, tenant_test_mode, tenant_private_key)
+
+    # copia a lista, pois ela eh alterada pelo docusign e perde a chave group
+    # deve ser usado esse modulo copy pq o .copy() do python nao funciona como deveria
+    # indicado pelo jhpyle: copy.deepcopy
+    el_recipients = copy.deepcopy(recipients)
+
     data_sent, data_received, e_signature_response_status_code = dsc.send_to_docusign(recipients, documents, send_immediately=True, email_subject="Documento para sua assinatura")
+
     log("Docusign data_received: {data_received}".format(data_received=data_received))
     el_log_to_console = get_config('el log to console')
     if el_log_to_console:
       log("Docusign data_received: {data_received}".format(data_received=data_received), "console")
     status = data_received['status'].lower()
-    envelope_statuses = {'sent': 'enviado para assinatura',
-                       'delivered': 'enviado para assinatura',
-                       'completed': 'assinado',
-                       'declined': 'assinatura recusada/inválida',
-                       'voided': 'assinatura recusada/inválida'}
-    if status in envelope_statuses.keys():
-        status = envelope_statuses[status]
-    else:
-        status = 'não encontrado'
     envelope_id = data_received['envelopeId']
   el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, tenant_esignature_provider, True)
   log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
@@ -32,13 +32,14 @@ code: |
     log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
 
   # cria envelope_log para recipients
-  log("doc_uuid data_received", "console")
-  log(doc_uuid, "console")
-  log(data_received, "console")
-  el_post_envelope_log = elc.post_envelope_log(tid, doc_uuid, data_received)
+  envelope_log_response, status_code = elc.post_envelope_log(tid, doc_uuid, data_received)
 
-  # cria signers_log para recipients
-  # el_post_signers_log = elc.post_signers_log(tid, recipients, documents)
+  # cria signers_log para o documento
+  if status_code == 200 or status_code == 201:
+    log("Criado envelope_log o documento")
+    el_post_signers_log, status_code = elc.post_signers_log(tid, el_recipients, documents, envelope_log_response['id'])
+    if status_code == 201:
+      log("Criado signers_log para recipients")
 
   if e_signature_response_status_code == 201:
     signature_success
