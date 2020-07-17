@@ -7,12 +7,24 @@ from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
+
+class DocumentStatus(Enum):
+    RASCUNHO = "rascunho"
+    CRIADO = "criado"
+    INSERIDO_GED = "inserido no GED"
+    ENVIADO_EMAIL = "enviado por e-mail"
+    ENVIADO_ASS_ELET = "enviado para assinatura"
+    ASSINADO = "assinado"
+    RECUSADO_INVALIDO = "assinatura recusada/inválida"
+    NAO_ENCONTRADO = "não encontrado"
+
+
 envelope_statuses = {
-    'sent': 'enviado para assinatura',
-    'delivered': 'enviado para assinatura',
-    'completed': 'assinado',
-    'declined': 'assinatura recusada/inválida',
-    'voided': 'assinatura recusada/inválida'}
+    'sent': DocumentStatus.ENVIADO_ASS_ELET.value,
+    'delivered': DocumentStatus.ENVIADO_ASS_ELET.value,
+    'completed': DocumentStatus.ASSINADO.value,
+    'declined': DocumentStatus.RECUSADO_INVALIDO.value,
+    'voided': DocumentStatus.RECUSADO_INVALIDO.value}
 
 recipient_group_types_dict = {
     "agents": {'type': "agent", 'pt-br': 'agente'},
@@ -25,17 +37,6 @@ recipient_group_types_dict = {
     "signers": {'type': "signer", 'pt-br': 'signatário'},
     "witness": {'type': "witness", 'pt-br': 'testemunha'}
 }
-
-
-class DocumentStatus(Enum):
-    RASCUNHO = "rascunho"
-    CRIADO = "criado"
-    INSERIDO_GED = "inserido no GED"
-    ENVIADO_EMAIL = "enviado por e-mail"
-    ENVIADO_ASS_ELET = "enviado para assinatura"
-    ASSINADO = "assinado"
-    RECUSADO_INVALIDO = "assinatura recusada/inválida"
-    NAO_ENCONTRADO = "não encontrado"
 
 
 class EducaLegalClient:
