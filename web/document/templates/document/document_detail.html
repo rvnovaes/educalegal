@@ -80,7 +80,7 @@
                       <div class="card-body">
                         <h5 class="card-title">{{ signer_log.name }}</h5>
                         <p class="card-text">E-mail: {{ signer_log.email }}</p>
-                        <p class="card-text">Criação: {{ signer_log.created_date|date:"d/m/Y H:i:s" }}</p>
+                        <p class="card-text">Importação: {{ signer_log.created_date|date:"d/m/Y H:i:s" }}</p>
                         <p class="card-text">Envio: {{ signer_log.sent_date|date:"d/m/Y H:i:s"|default:"-" }}</p>
                         <p class="card-text">Tipo: {{ signer_log.type }}</p>
                         {% if signer_log.pdf_filenames %}

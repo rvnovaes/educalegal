@@ -32,10 +32,13 @@ code: |
     log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
 
   # cria envelope_log para recipients
-  # el_post_envelope_log = elc.post_envelope_log(doc_uuid, data_received)
+  log("doc_uuid data_received", "console")
+  log(doc_uuid, "console")
+  log(data_received, "console")
+  el_post_envelope_log = elc.post_envelope_log(tid, doc_uuid, data_received)
 
   # cria signers_log para recipients
-  # el_post_signers_log = elc.post_signers_log(recipients, documents)
+  # el_post_signers_log = elc.post_signers_log(tid, recipients, documents)
 
   if e_signature_response_status_code == 201:
     signature_success

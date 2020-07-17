@@ -1,4 +1,3 @@
-import logging
 import json
 
 from docassemble.base.util import log
@@ -7,8 +6,6 @@ from requests import Session
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
-
-logger = logging.getLogger(__name__)
 
 recipient_group_types_dict = {
     "agents": "agent",
@@ -207,60 +204,61 @@ class EducaLegalClient:
     #   "uri": "/envelopes/1fb88796-8ef0-42a6-b74d-cfb841328e76"
     # },
 
-    # def post_envelope_log(self, doc_uuid, data_received):
-    #     """Cria registro com o log do envio do email para cada assinante"""
-    #
-    #     try:
-    #         payload = {
-    #             "envelope_id": data_received['envelopeId'],
-    #             "status": data_received['envelopeId'],
-    #             "envelope_created_date": data_received['envelopeId'],
-    #             "sent_date": data_received['envelopeId'],
-    #             "doc_uuid": doc_uuid,
-    #         }
-    #         final_url = self.api_base_url + "/v1/documents/{uuid}/envelope_logs/".format(uuid=doc_uuid)
-    #     except:
-    #         logger.info("post_envelope_log payload : ")
-    #         logger.info(payload)
-    #         logger.info("post_envelope_log final_url : " + final_url)
-    #
-    #     try:
-    #         response = self.session.post(final_url, data=payload)
-    #     except:
-    #         logger.info("post_envelope_log response : ")
-    #         logger.info(response.json())
-    #         # log("post_envelope_log response : " + str(response), "console")
-    #
-    #     return response.json()
-    #
-    # def post_signers_log(self, recipients, documents, envelope_log):
-    #     """Cria registro com o log do envio do email para cada assinante"""
-    #
-    #     for recipient in recipients:
-    #         if recipient['email']:
-    #             pdf_filenames = ''
-    #             for document in documents:
-    #                 pdf_filenames = chr(10).join(document['name'])
-    #
-    #             try:
-    #                 payload = {
-    #                     "name": recipient['name'],
-    #                     "email": recipient['email'],
-    #                     "type": recipient_group_types_dict[recipient['group']],
-    #                     "status": 'enviado para assinatura',
-    #                     "pdf_filenames": pdf_filenames,
-    #                     "envelope_log": envelope_log,
-    #                 }
-    #                 final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log)
-    #             except:
-    #                 logger.info("post_signers_log payload : ")
-    #                 logger.info(payload)
-    #                 logger.info("post_signers_log final_url : " + final_url)
-    #
-    #     try:
-    #         response = self.session.post(final_url, data=payload)
-    #     except:
-    #         logger.info("post_signers_log response : ")
-    #         logger.info(response.json())
-    #     return response.json()
-    #
+    def post_envelope_log(self, tenant_id, doc_uuid, data_received):
+        """Cria registro com o log do envio do email para cada assinante"""
+
+        payload = {
+            "envelope_id": data_received['envelopeId'],
+            "status": 'enviado para assinatura',
+            "envelope_created_date": data_received['statusDateTime'],
+            "sent_date": data_received['statusDateTime'],
+            "tenant": tenant_id,
+        }
+        final_url = self.api_base_url + "/v1/documents/{uuid}/envelope_logs/".format(uuid=doc_uuid)
+        log("final_url: " + final_url, "console")
+
+        try:
+            response = self.session.post(final_url, data=json.dumps(payload))
+            log("passou aqui 3", "console")
+        except Exception as e:
+            log("passou aqui 4", "console")
+            log(payload, "console")
+            log(e, "console")
+
+        log("passou aqui 5", "console")
+        return response.json()
+
+    def post_signers_log(self, tenant_id, recipients, documents, envelope_log):
+        """Cria registro com o log do envio do email para cada assinante"""
+
+        for recipient in recipients:
+            if recipient['email']:
+                pdf_filenames = ''
+                for document in documents:
+                    pdf_filenames = chr(10).join(document['name'])
+
+                try:
+                    payload = {
+                        "name": recipient['name'],
+                        "email": recipient['email'],
+                        "type": recipient_group_types_dict[recipient['group']],
+                        "status": 'enviado para assinatura',
+                        "pdf_filenames": pdf_filenames,
+                        "tenant": tenant_id,
+                        "envelope_log": envelope_log,
+                    }
+                    final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log)
+                except:
+                    log("post_signers_log payload :", "console")
+                    # logger.info("post_signers_log payload : ")
+                    # logger.info(payload)
+                    # logger.info("post_signers_log final_url : " + final_url)
+
+        try:
+            response = self.session.post(final_url, data=payload)
+        except:
+            log("post_signers_log response :", "console")
+            # logger.info("post_signers_log response : ")
+            # logger.info(response.json())
+        return response.json()
+

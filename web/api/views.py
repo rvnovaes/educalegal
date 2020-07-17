@@ -47,17 +47,29 @@ class EnvelopeLogViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Cria um novo log do envelope (envelope log).
+        Cria um novo log do envelope (envelope log), caso não exista.
+        Se já existir, retorna o envelope log encontrado.
 
         Busca o documento a partir do seu uuid.
         """
-        document = Document.objects.get(doc_uuid=request.data['doc_uuid'])
-        request.data['document'] = document
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        try:
+            document = Document.objects.get(doc_uuid=self.kwargs['uuid'])
+        except Document.DoesNotExist:
+            message = 'O documento {doc_uuid} não existe.'.format(doc_uuid=self.kwargs['uuid'])
+            logger.debug(message)
+        else:
+            try:
+                envelope_log = EnvelopeLog.objects.filter(document=document).first()
+                serializer = self.get_serializer()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except EnvelopeLog.DoesNotExist:
+                request.data['document'] = document.id
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logging.info(e)
 
 
 class SignerLogViewSet(viewsets.ModelViewSet):
