@@ -5,15 +5,38 @@ from rest_framework.fields import CurrentUserDefault
 from billing.models import Plan
 from document.models import Document, BulkDocumentGeneration, DocumentTaskView, EnvelopeLog, SignerLog
 from interview.models import Interview
-from school.models import School
+from school.models import School, SchoolUnit
 from tenant.models import Tenant, TenantGedData, ESignatureApp
+
+
+class ESignatureAppSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ESignatureApp
+        ref_name = "ESignatureApp v2"
+        fields = "__all__"
+
+
+class InterviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interview
+        ref_name = "Interview v2"
+        fields = "__all__"
 
 
 class PlanSerializer(serializers.ModelSerializer):
     class Meta:
         ref_name = "Plan v2"
         model = Plan
-        fiels = "__all__"
+        fields = "__all__"
+
+
+class TenantSerializer(serializers.ModelSerializer):
+    esignature_app = ESignatureAppSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Tenant
+        ref_name = "Tenant v2"
+        fields = "__all__"
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -32,20 +55,6 @@ class DocumentSerializer(serializers.ModelSerializer):
         return obj.school.name if obj.school else ''
 
 
-class InterviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Interview
-        ref_name = "Interview v2"
-        fields = "__all__"
-
-
-class PlanSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Plan
-        ref_name = "Plan v2"
-        fields = "__all__"
-
-
 class SchoolSerializer(serializers.ModelSerializer):
     city = serializers.StringRelatedField()
     state = serializers.StringRelatedField()
@@ -58,6 +67,13 @@ class SchoolSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class SchoolUnitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SchoolUnit
+        ref_name = "SchoolUnit v2"
+        fields = "__all__"
+
+
 class TenantGedDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantGedData
@@ -65,17 +81,7 @@ class TenantGedDataSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ESignatureAppSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ESignatureApp
-        ref_name = "ESignatureApp v2"
-        fields = "__all__"
 
 
-class TenantSerializer(serializers.ModelSerializer):
-    esignature_app = ESignatureAppSerializer(many=False, read_only=True)
 
-    class Meta:
-        model = Tenant
-        ref_name = "Tenant v2"
-        fields = "__all__"
+
