@@ -53,6 +53,19 @@ recipient_types_dict = {
 }
 
 
+recipient_group_types_dict = {
+    "agents": {'type': "agent", 'pt-br': 'agente'},
+    "carbonCopies": {'type': "carboncopy", 'pt-br': 'em cópia'},
+    "certifiedDeliveries": {'type': "certifieddelivery", 'pt-br': 'entrega certificada'},
+    "editors": {'type': "editor", 'pt-br': 'editor'},
+    "inPersonSigners": {'type': "inpersonsigner", 'pt-br': 'assinatura presencial'},
+    "intermediaries": {'type': "intermediary", 'pt-br': 'intermediário'},
+    "seals": {'type': "seal", 'pt-br': 'selo'},
+    "signers": {'type': "signer", 'pt-br': 'signatário'},
+    "witness": {'type': "witness", 'pt-br': 'testemunha'}
+}
+
+
 def docusign_xml_parser(data):
     envelope_data = dict()
     xml = xmltodict.parse(data)["DocuSignEnvelopeInformation"]

@@ -39,7 +39,7 @@ code: |
 
     # cria signers_log para o documento
     if len(el_recipients) > 0:
-      el_post_signers_log, status_code = elc.post_signers_log(tid, el_recipients, documents, envelope_log_response['id'])
+      el_post_signers_log, status_code = elc.post_signers_log(el_recipients, documents, tid, envelope_log_response['id'])
       if status_code == 201:
         log("Criado signers_log para recipients")
 

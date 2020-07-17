@@ -26,18 +26,6 @@ envelope_statuses = {
     'declined': DocumentStatus.RECUSADO_INVALIDO.value,
     'voided': DocumentStatus.RECUSADO_INVALIDO.value}
 
-recipient_group_types_dict = {
-    "agents": {'type': "agent", 'pt-br': 'agente'},
-    "carbonCopies": {'type': "carboncopy", 'pt-br': 'em cópia'},
-    "certifiedDeliveries": {'type': "certifieddelivery", 'pt-br': 'entrega certificada'},
-    "editors": {'type': "editor", 'pt-br': 'editor'},
-    "inPersonSigners": {'type': "inpersonsigner", 'pt-br': 'assinatura presencial'},
-    "intermediaries": {'type': "intermediary", 'pt-br': 'intermediário'},
-    "seals": {'type': "seal", 'pt-br': 'selo'},
-    "signers": {'type': "signer", 'pt-br': 'signatário'},
-    "witness": {'type': "witness", 'pt-br': 'testemunha'}
-}
-
 
 class EducaLegalClient:
     def __init__(self, api_base_url, token):
@@ -233,37 +221,32 @@ class EducaLegalClient:
 
         return response.json(), response.status_code
 
-    def post_signers_log(self, tenant_id, recipients, documents, envelope_log_id):
+    def post_signers_log(self, recipients, documents, tenant_id, envelope_log_id):
         """Cria registro com o log do envio do email para cada assinante"""
 
+        # acrescenta no recipient o restante dos campos
         for recipient in recipients:
-            if recipient['email']:
-                pdf_filenames = ''
-                for index, document in enumerate(documents):
-                    if index > 0:
-                        pdf_filenames += ' | ' + document['name']
-                    else:
-                        pdf_filenames = document['name']
+            recipient['status'] = 'gerado'
+            recipient['sent_date'] = ''
+            recipient['tenant'] = tenant_id
+            recipient['envelope_log'] = envelope_log_id
+            recipient['documents'] = documents
 
-                try:
-                    payload = {
-                        "name": recipient['name'],
-                        "email": recipient['email'],
-                        "type": recipient_group_types_dict[recipient['group']]['pt-br'],
-                        "status": 'gerado',
-                        "sent_date": '',
-                        "pdf_filenames": pdf_filenames,
-                        "tenant": tenant_id,
-                        "envelope_log": envelope_log_id,
-                    }
-                    final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log_id)
-                except Exception as e:
-                    log("Erro ao gerar o payload do signers_log", "console")
-                    log(e, "console")
+        log("api 1", "console")
+        log(recipients, "console")
 
-                try:
-                    response = self.session.post(final_url, data=payload)
-                except Exception as e:
-                    log("Erro ao gravar o signers_log", "console")
-                    log(e, "console")
-                return response.json(), response.status_code
+        try:
+            payload = {"recipients": recipients}
+            log("api 2", "console")
+            log(payload, "console")
+            final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log_id)
+        except Exception as e:
+            log("Erro ao gerar o payload do signers_log", "console")
+            log(e, "console")
+
+        try:
+            response = self.session.post(final_url, data=payload)
+        except Exception as e:
+            log("Erro ao gravar o signers_log", "console")
+            log(e, "console")
+        return response.json(), response.status_code
