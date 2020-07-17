@@ -44,10 +44,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
 class EnvelopeLogViewSet(viewsets.ModelViewSet):
     queryset = EnvelopeLog.objects.all()
     serializer_class = EnvelopeLogSerializer
-    logging.info('api 0')
 
     def create(self, request, *args, **kwargs):
-        logging.info('api 01')
         """
         Cria um novo log do envelope (envelope log), caso não exista.
         Se já existir, retorna o envelope log encontrado.
@@ -55,30 +53,26 @@ class EnvelopeLogViewSet(viewsets.ModelViewSet):
 
         try:
             document = Document.objects.filter(doc_uuid=self.kwargs['uuid']).first()
-            logging.info('api 1')
-            logging.info(document.id)
         except Exception as e:
             message = 'O documento {doc_uuid} não existe.'.format(doc_uuid=self.kwargs['uuid'])
             logger.debug(message)
             logger.debug(e)
-            logging.info('api 2')
         else:
             envelope_log = EnvelopeLog.objects.filter(document=document).first()
-            # insere o id do documento no dict do envelope
+            # copia o dicionario, pois o request.data eh immutable e deve
+            # ser inserida a chave id do documento no dict do envelope
             data_complete = request.data.copy()
             data_complete['document'] = document.id
             serializer = self.get_serializer(data=data_complete)
             serializer.is_valid(raise_exception=True)
-            logging.info('api 3')
 
             if envelope_log:
-                logging.info('api 4')
-                logging.info(envelope_log)
+                # copia o dicionario, pois o serializer.data eh immutable e deve
+                # ser inserida a chave 'id'
                 data_complete = serializer.data.copy()
                 data_complete['id'] = envelope_log.id
                 return Response(data_complete, status=status.HTTP_200_OK)
             else:
-                logging.info('api 5')
                 self.perform_create(serializer)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -94,8 +88,7 @@ class SignerLogViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class InterviewViewSet(viewsets.ReadOnlyModelViewSet):

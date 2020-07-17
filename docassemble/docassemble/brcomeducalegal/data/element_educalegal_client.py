@@ -212,7 +212,7 @@ class EducaLegalClient:
     def post_envelope_log(self, tenant_id, doc_uuid, data_received):
         """Cria registro com o log do envio do email para cada assinante"""
 
-        # formato da data YYYY-MM-DDThh:mm[:ss[.uuuuuu]]
+        # formato da data usado no django rest framework: YYYY-MM-DDThh:mm[:ss[.uuuuuu]]
         payload = {
             "envelope_id": data_received['envelopeId'],
             "status": "enviado",
@@ -226,6 +226,7 @@ class EducaLegalClient:
         try:
             response = self.session.post(final_url, data=payload)
         except Exception as e:
+            log("Erro ao gravar o envelope_log", "console")
             log(e, "console")
 
         return response.json(), response.status_code
@@ -255,11 +256,13 @@ class EducaLegalClient:
                     }
                     final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log_id)
                 except Exception as e:
+                    log("Erro ao gerar o payload do signers_log", "console")
                     log(e, "console")
 
         try:
             response = self.session.post(final_url, data=payload)
         except Exception as e:
+            log("Erro ao gravar o signers_log", "console")
             log(e, "console")
         return response.json(), response.status_code
 
