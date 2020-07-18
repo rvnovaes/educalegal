@@ -7,16 +7,9 @@ ga id: |
   code: ga_id_e_signature
 event: submit_to_esignature
 code: |
-  import copy
-
   log("Executando element-esignature.yml")
   if tenant_esignature_provider == 'Docusign':
     dsc = DocuSignClient(tenant_client_id, tenant_impersonated_user_guid, tenant_test_mode, tenant_private_key)
-
-    # copia a lista, pois ela eh alterada pelo docusign e perde a chave group
-    # deve ser usado esse modulo copy pq o .copy() do python nao funciona como deveria
-    # indicado pelo jhpyle: copy.deepcopy
-    el_recipients = copy.deepcopy(recipients)
 
     data_sent, data_received, e_signature_response_status_code = dsc.send_to_docusign(recipients, documents, send_immediately=True, email_subject="Documento para sua assinatura")
 
@@ -30,18 +23,6 @@ code: |
   log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
   if el_log_to_console:
     log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
-
-  # cria envelope_log para recipients
-  envelope_log_response, status_code = elc.post_envelope_log(tid, doc_uuid, data_received)
-
-  if status_code == 200 or status_code == 201:
-    log("Criado envelope_log o documento")
-
-    # cria signers_log para o documento
-    if len(el_recipients) > 0:
-      el_post_signers_log, status_code = elc.post_signers_log(el_recipients, documents, tid, envelope_log_response['id'])
-      if status_code == 201:
-        log("Criado signers_log para recipients")
 
   if e_signature_response_status_code == 201:
     signature_success

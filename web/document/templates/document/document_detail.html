@@ -111,11 +111,9 @@
 
     <script type="text/javascript">
         $.each({{ signer_statuses }}, function(index, signer_status) {
-          if (signer_status == 'criado' || signer_status == 'gerado') {
+          if (signer_status == 'criado') {
             $(".border-criado").addClass("el-border-primary");
             $(".header-criado").addClass("el-bg-primary");
-            $(".border-gerado").addClass("el-border-primary");
-            $(".header-gerado").addClass("el-bg-primary");
           } else if (signer_status == 'enviado') {
             $(".border-enviado").addClass("el-border-info");
             $(".header-enviado").addClass("el-bg-info");
