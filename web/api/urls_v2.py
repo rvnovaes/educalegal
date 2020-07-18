@@ -3,16 +3,15 @@ from rest_framework.schemas import get_schema_view
 from django.urls import path, include
 
 from .views_v2 import (
-    PlanViewSet,
-    DocumentViewSet,
-    document_download,
     InterviewViewSet,
-    # TenantDocumentViewSet,
-    # TenantInterviewViewSet,
-    # TenantSchoolViewSet,
-    # TenantViewSet,
-    TenantPlanView,
-    # TenantGedDataViewSet
+    PlanViewSet,
+    TenantViewSet,
+    DocumentViewSet,
+    DocumentDownloadViewSet,
+    TenantSchoolViewSet,
+    TenantSchoolUnitViewSet,
+    TenantInterviewViewSet,
+    TenantPlanViewSet
 )
 
 from .docusign_helpers import docusign_webhook_listener
@@ -25,25 +24,30 @@ API_DESCRIPTION = (
 schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
-    path("plans/", PlanViewSet.as_view({"get": "list"})),
-    path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
-    path("documents/", DocumentViewSet.as_view({"post": "create", "patch": "partial_update", "get": "list"})),
-    path("documents/<str:identifier>", DocumentViewSet.as_view({"get": "retrieve", "delete": "destroy"})),
-    path("documents/<str:identifier>/download", document_download),
-
+    # Administrative Views
     path("interviews/", InterviewViewSet.as_view({"get": "list"})),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
-    # path("tenants/", TenantViewSet.as_view({"get": "list"})),
-    # path("tenants/<int:pk>", TenantViewSet.as_view({"get": "retrieve"})),
-    path("tenants/<int:pk>/plan/", TenantPlanView.as_view()),
-    # path("tenants/<int:pk>/documents/", TenantDocumentViewSet.as_view({"get": "list"})),
-    # path("tenants/<int:pk>/interviews/", TenantInterviewViewSet.as_view({"get": "list"})),
-    # path("tenants/<int:pk>/schools/", TenantSchoolViewSet.as_view({"get": "list"})),
-    # path("tenants/<int:pk>/schools/<int:spk>", TenantSchoolViewSet.as_view({"get": "retrieve"})),
-    # path("tenants/<int:pk>/ged/", TenantGedDataViewSet.as_view({"get": "retrieve"})),
+    path("plans/", PlanViewSet.as_view({"get": "list"})),
+    path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
+    path("tenants/", TenantViewSet.as_view({"get": "list"})),
+    path("tenants/<int:pk>", TenantViewSet.as_view({"get": "retrieve"})),
+    # Documents Views
+    path("documents/", DocumentViewSet.as_view({"post": "create", "get": "list"})),
+    path("documents/<str:identifier>", DocumentViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+    path("documents/<str:identifier>/download", DocumentDownloadViewSet.as_view({"get": "retrieve", "delete": "destroy"})),
+    # Front end views
+    path("tenant/schools/", TenantSchoolViewSet.as_view({"post": "create", "get": "list"})),
+    path("tenant/schools/<int:pk>", TenantSchoolViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+
+    path("tenant/schools/<int:spk>/school_units", TenantSchoolUnitViewSet.as_view({"post": "create", "get": "list"})),
+    path("tenant/schools/<int:spk>/school_units/<int:pk>", TenantSchoolUnitViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+
+    # path("tenant/interviews/", TenantInterviewViewSet.as_view({"post": "create", "get": "list"})),
+    # path("tenant/interviews/<int:pk>", TenantInterviewViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+    path("tenant/plans/", TenantPlanViewSet.as_view({"get": "retrieve"})),
+    # path("tenant/ged_data/", TenantGedDataViewSet.as_view({"post": "create", "get": "list"})),
+    # path("tenant/ged_data/<int:pk>", TenantGedDataViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+    # Other
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
-    # path("docs/", include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
-    # path("rest-auth/", include("rest_auth.urls")),
-    # path("rest-auth/registration/", include('rest_auth.registration.urls')),
 ]
