@@ -237,24 +237,20 @@ class EducaLegalClient:
     def post_signers_log(self, recipients, documents, tenant_id, envelope_log_id):
         """Cria registro com o log do envio do email para cada assinante"""
 
-        # el_recipients['recipients']
-
-        log("doca 1", "console")
-        log(recipients, "console")
-
         # acrescenta no recipient o restante dos campos
         for recipient in recipients:
+            recipient['status'] = 'gerado'
+            recipient['sent_date'] = None
+            recipient['tenant'] = tenant_id
+            recipient['envelope_log'] = envelope_log_id
+            recipient['type'] = recipient_group_types_dict[recipient['group']]['pt-br']
+
             if 'tabs' in recipient.keys():
                 recipient.pop('tabs')
             if 'routingOrder' in recipient.keys():
                 recipient.pop('routingOrder')
-
-            recipient['status'] = 'gerado'
-            recipient['sent_date'] = ''
-            recipient['tenant'] = tenant_id
-            recipient['envelope_log'] = envelope_log_id
-
-            recipient['group'] = recipient_group_types_dict[recipient['group']]['pt-br']
+            if 'group' in recipient.keys():
+                recipient.pop('group')
 
             pdf_filenames = ''
             for index, document in enumerate(documents):
@@ -265,17 +261,12 @@ class EducaLegalClient:
 
             recipient['pdf_filenames'] = pdf_filenames
 
-        try:
-            payload = {"recipients": recipients}
-            log("doca 2", "console")
-            log(payload, "console")
-            final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log_id)
-        except Exception as e:
-            log("Erro ao gerar o payload do signers_log", "console")
-            log(e, "console")
+        final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log_id)
 
         try:
-            response = self.session.post(final_url, data=payload)
+            # when sending a list, use json keyword argument (not data) so the data is encoded to JSON and the
+            # Content-Type header is set to application/json.
+            response = self.session.post(final_url, json=recipients)
         except Exception as e:
             log("Erro ao gravar o signers_log", "console")
             log(e, "console")

@@ -85,50 +85,13 @@ class SignerLogViewSet(viewsets.ModelViewSet):
         """
         Cria um novo log do assinante (signer log).
         """
-        # logging.info('api 1')
-        # logging.info(request)
-        # logging.info(type(request))
+        # By default, Django Rest Framework assumes you are passing it a single object.
+        # To serialize a queryset or list of objects instead of a single object instance,
+        # you should pass the many=True flag when instantiating the serializer.
+        # You can then pass a queryset or list of objects to be serialized.
+        many = True if isinstance(request.data, list) else False
 
-        # is_many = True if isinstance(request.data, list) else False
-        is_many = True
-
-        logging.info('api 1-1')
-        logging.info(is_many)
-
-        # recipients = request.data['recipients']
-        #
-        # logging.info('api 2')
-        # logging.info(recipients)
-        #
-        # for recipient in recipients:
-        #     if recipient['email']:
-        #         try:
-        #             payload = {
-        #                 "name": recipient['name'],
-        #                 "email": recipient['email'],
-        #                 "type": recipient_group_types_dict[recipient['group']]['pt-br'],
-        #                 "status": 'gerado',
-        #                 "sent_date": '',
-        #                 "pdf_filenames": recipient['pdf_filenames'],
-        #                 "tenant": recipient['tenant_id'],
-        #                 "envelope_log": recipient['envelope_log_id'],
-        #             }
-        #             final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(
-        #                 id=recipient['envelope_log_id'])
-        #         except Exception as e:
-        #             message = 'Erro ao gerar o payload do signers_log'
-        #             logger.debug(message)
-        #             logger.debug(e)
-        #
-        #         try:
-        #             response = self.session.post(final_url, data=payload)
-        #         except Exception as e:
-        #             message = 'Erro ao gravar o signers_log'
-        #             logger.debug(message)
-        #             logger.debug(e)
-        #         return response.json(), response.status_code
-
-        serializer = self.get_serializer(data=request.data, many=is_many)
+        serializer = self.get_serializer(data=request.data, many=many)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

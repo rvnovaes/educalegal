@@ -5,16 +5,16 @@ sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
 from element_educalegal_client import EducaLegalClient
 
 ###### LOCALHOST ######
-api_base_url = "http://localhost:8008"
-token = "48974bcc7b577ab3d6fed7c281d90324f4612810"
+api_base_url = "http://localhost:8001"
+token = "9fa535d8bcfb4ce6410a59d46c61368334c96ddc"
 ##### app.educalegal.com.br #####
 # api_base_url = "https://app.educalegal.com.br"
 # token = "dbc67c03a50a11f974276fdb08a5820ecda6249b"
 
 
 if __name__ == "__main__":
-
     elc = EducaLegalClient(api_base_url, token)
+
     # Dados do Tenant
     print(elc.tenants_read(2))
 
@@ -57,7 +57,6 @@ if __name__ == "__main__":
     # related_documents = None
     # document_data = "test"
 
-
     response = elc.create_document(
         name,
         status,
@@ -98,3 +97,26 @@ if __name__ == "__main__":
         el_document_created_doc_uuid, new_status, new_envelope_id, new_signing_provider, submit_to_esignature=False
     )
     print(response)
+
+    # =========== elc.post_signers_log ============= #
+    # el_recipients = [
+    #     {'name': 'Ut est sed sed ipsa', 'email': 'dogoka@mailinator.com', 'group': 'signers', 'status': 'gerado',
+    #      'sent_date': '', 'tenant': '1', 'envelope_log': 27,
+    #      'pdf_filenames': '20200717-112740-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.pdf'},
+    #     {'name': 'Development Sociedade de Ensino Colégio Bacana Ltda.', 'email': 'silex@silexsistemas.com.br',
+    #      'group': 'signers', 'status': 'gerado', 'sent_date': '', 'tenant': '1', 'envelope_log': 27,
+    #      'pdf_filenames': '20200717-112740-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.pdf'}
+    # ]
+    #
+    # documents = {'name': 'documento.pdf'}
+    # tid = 1
+    # envelope_log_response = dict()
+    # envelope_log_response['id'] = 27
+    #
+    # el_post_signers_log, status_code = elc.post_signers_log(el_recipients, documents, tid, envelope_log_response['id'])
+    #
+    # print(status_code)
+    #
+    # print(el_post_signers_log)
+    # =========== elc.post_signers_log ============= #
+
