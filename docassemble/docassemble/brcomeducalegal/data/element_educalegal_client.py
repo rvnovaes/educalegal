@@ -27,6 +27,19 @@ envelope_statuses = {
     'voided': DocumentStatus.RECUSADO_INVALIDO.value}
 
 
+recipient_group_types_dict = {
+    "agents": {'type': "agent", 'pt-br': 'agente'},
+    "carbonCopies": {'type': "carboncopy", 'pt-br': 'em cópia'},
+    "certifiedDeliveries": {'type': "certifieddelivery", 'pt-br': 'entrega certificada'},
+    "editors": {'type': "editor", 'pt-br': 'editor'},
+    "inPersonSigners": {'type': "inpersonsigner", 'pt-br': 'assinatura presencial'},
+    "intermediaries": {'type': "intermediary", 'pt-br': 'intermediário'},
+    "seals": {'type': "seal", 'pt-br': 'selo'},
+    "signers": {'type': "signer", 'pt-br': 'signatário'},
+    "witness": {'type': "witness", 'pt-br': 'testemunha'}
+}
+
+
 class EducaLegalClient:
     def __init__(self, api_base_url, token):
         self.api_base_url = api_base_url
@@ -224,20 +237,37 @@ class EducaLegalClient:
     def post_signers_log(self, recipients, documents, tenant_id, envelope_log_id):
         """Cria registro com o log do envio do email para cada assinante"""
 
+        # el_recipients['recipients']
+
+        log("doca 1", "console")
+        log(recipients, "console")
+
         # acrescenta no recipient o restante dos campos
         for recipient in recipients:
+            if 'tabs' in recipient.keys():
+                recipient.pop('tabs')
+            if 'routingOrder' in recipient.keys():
+                recipient.pop('routingOrder')
+
             recipient['status'] = 'gerado'
             recipient['sent_date'] = ''
             recipient['tenant'] = tenant_id
             recipient['envelope_log'] = envelope_log_id
-            recipient['documents'] = documents
 
-        log("api 1", "console")
-        log(recipients, "console")
+            recipient['group'] = recipient_group_types_dict[recipient['group']]['pt-br']
+
+            pdf_filenames = ''
+            for index, document in enumerate(documents):
+                if index > 0:
+                    pdf_filenames += ' | ' + document['name']
+                else:
+                    pdf_filenames = document['name']
+
+            recipient['pdf_filenames'] = pdf_filenames
 
         try:
             payload = {"recipients": recipients}
-            log("api 2", "console")
+            log("doca 2", "console")
             log(payload, "console")
             final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log_id)
         except Exception as e:
