@@ -86,6 +86,7 @@ class SchoolUnit(TenantAwareModel):
     name = models.CharField(max_length=255, blank=True, verbose_name="Nome")
     school = models.ForeignKey(
         School,
+        null=True,
         on_delete=models.CASCADE,
         related_name="school_units",
         verbose_name="Unidade Escolar",

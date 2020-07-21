@@ -59,23 +59,24 @@ class Document(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
     signing_provider = models.CharField(
-        max_length=256, default="", verbose_name="Provedor"
+        max_length=256, blank=True, default="", verbose_name="Provedor"
     )
     envelope_id = models.CharField(
-        max_length=256, default="", verbose_name="Id do Envelope"
+        max_length=256, blank=True, default="", verbose_name="Id do Envelope"
     )
     status = models.CharField(max_length=256, default="", verbose_name="Status")
     ged_id = models.CharField(
-        max_length=128, default="", verbose_name="ID do Documento no GED"
+        max_length=128, blank=True, default="", verbose_name="ID do Documento no GED"
     )
-    ged_link = models.CharField(max_length=256, default="", verbose_name="Link")
+    ged_link = models.CharField(max_length=256, blank=True, default="", verbose_name="Link")
     ged_uuid = models.CharField(
         max_length=256,
+        blank=True,
         default="",
         help_text="UUID do documento. UUID = Universally Unique ID.",
         verbose_name="UUID",
     )
-    description = models.TextField(default="", verbose_name="Descrição")
+    description = models.TextField(default="", blank=True, verbose_name="Descrição")
     interview = models.ForeignKey(
         Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"
     )
@@ -95,13 +96,13 @@ class Document(TenantAwareModel):
         BulkDocumentGeneration, null=True, on_delete=models.CASCADE, verbose_name="Criação em Lote"
     )
     doc_uuid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="UUID")
-    task_create_document = models.CharField(max_length=256, default="", verbose_name="Task de criação de documento")
-    task_submit_to_esignature = models.CharField(max_length=256, default="", verbose_name="Task de assinatura")
-    task_send_email = models.CharField(max_length=256, default="", verbose_name="Task de envio de e-mail")
+    task_create_document = models.CharField(max_length=256, blank=True, default="", verbose_name="Task de criação de documento")
+    task_submit_to_esignature = models.CharField(max_length=256, blank=True, default="", verbose_name="Task de assinatura")
+    task_send_email = models.CharField(max_length=256, blank=True, default="", verbose_name="Task de envio de e-mail")
     submit_to_esignature = models.BooleanField(default=False, verbose_name="A Elet")
     send_email = models.BooleanField(default=False, verbose_name="E-mail?")
     mongo_uuid = models.CharField(
-        max_length=256, default="", verbose_name="UUID do Mongo"
+        max_length=256, blank=True, default="", verbose_name="UUID do Mongo"
     )
 
     def __str__(self):

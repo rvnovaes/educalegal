@@ -53,7 +53,7 @@ class TenantAwareAPIMixin:
 
 class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Retorna a lista de todas as entrevistas.
+    Retorna a lista de todas as entrevistas ou os detalhes de uma entrevista.
 
     Disponível apenas para administradores.
     """
@@ -138,9 +138,9 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Cria um novo documento.
+        Cria um novo documento
 
-        Nõa é necessário informar o tenant no corpo da requisição. O sistema usa o cliente do usuário ao qual o usuário está vinculado.
+        Não é necessário informar o tenant no corpo da requisição. O sistema usa o cliente do usuário ao qual o usuário está vinculado.
 
         400 BAD REQUEST: Se for tentada a criação de um documento em um cliente (tenant) distinto daquele ao qual o usuário está vinculado.
             => "Somente é permitida a criação de documentos no seu cliente (tenant)."
@@ -217,6 +217,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
         404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente
         (tenant) ao qual o usuário da requisição está vinculado.
+
+        405 Método "DELETE" não é permitido: Se não for informado o doc_uuid
         """
         doc_uuid = kwargs["identifier"]
         if not checkers.is_uuid(doc_uuid):
@@ -416,7 +418,10 @@ class TenantSchoolViewSet(TenantAwareAPIMixin, viewsets.ModelViewSet):
 
 
 class TenantSchoolUnitViewSet(viewsets.ModelViewSet):
-
+    """
+    Permite criar, alterar, listar e apagar as unidades das escolas.
+    Só permite excluir escola vinculada ao tenant referente ao token informado.
+    """
     queryset = SchoolUnit.objects.all()
     serializer_class = SchoolUnitSerializer
 
