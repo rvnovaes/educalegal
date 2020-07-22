@@ -47,6 +47,7 @@ code: |
 ---
 objects:
   - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+  - example_termo_acordo_individual_para_banco_horas_mp_927_2020: DAStaticFile.using(filename='example-termo-acordo-individual-para-banco-horas-mp-927-2020.pdf')
 ---
 code: |
   workers[i].name.text
@@ -103,7 +104,12 @@ script: |
         $('#d29ya2Vyc1tpXS5jcGY').mask('000.000.000-00', {reverse: true});
     });
   </script>
+right: |
+  <center><h5><strong>Saiba mais</strong></h5>
+  <p>A MP 927/202 estabeleceu o Regime Especial de Compensação de Jornada. Em vista das intercorrências da pandemia, geradora do estado de calamidade pública, a compensação das horas acumuladas nesse período, poderá ser realizada mediante a prorrogação da jornada de trabalho em até 2 (duas) horas, não excedendo o limite de 10 (dez) horas diárias.</p>
+  <center>[Clique para visualizar a minuta](${ example_termo_acordo_individual_para_banco_horas_mp_927_2020.url_for() })</center>
 ---
+
 section: Empregado
 progress: 80
 question: |

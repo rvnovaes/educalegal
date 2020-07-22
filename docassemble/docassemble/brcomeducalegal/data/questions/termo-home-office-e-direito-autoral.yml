@@ -52,6 +52,7 @@ code: |
 ---
 objects:
   - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+  - example_termo_mudanca_de_regime_e_cessao_do_direito_autoral: DAStaticFile.using(filename='example-termo-mudanca-de-regime-e-cessao-do-direito-autoral.pdf')
 ---
 code: |
   workers[i].name.text
@@ -109,6 +110,11 @@ script: |
         $('#d29ya2Vyc1tpXS5jcGY').mask('000.000.000-00', {reverse: true});
     });
   </script>
+right: |
+  <center><h5><strong>Saiba mais</strong></h5>
+  <p>Por meio deste termo, as partes acordam em realizar uma alteração temporária no regime de trabalho contratualmente estabelecido, da forma presencial, para o regime de home office</p>
+  <p>O empregado, também, cederá os direitos autorais de quaisquer materiais intelectuais no âmbito da relação entre as partes, incluindo: gravação de videoaulas, elaboração de exercícios e material escrito.</p>
+  <center>[Clique para visualizar a minuta](${ example_termo_mudanca_de_regime_e_cessao_do_direito_autoral.url_for() })</center>
 ---
 section: Empregado
 progress: 45
