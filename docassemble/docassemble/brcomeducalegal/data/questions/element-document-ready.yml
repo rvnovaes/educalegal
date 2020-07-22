@@ -34,7 +34,7 @@ action buttons:
     button_list
 ---
 code: |
-  esignature_button = {'action': 'submit_to_esignature',
+  esignature_button = {'action': 'review_school_email_answer',
                        'label': 'Enviar para assinatura eletrônica',
                        'color': 'info',
                        'icon': 'signature'}

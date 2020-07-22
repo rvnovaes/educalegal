@@ -1,0 +1,27 @@
+---
+question: |
+  Confirmar e-mail da escola para assinatura eletrônica
+fields:
+  - "E-mail:": school_email
+    help: ${ help_email_msg }
+    required: True
+    datatype: email
+---
+event: review_school_email_answer
+back button: False
+question: |
+  Confirmar e-mail da escola para assinatura eletrônica.
+review:
+  - Editar: school_email
+    button: |
+      ${ school_email }.
+action buttons:
+  code: |
+    [esignature_button_send]
+---
+code: |
+  esignature_button_send = {'action': 'submit_to_esignature',
+                       'label': 'Confirmar',
+                       'color': 'info',
+                       'icon': 'signature'}
+---
