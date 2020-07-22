@@ -112,7 +112,7 @@ script: |
   </script>
 right: |
   <center><h5><strong>Saiba mais</strong></h5>
-  <p>Pelo presente Instrumento, fica acordado entre as partes, a redução salarial do EMPREGADO com a correspondente redução da sua jornada de trabalho no mesmo percentual.</p>
+  <p>Pelo presente Instrumento, fica acordada entre as partes, a redução salarial do EMPREGADO com a correspondente redução da sua jornada de trabalho no mesmo percentual.</p>
   <p>O EMPREGADOR pagará ao EMPREGADO ajuda compensatória mensal, de natureza indenizatória, em decorrência da redução de sua jornada de trabalho e de salário.</p>
   <center>[Clique para visualizar a minuta](${ example_acordo_individual_reducao_de_jornada_e_reducao_salarial.url_for() })</center>
 ---
