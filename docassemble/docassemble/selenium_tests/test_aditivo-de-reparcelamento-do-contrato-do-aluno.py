@@ -12,7 +12,7 @@ class TestAditivodereparcelamentodocontratodoaluno(WebTest):
         "server,user,password,document_name",
         [
             ("https://test.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Aditivo de Reparcelamento do Contrato do Aluno"),
-            ("https://app.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Autotest_Aditivo de Reparcelamento do Contrato do Aluno"),
+            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br","silex@568","Aditivo de Reparcelamento do Contrato do Aluno"),
 
         ],
     )
