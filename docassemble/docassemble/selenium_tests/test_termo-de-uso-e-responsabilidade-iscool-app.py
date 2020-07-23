@@ -10,8 +10,8 @@ class TestTermoDeUsoeResponsabilidadeEscoolApp(WebTest):
   @pytest.mark.parametrize(
     "server,user,password,document_name",
     [
-      ("https://test.educalegal.com.br/","autotest@educalegal.com.br", "Silex2109", "Autotest_Termo de Uso e Responsabilidade - Iscool App"),
-      ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Termo de Uso e Responsabilidade - Iscool App"),
+      ("https://test.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Termo de Uso e Responsabilidade - Iscool App"),
+      ("https://app.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Termo de Uso e Responsabilidade - Iscool App"),
 
     ],
   )

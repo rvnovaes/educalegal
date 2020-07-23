@@ -11,8 +11,8 @@ class TestPropostaderenegociacaofluxodepagamento(WebTest):
     @pytest.mark.parametrize(
         "server,user,password,document_name",
         [
-            ("https://test.educalegal.com.br/","autotest@educalegal.com.br", "Silex2109","Proposta de renegociação - Postergação do Fluxo de Pagamento​"),
-            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568","Proposta de renegociação - Postergação do Fluxo de Pagamento​​​"),
+            ("https://test.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Proposta de renegociação - Postergação do Fluxo de Pagamento​"),
+            ("https://app.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Proposta de renegociação - Postergação do Fluxo de Pagamento​​​"),
 
         ],
     )

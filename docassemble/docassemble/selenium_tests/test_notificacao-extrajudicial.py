@@ -11,8 +11,8 @@ class TestNotificaoExtrajudicial(WebTest):
     @pytest.mark.parametrize(
         "server,user,password,document_name",
         [
-            ("https://test.educalegal.com.br/","autotest@educalegal.com.br", "Silex2109","Autotest_Notificação de cobrança"),
-            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Notificação de cobrança"),
+            ("https://test.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Notificação de cobrança"),
+            ("https://app.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Notificação de cobrança"),
 
         ],
     )
