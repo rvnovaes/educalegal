@@ -11,7 +11,7 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
     @pytest.mark.parametrize(
         "server,user,password,document_name",
         [
-            ("https://test.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Termo de Acordo - Mudança do Regime de Jornada e Cessão do Direito Autoral"),
+            ("https://test.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Termo para mudança de regime para Home Office e Cessão do Direito Autoral​"),
             ("https://app.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Termo para mudança de regime para Home Office e Cessão do Direito Autoral​"),
 
         ],
