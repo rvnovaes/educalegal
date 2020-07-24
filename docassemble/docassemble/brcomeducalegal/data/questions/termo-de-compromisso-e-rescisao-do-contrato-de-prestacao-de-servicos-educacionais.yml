@@ -36,13 +36,6 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
-    if len(school_units_list) == 0:
-      # nao pode ser usado school_unit pq essa variavel foi usada no endereco da escola
-      school_division = None
-    elif len(school_units_list) == 1:
-      school_division = school_units_list[0]
-    else:
-      school_division
     rescindentes.target_number = 1
     if plan_use_esignature:
       valid_rescindente_table

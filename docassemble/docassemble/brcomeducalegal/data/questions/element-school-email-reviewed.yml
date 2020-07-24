@@ -1,6 +1,6 @@
 ---
 question: |
-  Confirmar e-mail da escola para assinatura eletrônica
+  Editar e-mail:
 fields:
   - "E-mail:": school_email
     help: ${ help_email_msg }
@@ -10,18 +10,31 @@ fields:
 event: review_school_email_answer
 back button: False
 question: |
-  Confirmar e-mail da escola para assinatura eletrônica.
+    Confirma e-mail da escola?
 review:
   - Editar: school_email
     button: |
-      ${ school_email }.
+      ${ school_email }
 action buttons:
   code: |
-    [esignature_button_send]
+    button_send_list
 ---
 code: |
   esignature_button_send = {'action': 'submit_to_esignature',
                        'label': 'Confirmar',
                        'color': 'info',
                        'icon': 'signature'}
+---
+code: |
+  email_button_send = {'action': 'el_send_email',
+                       'label': 'Confirmar',
+                       'color': 'info',
+                       'icon': 'envelope'}
+---
+code: |
+  button_send_list = list()
+  if action_argument('target') == 'signature':
+    button_send_list.append(esignature_button_send)
+  elif action_argument('target') == 'email':
+    button_send_list.append(email_button_send)
 ---
