@@ -3,14 +3,6 @@ pipeline {
    agent any
 
    stages {
-//        stage('update_code') {
-//            steps {
-//                git (
-//                    credentialsId: '75810dd9-c7b3-4b29-991d-f8527ddb4f21',
-//                    url: 'https://github.com/silexsistemas/educalegal.git'
-//                    )
-//             }
-//        }
        stage('update_venv') {
            steps {
                dir('docassemble/docassemble/selenium_tests/'){
