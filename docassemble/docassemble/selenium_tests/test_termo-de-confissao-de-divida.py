@@ -319,7 +319,7 @@ class TestTermodeconfissaodedivida(WebTest):
             By.XPATH, "//form[@id='daform']/div[3]/div/div/input"
         ).send_keys("2")
         self.driver.find_element(
-            By.XPATH, "//label[contains(.,'conta corrente')]"
+            By.XPATH, "//form[@id='daform']/div[5]/div/fieldset/label[2]/span[2]"
         ).click()
         self.wait.until(
             EC.text_to_be_present_in_element(
