@@ -1,21 +1,22 @@
 import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from .web_test import WebTest
-from .parameters import CNPJ, CPF
+from .parameters import CNPJ, CPF, RUN_TESTS_AUTOTEST, RUN_TESTS_PRODUCTION
 
 
 class TestContratodeInscricaoemProgramadeViagemPedagogica(WebTest):
-    @pytest.mark.parametrize(
-        "server,user,password,document_name",
-        [
-            ("https://test.educalegal.com.br/","autotest@educalegal.com.br","Silex2109","Autotest_Contrato de viagem de formação pedagógica"),
-            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br","silex@568","Contrato de viagem de formação pedagógica"),
+    # indica em qual ambiente o teste deve ser executado
+    environment = list()
+    if RUN_TESTS_AUTOTEST:
+        environment.append(("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
+                            "Autotest_Contrato de viagem de formação pedagógica"),)
+    if RUN_TESTS_PRODUCTION:
+        environment.append(("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
+                            "Contrato de viagem de formação pedagógica"),)
 
-        ],
-    )
+    @pytest.mark.parametrize("server,user,password,document_name", environment,)
     def test_contratodeInscricaoemProgramadeViagemPedagogica(self, server, user, password, document_name):
         self.driver.get(server)
         self.driver.find_element(By.ID, "id_login").click()
