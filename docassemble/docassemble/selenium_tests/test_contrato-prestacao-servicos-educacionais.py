@@ -4,18 +4,20 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from .web_test import WebTest
-from .parameters import CPF
+from .parameters import CPF, RUN_TESTS_AUTOTEST, RUN_TESTS_PRODUCTION
 
 
 class TestContratodoaluno(WebTest):
-    @pytest.mark.parametrize(
-        "server,user,password,document_name",
-        [
-            ("https://test.educalegal.com.br/","autotest@educalegal.com.br", "Silex2109","Autotest_Contrato do aluno"),
-            ("https://app.educalegal.com.br/","maria.secretaria@educalegal.com.br", "silex@568", "Contrato do aluno"),
+    # indica em qual ambiente o teste deve ser executado
+    environment = list()
+    if RUN_TESTS_AUTOTEST:
+        environment.append(("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
+                            "Autotest_Contrato de Prestação de Serviços Educacionais"),)
+    if RUN_TESTS_PRODUCTION:
+        environment.append(("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
+                            "Contrato de Prestação de Serviços Educacionais"),)
 
-        ],
-    )
+    @pytest.mark.parametrize("server,user,password,document_name", environment,)
     def test_contratodoaluno(self, server, user, password, document_name):
         self.driver.get(server)
         self.driver.find_element(By.ID, "id_login").send_keys(user)
