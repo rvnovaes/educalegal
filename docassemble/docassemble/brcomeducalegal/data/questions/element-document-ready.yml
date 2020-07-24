@@ -35,12 +35,14 @@ action buttons:
 ---
 code: |
   esignature_button = {'action': 'review_school_email_answer',
+                       'arguments': {'target': 'signature'},
                        'label': 'Enviar para assinatura eletrônica',
                        'color': 'info',
                        'icon': 'signature'}
 ---
 code: |
-  email_button = {'action': 'el_send_email',
+  email_button = {'action': 'review_school_email_answer',
+                       'arguments': {'target': 'email'},
                        'label': 'Enviar por e-mail',
                        'color': 'info',
                        'icon': 'envelope'}

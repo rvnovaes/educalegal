@@ -36,13 +36,6 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
-    if len(school_units_list) == 0:
-      # nao pode ser usado school_unit pq essa variavel foi usada no endereco da escola
-      school_division = None
-    elif len(school_units_list) == 1:
-      school_division = school_units_list[0]
-    else:
-      school_division
     contractors.gather()
     if plan_use_esignature:
       valid_contractors_table
@@ -302,7 +295,7 @@ code: |
           new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 2
+          new_recipient['routingOrder'] = 1
           new_recipient['tabs'] = [
               {
                   'type': 'signHere',
@@ -315,7 +308,7 @@ code: |
   new_recipient['name'] = school_legal_name
   new_recipient['email'] = school_email
   new_recipient['group'] = 'signers'
-  new_recipient['routingOrder'] = 3
+  new_recipient['routingOrder'] = 2
   new_recipient['tabs'] = [
       {
           'type': 'signHere',
