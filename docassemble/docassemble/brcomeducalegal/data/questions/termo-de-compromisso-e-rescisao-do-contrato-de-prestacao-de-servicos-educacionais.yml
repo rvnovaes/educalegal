@@ -146,6 +146,7 @@ fields:
   - 'Ano Letivo: ': students[i].school_year
     datatype: text
   - 'Série: ': students[i].grade
+    datatype: dropdown
     choices:
     - Berçário: Berçário
     - Maternal I: Maternal I
