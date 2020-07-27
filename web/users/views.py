@@ -22,5 +22,7 @@ class CustomUserPasswordChangeView(PasswordChangeView):
             logout(self.request)
 
             # redireciona para pagina de login
-            # return redirect('%s?next=%s' % (settings.ACCOUNT_LOGOUT_REDIRECT_URL, self.request.path))
             return redirect(settings.ACCOUNT_LOGOUT_REDIRECT_URL)
+        else:
+            return super(PasswordChangeView, self).form_valid(form)
+
