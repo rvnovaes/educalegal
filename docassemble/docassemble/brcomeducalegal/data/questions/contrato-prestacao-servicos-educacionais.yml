@@ -161,20 +161,26 @@ section: Aluno(a)
 question: Dados escolares
 fields:
   - 'Série: ': students[i].grade
-    choices:
-    - 1ª série do ensino fundamental: 1ª série do ensino fundamental
-    - 2ª série do ensino fundamental: 2ª série do ensino fundamental
-    - 3ª série do ensino fundamental: 3ª série do ensino fundamental
-    - 4ª série do ensino fundamental: 4ª série do ensino fundamental
-    - 5ª série do ensino fundamental: 5ª série do ensino fundamental
-    - 6ª série do ensino fundamental: 6ª série do ensino fundamental
-    - 7ª série do ensino fundamental: 7ª série do ensino fundamental
-    - 8ª série do ensino fundamental: 8ª série do ensino fundamental
-    - 9ª série do ensino fundamental: 9ª série do ensino fundamental
-    - 1ª série do ensino médio: 1ª série do ensino médio
-    - 2ª série do ensino médio: 2ª série do ensino médio
-    - 3ª série do ensino médio: 3ª série do ensino médio
     datatype: dropdown
+    choices:
+    - Berçário: Berçário
+    - Maternal I: Maternal I
+    - Maternal II: Maternal II
+    - Maternal III: Maternal III
+    - 1º período do ensino infantil: 1º período do ensino infantil
+    - 2º período do ensino infantil: 2º período do ensino infantil
+    - 1º ano do ensino fundamental: 1º ano do ensino fundamental
+    - 2º ano do ensino fundamental: 2º ano do ensino fundamental
+    - 3º ano do ensino fundamental: 3º ano do ensino fundamental
+    - 4º ano do ensino fundamental: 4º ano do ensino fundamental
+    - 5º ano do ensino fundamental: 5º ano do ensino fundamental
+    - 6º ano do ensino fundamental: 6º ano do ensino fundamental
+    - 7º ano do ensino fundamental: 7º ano do ensino fundamental
+    - 8º ano do ensino fundamental: 8º ano do ensino fundamental
+    - 9º ano do ensino fundamental: 9º ano do ensino fundamental
+    - 1º ano do ensino médio: 1º ano do ensino médio
+    - 2º ano do ensino médio: 2º ano do ensino médio
+    - 3º ano do ensino médio: 3º ano do ensino médio
   - 'Período: ': students[i].period
     choices:
     - matutino: matutino

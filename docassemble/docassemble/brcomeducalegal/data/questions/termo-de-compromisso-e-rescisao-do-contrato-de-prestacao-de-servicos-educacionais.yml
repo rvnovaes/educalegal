@@ -146,10 +146,14 @@ fields:
   - 'Ano Letivo: ': students[i].school_year
     datatype: text
   - 'Série: ': students[i].grade
+    datatype: dropdown
     choices:
-    - 1º ano do ensino infantil: 1º ano do ensino infantil
-    - 2º ano do ensino infantil: 2º ano do ensino infantil
-    - 3º ano do ensino infantil: 3º ano do ensino infantil
+    - Berçário: Berçário
+    - Maternal I: Maternal I
+    - Maternal II: Maternal II
+    - Maternal III: Maternal III
+    - 1º período do ensino infantil: 1º período do ensino infantil
+    - 2º período do ensino infantil: 2º período do ensino infantil
     - 1º ano do ensino fundamental: 1º ano do ensino fundamental
     - 2º ano do ensino fundamental: 2º ano do ensino fundamental
     - 3º ano do ensino fundamental: 3º ano do ensino fundamental
