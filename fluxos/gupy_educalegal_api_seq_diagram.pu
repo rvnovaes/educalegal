@@ -1,0 +1,29 @@
+@startuml
+header Integração - Educa Legal + Gupy + GED + Docusign
+actor Candidato
+autonumber
+Mais -> Gupy: Contrata o canditado
+activate Gupy
+Gupy -> Educalegal: Candidate Hired Event
+deactivate Gupy
+activate Educalegal
+Educalegal -> Candidato: E-mail com link para finalização do cadastro
+activate Candidato
+Candidato -> Educalegal: Preenche formulário
+deactivate Candidato
+Educalegal -> Docusign: Documentos para assinatura
+Educalegal -> GED: Cópia dos documentos
+deactivate Educalegal
+Docusign -> Candidato: Documentos para assinatura
+activate Candidato
+Candidato -> Docusign: Assina documentos
+deactivate Candidato
+activate Docusign
+Docusign -> Educalegal: Documentos assinados
+deactivate Docusign
+activate Educalegal
+Educalegal -> GED: Documentos assinados
+Educalegal -> XLS: Dados do funcionário
+Educalegal -> SistemaRH: Cadastro do funcionário
+deactivate Educalegal
+@enduml
