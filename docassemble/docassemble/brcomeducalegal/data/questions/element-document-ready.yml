@@ -2,6 +2,8 @@ include:
   - element-esignature.yml
   - element-send-email.yml
 ---
+undefine:
+  - button_send_list
 ga id: |
   code: ga_id_end
 event: document_ready_screen
