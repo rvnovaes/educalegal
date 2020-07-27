@@ -38,6 +38,7 @@ class CustomUserAdmin(UserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
+                    "force_password_change",
                     "groups",
                     "user_permissions",
                 ),
