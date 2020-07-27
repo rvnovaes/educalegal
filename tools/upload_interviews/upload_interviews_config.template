@@ -7,3 +7,4 @@ PRODUCTION = D8WUkJKxxW06qDS1UB5KlwyVXeUE1Mnx
 questions = /opt/educalegal/docassemble/docassemble/brcomeducalegal/data/questions
 templates = /opt/educalegal/docassemble/docassemble/brcomeducalegal/data/templates
 modules = /opt/educalegal/docassemble/docassemble/brcomeducalegal/data
+static = /opt/educalegal/docassemble/docassemble/brcomeducalegal/data/static
