@@ -76,9 +76,11 @@ selected_items_message = ""
 questions = sorted([f for f in listdir(config["sources"]["questions"]) if isfile(join(config["sources"]["questions"], f))])
 templates = sorted([f for f in listdir(config["sources"]["templates"]) if isfile(join(config["sources"]["templates"], f))])
 modules = sorted([f for f in listdir(config["sources"]["modules"]) if isfile(join(config["sources"]["modules"], f))])
+static = sorted([f for f in listdir(config["sources"]["static"]) if isfile(join(config["sources"]["static"], f))])
 selected_questions = []
 selected_modules = []
 selected_templates =[]
+selected_static =[]
 
 step2 = False
 step3 = False
@@ -127,11 +129,12 @@ while True:
 # Step 2
 layout = [
     [sg.Text("Selecione os items a serem enviados:")],
-    [sg.Text("Todos: "), sg.Checkbox("Questions", key="questions_checkbox"), sg.Checkbox("Templates", key="templates_checkbox"), sg.Checkbox("Modules", key="modules_checkbox")],
+    [sg.Text("Todos: "), sg.Checkbox("Questions", key="questions_checkbox"), sg.Checkbox("Templates", key="templates_checkbox"), sg.Checkbox("Modules", key="modules_checkbox"), sg.Checkbox("Static", key="static_checkbox")],
     [
         sg.Listbox(questions, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="questions_listbox"),
         sg.Listbox(templates, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="templates_listbox"),
-        sg.Listbox(modules, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="modules_listbox")
+        sg.Listbox(modules, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="modules_listbox"),
+        sg.Listbox(static, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="static_listbox")
     ],
     [sg.Button("Ok", key="final_ok"), sg.Button("Cancel")],
 ]
@@ -159,12 +162,18 @@ while step2:
         else:
             selected_modules = window["modules_listbox"].get()
 
+        if window["static_checkbox"].Get():
+            selected_static = window["static_listbox"].GetListValues()
+        else:
+            selected_static = window["static_listbox"].get()
+
         selected_items_message = """
         Foram selecionados os seguintes items:\n
         Questions: {selected_questions}\n
         Templates: {selected_templates}\n
-        Modules: {selected_modules}        
-        """.format(selected_questions=selected_questions, selected_templates=selected_templates, selected_modules=selected_modules)
+        Modules: {selected_modules}\n
+        Static: {selected_static}  
+        """.format(selected_questions=selected_questions, selected_templates=selected_templates, selected_modules=selected_modules, selected_static=selected_static)
         step3 = True
         window.close()
 
@@ -198,6 +207,10 @@ while step3:
             if len(selected_modules) > 0:
                 for module in selected_modules:
                     message = post_to_docassemble(api_key, selected_destination, join(config["sources"]["modules"], module), "modules", selected_user_id, selected_project)
+                    window["output"].print(message)
+            if len(selected_static) > 0:
+                for static in selected_static:
+                    message = post_to_docassemble(api_key, selected_destination, join(config["sources"]["static"], static), "static", selected_user_id, selected_project)
                     window["output"].print(message)
         except Exception as e:
             window["output"].print(e)
