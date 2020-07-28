@@ -24,7 +24,8 @@ module.exports = {
   router: {
     base: '/',
     linkExactActiveClass: 'active',
-    middleware: ['auth'],
+    // Força autenticacao para acessar as paginas
+    // middleware: ['auth'],
   },
   /*
   ** Headers of the page
@@ -80,6 +81,9 @@ module.exports = {
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
+    // Default: http://[HOST]:[PORT][PREFIX]
+    // Defines the base URL which is used and prepended to make server side requests.
+    // Environment variable API_URL can be used to override baseURL.
     baseURL: 'http://localhost:8008'
   },
 
@@ -94,7 +98,8 @@ module.exports = {
           !payload.msg ? 'Operação bem sucedida' : payload.msg,
         options: {
           type: 'success',
-          icon: 'check'
+          icon: 'check',
+          theme: 'outline'
         }
       },
       {
@@ -103,7 +108,8 @@ module.exports = {
           !payload.msg ? 'Oops.. Erro inesperado' : payload.msg,
         options: {
           type: 'error',
-          icon: 'times'
+          icon: 'times',
+          theme: 'outline'
         }
       }
     ]
@@ -124,10 +130,10 @@ module.exports = {
         }
       }
     },
-    // TODO conferir caminho
+    // TODO conferir caminho uma vez que a pagina de login é o index.vue
     redirect: {
       // login: '/login',
-      login: '/dashboard',
+      login: '/',
     },
   },
 

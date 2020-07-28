@@ -156,7 +156,7 @@
         return `${this.$route.name} Page`;
       },
       layoutClass() {
-        let exceptions = ['index', 'home']
+        let exceptions = ['home']
         if (!exceptions.includes(this.$route.name)) {
           return 'bg-primary'
         } else {

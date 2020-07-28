@@ -19,11 +19,11 @@ django-tables2~=2.3.1
 django-filter~=2.3.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.14.19
+boto3~=1.14.30
 # Production server
 gunicorn~=20.0.4
 # Misc
-lxml~=4.5.1
+lxml~=4.5.2
 xmltodict~=0.12.0
 Pillow~=7.2.0
 pyyaml~=5.3.1
@@ -33,7 +33,7 @@ django-debug-toolbar~=2.2
 # API Debugging
 django-silk~=4.0.1
 # Read csv
-pandas~=1.0.5
+pandas~=1.1.0
 # Django models currency
 django-money~=1.1
 # Google Analytics

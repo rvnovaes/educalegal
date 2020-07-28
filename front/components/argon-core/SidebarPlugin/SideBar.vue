@@ -60,7 +60,7 @@ export default {
     },
     logo: {
       type: String,
-      default: 'img/brand/logo_educa_legal_h.png',
+      default: 'img/brand/logo_educa_legal_b.png',
       description: 'Sidebar app logo'
     },
     backgroundColor: {
