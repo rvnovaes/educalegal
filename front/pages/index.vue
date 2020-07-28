@@ -49,7 +49,7 @@
                               :rules="{required: true, email: true}"
                               prepend-icon="ni ni-email-83"
                               placeholder="Email"
-                              v-model="model.email">
+                              v-model="model.username">
                   </base-input>
 
                   <base-input alternative
@@ -89,7 +89,9 @@
     data() {
       return {
         model: {
-          email: '',
+          // passamos o email em username uma vez que a API do EL espera um post com username e password
+          // Entretanto, aceita tanto o username quanto email nesse campo
+          username: '',
           password: '',
           rememberMe: false
         }

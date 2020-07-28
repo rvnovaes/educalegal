@@ -130,10 +130,10 @@ module.exports = {
         }
       }
     },
-    // TODO conferir caminho uma vez que a pagina de login é o index.vue
     redirect: {
-      // login: '/login',
       login: '/',
+      logout: '/',
+      home: '/dashboard'
     },
   },
 
