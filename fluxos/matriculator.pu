@@ -7,11 +7,11 @@ Educalegal -> GED: Cópia dos documentos
 Educalegal -> Docusign: Documentos para assinatura
 deactivate Educalegal
 activate Docusign
-Docusign -> Contratante: Documentos para assinatura
+Docusign -> Contratantes: Documentos para assinatura
 deactivate Docusign
-activate Contratante
-Contratante -> Docusign: Documentos assinados
-deactivate Contratante
+activate Contratantes
+Contratantes -> Docusign: Documentos assinados
+deactivate Contratantes
 activate Docusign
 Docusign -> Educalegal: Documentos assinados
 deactivate Docusign
