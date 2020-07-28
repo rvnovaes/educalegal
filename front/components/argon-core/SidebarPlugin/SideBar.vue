@@ -60,7 +60,7 @@ export default {
     },
     logo: {
       type: String,
-      default: 'https://demos.creative-tim.com/nuxt-argon-dashboard-pro/img/brand/green.png',
+      default: 'img/brand/logo_educa_legal_h.png',
       description: 'Sidebar app logo'
     },
     backgroundColor: {

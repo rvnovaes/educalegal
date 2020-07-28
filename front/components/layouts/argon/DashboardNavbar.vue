@@ -2,7 +2,7 @@
   <base-nav
     container-classes="container-fluid"
     class="navbar-top border-bottom navbar-expand"
-    :class="{'bg-success navbar-dark': type === 'default'}"
+    :class="{'bg-primary navbar-dark': type === 'default'}"
   >
     <!-- Search form -->
     <form class="navbar-search form-inline mr-sm-3"
