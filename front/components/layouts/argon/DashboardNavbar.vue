@@ -240,10 +240,12 @@
             <span>Support</span>
           </a>
           <div class="dropdown-divider"></div>
-          <a href="#!" class="dropdown-item">
+<!--          <a href="#!" class="dropdown-item">-->
+          <nuxt-link class="dropdown-item" to="/logout">
             <i class="ni ni-user-run"></i>
-            <span>Logout</span>
-          </a>
+            <span>Sair</span>
+          </nuxt-link>
+<!--          </a>-->
 
         </template>
       </base-dropdown>
@@ -252,6 +254,7 @@
 </template>
 <script>
   import { CollapseTransition } from 'vue2-transitions';
+  import { mapState } from 'vuex'
   import BaseNav from '@/components/argon-core/Navbar/BaseNav.vue';
   import Modal from '@/components/argon-core/Modal.vue';
 
@@ -269,10 +272,12 @@
       }
     },
     computed: {
+      ...mapState('auth', ['loggedIn']),
       routeName() {
         const { name } = this.$route;
         return this.capitalizeFirstLetter(name);
       }
+
     },
     data() {
       return {

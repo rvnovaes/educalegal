@@ -25,7 +25,7 @@ module.exports = {
     base: '/',
     linkExactActiveClass: 'active',
     // Força autenticacao para acessar as paginas
-    // middleware: ['auth'],
+    middleware: ['auth'],
   },
   /*
   ** Headers of the page
