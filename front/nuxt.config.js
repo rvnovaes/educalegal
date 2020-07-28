@@ -23,17 +23,18 @@ module.exports = {
   mode: 'universal',
   router: {
     base: '/',
-    linkExactActiveClass: 'active'
+    linkExactActiveClass: 'active',
+    middleware: ['auth'],
   },
   /*
   ** Headers of the page
   */
   head: {
-    title: 'Nuxt Argon Dashboard PRO',
+    title: 'Educa Legal',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Nuxt Argon Dashboard PRO - Premium Nuxt.js & Bootstrap 4 Dashboard' }
+      { hid: 'description', name: 'description', content: 'Educa Legal - Advocacia Virtual para Escolas' }
     ],
     link: [
       { rel: 'icon', type: 'image/png', href: 'favicon.png' },
@@ -71,12 +72,63 @@ module.exports = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
+    '@nuxtjs/auth',
+    '@nuxtjs/toast'
   ],
   /*
   ** Axios module configuration
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
+    baseURL: 'http://localhost:8008'
+  },
+
+  toast: {
+    position: 'top-center',
+    iconPack: 'fontawesome',
+    duration: 3000,
+    register: [
+      {
+        name: 'defaultSuccess',
+        message: (payload) =>
+          !payload.msg ? 'Operação bem sucedida' : payload.msg,
+        options: {
+          type: 'success',
+          icon: 'check'
+        }
+      },
+      {
+        name: 'defaultError',
+        message: (payload) =>
+          !payload.msg ? 'Oops.. Erro inesperado' : payload.msg,
+        options: {
+          type: 'error',
+          icon: 'times'
+        }
+      }
+    ]
+  },
+
+  auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          login: {
+            url: '/v2/token/',
+            method: 'post',
+            propertyName: 'access',
+            altProperty: 'refresh'
+          },
+          logout: {},
+          user: false
+        }
+      }
+    },
+    // TODO conferir caminho
+    redirect: {
+      // login: '/login',
+      login: '/dashboard',
+    },
   },
 
   /*
@@ -90,6 +142,18 @@ module.exports = {
     ** You can extend webpack config here
     */
     extend(config, ctx) {
+      // Added Line
+      config.devtool = ctx.isClient ? 'eval-source-map' : 'inline-source-map'
+
+      // Run ESLint on save
+      // if (ctx.isDev && ctx.isClient) {
+      //   config.module.rules.push({
+      //     enforce: 'pre',
+      //     test: /\.(js|vue)$/,
+      //     loader: 'eslint-loader',
+      //     exclude: /(node_modules)/
+      //   })
+      // }
 
     },
     extractCSS: process.env.NODE_ENV === 'production',

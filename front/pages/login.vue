@@ -49,7 +49,7 @@
                               :rules="{required: true, email: true}"
                               prepend-icon="ni ni-email-83"
                               placeholder="Email"
-                              v-model="model.email">
+                              v-model="model.username">
                   </base-input>
 
                   <base-input alternative
@@ -89,15 +89,30 @@
     data() {
       return {
         model: {
-          email: '',
+          username: '',
+          // email: '',
           password: '',
           rememberMe: false
         }
       };
     },
     methods: {
-      onSubmit() {
-        // this will be called only after form is valid. You can do api call here to login
+      // onSubmit() {
+      //   // this will be called only after form is valid. You can do api call here to login
+      // }
+      async onSubmit() {
+        try {
+          await this.$auth.loginWith('local', {
+            data: this.model
+          })
+          this.$toasted.global.defaultSuccess({
+            msg: 'Usuário autenticado com sucesso'
+          })
+        } catch (err) {
+          this.$toasted.global.defaultError({
+            msg: 'Usuário ou senha inválidos.'
+          })
+        }
       }
     }
   };

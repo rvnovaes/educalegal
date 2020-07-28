@@ -2,6 +2,8 @@ import os
 import moneyed
 from moneyed.localization import _FORMATTER
 from decimal import ROUND_HALF_EVEN
+from datetime import timedelta
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -173,12 +175,24 @@ DEFAULT_FROM_EMAIL = "sistemas@educalegal.com.br"
 
 
 # API Settings
+LOGIN_URL = "/api/v2/login"
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
+}
+
+
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.DjangoModelPermissions" # TODO Verificar se realmente importa
+    ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         # Session Authentication is kept here for the browseable API
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
     ],
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -188,6 +202,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_datatables.filters.DatatablesFilterBackend',
     ),
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
     'DEFAULT_PAGINATION_CLASS': 'rest_framework_datatables.pagination.DatatablesPageNumberPagination',
     'PAGE_SIZE': 50,
 
@@ -203,8 +218,9 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_WHITELIST = (
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
     "http://localhost:8000",
-    "https://docs.educalegal.com.br",
 )
 
 LOGGING = {
