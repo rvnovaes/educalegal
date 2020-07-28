@@ -105,8 +105,8 @@
       <div class="container">
         <div class="row align-items-center justify-content-xl-between">
           <div class="col-xl-12">
-            <div class="copyright text-center text-lg-right text-muted">
-              © {{year}} <a href="https://www.educalegal.com.br" class="font-weight-bold ml-1" target="_blank" rel="noopener">Educa Legal</a> - Versão 2.0
+            <div class="copyright text-center text-black-50 text-lg-right">
+              © {{year}} <a href="https://www.educalegal.com.br" class="font-weight-bold text-white ml-1" target="_blank" rel="noopener">Educa Legal</a> - Versão 2.0
             </div>
 <!--          </div>-->
 <!--          <div class="col-xl-6">-->
@@ -158,7 +158,7 @@
       layoutClass() {
         let exceptions = ['index', 'home']
         if (!exceptions.includes(this.$route.name)) {
-          return 'bg-default'
+          return 'bg-primary'
         } else {
           return ''
         }
