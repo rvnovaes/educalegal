@@ -1,0 +1,22 @@
+@startuml
+header Integração - Educa Legal + API Teia
+autonumber
+APITeia -> Educalegal: Dados do contrato (API ou XLS)
+activate Educalegal
+Educalegal -> GED: Cópia dos documentos
+Educalegal -> Docusign: Documentos para assinatura
+deactivate Educalegal
+activate Docusign
+Docusign -> Contratante: Documentos para assinatura
+deactivate Docusign
+activate Contratante
+Contratante -> Docusign: Documentos assinados
+deactivate Contratante
+activate Docusign
+Docusign -> Educalegal: Documentos assinados
+deactivate Docusign
+activate Educalegal
+Educalegal -> GED: Documentos assinados
+Educalegal -> APITeia: Dados do contrato (API ou XLS)
+deactivate Educalegal
+@enduml
