@@ -1,14 +1,13 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="header bg-gradient-success py-7 py-lg-8 pt-lg-9">
+    <div class="header bg-gradient-success py-7 py-lg-7 pt-lg-9">
       <div class="container">
         <div class="header-body text-center mb-7">
           <div class="row justify-content-center">
             <div class="col-xl-5 col-lg-6 col-md-8 px-5">
-              <h1 class="text-white">Welcome!</h1>
-              <p class="text-lead text-white">Use these awesome forms to login or create new account in your project for
-                free.</p>
+              <img src="img/brand/logo_educa_legal.png" alt="Logo Educa Legal">
+              <p class="text-lead text-white">Advocacia Virtual para Escolas</p>
             </div>
           </div>
         </div>
@@ -25,22 +24,22 @@
       <div class="row justify-content-center">
         <div class="col-lg-5 col-md-7">
           <div class="card bg-secondary border-0 mb-0">
-            <div class="card-header bg-transparent pb-5">
-              <div class="text-muted text-center mt-2 mb-3"><small>Sign in with</small></div>
-              <div class="btn-wrapper text-center">
-                <a href="#" class="btn btn-neutral btn-icon">
-                  <span class="btn-inner--icon"><img src="~/static/img/icons/common/github.svg"></span>
-                  <span class="btn-inner--text">Github</span>
-                </a>
-                <a href="#" class="btn btn-neutral btn-icon">
-                  <span class="btn-inner--icon"><img src="~/static/img/icons/common/google.svg"></span>
-                  <span class="btn-inner--text">Google</span>
-                </a>
-              </div>
-            </div>
+<!--            <div class="card-header bg-transparent pb-5">-->
+<!--              <div class="text-muted text-center mt-2 mb-3"><small>Sign in with</small></div>-->
+<!--              <div class="btn-wrapper text-center">-->
+<!--                <a href="#" class="btn btn-neutral btn-icon">-->
+<!--                  <span class="btn-inner&#45;&#45;icon"><img src="~/static/img/icons/common/github.svg"></span>-->
+<!--                  <span class="btn-inner&#45;&#45;text">Github</span>-->
+<!--                </a>-->
+<!--                <a href="#" class="btn btn-neutral btn-icon">-->
+<!--                  <span class="btn-inner&#45;&#45;icon"><img src="~/static/img/icons/common/google.svg"></span>-->
+<!--                  <span class="btn-inner&#45;&#45;text">Google</span>-->
+<!--                </a>-->
+<!--              </div>-->
+<!--            </div>-->
             <div class="card-body px-lg-5 py-lg-5">
               <div class="text-center text-muted mb-4">
-                <small>Or sign in with credentials</small>
+                <small>Digite seu e-mail e sua senha</small>
               </div>
               <validation-observer v-slot="{handleSubmit}" ref="formValidator">
                 <form role="form" @submit.prevent="handleSubmit(onSubmit)">
@@ -55,17 +54,17 @@
 
                   <base-input alternative
                               class="mb-3"
-                              name="Password"
+                              name="Senha"
                               :rules="{required: true, min: 6}"
                               prepend-icon="ni ni-lock-circle-open"
                               type="password"
-                              placeholder="Password"
+                              placeholder="Senha"
                               v-model="model.password">
                   </base-input>
 
-                  <base-checkbox v-model="model.rememberMe">Remember me</base-checkbox>
+                  <base-checkbox v-model="model.rememberMe">Lembrar</base-checkbox>
                   <div class="text-center">
-                    <base-button type="primary" native-type="submit" class="my-4">Sign in</base-button>
+                    <base-button type="primary" native-type="submit" class="my-4">Entrar</base-button>
                   </div>
                 </form>
               </validation-observer>
@@ -73,10 +72,10 @@
           </div>
           <div class="row mt-3">
             <div class="col-6">
-              <router-link to="/dashboard" class="text-light"><small>Forgot password?</small></router-link>
+              <router-link to="/dashboard" class="text-light"><small>Esqueceu a senha?</small></router-link>
             </div>
             <div class="col-6 text-right">
-              <router-link to="/register" class="text-light"><small>Create new account</small></router-link>
+              <router-link to="/register" class="text-light"><small>Cria nova conta</small></router-link>
             </div>
           </div>
         </div>
