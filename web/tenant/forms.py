@@ -15,7 +15,7 @@ from billing.models import Plan
 class EducaLegalSignupForm(SignupForm):
     full_name = forms.CharField(label="Nome Completo", required=True)
     tenant_name = forms.CharField(label="Nome da Escola", required=True)
-    tenant_phone = forms.CharField(label="Telefone da Escola", required=True)
+    tenant_phone = forms.CharField(label="Telefone/Whatsapp", required=True)
     eua = forms.BooleanField(
         label="Concordo com a política de privacidade e os termos de uso", required=True
     )
