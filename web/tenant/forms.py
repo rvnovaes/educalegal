@@ -15,11 +15,12 @@ from billing.models import Plan
 class EducaLegalSignupForm(SignupForm):
     full_name = forms.CharField(label="Nome Completo", required=True)
     tenant_name = forms.CharField(label="Nome da Escola", required=True)
+    tenant_phone = forms.CharField(label="Telefone da Escola", required=True)
     eua = forms.BooleanField(
         label="Concordo com a política de privacidade e os termos de uso", required=True
     )
 
-    field_order = ["full_name", "tenant_name", "email", "password1", "password2", "eua"]
+    field_order = ["full_name", "tenant_name", "tenant_phone", "email", "password1", "password2", "eua"]
 
     def clean(self):
         super().clean()
@@ -41,7 +42,8 @@ class EducaLegalSignupForm(SignupForm):
             eua_agreement=self.cleaned_data.get("eua"),
             plan=essential_plan,
             auto_enrolled=True,
-            esignature_app=None
+            esignature_app=None,
+            phone=self.cleaned_data.get("tenant_phone"),
         )
         tenant.save()
         # Selects every freemium interview and adds to newly created tenant
