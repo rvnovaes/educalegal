@@ -4,7 +4,7 @@ from .models import Tenant, TenantGedData, ESignatureApp
 
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
-    list_display = ["name", "plan", "auto_enrolled", "created_date"]
+    list_display = ["name", "plan", "auto_enrolled", "created_date", "phone"]
     list_filter = ["auto_enrolled", "plan"]
     list_editable = ["plan"]
     search_fields = ["name"]

@@ -54,6 +54,8 @@ class Tenant(models.Model):
 
     esignature_app = models.ForeignKey(ESignatureApp, null=True, blank=True, on_delete=models.PROTECT, default=1)
 
+    phone = models.CharField(max_length=255, verbose_name="Telefone")
+
     class Meta:
         ordering = ["name"]
         verbose_name = "Instância"
