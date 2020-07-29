@@ -257,7 +257,7 @@ fields:
     datatype: integer
     required: true
     min: 1
-    max: 90
+    max: 120
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
