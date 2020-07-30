@@ -48,6 +48,8 @@ urlpatterns = [
         r"^v1/docs/redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     ),
       path("v2/", include("api.urls_v2")),
+      # Como existe v1/api-auth com o mesmo include, ele emite esse warning
+      # URL namespace 'rest_framework' isn't unique. You may not be able to reverse all URLs in this namespace
       path("v2/api-auth/", include("rest_framework.urls")),
       url(
           r"^v2/docs/swagger(?P<format>\.json|\.yaml)$",

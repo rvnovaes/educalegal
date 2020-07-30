@@ -133,7 +133,7 @@ module.exports = {
     redirect: {
       login: '/',
       logout: '/',
-      home: '/dashboard'
+      home: '/painel'
     },
   },
 

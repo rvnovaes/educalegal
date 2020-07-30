@@ -186,7 +186,6 @@ SIMPLE_JWT = {
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
-        "rest_framework.permissions.DjangoModelPermissions" # TODO Verificar se realmente importa
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         # Session Authentication is kept here for the browseable API
