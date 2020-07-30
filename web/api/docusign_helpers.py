@@ -194,7 +194,7 @@ def docusign_webhook_listener(request):
         # encontrar o documento no banco
         envelope_status = str(envelope_data["envelope_status"]).lower()
 
-        # variável para salvar o nome dos pdfs no signer_log
+        # variável para salvar o nome dos pdfs no signer
         pdf_filenames = ''
 
         tenant = Tenant.objects.get(pk=document.tenant.pk)
@@ -269,9 +269,9 @@ def docusign_webhook_listener(request):
 
         for recipient_status in recipient_statuses:
             try:
-                # se já tem o status para o email e para o envelope_log, não salva outro igual
+                # se já tem o status para o email e para o documento, não salva outro igual
                 # só cria outro se o status do recipient mudou
-                signer_log = Signer.objects.get(
+                signer = Signer.objects.get(
                     document=document,
                     email=recipient_status['Email'],
                     status=recipient_status['Status'])
@@ -288,9 +288,9 @@ def docusign_webhook_listener(request):
                         tenant=tenant,
                     )
 
-                    signer_log.save()
+                    signer.save()
                 except Exception as e:
-                    message = 'Não foi possível salvar o SignerLog: ' + str(e)
+                    message = 'Não foi possível salvar o Signer: ' + str(e)
                     logger.exception(message)
 
     return HttpResponse("Success!")
