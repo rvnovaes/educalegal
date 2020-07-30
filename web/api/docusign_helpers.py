@@ -177,11 +177,10 @@ def docusign_webhook_listener(request):
         filepath = os.path.join(envelope_dir, filename)
         with open(filepath, "wb") as xml_file:
             xml_file.write(data)
-
     except Exception as e:
-        msg = str(e)
-        logger.exception(msg)
-        return HttpResponse(msg)
+        message = str(e)
+        logger.exception(message)
+        return HttpResponse(message)
 
     logging.info('passou aqui 1')
     try:
@@ -191,6 +190,11 @@ def docusign_webhook_listener(request):
         logging.info('passou aqui 3')
         message = 'O documento do envelope {envelope_id} não existe.'.format(envelope_id=envelope_data["envelope_id"])
         logger.debug(message)
+        return HttpResponse(message)
+    except Exception as e:
+        message = str(e)
+        logger.exception(message)
+        logging.info(message)
         return HttpResponse(message)
     else:
         logging.info('passou aqui 4')
