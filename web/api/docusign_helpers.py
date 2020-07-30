@@ -245,10 +245,15 @@ def docusign_webhook_listener(request):
         # atualiza o status do documento
         document.save(update_fields=['status'])
 
-        # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
+        # se o envelope já existe atualiza o status, caso contrário, cria o envelope
         try:
-            envelope = Envelope.objects.get(document=document)
-        except Envelope.DoesNotExist:
+            envelope = Envelope.objects.filter(identifier=envelope_data["envelope_id"]).first()
+        except Exception as e:
+            msg = str(e)
+            logger.exception(msg)
+            return HttpResponse(msg)
+
+        if not envelope:
             envelope = Envelope(
                 identifier=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
