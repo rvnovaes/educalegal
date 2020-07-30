@@ -42,7 +42,7 @@
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">
-                            <span class="font-weight-bold">Status: </span>{{ envelope.identifier }}
+                            <span class="font-weight-bold">ID: </span>{{ envelope.identifier }}
                         </li>
                         <li class="list-group-item">
                             <span class="font-weight-bold">Provedor: </span>{{ envelope.signing_provider }}
@@ -64,33 +64,36 @@
             {% endwith %}
         {% endif %}
 
-        <div class="card-header">
-          <h5>Detalhes dos Destinatários</h5>
-        </div>
-        <br/>
-        <div class="card-deck ml-1 mr-1">
-          <div class="row">
-            {% if document.signers.all %}
-              <div class="col-sm">
-                <div class="card mb-3 border-{{ signer.status }}">
-                  <div class="card-header header-{{ signer.status }}">
-                    <b>{{ signer.status|title }}</b>
+
+        {% if signers %}
+            <div class="card-header">
+              <h5>Detalhes dos Destinatários</h5>
+            </div>
+            <br/>
+            <div class="card-deck ml-1 mr-1">
+              <div class="row">
+                {% for signer in signers %}
+                  <div class="col-sm">
+                    <div class="card mb-3 border-{{ signer.status }}">
+                      <div class="card-header header-{{ signer.status }}">
+                        <b>{{ signer.status|title }}</b>
+                      </div>
+                      <div class="card-body">
+                        <h5 class="card-title">{{ signer.name }}</h5>
+                        <p class="card-text">E-mail: {{ signer.email }}</p>
+                        <p class="card-text">Importação: {{ signer.created_date|date:"d/m/Y H:i:s" }}</p>
+                        <p class="card-text">Envio: {{ signer.sent_date|date:"d/m/Y H:i:s"|default:"-" }}</p>
+                        <p class="card-text">Tipo: {{ signer.type }}</p>
+                        {% if signer.pdf_filenames %}
+                          <p class="card-text">PDFs: {{ signer.pdf_filenames|linebreaks }}</p>
+                        {% endif %}
+                      </div>
+                    </div>
                   </div>
-                  <div class="card-body">
-                    <h5 class="card-title">{{ signer.name }}</h5>
-                    <p class="card-text">E-mail: {{ signer.email }}</p>
-                    <p class="card-text">Importação: {{ signer.created_date|date:"d/m/Y H:i:s" }}</p>
-                    <p class="card-text">Envio: {{ signer.sent_date|date:"d/m/Y H:i:s"|default:"-" }}</p>
-                    <p class="card-text">Tipo: {{ signer.type }}</p>
-                    {% if signer.pdf_filenames %}
-                      <p class="card-text">PDFs: {{ signer.pdf_filenames|linebreaks }}</p>
-                    {% endif %}
-                  </div>
-                </div>
+                {% endfor %}
               </div>
-            {% endif %}
-          </div>
-        </div>
+            </div>
+        {% endif %}
 
         <br/>
         {% if document.documents.all %}

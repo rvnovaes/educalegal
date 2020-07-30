@@ -260,7 +260,7 @@ class EducaLegalClient:
 
             recipient['pdf_filenames'] = pdf_filenames
 
-        final_url = self.api_base_url + "/v1/envelopes/"
+        final_url = self.api_base_url + "/v1/documents/{id}/signers/".format(id=document_id)
 
         try:
             # when sending a list, use json keyword argument (not data) so the data is encoded to JSON and the
