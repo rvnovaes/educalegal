@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     "django_celery_results",
     # https://github.com/izimobil/django-rest-framework-datatables
     "rest_framework_datatables",
+    # GraphQL
+    "graphene_django",
     # Local
     "tenant",
     "users",
@@ -285,3 +287,7 @@ CURRENCIES = ("BRL",)
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_BROKER_URL = 'amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal'
+
+GRAPHENE = {
+    'SCHEMA': 'api.schema.schema' # Where your Graphene schema lives
+}

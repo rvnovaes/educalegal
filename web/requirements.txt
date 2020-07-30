@@ -19,7 +19,7 @@ django-tables2~=2.3.1
 django-filter~=2.3.0
 # Store files on Digital Ocean Spaces
 django-storages~=1.9.1
-boto3~=1.14.30
+boto3~=1.14.32
 # Production server
 gunicorn~=20.0.4
 # Misc
@@ -39,7 +39,7 @@ django-money~=1.1
 # Google Analytics
 # django-google-analytics-app
 # MongoDB
-pymongo~=3.10.1
+pymongo~=3.11.0
 mongoengine~=0.20.0
 # Used to test docusign requests
 PyJWT~=1.7.1
@@ -51,8 +51,11 @@ celery~=4.4.6
 django-celery-results~=1.2.1
 future~=0.18.2
 # Tests
-pytest~=5.4.3
+pytest~=6.0.1
 # https://github.com/izimobil/django-rest-framework-datatables
 djangorestframework-datatables
-PySimpleGUI~=4.24.0
+PySimpleGUI~=4.26.0
 dateparser~=0.7.6
+# GraphQL
+graphene~=2.1.8
+graphene-django~=2.12.1
