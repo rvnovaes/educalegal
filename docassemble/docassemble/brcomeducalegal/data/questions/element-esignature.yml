@@ -19,12 +19,11 @@ code: |
     if el_log_to_console:
       log("Docusign data_received: {data_received}".format(data_received=data_received), "console")
     status = data_received['status'].lower()
-    envelope_id = data_received['envelopeId']
 
   # cria envelope no educa legal
   response_json, status_code = elc.post_envelope(tid, tenant_esignature_provider, data_received)
   if status_code == 201:
-    el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, response_json['id'], True)
+    el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, response_json['id'], response_json['identifier'], True)
     log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
     if el_log_to_console:
       log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")

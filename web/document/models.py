@@ -85,8 +85,8 @@ class Document(TenantAwareModel):
     name = models.CharField(max_length=512, verbose_name="Nome")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
-    envelope_id_old = models.CharField(
-        max_length=256, blank=True, default="", verbose_name="Id do Envelope"
+    envelope_number = models.CharField(
+        max_length=256, blank=True, default="", verbose_name="N° do Envelope"
     )
     status = models.CharField(max_length=256, default="", verbose_name="Status")
     ged_id = models.CharField(
@@ -136,6 +136,14 @@ class Document(TenantAwareModel):
         blank=True,
         verbose_name="Envelope",
         related_name="documents")
+
+    class Meta:
+        ordering = ["-created_date"]
+        verbose_name = "Documento"
+        verbose_name_plural = "Documentos"
+        indexes = [
+            models.Index(fields=['envelope_number']),
+        ]
 
     def __str__(self):
         if self.school is not None:

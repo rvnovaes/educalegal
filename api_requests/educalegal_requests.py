@@ -45,7 +45,7 @@ if __name__ == "__main__":
     name = "---"
     # status = "criado"
     status = "rascunho"
-    envelope_id = None
+    envelope_number = None
     # ged_id = 1
     # ged_link = "http://whatever"
     # ged_uuid = "179dad8b-9bg6-4945-8f81-257d37050111"
