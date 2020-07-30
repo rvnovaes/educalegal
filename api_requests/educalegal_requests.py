@@ -96,7 +96,25 @@ if __name__ == "__main__":
     )
     print(response)
 
-    # =========== elc.post_signers_log ============= #
+    # =========== elc.post_envelope ============= #
+    # tid = 1
+    # data_received = {
+    #   "envelopeId": "aaa",
+    #   "status": "sent",
+    #   "statusDateTime": "2020-07-30T16:49:23.7938569Z",
+    #   "uri": "/envelopes/b08b6022-fbb9-4e47-955f-eda4ac3f13a0"
+    # }
+    # esignature_provider = 'Docusign'
+    #
+    # response, status_code = elc.post_envelope(tid, esignature_provider, data_received)
+    #
+    # print(status_code)
+    #
+    # print(response)
+    # =========== elc.post_envelope ============= #
+
+
+    # =========== elc.post_signers ============= #
     # el_recipients = [
     #     {'name': 'Ut est sed sed ipsa', 'email': 'dogoka@mailinator.com', 'group': 'signers', 'status': 'gerado',
     #      'sent_date': '', 'tenant': '1', 'envelope_log': 27,
@@ -116,5 +134,4 @@ if __name__ == "__main__":
     # print(status_code)
     #
     # print(el_post_signers_log)
-    # =========== elc.post_signers_log ============= #
-
+    # =========== elc.post_signers ============= #
