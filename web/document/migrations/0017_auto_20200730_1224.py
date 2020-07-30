@@ -11,6 +11,82 @@ class Migration(migrations.Migration):
         ('document', '0016_auto_20200721_0921'),
     ]
 
+    sql_insert_envelopes = """
+INSERT INTO document_envelope 
+  (created_date, 
+  altered_date, 
+  identifier, 
+  status, 
+  envelope_created_date, 
+  sent_date, 
+  status_update_date,
+  signing_provider, 
+  tenant_id,
+  envelope_log_id) 
+(SELECT 
+  created_date, 
+  altered_date, 
+  envelope_id, 
+  status, 
+  envelope_created_date, 
+  sent_date, 
+  status_update_date, 
+  'Docusign',
+  tenant_id,
+  id
+FROM document_envelopelog el
+order by
+  el.id);
+    """
+
+    sql_update_documents = """
+update 
+  document_document d  
+set 
+  envelope_id = e.id 
+from 
+  document_envelopelog el inner join
+  document_envelope e on
+  el.id = e.envelope_log_id 
+where 
+  el.document_id = d.id;
+    """
+
+    sql_insert_signers = """
+INSERT INTO document_signer 
+  (created_date, 
+  "name", 
+  email, 
+  "type", 
+  status, 
+  sent_date, 
+  pdf_filenames, 
+  document_id,
+  tenant_id, 
+  envelope_log_id, 
+  signer_log_id) 
+(SELECT 
+  sl.created_date, 
+  sl."name", 
+  sl.email, 
+  sl."type", 
+  sl.status, 
+  sl.sent_date, 
+  sl.pdf_filenames, 
+  d.id,
+  sl.tenant_id, 
+  sl.envelope_log_id, 
+  sl.id
+FROM document_signerlog sl
+inner join document_envelope e on
+  sl.envelope_log_id = e.envelope_log_id 
+inner join document_document d on
+  e.id = d.envelope_id 
+order by
+  sl.id);
+    """
+
+
     operations = [
         migrations.RemoveField(
             model_name='document',
@@ -93,4 +169,7 @@ class Migration(migrations.Migration):
             model_name='envelope',
             index=models.Index(fields=['status'], name='document_en_status_4aad6c_idx'),
         ),
+        migrations.RunSQL(sql_insert_envelopes),
+        migrations.RunSQL(sql_update_documents),
+        migrations.RunSQL(sql_insert_signers),
     ]
