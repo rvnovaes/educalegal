@@ -3,10 +3,10 @@ from django.urls import path
 
 from .views import (
     DocumentViewSet,
-    EnvelopeLogViewSet,
+    EnvelopeViewSet,
     InterviewViewSet,
     PlanViewSet,
-    SignerLogViewSet,
+    SignerViewSet,
     TenantDocumentViewSet,
     TenantInterviewViewSet,
     TenantSchoolViewSet,
@@ -25,10 +25,10 @@ schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
     path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
+    path("envelopes/", EnvelopeViewSet.as_view({"post": "create"}),),
     path("documents/", DocumentViewSet.as_view({"post": "create", "patch": "partial_update"}),),
     path("documents/<int:pk>", DocumentViewSet.as_view({"get": "retrieve"}),),
-    path("documents/<str:uuid>/envelope_logs/", EnvelopeLogViewSet.as_view({"post": "create"}),),
-    path("envelope_logs/<int:id>/signer_logs/", SignerLogViewSet.as_view({"post": "create"}),),
+    path("documents/<int:id>/signers/", SignerViewSet.as_view({"post": "create"}),),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
     path("tenants/", TenantViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>", TenantViewSet.as_view({"get": "retrieve"})),

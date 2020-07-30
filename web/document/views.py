@@ -30,7 +30,7 @@ from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
-from .models import Document, BulkDocumentGeneration, DocumentTaskView, EnvelopeLog, SignerLog, DocumentStatus
+from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus
 from .tasks import create_document, submit_to_esignature, send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
@@ -59,35 +59,30 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
         document = Document.objects.get(pk=self.kwargs["pk"])
 
         try:
-            envelope_log = EnvelopeLog.objects.filter(document=document).first()
-        except EnvelopeLog.DoesNotExist:
-            pass
-
-        try:
-            # busca somente o último signer_log de cada email do envelope
-            signer_logs = SignerLog.objects.raw(
+            # busca somente o último signer de cada email do documento
+            signers = Signer.objects.raw(
                 """select
                     s1.* 
                    from
-                    document_signerlog s1
+                    document_signer s1
                    where
-                    s1.envelope_log_id = {envelope_id} and
+                    s1.document_id = {document_id} and
                     s1.created_date = (
 	                    select
 	                        max(created_date)
 	                    from
-	                        document_signerlog s2
+	                        document_signer s2
 	                    where
- 	                        s1.envelope_log_id = s2.envelope_log_id and 
+ 	                        s1.document_id = s2.document_id and 
 	                        s1.email = s2.email 
-                ) order by s1.created_date desc;""".format(envelope_id=envelope_log.id))
+                ) order by s1.created_date desc;""".format(document_id=document.id))
         except:
             pass
         else:
-            context['signer_logs'] = list(signer_logs)
+            context['signers'] = list(signers)
             signer_statuses = list()
-            for signer_log in signer_logs:
-                signer_statuses.append(signer_log.status)
+            for signer in signers:
+                signer_statuses.append(signer.status)
 
             # Explicitly mark a string as safe for (HTML) output purposes. The returned object can be used
             # everywhere a string is appropriate.

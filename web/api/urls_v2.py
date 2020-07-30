@@ -10,7 +10,6 @@ from .views_v2 import (
     DocumentDownloadViewSet,
     TenantSchoolViewSet,
     TenantSchoolUnitViewSet,
-    TenantInterviewViewSet,
     TenantPlanViewSet
 )
 

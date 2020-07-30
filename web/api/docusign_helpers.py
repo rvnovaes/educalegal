@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.conf import settings
 
-from document.models import Document, EnvelopeLog, SignerLog, DocumentStatus
+from document.models import Document, Envelope, Signer, DocumentStatus
 from interview.models import Interview
 from tenant.models import Tenant, TenantGedData
 
@@ -186,7 +186,7 @@ def docusign_webhook_listener(request):
     try:
         document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
     except Document.DoesNotExist:
-        message = 'O envelope {envelope_id} não existe.'.format(envelope_id=envelope_data["envelope_id"])
+        message = 'O documento do envelope {envelope_id} não existe.'.format(envelope_id=envelope_data["envelope_id"])
         logger.debug(message)
         return HttpResponse(message)
     else:
@@ -242,45 +242,49 @@ def docusign_webhook_listener(request):
         else:
             document.status = DocumentStatus.NAO_ENCONTRADO.value
 
-        document.save()
+        # atualiza o status do documento
+        document.save(update_fields=['status'])
 
         # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
         try:
-            envelope_log = EnvelopeLog.objects.get(document=document)
-        except EnvelopeLog.DoesNotExist:
-            envelope_log = EnvelopeLog(
-                envelope_id=envelope_data['envelope_id'],
+            envelope = Envelope.objects.get(document=document)
+        except Envelope.DoesNotExist:
+            envelope = Envelope(
+                identifier=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
                 envelope_created_date=envelope_data['envelope_created'],
                 sent_date=envelope_data['envelope_sent'],
                 status_update_date=envelope_data['envelope_time_generated'],
-                document=document,
                 tenant=tenant,
             )
-            envelope_log.save()
+            envelope.save()
+
+            # vincula o envelope criado ao documento
+            document.envelope = envelope
+            document.save(update_fields=['envelope'])
         else:
-            envelope_log.status = envelope_data_translated['envelope_status']
-            envelope_log.status_update_date = envelope_data['envelope_time_generated']
-            envelope_log.save(update_fields=['status', 'status_update_date'])
+            envelope.status = envelope_data_translated['envelope_status']
+            envelope.status_update_date = envelope_data['envelope_time_generated']
+            envelope.save(update_fields=['status', 'status_update_date'])
 
         for recipient_status in recipient_statuses:
             try:
                 # se já tem o status para o email e para o envelope_log, não salva outro igual
                 # só cria outro se o status do recipient mudou
-                signer_log = SignerLog.objects.get(
-                    envelope_log=envelope_log,
+                signer_log = Signer.objects.get(
+                    document=document,
                     email=recipient_status['Email'],
                     status=recipient_status['Status'])
-            except SignerLog.DoesNotExist:
+            except Signer.DoesNotExist:
                 try:
-                    signer_log = SignerLog(
+                    signer = Signer(
                         name=recipient_status['UserName'],
                         email=recipient_status['Email'],
                         status=recipient_status['Status'],
                         sent_date=recipient_status['data_envio'],
                         type=recipient_status['Type'],
                         pdf_filenames=pdf_filenames,
-                        envelope_log=envelope_log,
+                        document=document,
                         tenant=tenant,
                     )
 
