@@ -19,10 +19,18 @@ code: |
       log("Docusign data_received: {data_received}".format(data_received=data_received), "console")
     status = data_received['status'].lower()
     envelope_id = data_received['envelopeId']
-  el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, tenant_esignature_provider, True)
-  log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
-  if el_log_to_console:
-    log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
+
+  # cria envelope no educa legal
+  response_json, status_code = elc.post_envelope(tid, tenant_esignature_provider, data_received)
+  if status_code == 200:
+    el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, True)
+    log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
+    if el_log_to_console:
+      log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
+  else:
+    if el_log_to_console:
+      log("Não foi possível criar o envelope. Status code: " + str(status_code), "console")
+      log(response_json, "console")
 
   if e_signature_response_status_code == 201:
     signature_success

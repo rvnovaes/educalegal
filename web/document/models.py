@@ -63,6 +63,9 @@ class Envelope(TenantAwareModel):
     sent_date = models.DateTimeField(null=True, verbose_name="Envio")
     # salva o TimeGenerated - Specifies the time of the status change.
     status_update_date = models.DateTimeField(null=True, verbose_name="Alteração do status")
+    signing_provider = models.CharField(
+        max_length=256, blank=True, default="", verbose_name="Provedor"
+    )
     envelope_log_id = models.IntegerField(null=True, blank=True, verbose_name="envelope_log_id")
 
     class Meta:
@@ -82,9 +85,6 @@ class Document(TenantAwareModel):
     name = models.CharField(max_length=512, verbose_name="Nome")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
-    signing_provider = models.CharField(
-        max_length=256, blank=True, default="", verbose_name="Provedor"
-    )
     envelope_id_old = models.CharField(
         max_length=256, blank=True, default="", verbose_name="Id do Envelope"
     )

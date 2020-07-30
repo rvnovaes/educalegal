@@ -186,7 +186,6 @@ class EducaLegalClient:
         doc_uuid,
         status,
         envelope_id,
-        signing_provider,
         submit_to_esignature,
         related_documents=None
     ):
@@ -203,8 +202,7 @@ class EducaLegalClient:
         payload = {
             "doc_uuid": doc_uuid,
             "status": status,
-            "envelope_id": envelope_id,
-            "signing_provider": signing_provider,
+            "envelope": envelope_id,
             "submit_to_esignature": submit_to_esignature,
             "related_documents": related_documents
         }
@@ -212,12 +210,13 @@ class EducaLegalClient:
         response = self.session.patch(final_url, data=payload)
         return response.json()
 
-    def post_envelope(self, tenant_id, data_received):
+    def post_envelope(self, tenant_id, signing_provider, data_received):
         """Cria registro com o log do envio do email para cada assinante"""
 
         # formato da data usado no django rest framework: YYYY-MM-DDThh:mm[:ss[.uuuuuu]]
         payload = {
             "identifier": data_received['envelopeId'],
+            "signing_provider": signing_provider,
             "status": "enviado",
             "envelope_created_date": data_received['statusDateTime'][:26],
             "sent_date": data_received['statusDateTime'][:26],

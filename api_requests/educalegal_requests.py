@@ -46,7 +46,6 @@ if __name__ == "__main__":
     # status = "criado"
     status = "rascunho"
     envelope_id = None
-    signing_provider = None
     # ged_id = 1
     # ged_link = "http://whatever"
     # ged_uuid = "179dad8b-9bg6-4945-8f81-257d37050111"
@@ -91,10 +90,9 @@ if __name__ == "__main__":
 
     ged_id = 1
     new_status = "modificado"
-    new_envelope_id = "035322ff-6acc-4c1d-992d-a6a68ca6b68a"
-    new_signing_provider = "Docusign"
+    new_envelope_id = 1
     response = elc.patch_document_with_esignature_data(
-        el_document_created_doc_uuid, new_status, new_envelope_id, new_signing_provider, submit_to_esignature=False
+        el_document_created_doc_uuid, new_status, new_envelope_id, submit_to_esignature=False
     )
     print(response)
 
