@@ -85,10 +85,12 @@ class TestAcordosindividuaistrabalhistascoronavirus(WebTest):
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Dados do acordo"))
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li/p/span/input").send_keys("20")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li/p/span/input").send_keys("1000")
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[2]/p/span/span[2]/input").send_keys(
-            "100")
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[3]/p/span/input").send_keys("90")
+            "2000")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[3]/p/span/span[2]/input").send_keys(
+            "454")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[4]/p/span/input").send_keys("90")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"),
                                                                                                   "Cláusula de estabilidade de emprego conforme padrão definido por:"))

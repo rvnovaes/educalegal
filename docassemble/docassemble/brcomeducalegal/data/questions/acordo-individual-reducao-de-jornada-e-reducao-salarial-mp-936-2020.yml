@@ -195,14 +195,21 @@ question: |
 subquestion: |
   1. Fica acordada entre as Partes, a redução salarial de [FIELD pc_reducao]%.
 
-  2. O EMPREGADOR pagará ao EMPREGADO ajuda compensatória mensal no valor de [FIELD valor].
+  2. O valor do salário reduzido será de [FIELD low_salary_value]
 
-  3. O presente acordo terá um prazo de [FIELD prazo] dias.
+  3. O EMPREGADOR pagará ao EMPREGADO ajuda compensatória mensal no valor de [FIELD valor].
+
+  4. O presente acordo terá um prazo de [FIELD prazo] dias.
 fields:
   - Redução: pc_reducao
     datatype: number
     hint: 000,00
     inline width: 5em
+    required: True
+  - Salário Reduzido: low_salary_value
+    datatype: currency
+    hint: 0000,00
+    inline width: 10em
     required: True
   - Valor: valor
     datatype: currency
@@ -219,6 +226,7 @@ script: |
     $(document).ready(function(){
       $('#cGNfcmVkdWNhbw').mask("###0.00", {reverse: true});
       $('#dmFsb3I').mask("###0.00", {reverse: true});
+      $('#bG93X3NhbGFyeV92YWx1ZQ').mask("###0.00", {reverse: true});
     });
   </script>
 ---
@@ -227,6 +235,7 @@ code: |
   valor_extenso = num2words(valor, lang='pt_BR', to='currency')
   pc_reducao_extenso = num2words(pc_reducao, lang='pt_BR')
   prazo_extenso = num2words(prazo, lang='pt_BR')
+  low_salary_value_extenso = num2words(low_salary_value, lang='pt_BR', to='currency')
 ---
 section: Acordo
 progress: 70
