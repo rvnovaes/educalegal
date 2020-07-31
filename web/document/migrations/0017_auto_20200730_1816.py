@@ -135,6 +135,11 @@ class Migration(migrations.Migration):
             model_name='document',
             old_name='envelope_id',
             new_name='envelope_number'),
+        migrations.AlterField(
+            model_name='document',
+            name='envelope_number',
+            field=models.CharField(blank=True, default='', max_length=256, verbose_name='N° do Envelope'),
+        ),
         migrations.RemoveField(
             model_name='document',
             name='signing_provider',
