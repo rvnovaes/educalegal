@@ -93,8 +93,7 @@ end note
 
 
 Docusign -> Docassemble: envelope_data
-Docassemble -> EducaLegal: POST post_envelope(tenant_id, esignature_provider, envelope_data)
-Docassemble -> EducaLegal: PATCH patch_document_with_esignature_data(doc_uuid, status, envelope_id, submit_to_esignature)
+Docassemble -> EducaLegal: PATCH patch_document_with_esignature_data(doc_uuid, status, envelope_number, submit_to_esignature)
 deactivate Docassemble
 activate EducaLegal
 

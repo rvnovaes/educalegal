@@ -185,7 +185,6 @@ class EducaLegalClient:
         self,
         doc_uuid,
         status,
-        envelope_id,
         envelope_number,
         submit_to_esignature,
         related_documents=None
@@ -203,7 +202,6 @@ class EducaLegalClient:
         payload = {
             "doc_uuid": doc_uuid,
             "status": status,
-            "envelope": envelope_id,
             "envelope_number": envelope_number,
             "submit_to_esignature": submit_to_esignature,
             "related_documents": related_documents

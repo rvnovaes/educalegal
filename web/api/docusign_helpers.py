@@ -276,7 +276,8 @@ def docusign_webhook_listener(request):
 
             # vincula o envelope criado ao documento
             document.envelope = envelope
-            document.save(update_fields=['envelope'])
+            document.envelope_number = envelope.identifier
+            document.save(update_fields=['envelope', 'envelope_number'])
             logging.info('passou aqui 10')
         else:
             logging.info('passou aqui 11')

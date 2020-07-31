@@ -90,9 +90,9 @@ if __name__ == "__main__":
 
     ged_id = 1
     new_status = "modificado"
-    new_envelope_id = 1
+    new_envelope_number = '3fc59949-23ab-4301-b4ce-1176f1246954'
     response = elc.patch_document_with_esignature_data(
-        el_document_created_doc_uuid, new_status, new_envelope_id, submit_to_esignature=False
+        el_document_created_doc_uuid, new_status, new_envelope_number, submit_to_esignature=False
     )
     print(response)
 
