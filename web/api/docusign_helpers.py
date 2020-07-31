@@ -270,6 +270,7 @@ def docusign_webhook_listener(request):
                 envelope_created_date=envelope_data['envelope_created'],
                 sent_date=envelope_data['envelope_sent'],
                 status_update_date=envelope_data['envelope_time_generated'],
+                signing_provider='Docusign',
                 tenant=tenant,
             )
             envelope.save()
