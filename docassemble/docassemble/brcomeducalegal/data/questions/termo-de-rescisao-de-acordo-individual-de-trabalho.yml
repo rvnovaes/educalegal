@@ -189,13 +189,13 @@ progress: 70
 question: |
   Dados do acordo
 fields:
-  - As partes têm interesse na rescisão antecipada do: tipo_acordo
+  - As partes têm interesse na rescisão antecipada do: term_type
     datatype: radio
     choices:
       - Acordo individual de Redução de Jornada e Redução Salarial
       - Termo de Acordo Individual -Banco de Horas
       - Termo de Mudança de Regime e Cessão do Direito Autoral
-  - O acordo foi firmado em: data_acordo
+  - O acordo foi firmado em: term_date
     datatype: date
 ---
 code: |
