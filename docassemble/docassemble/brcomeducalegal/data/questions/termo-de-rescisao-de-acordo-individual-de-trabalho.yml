@@ -39,7 +39,7 @@ code: |
       item.name.text
     if plan_use_esignature:
       valid_workers_table
-    tipo_acordo
+    term_type
     signature_local
     generated_file
     el_document_patched_with_docassemble_data
