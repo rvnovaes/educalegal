@@ -99,7 +99,7 @@ class TestContratodoaluno(WebTest):
         )
         dropdown = self.driver.find_element(By.ID, "c3R1ZGVudHNbaV0uZ3JhZGU")
         dropdown.find_element(
-            By.XPATH, "//option[. = '1ª série do ensino fundamental']"
+            By.XPATH, "//option[. = '1º ano do ensino fundamental']"
         ).click()
         dropdown = self.driver.find_element(By.ID, "c3R1ZGVudHNbaV0ucGVyaW9k")
         dropdown.find_element(By.XPATH, "//option[. = 'matutino']").click()
