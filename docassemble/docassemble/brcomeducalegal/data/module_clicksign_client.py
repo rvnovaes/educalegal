@@ -70,7 +70,8 @@ class ClickSignClient:
             if recipient['email'] not in response_dict.keys():
                 response_dict[recipient['email']] = {
                     "response_json": response.json(),
-                    "status_code": response.status_code
+                    "status_code": response.status_code,
+                    "routingOrder": recipient['routingOrder']
                 }
 
         response_dict = json.dumps(response_dict)
@@ -86,28 +87,58 @@ class ClickSignClient:
         JSON com os dados do documento vinculado ao signatário.
         """
 
+        response_dict = dict()
         for signer in signers:
             payload = {
                 "list": {
-                    "document_key": "/" + document_uuid,
-                    "signer_key": signer['key'],
+                    "document_key": document_uuid,
+                    "signer_key": signers[signer]['response_json']['signer']['key'],
                     "sign_as": "sign",
-                    "group": signer['routingOrder'],
+                    "group": signers[signer]['routingOrder'],
                     "message": 'Assine eletrônicamente esse documento.'
                 },
             }
 
-        final_url = self.api_base_url + "api/v1/lists"
-        response = self.session.post(final_url, json=payload).json()
-        return response
+            final_url = self.api_base_url + "api/v1/lists"
+            response = self.session.post(final_url, json=payload)
+
+            if signer not in response_dict.keys():
+                response_dict[signer] = {
+                    "response_json": response.json(),
+                    "status_code": response.status_code
+                }
+
+        response_dict = json.dumps(response_dict)
+
+        return response_dict
 
     def send_to_cliksign(self, documents, recipients):
-        status_code, document_response = self.upload_document2(documents)
+        # cria o documento
+        status_code, document_response = self.upload_document(documents)
 
-        if status_code == 200:
-            status_code, signer_response = self.add_signer(recipients)
+        # se nao conseguiu criar o documento, retorna erro
+        if status_code != 201:
+            return status_code, document_response
 
-        status_code, signer_to_document_response = self.add_signer_to_document(
+        # cria os destinatarios
+        signer_response = self.add_signer(recipients)
+
+        for signer in signer_response:
+            # se nao conseguiu criar algum destinatario, retorna erro
+            if signer_response[signer]['status_code'] != 201:
+                return signer_response[signer]['status_code'], signer_response[signer]['response_json']
+
+        # vincula o documento aos destinatarios criados
+        signer_doc_response = self.add_signer_to_document(
             document_response['document']['key'], signer_response)
 
-        return signer_to_document_response
+        for signer_doc in signer_doc_response:
+            # se nao conseguiu criar algum destinatario, retorna erro
+            if signer_doc_response[signer_doc]['status_code'] != 201:
+                return signer_doc_response[signer_doc]['status_code'], signer_doc_response[signer_doc]['response_json']
+
+        # envia por email o documento aos destinatarios
+        signer_doc_response = self.add_signer_to_document(
+            document_response['document']['key'], signer_response)
+
+        return signer_doc_response

@@ -56,7 +56,58 @@ def add_signer():
     csc.add_signer(recipients)
 
 
+def add_signer_to_document():
+    document_uuid = 'a127512e-7259-4719-ac06-0dfdfe209454'
+    signers = {
+       "iasmini.gomes@gmail.com":{
+          "response_json":{
+             "signer":{
+                "key":"92287f1b-5d33-4bff-be3d-095ebebe16c0",
+                "email":"iasmini.gomes@gmail.com",
+                "auths":[
+                   "email"
+                ],
+                "delivery":"email",
+                "name":"IASMINI FURTADO DE MAGALHAES GOMES",
+                "documentation":None,
+                "birthday":None,
+                "phone_number":None,
+                "has_documentation":False,
+                "created_at":"2020-08-04T19:31:13.321-03:00",
+                "updated_at":"2020-08-04T19:31:13.321-03:00"
+             }
+          },
+          "status_code":201,
+          "routingOrder": 1
+       },
+       "silex@silexsistemas.com.br":{
+          "response_json":{
+             "signer":{
+                "key":"b6148307-0c45-4516-a223-51a6490dcbe8",
+                "email":"silex@silexsistemas.com.br",
+                "auths":[
+                   "email"
+                ],
+                "delivery":"email",
+                "name":"Development Sociedade de Ensino Col\u00e9gio Bacana Ltda.",
+                "documentation":None,
+                "birthday":None,
+                "phone_number":None,
+                "has_documentation":False,
+                "created_at":"2020-08-04T19:31:13.584-03:00",
+                "updated_at":"2020-08-04T19:31:13.584-03:00"
+             }
+          },
+          "status_code":201,
+          "routingOrder": 2
+       }
+    }
+    csc.add_signer_to_document(document_uuid, signers)
+
+
 if __name__ == '__main__':
     # print(upload_document())
 
-    print(add_signer())
+    # print(add_signer())
+
+    print(add_signer_to_document())
