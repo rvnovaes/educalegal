@@ -105,6 +105,9 @@ def add_signer_to_document():
     csc.add_signer_to_document(document_uuid, signers)
 
 
+def send_email()
+
+
 if __name__ == '__main__':
     # print(upload_document())
 

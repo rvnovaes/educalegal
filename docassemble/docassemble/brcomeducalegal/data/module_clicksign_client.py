@@ -112,6 +112,36 @@ class ClickSignClient:
 
         return response_dict
 
+    def send_email(self, signers):
+        """
+        Adiciona no documento os destinatários para a assinatura eletrônica.
+        :param document_uuid:
+         Identificador único do documento
+        :return:
+        JSON com os dados do documento vinculado ao signatário.
+        """
+
+        response_dict = dict()
+        for signer in signers:
+            payload = {
+                "request_signature_key": "0d5a9615-2bb8-3a23-6584-33ff436bb990",
+                "message": "Prezado João,\nPor favor assine o documento.\n\nQualquer dúvida estou à disposição.\n\nAtenciosamente,\nGuilherme Alvez",
+                "url": "https://www.example.com/abc"
+            }
+
+            final_url = self.api_base_url + "api/v1/lists"
+            response = self.session.post(final_url, json=payload)
+
+            if signer not in response_dict.keys():
+                response_dict[signer] = {
+                    "response_json": response.json(),
+                    "status_code": response.status_code
+                }
+
+        response_dict = json.dumps(response_dict)
+
+        return response_dict
+
     def send_to_cliksign(self, documents, recipients):
         # cria o documento
         status_code, document_response = self.upload_document(documents)
