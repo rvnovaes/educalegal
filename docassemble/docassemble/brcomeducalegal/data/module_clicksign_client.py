@@ -1,3 +1,5 @@
+import json
+
 from requests import Session
 
 # https://github.com/bustawin/retry-requests
@@ -47,7 +49,8 @@ class ClickSignClient:
         Lista de responses em JSON com os dados do(s) destinatário(s) criado(s).
         """
 
-        response_list = list()
+        response_dict = dict()
+        recipients = recipients['signers']
         for recipient in recipients:
             payload = {
                 "signer": {
@@ -62,10 +65,17 @@ class ClickSignClient:
             }
 
             final_url = self.api_base_url + "api/v1/signers"
-            response = self.session.post(final_url, json=payload).json()
-            response_list.append(response)
+            response = self.session.post(final_url, json=payload)
 
-        return response_list
+            if recipient['email'] not in response_dict.keys():
+                response_dict[recipient['email']] = {
+                    "response_json": response.json(),
+                    "status_code": response.status_code
+                }
+
+        response_dict = json.dumps(response_dict)
+
+        return response_dict
 
     def add_signer_to_document(self, document_uuid, signers):
         """
