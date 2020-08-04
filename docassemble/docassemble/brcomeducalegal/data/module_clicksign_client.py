@@ -142,7 +142,7 @@ class ClickSignClient:
 
         return response_dict
 
-    def send_to_cliksign(self, documents, recipients):
+    def send_to_clicksign(self, documents, recipients):
         # cria o documento
         status_code, document_response = self.upload_document(documents)
 
