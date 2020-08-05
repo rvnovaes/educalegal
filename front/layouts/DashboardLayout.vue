@@ -39,7 +39,7 @@
           :link="{
             name: 'Escolas',
             icon: 'ni ni-hat-3 text-green',
-            path: '/escolas'
+            path: '/escolas/listar'
           }">
         </sidebar-item>
 

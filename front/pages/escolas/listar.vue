@@ -122,8 +122,8 @@
 import { Table, TableColumn, Select, Option } from 'element-ui';
 import RouteBreadCrumb from '@/components/argon-core/Breadcrumb/RouteBreadcrumb'
 import { BasePagination } from '@/components/argon-core';
-import clientPaginationMixin from '~/components/tables/PaginatedTables/clientPaginationMixin'
-import swal from 'sweetalert2';
+import clientPaginationMixin from '@/components/tables/PaginatedTables/clientPaginationMixin'
+import Swal from 'sweetalert2';
 // import users from '~/components/tables/users2'; Os dados eram importados daqui
 import gql from 'graphql-tag'
 
@@ -176,42 +176,58 @@ export default {
   },
   methods: {
     handleLike(index, row) {
-      swal({
-        title: `You liked ${row.name}`,
+      Swal.fire({
+        title: `Você marcou ${row.name} como favorita`,
         buttonsStyling: false,
         type: 'success',
         confirmButtonClass: 'btn btn-success btn-fill'
       });
     },
     handleEdit(index, row) {
-      swal({
-        title: `You want to edit ${row.name}`,
+      Swal.fire({
+        title: `Você deseja editar ${row.name}?`,
         buttonsStyling: false,
-        confirmButtonClass: 'btn btn-info btn-fill'
-      });
+        showCancelButton: true,
+        confirmButtonClass: 'btn btn-success btn-fill',
+        cancelButtonClass: 'btn btn-danger btn-fill',
+        cancelButtonText: 'Cancelar'
+      }).then(result => {
+          if (result.value){
+          this.editRow(row);
+          }
+        }
+      )
     },
     handleDelete(index, row) {
-      swal({
-        title: 'Are you sure?',
-        text: `You won't be able to revert this!`,
+      Swal.fire({
+        title: `Tem certeza que quer excluir ${row.name}?`,
+        text: `Não é possível desfazer essa ação!`,
         type: 'warning',
         showCancelButton: true,
         confirmButtonClass: 'btn btn-success btn-fill',
         cancelButtonClass: 'btn btn-danger btn-fill',
-        confirmButtonText: 'Yes, delete it!',
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar',
         buttonsStyling: false
       }).then(result => {
         if (result.value) {
           this.deleteRow(row);
-          swal({
-            title: 'Deleted!',
-            text: `You deleted ${row.name}`,
+          Swal.fire({
+            title: 'Excluída!',
+            text: `Você excluiu ${row.name}`,
             type: 'success',
             confirmButtonClass: 'btn btn-success btn-fill',
             buttonsStyling: false
           });
         }
       });
+    },
+    editRow(row){
+      let indexToEdit = row.id;
+      console.log(indexToEdit);
+      this.$router.push({
+        path: '/escolas/' + indexToEdit
+      })
     },
     deleteRow(row) {
       let indexToDelete = this.tableData.findIndex(
@@ -229,6 +245,7 @@ export default {
     tableData:{
       query: gql`{
         allSchools {
+          id,
           name,
           legalName,
           city,
