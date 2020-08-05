@@ -1,9 +1,18 @@
 from django.db import models
 from billing.models import Plan
-
+from enum import Enum
 
 # For genenral informations about the structure we used here, see:
 # https://books.agiliq.com/projects/django-multi-tenant/en/latest/
+
+
+class ESignatureAppProvider(Enum):
+    CLICKSIGN = "ClickSign"
+    DOCUSIGN = "Docusign"
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
 
 
 class ESignatureApp(models.Model):
@@ -11,7 +20,10 @@ class ESignatureApp(models.Model):
         max_length=255, default="Educa Legal Development", verbose_name="Nome da Aplicação Cliente",
     )
     provider = models.CharField(
-        max_length=255, default="Docusign", verbose_name="Fornecedor",
+        max_length=255,
+        choices=ESignatureAppProvider.choices(),
+        default=ESignatureAppProvider.CLICKSIGN.value,
+        verbose_name="Fornecedor",
     )
     private_key = models.TextField(verbose_name="Private Key")
     client_id = models.CharField(
