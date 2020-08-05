@@ -18,7 +18,12 @@
       <div class="row">
         <div class="col">
           <div class="card-wrapper">
-            <custom-styles-validation></custom-styles-validation>
+            <escola-form :name="school.name"
+                         :legal-name="school.legalName"
+                         :city="school.city"
+                         :state="school.state"
+                         :zip="school.zip">
+            </escola-form>
           </div>
         </div>
       </div>
@@ -27,9 +32,7 @@
 </template>
 
 <script>
-  import CustomStylesValidation from '@/components/pages/forms/CustomStylesValidation'
-  import BrowserDefaultsValidation from '@/components/pages/forms/BrowserDefaultsValidation'
-  import ServerSideValidation from '@/components/pages/forms/ServerSideValidation'
+  import EscolaForm from '@/components/pages/forms/EscolaForm'
   import gql from 'graphql-tag'
 
   export const SCHOOL = gql`
@@ -40,23 +43,21 @@
               name,
               legalName,
               city,
-              state
+              state,
+              zip
             }
       }`
 
 
   export default {
-    name: 'form-components',
+    name: 'escola-edicao',
     layout: 'DashboardLayout',
     components: {
-      CustomStylesValidation,
-      BrowserDefaultsValidation,
-      ServerSideValidation
+      EscolaForm,
     },
     data() {
       return {
         school: '',
-        id: this.$route.params.id
       }
     },
     apollo: {
@@ -64,7 +65,7 @@
         query: SCHOOL,
         variables () {
           return {
-            id: this.id
+            id: this.$route.params.id
           }
         },
         loadingKey: 'carregando...',
