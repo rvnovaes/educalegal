@@ -39,10 +39,9 @@ code: |
     for item in stock_company:
       item.name.text
     for item in directors:
-          item.name.text
-    presiding_officers.target_number = 1
-    for item in presiding_officers:
-      item.name.text
+      item.name.first
+    general_shareholder_meeting_date
+    chairman_name
     accounting_year
     for item in agenda:
       item.name.text
@@ -59,7 +58,7 @@ code: |
   all_done
 ---
 objects:
-  - example_ata_assembleia_geral_ordinarial: DAStaticFile.using(filename='example-acordo-individual-reducao-de-jornada-e-reducao-salarial.pdf')
+  - example_ata_assembleia_geral_ordinaria: DAStaticFile.using(filename='example-ata-assembleia-geral-ordinaria.pdf')
   - stock_company: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
 ---
 code: |
@@ -98,14 +97,14 @@ fields:
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#c3RvY2tfY29tcGFueVtpXS5jbnBq').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 right: |
   <center><h5><strong>Saiba mais</strong></h5>
   <p></p>
   <p></p>
-  <center>[Clique para visualizar a minuta](${ example_ata_assembleia_geral_ordinarial.url_for() })</center>
+  <center>[Clique para visualizar a minuta](${ example_ata_assembleia_geral_ordinaria.url_for() })</center>
 ---
 progress: 5
 section: Companhia
@@ -130,11 +129,11 @@ fields:
 script: |
   <script type="text/javascript">
   $(document).ready(function(){
-    $('#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+    $('#c3RvY2tfY29tcGFueVtpXS5hZGRyZXNzLnppcA').mask('00000-000');
   });
 
-  $("#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA").focusout(function(){
-    var cep = $("#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA").val();
+  $("#c3RvY2tfY29tcGFueVtpXS5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#c3RvY2tfY29tcGFueVtpXS5hZGRyZXNzLnppcA").val();
     cep = cep.replace ("-","");
     if (cep != ""){
       var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
@@ -144,10 +143,10 @@ script: |
         type: "get",
         dataType: "json",
         success: function(data){
-          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
-          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
-          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
-          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+          $("#c3RvY2tfY29tcGFueVtpXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#c3RvY2tfY29tcGFueVtpXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#c3RvY2tfY29tcGFueVtpXS5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#c3RvY2tfY29tcGFueVtpXS5hZGRyZXNzLnN0YXRl").val(data.uf);
         },
         error: function(erro){
           console.log(erro);
@@ -165,7 +164,7 @@ section: Companhia
 question: |
   Integrantes da administração da companhia presentes
 fields:
-  - "Nome completo:": directors[i].name.text
+  - "Nome completo:": directors[i].name.first
     required: True
 list collect: True
 ---
@@ -177,42 +176,32 @@ fields:
     datatype: date
     required: True
   - "Horário:": general_shareholder_meeting_hours
-    datatype: date
+    datatype: time
     required: True
----
-objects:
-  - presiding_officers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
----
-section: Assembleia
-progress: 5
-question: Número de Integrantes da Mesa
-fields:
-  - Número: presiding_officers.target_number
-    datatype: integer
-    default: 1
-    min: 1
 ---
 section: Assembleia
 progress: 15
 question: Presidente e secretário da mesa da Assembleia
 fields:
-  - "Presidente: ": presiding_officers[i].chairman_name
+  - "Presidente: ": chairman_name
     required: True
-  - "E-mail do presidente: ": presiding_officers[i].chairman_email
+  - "E-mail do presidente: ": chairman_email
     help: ${ help_email_msg }
     datatype: email
-  - "Secretário: ": presiding_officers[i].secretary_name
+  - "Secretário: ": secretary_name
     required: True
-    email:
-  - "E-mail do secretário: ": presiding_officers[i].secretary_email
+  - "E-mail do secretário: ": secretary_email
     help: ${ help_email_msg }
     datatype: email
 ---
 section: Assembleia
 progress: 15
-question: Exercício social encerrado no ano de [FIELD accounting_year]
+question: Exercício Social
+subquestion: |
+  Demonstrações financeiras da Companhia, relativos ao exercício social encerrado em [FIELD accounting_year].
 fields:
   - Ano: accounting_year
+    datatype: integer
     inline width: 10em
     required: True
 ---
@@ -221,10 +210,13 @@ objects:
 ---
 progress: 25
 section: Agenda
-question: |
-  Ordem do dia
+question: Ordem do dia
+subquestion: |
+  Esta assembleia terá como agenda as seguintes ordens:
 fields:
   - "Ordem:": agenda[i].name.text
+    input type: area
+    rows: 10
     required: True
 list collect: True
 ---
@@ -233,12 +225,15 @@ objects:
 ---
 progress: 30
 section: Deliberações
-question: |
+question: Deliberações
+subquestion: |
   Os acionistas decidiram, por unanimidade, sem quaisquer reservas ou ressalvas:
 fields:
   - "Ordem:": adoptions[i].name.text
     required: True
-    default: "APROVAR, ..."
+    default: "APROVAR, "
+    input type: area
+    rows: 10
 list collect: True
 ---
 code: |
