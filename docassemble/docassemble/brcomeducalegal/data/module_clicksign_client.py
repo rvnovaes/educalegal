@@ -74,8 +74,6 @@ class ClickSignClient:
                     "routingOrder": recipient['routingOrder']
                 }
 
-        response_dict = json.dumps(response_dict)
-
         return response_dict
 
     def add_signer_to_document(self, document_uuid, signers):
@@ -108,11 +106,9 @@ class ClickSignClient:
                     "status_code": response.status_code
                 }
 
-        response_dict = json.dumps(response_dict)
-
         return response_dict
 
-    def send_email(self, signers):
+    def send_email(self, signature_keys):
         """
         Adiciona no documento os destinatários para a assinatura eletrônica.
         :param document_uuid:
@@ -122,23 +118,21 @@ class ClickSignClient:
         """
 
         response_dict = dict()
-        for signer in signers:
-            payload = {
-                "request_signature_key": "0d5a9615-2bb8-3a23-6584-33ff436bb990",
-                "message": "Prezado João,\nPor favor assine o documento.\n\nQualquer dúvida estou à disposição.\n\nAtenciosamente,\nGuilherme Alvez",
-                "url": "https://www.example.com/abc"
-            }
-
-            final_url = self.api_base_url + "api/v1/lists"
-            response = self.session.post(final_url, json=payload)
-
-            if signer not in response_dict.keys():
-                response_dict[signer] = {
-                    "response_json": response.json(),
-                    "status_code": response.status_code
+        for signature_key in signature_keys:
+            # envia email somente para os destinatarios do grupo 1 (primeiro na ordem)
+            if signature_keys[signature_key]['response_json']['list']['group'] == 1:
+                payload = {
+                    "request_signature_key": signature_keys[signature_key]['response_json']['list']['request_signature_key'],
+                    "message": "Prezado João,\nPor favor assine o documento.\n\nQualquer dúvida estou à disposição.\n\nAtenciosamente,\nGuilherme Alvez"
                 }
 
-        response_dict = json.dumps(response_dict)
+                final_url = self.api_base_url + "api/v1/notifications"
+                response = self.session.post(final_url, json=payload)
+
+                if signature_key not in response_dict.keys():
+                    response_dict[signature_key] = {
+                        "status_code": response.status_code
+                    }
 
         return response_dict
 
@@ -168,7 +162,11 @@ class ClickSignClient:
                 return signer_doc_response[signer_doc]['status_code'], signer_doc_response[signer_doc]['response_json']
 
         # envia por email o documento aos destinatarios
-        signer_doc_response = self.add_signer_to_document(
-            document_response['document']['key'], signer_response)
+        signature_key_response = self.send_email(signer_doc_response)
 
-        return signer_doc_response
+        for signature_key in signature_key_response:
+            # se nao conseguiu envia o email para algum destinatario, retorna erro
+            if signer_doc_response[signature_key]['status_code'] != 202:
+                return signer_doc_response[signature_key]['status_code']
+
+        return signer_doc_response[signature_key]['status_code']
