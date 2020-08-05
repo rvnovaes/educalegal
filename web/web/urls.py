@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
 from django.conf.urls.static import static
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -66,7 +67,7 @@ urlpatterns = [
       url(
           r"^v2/docs/redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
       ),
-      url(r'^v2/graphql$', GraphQLView.as_view(graphiql=True))
+      url(r'^graphql$', csrf_exempt(GraphQLView.as_view(graphiql=True)))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

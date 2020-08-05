@@ -44,7 +44,7 @@
               <div>
                 <base-input v-model="searchQuery"
                             prepend-icon="fas fa-search"
-                            placeholder="Search...">
+                            placeholder="Buscar...">
                 </base-input>
               </div>
             </div>
@@ -124,7 +124,8 @@ import RouteBreadCrumb from '@/components/argon-core/Breadcrumb/RouteBreadcrumb'
 import { BasePagination } from '@/components/argon-core';
 import clientPaginationMixin from '~/components/tables/PaginatedTables/clientPaginationMixin'
 import swal from 'sweetalert2';
-import users from '~/components/tables/users2';
+// import users from '~/components/tables/users2'; Os dados eram importados daqui
+import gql from 'graphql-tag'
 
 export default {
   mixins: [clientPaginationMixin],
@@ -139,49 +140,37 @@ export default {
   },
   data() {
     return {
-      propsToSearch: ['name', 'email', 'age'],
+      propsToSearch: ['name', 'legalName', 'city', 'state'],
       tableColumns: [
         {
           type: 'selection'
         },
         {
           prop: 'name',
-          label: 'Name',
+          label: 'Nome',
           minWidth: 160,
           sortable: true
         },
         {
-          prop: 'position',
-          label: 'Position',
+          prop: 'legalName',
+          label: 'Razão Social',
           minWidth: 220,
           sortable: true
         },
         {
           prop: 'city',
-          label: 'Office',
+          label: 'Cidade',
           minWidth: 135,
           sortable: true
         },
         {
-          prop: 'age',
-          label: 'Age',
+          prop: 'state',
+          label: 'Estado',
           minWidth: 100,
           sortable: true
         },
-        {
-          prop: 'createdAt',
-          label: 'Start Date',
-          minWidth: 150,
-          sortable: true
-        },
-        {
-          prop: 'salary',
-          label: 'Salary',
-          minWidth: 120,
-          sortable: true
-        }
       ],
-      tableData: users,
+      tableData: [],
       selectedRows: []
     };
   },
@@ -234,6 +223,26 @@ export default {
     },
     selectionChange(selectedRows) {
       this.selectedRows = selectedRows
+    }
+  },
+  apollo: {
+    tableData:{
+      query: gql`{
+        allSchools {
+          name,
+          legalName,
+          city,
+          state
+        }
+      }`,
+      loadingKey: 'carregando...',
+      /*
+      O apollo tenta carregar allSchools em uma variavel chamada allSchools. Mas a chave que queremos usar e tableData
+      que e a usada pelo componente. Portanto, e preciso informar ao apollo pelo comando abaixo, ou seja, atualize
+      tableData (data) com o retorno (data.allSchools)
+      Ver https://apollo.vuejs.org/guide/apollo/queries.html#name-matching
+       */
+      update: data => data.allSchools
     }
   }
 };
