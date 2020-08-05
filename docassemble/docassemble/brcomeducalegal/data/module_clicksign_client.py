@@ -155,7 +155,7 @@ class ClickSignClient:
             document_response['document']['key'], signer_response)
 
         for signer_doc in signer_doc_response:
-            # se nao conseguiu criar algum destinatario, retorna erro
+            # se nao vincular algum destinatario ao documento, retorna erro
             if signer_doc_response[signer_doc]['status_code'] != 201:
                 return signer_doc_response[signer_doc]['status_code'], signer_doc_response[signer_doc]['response_json']
 
@@ -163,7 +163,7 @@ class ClickSignClient:
         signature_key_response = self.send_email(signer_doc_response)
 
         for signature_key in signature_key_response:
-            # se nao conseguiu envia o email para algum destinatario, retorna erro
+            # se nao conseguiu enviar o email para algum destinatario, retorna erro
             if signer_doc_response[signature_key]['status_code'] != 202:
                 return signer_doc_response[signature_key]['status_code']
 
