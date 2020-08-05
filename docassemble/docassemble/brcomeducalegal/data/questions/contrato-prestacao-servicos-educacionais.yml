@@ -365,7 +365,7 @@ fields:
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#dmFsb3JBbnVhbA').mask('000000000000000.00', {reverse: true});
+        $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
       });
   </script>
 ---
