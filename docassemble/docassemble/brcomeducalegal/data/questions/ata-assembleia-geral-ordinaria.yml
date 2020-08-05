@@ -48,7 +48,12 @@ code: |
     for item in adoptions:
       item.name.text
     for item in shareholders:
-      item.name.text
+      if item.type == "individual":
+        item.show_pf = "individual"
+        item[i].child.target_number = 0
+      elif item.type == "organization":
+        item.show_pj = "organization"
+        item[i].child.target_number = 0
     signature_local
     generated_file
     el_document_patched_with_docassemble_data
@@ -162,7 +167,7 @@ objects:
 progress: 20
 section: Companhia
 question: |
-  Integrantes da administração da companhia presentes
+  Integrantes da administração da companhia presentes na assembleia
 fields:
   - "Nome completo:": directors[i].name.first
     required: True
@@ -235,6 +240,54 @@ fields:
     input type: area
     rows: 10
 list collect: True
+---
+objects:
+  - shareholders: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True)
+  - shareholders[i].child: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True)
+---
+section: Acionistas
+question: |
+  Número de Acionistas
+fields:
+  - Número: shareholders.target_number
+    datatype: integer
+    min: 1
+---
+section: Acionistas
+question: |
+  Tipo de Pessoa
+fields:
+  - "Tipo:": shareholders[i].type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+---
+question: |
+  Dados do(a) ${ word(ordinal(i)) } shareholders_title(s)
+fields:
+  - Nome Completo: shareholders[i].name.text
+    show if:
+      code: |
+        shareholders[i].show_pf == "individual"
+  - Razão Social: shareholders[i].name.text
+    show if:
+      code: |
+        shareholders[i].show_pj == "organization"
+---
+section: Acionistas
+question: |
+  Dados do ${ word(ordinal(j)) } representante do(a) ${ shareholders[i] }:
+fields:
+  - "Nome completo:": shareholders[i].child[j].name.first
+    required: False
 ---
 code: |
   recipients = list()
