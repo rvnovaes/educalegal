@@ -70,7 +70,6 @@ class ClickSignClient:
         """
 
         response_dict = dict()
-        recipients = recipients['signers']
         for recipient in recipients:
             payload = {
                 "signer": {

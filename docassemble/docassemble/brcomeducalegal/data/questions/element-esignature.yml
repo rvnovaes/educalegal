@@ -29,10 +29,14 @@ code: |
   elif tenant_esignature_provider == 'CLICKSIGN':
     csc = ClickSignClient(tenant_private_key, tenant_test_mode)
 
+    log("documents console", "console")
+    log(documents, "console")
+    log("recipients console", "console")
+    log(recipients, "console")
     status_code, reason = csc.send_to_clicksign(documents, recipients)
     log(response, "console")
 
-    if status_code = 202:
+    if status_code == 202:
       e_signature_response_status_code = 201
     else:
       e_signature_response_status_code = 0

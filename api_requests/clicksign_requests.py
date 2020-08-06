@@ -17,36 +17,32 @@ documents = [
     }
 ]
 
-recipients = {
-    "signers": [
-        {
-            "email": "iasmini.gomes@gmail.com",
-            "name": "IASMINI FURTADO DE MAGALHAES GOMES",
-            "recipientId": 1,
-            "routingOrder": 1,
-            "tabs": {
-                "signHereTabs": [
-                    {
-                        "anchorString": "931714545176332"
-                    }
-                ]
-            }
-        },
-        {
-            "email": "silex@silexsistemas.com.br",
-            "name": "Development Sociedade de Ensino Col\u00e9gio Bacana Ltda.",
-            "recipientId": 2,
-            "routingOrder": 2,
-            "tabs": {
-                "signHereTabs": [
-                    {
-                        "anchorString": "931043515650174"
-                    }
-                ]
-            }
-        }
-    ]
-}
+recipients = [
+   {
+      'name':'IASMINI FURTADO DE MAGALHAES GOMES',
+      'email':'iasmini.gomes@gmail.com',
+      'group':'signers',
+      'routingOrder':1,
+      'tabs':[
+         {
+            'type':'signHere',
+            'anchorString':610456158696009
+         }
+      ]
+   },
+   {
+      'name':'Development Sociedade de Ensino Colégio Bacana Ltda.',
+      'email':'silex@silexsistemas.com.br',
+      'group':'signers',
+      'routingOrder':2,
+      'tabs':[
+         {
+            'type':'signHere',
+            'anchorString':256912807153874
+         }
+      ]
+   }
+]
 
 
 def upload_document():
@@ -113,8 +109,8 @@ def send_to_clicksign():
 if __name__ == '__main__':
     # print(upload_document())
 
-    # print(add_signer())
+    print(add_signer())
 
     # print(add_signer_to_document())
 
-    print(send_to_clicksign())
+    # print(send_to_clicksign())
