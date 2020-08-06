@@ -36,15 +36,34 @@ code: |
     log(documents, "console")
     log("recipients console", "console")
     log(recipients, "console")
-    status_code, reason = csc.send_to_clicksign(documents, recipients)
-    log(response, "console")
 
-    if status_code == 202:
-      e_signature_response_status_code = 201
-    else:
-      e_signature_response_status_code = 0
-      log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=reason))
-      log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=reason), "console")
+    # faz o upload do documento no clicksign
+    status_code, response, envelope_id, data_sent = csc.upload_document(documents)
+    log("status_code upload", "console")
+    log(status_code, "console")
+    log("envelope_id upload", "console")
+    log(envelope_id, "console")
+
+    if status_code == 201:
+      status = 'enviado'
+
+      # salva no documento do educa legal o status e o envelope_id do documento criado no clicksign
+      el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, True)
+      log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
+      if el_log_to_console:
+        log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
+
+      # adiciona os signatarios ao documento e envia por email para o primeiro signatario
+      # o envelope_id eh a key do documento no clicksign
+      status_code, reason, data_sent = csc.send_to_signers(envelope_id, recipients)
+      log(status_code, "console")
+
+      if status_code == 202:
+        e_signature_response_status_code = 201
+      else:
+        e_signature_response_status_code = 0
+        log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=reason))
+        log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=reason), "console")
 
   if e_signature_response_status_code == 201:
     signature_success

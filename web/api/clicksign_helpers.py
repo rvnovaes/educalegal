@@ -129,16 +129,19 @@ def webhook_listener(request):
         else:
             logging.info('passou aqui 7')
             envelope_status = str(data['document']['status']).lower()
+            logging.info('status do clicksign helpers 1')
             if envelope_status in envelope_statuses.keys():
                 envelope_status = envelope_statuses[envelope_status]['clicksign']
                 document_status = envelope_statuses[envelope_status]['el']
             else:
                 envelope_status = DocumentStatus.NAO_ENCONTRADO.value
                 document_status = DocumentStatus.NAO_ENCONTRADO.value
+            logging.info('status do clicksign helpers 2')
 
             filename = ''
             tenant = Tenant.objects.get(pk=document.tenant.pk)
             logging.info('passou aqui 8')
+            logging.info('status do clicksign helpers 3')
             logging.info(envelope_status)
             logging.info(document_status)
             # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
