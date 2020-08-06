@@ -100,11 +100,6 @@ def webhook_listener(request):
         logging.info('passou aqui 1')
         logging.info(data)
 
-        # ignora o evento add_signer, pois nao tem nenhuma informacao nova
-        if data['event']['name'] == 'add_signer':
-            logging.info('passou aqui 2')
-            return HttpResponse("Success!")
-
         # localiza o documento pelo uuid
         envelope_number = data['document']['key']
         logging.info('passou aqui 3')
@@ -225,8 +220,7 @@ def webhook_listener(request):
                 envelope.save(update_fields=['status', 'status_update_date'])
 
             # define o status do recipient de acordo com o evento do webhook
-            if data['event']['name'] == 'upload':
-                # no evento upload vem o documento e os destinatarios vinculados
+            if data['event']['name'] == 'add_signer':
                 recipient_status = 'criado'
             elif data['event']['name'] == 'sign':
                 recipient_status = 'finalizado'
