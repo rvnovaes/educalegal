@@ -261,8 +261,8 @@ class ClickSignClient:
                 if signer_response[signer]['status_code'] != 201:
                     log("module 17", "console")
                     return signer_response[signer]['status_code'], \
-                           signer_response[signer]['response_json'], \
-                           signer_request
+                        signer_response[signer]['response_json'], \
+                        signer_request
         else:
             log("module 18", "console")
             return 0, None, signer_request
@@ -276,8 +276,8 @@ class ClickSignClient:
                 if signer_doc_response[signer_doc]['status_code'] != 201:
                     log("module 19", "console")
                     return signer_doc_response[signer_doc]['status_code'], \
-                           signer_doc_response[signer_doc]['response_json'], \
-                           signer_doc_request
+                        signer_doc_response[signer_doc]['response_json'], \
+                        signer_doc_request
         else:
             log("module 20", "console")
             return 0, None, signer_doc_request
@@ -296,8 +296,11 @@ class ClickSignClient:
                 if signature_key_response[signature_key]['status_code'] != 202:
                     log("module 21", "console")
                     return signature_key_response[signature_key]['status_code'], \
-                           signature_key_response[signature_key]['reason'], \
-                           signature_key_request
+                        signature_key_response[signature_key]['reason'], \
+                        signature_key_request
         else:
             log("module 22", "console")
             return 0, None, signature_key_request
+
+        return signature_key_response[signature_key]['status_code'], \
+            signature_key_response[signature_key]['reason'], None

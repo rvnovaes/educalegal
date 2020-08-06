@@ -62,16 +62,21 @@ code: |
 
       if status_code == 202:
         e_signature_response_status_code = 201
+        log("success", "console")
+        log(e_signature_response_status_code, "console")
       else:
+        log("failed", "console")
         e_signature_response_status_code = 0
+        log(e_signature_response_status_code, "console")
         log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=reason))
         log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=reason), "console")
+        log("failed 2", "console")
 
   if e_signature_response_status_code == 201:
-      log("success", "console")
+    log("success", "console")
     signature_success
   else:
-      log("success", "console")
+    log("success", "console")
     signature_fail
 ---
 event: signature_success
@@ -79,8 +84,6 @@ back button: False
 question: Documento enviado para assinatura com sucesso
 subquestion: |
   ####O documento foi enviado para o(s) seguinte(s) destinatário(s):
-      log("recipients final", "console")
-      log(recipients, "console")
   % for recipient in recipients:
     % if recipient['email']:
       * ${ recipient['name'] }
