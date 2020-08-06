@@ -53,7 +53,8 @@ code: |
         item[i].child.target_number = 0
       elif item.type == "organization":
         item.name.text
-        item[i].child.target_number = 0
+        for pf in item[i].child:
+          item[i].child.name.text
     signature_local
     generated_file
     el_document_patched_with_docassemble_data
@@ -282,11 +283,11 @@ fields:
   - Nome Completo: shareholders[i].name.text
     show if:
       code: |
-        email_show == "ambos"
+        shareholders[i].type == "individual"
   - Razão Social: shareholders[i].name.text
     show if:
       code: |
-        email_show == "ambos"
+        shareholders[i].type == "organization"
   - "Número de representantes:": shareholders[i].child.target_number
       required: False
       datatype: integer
@@ -294,6 +295,7 @@ fields:
       min: 1
       show if:
         code: |
+          shareholders[i].type == "organization"
 ---
 section: Acionistas
 question: |
