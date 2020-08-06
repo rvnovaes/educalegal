@@ -15,9 +15,9 @@ el_environment = get_config('el environment')
 # el_environment = 'development'
 
 if el_environment == "production":
-    webhook_url = "https://app.educalegal.com.br/v1/docusign/webhook"
+    webhook_url = "https://app.educalegal.com.br/v1/clicksign/webhook"
 else:
-    webhook_url = "https://test.educalegal.com.br/v1/docusign/webhook"
+    webhook_url = "https://test.educalegal.com.br/v1/clicksign/webhook"
 
 
 class ClickSignClient:
