@@ -8,10 +8,6 @@
             <route-breadcrumb/>
           </nav>
         </div>
-        <div class="col-lg-6 col-5 text-right">
-          <base-button size="sm" type="neutral">New</base-button>
-          <base-button size="sm" type="neutral">Filters</base-button>
-        </div>
       </div>
     </base-header>
     <div class="container-fluid mt--6">
@@ -20,9 +16,18 @@
           <div class="card-wrapper">
             <escola-form :name="school.name"
                          :legal-name="school.legalName"
+                         :legal-type="school.legalType"
+                         :cnpj="school.cnpj"
+                         :phone="school.phone"
+                         :site="school.site"
+                         :email="school.email"
+                         :zip="school.zip"
+                         :street="school.street"
+                         :streetNumber="school.streetNumber"
+                         :unit="school.unit"
+                         :neighborhood="school.neighborhood"
                          :city="school.city"
-                         :state="school.state"
-                         :zip="school.zip">
+                         :state="school.state">
             </escola-form>
           </div>
         </div>
@@ -36,18 +41,25 @@
   import gql from 'graphql-tag'
 
   export const SCHOOL = gql`
-    query school($id: Int!)
-            {
-            school(id: $id) {
-              id,
-              name,
-              legalName,
-              city,
-              state,
-              zip
-            }
-      }`
-
+    query school($id: Int!) {
+        school(id: $id) {
+        id,
+        name,
+        legalName,
+        legalType,
+        cnpj,
+        phone,
+        site,
+        email,
+        zip,
+        street,
+        streetNumber,
+        unit,
+        neighborhood,
+        city,
+        state
+    }
+  }`
 
   export default {
     name: 'escola-edicao',
