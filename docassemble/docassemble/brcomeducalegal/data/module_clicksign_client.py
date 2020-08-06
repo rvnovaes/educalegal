@@ -3,12 +3,34 @@ from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
+from docassemble.base.util import (
+    log,
+    get_config,
+    url_of,
+)
+
 __all__ = ["ClickSignClient"]
+
+el_environment = get_config('el environment')
+# el_environment = 'development'
+
+if el_environment == "production":
+    webhook_url = "https://app.educalegal.com.br/v1/docusign/webhook"
+else:
+    webhook_url = "https://test.educalegal.com.br/v1/docusign/webhook"
 
 
 class ClickSignClient:
-    def __init__(self, api_base_url, token):
-        self.api_base_url = api_base_url
+    def __init__(self, token, test_mode):
+        self.test_mode = test_mode
+        self.token = token
+        self.target_uri = url_of("interview", _external=True)
+
+        if self.test_mode:
+            self.base_url = "https://sandbox.clicksign.com/"
+        else:
+            self.base_url = "https://app.clicksign.com/"
+
         self.session = retry(
             Session(),
             retries=3,
@@ -20,7 +42,7 @@ class ClickSignClient:
         self.session.params.update(params)
 
     def get_document(self, uuid):
-        final_url = self.api_base_url + "api/v1/documents/{uuid}".format(uuid=uuid)
+        final_url = self.base_url + "api/v1/documents/{uuid}".format(uuid=uuid)
         response = self.session.get(final_url).json()
         return response
 
@@ -34,7 +56,7 @@ class ClickSignClient:
                     }
                 }
 
-        final_url = self.api_base_url + "api/v1/documents"
+        final_url = self.base_url + "api/v1/documents"
         response = self.session.post(final_url, json=payload)
         return response.status_code, response.json()
 
@@ -62,7 +84,7 @@ class ClickSignClient:
                 }
             }
 
-            final_url = self.api_base_url + "api/v1/signers"
+            final_url = self.base_url + "api/v1/signers"
             response = self.session.post(final_url, json=payload)
 
             if recipient['email'] not in response_dict.keys():
@@ -91,17 +113,18 @@ class ClickSignClient:
                     "signer_key": signers[signer]['response_json']['signer']['key'],
                     "sign_as": "sign",
                     "group": signers[signer]['routingOrder'],
-                    "message": 'Assine eletrônicamente esse documento.'
+                    "message": 'Por favor assine o documento.'
                 },
             }
 
-            final_url = self.api_base_url + "api/v1/lists"
+            final_url = self.base_url + "api/v1/lists"
             response = self.session.post(final_url, json=payload)
 
             if signer not in response_dict.keys():
                 response_dict[signer] = {
                     "response_json": response.json(),
-                    "status_code": response.status_code
+                    "status_code": response.status_code,
+                    "signer": signers[signer]['response_json']['signer']
                 }
 
         return response_dict
@@ -121,15 +144,16 @@ class ClickSignClient:
             if signature_keys[signature_key]['response_json']['list']['group'] == 1:
                 payload = {
                     "request_signature_key": signature_keys[signature_key]['response_json']['list']['request_signature_key'],
-                    "message": "Prezado João,\nPor favor assine o documento.\n\nQualquer dúvida estou à disposição.\n\nAtenciosamente,\nGuilherme Alvez"
+                    "message": "Prezado(a) {signer_name},\n\nPor favor, assine o documento.".format(signer_name=signature_keys[signature_key]['signer']['name'])
                 }
 
-                final_url = self.api_base_url + "api/v1/notifications"
+                final_url = self.base_url + "api/v1/notifications"
                 response = self.session.post(final_url, json=payload)
 
                 if signature_key not in response_dict.keys():
                     response_dict[signature_key] = {
-                        "status_code": response.status_code
+                        "status_code": response.status_code,
+                        "reason": response.reason
                     }
 
         return response_dict
@@ -164,7 +188,7 @@ class ClickSignClient:
 
         for signature_key in signature_key_response:
             # se nao conseguiu enviar o email para algum destinatario, retorna erro
-            if signer_doc_response[signature_key]['status_code'] != 202:
-                return signer_doc_response[signature_key]['status_code']
+            if signature_key_response[signature_key]['status_code'] != 202:
+                return signature_key_response[signature_key]['status_code'], signature_key_response[signature_key]['reason']
 
-        return signer_doc_response[signature_key]['status_code']
+        return signature_key_response[signature_key]['status_code'], signature_key_response[signature_key]['reason']

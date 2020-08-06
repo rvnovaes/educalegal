@@ -4,10 +4,9 @@ sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
 from module_clicksign_client import ClickSignClient
 
 ###### LOCALHOST ######
-api_base_url = "https://sandbox.clicksign.com/"
 token = "dc0251e3-bb8e-4813-84c0-1158ba0bdbcf"
 
-csc = ClickSignClient(api_base_url, token)
+csc = ClickSignClient(token, True)
 
 documents = [
     {
