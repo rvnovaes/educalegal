@@ -61,7 +61,6 @@ class ClickSignClient:
 
         try:
             response = self.session.post(final_url, json=payload)
-            return response.status_code, response.json(), response.json()['document']['key'], None
         except RequestException:
             request_json = {
                 "endpoint": endpoint,
@@ -75,6 +74,8 @@ class ClickSignClient:
                 "exception": e,
             }
             return 0, None, '', request_json
+        else:
+            return response.status_code, response.json(), response.json()['document']['key'], None
 
     def add_signer(self, recipients):
         """
@@ -115,7 +116,6 @@ class ClickSignClient:
                         "status_code": response.status_code,
                         "routingOrder": recipient['routingOrder']
                     }
-                return response_dict, None
             except RequestException:
                 log("module 4", "console")
                 log(response.json(), "console")
@@ -135,6 +135,8 @@ class ClickSignClient:
                     "exception": e,
                 }
                 return None, request_json
+            else:
+                return response_dict, None
 
     def add_signer_to_document(self, document_uuid, signers):
         """
@@ -173,7 +175,6 @@ class ClickSignClient:
                         "signer": signers[signer]['response_json']['signer']
                     }
                 log("module 8", "console")
-                return response_dict, None
             except RequestException:
                 log("module 9", "console")
                 log(response.json(), "console")
@@ -195,6 +196,8 @@ class ClickSignClient:
                     "exception": e,
                 }
                 return None, request_json
+            else:
+                return response_dict, None
 
     def send_email(self, signature_keys):
         """
@@ -227,7 +230,6 @@ class ClickSignClient:
                         "reason": response.reason
                     }
                 log("module 13", "console")
-                return response_dict, None
             except RequestException:
                 log("module 14", "console")
                 log(response.reason, "console")
@@ -247,6 +249,8 @@ class ClickSignClient:
                     "exception": e,
                 }
                 return None, request_json
+            else:
+                return response_dict, None
 
     def send_to_signers(self, doc_uuid, recipients):
         """Cria os destinatários, vincula ao documento e envia por e-mail para assinatura."""
