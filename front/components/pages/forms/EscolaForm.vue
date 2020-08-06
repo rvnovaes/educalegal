@@ -140,7 +140,7 @@
           </div>
         </div>
         <base-button type="success" native-type="submit"><i class="fa fa-check"></i>Salvar</base-button>
-        <base-button @click="cancel" type="danger"><i class="fa fa-window-close"></i>Cancelar</base-button>
+        <base-button @click="cancel()" type="danger"><i class="fa fa-window-close"></i>Cancelar</base-button>
       </form>
     </validation-observer>
   </card>

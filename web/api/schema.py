@@ -15,6 +15,21 @@ class SchoolType(DjangoObjectType):
     class Meta:
         model = School
 
+class SchoolMutation(graphene.Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.ID()
+        name = graphene.String()
+
+    # The class attributes define the response of the mutation
+    school = graphene.Field(SchoolType)
+
+    def mutate(self, info, id, name):
+        school = School.objects.get(pk=id)
+        school.name = name
+        school.save()
+        return SchoolMutation(school=school)
+
 
 class Query(graphene.ObjectType):
     all_documents = graphene.List(DocumentType)
@@ -38,5 +53,8 @@ class Query(graphene.ObjectType):
         return School.objects.get(pk=id)
 
 
+class Mutation(graphene.ObjectType):
+    update_school = SchoolMutation.Field()
 
-schema = graphene.Schema(query=Query)
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
