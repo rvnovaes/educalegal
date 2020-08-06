@@ -48,10 +48,10 @@ code: |
     for item in adoptions:
       item.name.text
     for item in shareholders:
-      if shareholders_type  == 'individual':
+      if item.type  == 'individual':
         item.name.text
         item.child.target_number = 0
-      elif shareholders_type == 'organization':
+      elif item.type == 'organization':
         item.name.text
         for pf in item.child:
           pf.name.first
@@ -255,8 +255,9 @@ objects:
         complete_attribute='complete')
 ---
 code: |
+  shareholders[i].type
   shareholders[i].name.text
-  if shareholders_type == 'organization':
+  if shareholders[i].type == 'organization':
     shareholders[i].child.gather()
   shareholders[i].complete = True
 ---
@@ -266,7 +267,7 @@ code: |
 ---
 section: Acionistas
 question: |
-  Número de Acionistas
+  Número de acionistas presentes na assembleia
 fields:
   - Número: shareholders.target_number
     datatype: integer
@@ -274,9 +275,9 @@ fields:
 ---
 section: Acionistas
 question: |
-  Tipo de Pessoa
+  Tipo do ${ word(ordinal(i)) } acionista
 fields:
-  - "Tipo:": shareholders_type
+  - "Tipo:": shareholders[i].type
     required: True
     datatype: radio
     choices:
@@ -284,16 +285,16 @@ fields:
       - Pessoa Jurídica: organization
 ---
 question: |
-  Dados do(a) ${ word(ordinal(i)) } shareholders_title(s)
+  Dados do(a) ${ word(ordinal(i)) } acionista
 fields:
   - Nome Completo: shareholders[i].name.text
     show if:
       code: |
-        shareholders_type == "individual"
+        shareholders[i].type == "individual"
   - Razão Social: shareholders[i].name.text
     show if:
       code: |
-        shareholders_type == "organization"
+        shareholders[i].type == "organization"
   - "Número de representantes:": shareholders[i].child.target_number
     required: False
     datatype: integer
@@ -301,7 +302,7 @@ fields:
     min: 1
     show if:
       code: |
-        shareholders_type == "organization"
+        shareholders[i].type == "organization"
 ---
 section: Acionistas
 question: |
