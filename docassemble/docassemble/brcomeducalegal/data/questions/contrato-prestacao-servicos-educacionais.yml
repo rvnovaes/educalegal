@@ -365,28 +365,19 @@ fields:
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#dmFsb3JBbnVhbA').mask('000000000000000.00', {reverse: true});
+        $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
       });
   </script>
 ---
 code: |
   recipients = list()
-
-  sistemas_recipient = dict()
-  sistemas_recipient['name'] = "Sistemas Educa Legal"
-  sistemas_recipient['email'] = "sistemas@educalegal.com.br"
-  sistemas_recipient['group'] = "carbonCopies"
-  sistemas_recipient['routingOrder'] = 1
-  recipients.append(sistemas_recipient)
-
-
   for item in contractors:
       if item.email:
           new_recipient = dict()
           new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 2
+          new_recipient['routingOrder'] = 1
           new_recipient['tabs'] = [
               {
                   'type': 'signHere',
@@ -399,7 +390,7 @@ code: |
   new_recipient['name'] = school_legal_name
   new_recipient['email'] = school_email
   new_recipient['group'] = 'signers'
-  new_recipient['routingOrder'] = 3
+  new_recipient['routingOrder'] = 2
   new_recipient['tabs'] = [
       {
           'type': 'signHere',
