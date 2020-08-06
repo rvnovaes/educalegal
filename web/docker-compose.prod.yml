@@ -5,7 +5,7 @@ services:
     command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.production
-      - EL_ENV = production
+      - EL_ENV=production
     ports:
       - "8000:8000"
   educalegal_celery:
