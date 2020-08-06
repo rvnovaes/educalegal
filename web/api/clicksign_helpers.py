@@ -94,6 +94,7 @@ def webhook_listener(request):
     data = request.body  # This is the entire incoming POST content in Django
 
     logging.info('passou aqui 1')
+    logging.info(data)
 
     # ignora o evento add_signer, pois nao tem nenhuma informacao nova
     if data['event']['name'] == 'add_signer':
