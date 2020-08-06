@@ -48,13 +48,13 @@ code: |
     for item in adoptions:
       item.name.text
     for item in shareholders:
-      if item.type == "individual":
+      if shareholders_type  == 'individual':
         item.name.text
-        item[i].child.target_number = 0
-      elif item.type == "organization":
+        item.child.target_number = 0
+      elif shareholders_type == 'organization':
         item.name.text
-        for pf in item[i].child:
-          item[i].child.name.text
+        for pf in item.child:
+          pf.name.first
     signature_local
     generated_file
     el_document_patched_with_docassemble_data
@@ -65,7 +65,7 @@ code: |
 ---
 objects:
   - example_ata_assembleia_geral_ordinaria: DAStaticFile.using(filename='example-ata-assembleia-geral-ordinaria.pdf')
-  - stock_company: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+  - stock_company: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
 ---
 code: |
   stock_company[i].name.text
@@ -246,17 +246,23 @@ objects:
   - shareholders: |
       DAList.using(
         object_type=Person,
-        complete_attribute='complete',
-        ask_number=True)
+        ask_number=True,
+        complete_attribute='complete')
   - shareholders[i].child: |
       DAList.using(
-        object_type=Person,
-        ask_number=True)
+        object_type=Individual,
+        ask_number=True,
+        complete_attribute='complete')
 ---
 code: |
-  shareholders[i].type
   shareholders[i].name.text
+  if shareholders_type == 'organization':
+    shareholders[i].child.gather()
   shareholders[i].complete = True
+---
+code: |
+  shareholders[i].child[j].name.first
+  shareholders[i].child[j].complete = True
 ---
 section: Acionistas
 question: |
@@ -270,7 +276,7 @@ section: Acionistas
 question: |
   Tipo de Pessoa
 fields:
-  - "Tipo:": shareholders[i].type
+  - "Tipo:": shareholders_type
     required: True
     datatype: radio
     choices:
@@ -283,25 +289,25 @@ fields:
   - Nome Completo: shareholders[i].name.text
     show if:
       code: |
-        shareholders[i].type == "individual"
+        shareholders_type == "individual"
   - Razão Social: shareholders[i].name.text
     show if:
       code: |
-        shareholders[i].type == "organization"
+        shareholders_type == "organization"
   - "Número de representantes:": shareholders[i].child.target_number
-      required: False
-      datatype: integer
-      default: 1
-      min: 1
-      show if:
-        code: |
-          shareholders[i].type == "organization"
+    required: False
+    datatype: integer
+    default: 1
+    min: 1
+    show if:
+      code: |
+        shareholders_type == "organization"
 ---
 section: Acionistas
 question: |
   Dados do ${ word(ordinal(j)) } representante do(a) ${ shareholders[i] }:
 fields:
-  - "Nome completo:": shareholders[i].child[j].name.text
+  - "Nome completo:": shareholders[i].child[j].name.first
     required: False
 ---
 code: |
