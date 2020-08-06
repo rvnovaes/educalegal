@@ -57,6 +57,8 @@ code: |
       # o envelope_id eh a key do documento no clicksign
       status_code, reason, data_sent = csc.send_to_signers(envelope_id, recipients)
       log(status_code, "console")
+      log(reason, "console")
+      log(data_sent, "console")
 
       if status_code == 202:
         e_signature_response_status_code = 201
@@ -66,8 +68,10 @@ code: |
         log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=reason), "console")
 
   if e_signature_response_status_code == 201:
+      log("success", "console")
     signature_success
   else:
+      log("success", "console")
     signature_fail
 ---
 event: signature_success
@@ -75,6 +79,8 @@ back button: False
 question: Documento enviado para assinatura com sucesso
 subquestion: |
   ####O documento foi enviado para o(s) seguinte(s) destinatário(s):
+      log("recipients final", "console")
+      log(recipients, "console")
   % for recipient in recipients:
     % if recipient['email']:
       * ${ recipient['name'] }

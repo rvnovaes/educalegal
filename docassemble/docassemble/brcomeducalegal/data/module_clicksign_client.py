@@ -87,7 +87,7 @@ class ClickSignClient:
 
         response_dict = dict()
         log("module 1", "console")
-        log("recipients", "console")
+        log(recipients, "console")
         for recipient in recipients:
             payload = {
                 "signer": {
@@ -284,10 +284,15 @@ class ClickSignClient:
 
         # envia por email o documento aos destinatarios
         signature_key_response, signature_key_request = self.send_email(signer_doc_response)
+        log("module 20-1", "console")
 
         # se nao conseguiu enviar o email para algum destinatario, retorna erro
         if signature_key_response:
+            log("module 20-2", "console")
+            log(signature_key_response, "console")
             for signature_key in signature_key_response:
+                log("module 20-3", "console")
+                log(signature_key_response[signature_key]['status_code'], "console")
                 if signature_key_response[signature_key]['status_code'] != 202:
                     log("module 21", "console")
                     return signature_key_response[signature_key]['status_code'], \

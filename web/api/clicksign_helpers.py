@@ -130,12 +130,22 @@ def webhook_listener(request):
             logging.info('passou aqui 7')
             envelope_status = str(data['document']['status']).lower()
             logging.info('status do clicksign helpers 1')
+            logging.info('passou aqui 7-1')
+            logging.info(envelope_status)
             if envelope_status in envelope_statuses.keys():
                 envelope_status = envelope_statuses[envelope_status]['clicksign']
+                logging.info('passou aqui 7-2')
+                logging.info(envelope_status)
                 document_status = envelope_statuses[envelope_status]['el']
+                logging.info('passou aqui 7-3')
+                logging.info(document_status)
             else:
                 envelope_status = DocumentStatus.NAO_ENCONTRADO.value
+                logging.info('passou aqui 7-4')
+                logging.info(envelope_status)
                 document_status = DocumentStatus.NAO_ENCONTRADO.value
+                logging.info('passou aqui 7-5')
+                logging.info(document_status)
             logging.info('status do clicksign helpers 2')
 
             filename = ''
@@ -143,6 +153,7 @@ def webhook_listener(request):
             logging.info('passou aqui 8')
             logging.info('status do clicksign helpers 3')
             logging.info(envelope_status)
+            logging.info('passou aqui 8-1')
             logging.info(document_status)
             # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
             if envelope_status == "finalizado":
@@ -265,6 +276,7 @@ def webhook_listener(request):
         logging.info('passou aqui 23')
 
     except Exception as e:
+        logging.info('passou aqui 24')
         logging.info(e)
 
     return HttpResponse("Success!")
