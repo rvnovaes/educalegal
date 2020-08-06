@@ -256,7 +256,7 @@ def webhook_listener(request):
                                 status=recipient_status,
                                 sent_date=recipient['created_at'],
                                 type=recipient_types[recipient['sign_as']],
-                                filenames=filename,
+                                pdf_filenames=filename,
                                 document=document,
                                 tenant=tenant,
                             )
