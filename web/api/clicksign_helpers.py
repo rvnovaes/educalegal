@@ -90,7 +90,7 @@ def verify_hmac(headers: dict, request_data: bytes, secret_key: str):
 
 @require_POST
 @csrf_exempt
-def clicksign_webhook_listener(request):
+def webhook_listener(request):
     data = request.body  # This is the entire incoming POST content in Django
 
     logging.info('passou aqui 1')
