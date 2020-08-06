@@ -109,8 +109,8 @@ def send_to_clicksign():
 if __name__ == '__main__':
     # print(upload_document())
 
-    print(add_signer())
+    # print(add_signer())
 
     # print(add_signer_to_document())
 
-    # print(send_to_clicksign())
+    print(send_to_clicksign())

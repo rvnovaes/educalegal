@@ -11,6 +11,9 @@ code: |
   log("Executando element-esignature.yml")
   el_log_to_console = get_config('el log to console')
 
+  log("tenant_esignature_provider console", "console")
+  log(tenant_esignature_provider, "console")
+
   if tenant_esignature_provider == 'DOCUSIGN':
     dsc = DocuSignClient(tenant_client_id, tenant_impersonated_user_guid, tenant_test_mode, tenant_private_key)
 

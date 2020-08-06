@@ -16,6 +16,7 @@ services:
         target: /code/media
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.development_docker
+      - EL_ENV = development
     depends_on:
       - educalegal_rabbitmq
       - mongo
