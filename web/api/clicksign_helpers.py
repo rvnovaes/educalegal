@@ -8,10 +8,10 @@ import urllib.request
 
 from pathlib import Path
 
+from django.conf import settings
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from django.conf import settings
 
 from document.models import Document, Envelope, Signer, DocumentStatus
 from interview.models import Interview
@@ -55,10 +55,13 @@ recipient_types = {
 
 logger = logging.getLogger(__name__)
 
-if os.environ['EL_ENV'] == 'production':
-    secret_key = 'gerar no ambiente de producao'
-else:
-    secret_key = '6c49e1a0f98862bd735efec7548148b4'
+# if os.environ['EL_ENV'] == 'production':
+#     secret_key = 'gerar no ambiente de producao'
+# else:
+#     secret_key = '6c49e1a0f98862bd735efec7548148b4'
+
+# DEVELOPMENT - VER COMO PEGO O EL_ENV DO CONTAINER
+secret_key = '6c49e1a0f98862bd735efec7548148b4'
 
 
 def verify_hmac(headers, request_data):
