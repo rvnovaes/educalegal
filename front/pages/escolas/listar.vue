@@ -179,8 +179,10 @@ export default {
       Swal.fire({
         title: `Você marcou ${row.name} como favorita`,
         buttonsStyling: false,
-        type: 'success',
-        confirmButtonClass: 'btn btn-success btn-fill'
+        icon: 'success',
+        customClass: {
+          confirmButton: 'btn btn-success btn-fill',
+        },
       });
     },
     handleEdit(index, row) {
@@ -188,8 +190,11 @@ export default {
         title: `Você deseja editar ${row.name}?`,
         buttonsStyling: false,
         showCancelButton: true,
-        confirmButtonClass: 'btn btn-success btn-fill',
-        cancelButtonClass: 'btn btn-danger btn-fill',
+        icon: 'question',
+        customClass: {
+          confirmButton: 'btn btn-success btn-fill',
+          cancelButton: 'btn btn-danger btn-fill'
+        },
         cancelButtonText: 'Cancelar'
       }).then(result => {
           if (result.value){
@@ -202,21 +207,26 @@ export default {
       Swal.fire({
         title: `Tem certeza que quer excluir ${row.name}?`,
         text: `Não é possível desfazer essa ação!`,
-        type: 'warning',
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonClass: 'btn btn-success btn-fill',
-        cancelButtonClass: 'btn btn-danger btn-fill',
+        customClass: {
+          confirmButton: 'btn btn-success btn-fill',
+          cancelButton: 'btn btn-danger btn-fill'
+        },
         confirmButtonText: 'Sim, excluir!',
         cancelButtonText: 'Cancelar',
-        buttonsStyling: false
+        buttonsStyling: false,
+
       }).then(result => {
         if (result.value) {
           this.deleteRow(row);
           Swal.fire({
             title: 'Excluída!',
             text: `Você excluiu ${row.name}`,
-            type: 'success',
-            confirmButtonClass: 'btn btn-success btn-fill',
+            icon: 'success',
+            customClass: {
+              confirmButton: 'btn btn-success btn-fill',
+            },
             buttonsStyling: false
           });
         }
@@ -224,7 +234,6 @@ export default {
     },
     editRow(row){
       let indexToEdit = row.id;
-      console.log(indexToEdit);
       this.$router.push({
         path: '/escolas/' + indexToEdit
       })
