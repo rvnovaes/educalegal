@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import hmac
+import json
 import logging
 import os
 import urllib.request
@@ -87,7 +88,8 @@ def verify_hmac(headers, request_data):
 @csrf_exempt
 def webhook_listener(request):
     try:
-        data = request.body  # This is the entire incoming POST content in Django
+        # converte json para dict
+        data = json.loads(request.body)
         # headers = request.get('headers')
 
         # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
@@ -261,7 +263,7 @@ def webhook_listener(request):
 
     except Exception as e:
         logging.info(e)
-    
+
     return HttpResponse("Success!")
 
 
