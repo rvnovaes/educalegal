@@ -53,8 +53,6 @@ code: |
         item.child.target_number = 0
       elif item.type == 'organization':
         item.name.text
-        for pf in item.child:
-          pf.name.first
     signature_local
     generated_file
     el_document_patched_with_docassemble_data
@@ -65,7 +63,7 @@ code: |
 ---
 objects:
   - example_ata_assembleia_geral_ordinaria: DAStaticFile.using(filename='example-ata-assembleia-geral-ordinaria.pdf')
-  - stock_company: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+  - stock_company: DAList.using(object_type=Organization, complete_attribute='complete', ask_number=True)
 ---
 code: |
   stock_company[i].name.text
@@ -251,8 +249,7 @@ objects:
   - shareholders[i].child: |
       DAList.using(
         object_type=Individual,
-        ask_number=True,
-        complete_attribute='complete')
+        ask_number=True)
 ---
 code: |
   shareholders[i].type
@@ -260,10 +257,6 @@ code: |
   if shareholders[i].type == 'organization':
     shareholders[i].child.gather()
   shareholders[i].complete = True
----
-code: |
-  shareholders[i].child[j].name.first
-  shareholders[i].child[j].complete = True
 ---
 section: Acionistas
 question: |
@@ -314,20 +307,33 @@ fields:
 code: |
   recipients = list()
 
-  for item in directors:
-      if item.email:
-          new_recipient = dict()
-          new_recipient['name'] = item.name.text
-          new_recipient['email'] = item.email
-          new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 1
-          new_recipient['tabs'] = [
-              {
-                  'type': 'signHere',
-                  'anchorString': generate_anchor('signHere', item.email)
-              },
-          ]
-          recipients.append(new_recipient)
+  if chairman_email:
+      new_recipient = dict()
+      new_recipient['name'] = chairman_name
+      new_recipient['email'] = chairman_email
+      new_recipient['group'] = 'signers'
+      new_recipient['routingOrder'] = 1
+      new_recipient['tabs'] = [
+          {
+              'type': 'signHere',
+              'anchorString': generate_anchor('signHere', chairman_email)
+          },
+      ]
+      recipients.append(new_recipient)
+
+  if secretary_email:
+      new_recipient = dict()
+      new_recipient['name'] = secretary_name
+      new_recipient['email'] = secretary_email
+      new_recipient['group'] = 'signers'
+      new_recipient['routingOrder'] = 1
+      new_recipient['tabs'] = [
+          {
+              'type': 'signHere',
+              'anchorString': generate_anchor('signHere', secretary_email)
+          },
+      ]
+      recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
 
