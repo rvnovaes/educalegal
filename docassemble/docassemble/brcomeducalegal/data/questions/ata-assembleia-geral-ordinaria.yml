@@ -49,10 +49,10 @@ code: |
       item.name.text
     for item in shareholders:
       if item.type == "individual":
-        item.show_pf = "individual"
+        item.name.text
         item[i].child.target_number = 0
       elif item.type == "organization":
-        item.show_pj = "organization"
+        item.name.text
         item[i].child.target_number = 0
     signature_local
     generated_file
@@ -87,9 +87,9 @@ ga id: |
   code: ga_id_begin
 progress: 5
 section: Companhia
-question: Dados do(a) ${word(ordinal(i)) } Companhia
+question: Dados da Companhia
 fields:
-  - 'Nome completo: ': stock_company[i].name.text
+  - 'Razão Social: ': stock_company[i].name.text
     datatype: text
   - 'CNPJ:': stock_company[i].cnpj
     datatype: text
@@ -203,7 +203,7 @@ section: Assembleia
 progress: 15
 question: Exercício Social
 subquestion: |
-  Demonstrações financeiras da Companhia, relativos ao exercício social encerrado em [FIELD accounting_year].
+  As demonstrações financeiras apresentadas pela Companhia são relativas ao exercício social encerrado em [FIELD accounting_year].
 fields:
   - Ano: accounting_year
     datatype: integer
@@ -217,7 +217,7 @@ progress: 25
 section: Agenda
 question: Ordem do dia
 subquestion: |
-  Esta assembleia terá como agenda as seguintes ordens:
+  Esta assembleia terá como agenda:
 fields:
   - "Ordem:": agenda[i].name.text
     input type: area
@@ -245,11 +245,17 @@ objects:
   - shareholders: |
       DAList.using(
         object_type=Person,
+        complete_attribute='complete',
         ask_number=True)
   - shareholders[i].child: |
       DAList.using(
         object_type=Person,
         ask_number=True)
+---
+code: |
+  shareholders[i].type
+  shareholders[i].name.text
+  shareholders[i].complete = True
 ---
 section: Acionistas
 question: |
@@ -276,17 +282,24 @@ fields:
   - Nome Completo: shareholders[i].name.text
     show if:
       code: |
-        shareholders[i].show_pf == "individual"
+        email_show == "ambos"
   - Razão Social: shareholders[i].name.text
     show if:
       code: |
-        shareholders[i].show_pj == "organization"
+        email_show == "ambos"
+  - "Número de representantes:": shareholders[i].child.target_number
+      required: False
+      datatype: integer
+      default: 1
+      min: 1
+      show if:
+        code: |
 ---
 section: Acionistas
 question: |
   Dados do ${ word(ordinal(j)) } representante do(a) ${ shareholders[i] }:
 fields:
-  - "Nome completo:": shareholders[i].child[j].name.first
+  - "Nome completo:": shareholders[i].child[j].name.text
     required: False
 ---
 code: |
