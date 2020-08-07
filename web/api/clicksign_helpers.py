@@ -223,54 +223,56 @@ def webhook_listener(request):
                 envelope.status_update_date = data['document']['updated_at']
                 envelope.save(update_fields=['status', 'status_update_date'])
 
+            recipient_status = None
             # define o status do recipient de acordo com o evento do webhook
             if data['event']['name'] == 'add_signer':
                 recipient_status = 'criado'
             elif data['event']['name'] == 'sign':
                 recipient_status = 'finalizado'
 
-            logging.info('passou aqui 18')
-            logging.info(recipient_status)
-            for recipient in data['document']['signers']:
-                try:
-                    logging.info('passou aqui 19')
-                    # se já tem o status para o email e para o documento, não salva outro igual
-                    # só cria outro se o status do recipient mudou
-                    signer = Signer.objects.get(
-                        document=document,
-                        email=recipient['email'],
-                        status=recipient_status)
-                except Signer.DoesNotExist:
-                    logging.info('passou aqui 20')
-                    create_signer = False
-                    if recipient_status == 'criado':
-                        create_signer = True
-                    elif recipient_status == 'finalizado':
-                        # no evento sign vem uma tag 'signature' para o destinatario que assinou
-                        for item in data['document']['signers']:
-                            if recipient['email'] == item['email'] and 'signature' in item:
-                                create_signer = True
+            if recipient_status:
+                logging.info('passou aqui 18')
+                logging.info(recipient_status)
+                for recipient in data['document']['signers']:
+                    try:
+                        logging.info('passou aqui 19')
+                        # se já tem o status para o email e para o documento, não salva outro igual
+                        # só cria outro se o status do recipient mudou
+                        signer = Signer.objects.get(
+                            document=document,
+                            email=recipient['email'],
+                            status=recipient_status)
+                    except Signer.DoesNotExist:
+                        logging.info('passou aqui 20')
+                        create_signer = False
+                        if recipient_status == 'criado':
+                            create_signer = True
+                        elif recipient_status == 'finalizado':
+                            # no evento sign vem uma tag 'signature' para o destinatario que assinou
+                            for item in data['document']['signers']:
+                                if recipient['email'] == item['email'] and 'signature' in item:
+                                    create_signer = True
 
-                    if create_signer:
-                        try:
-                            logging.info('passou aqui 21')
-                            signer = Signer(
-                                name=recipient['name'],
-                                email=recipient['email'],
-                                status=recipient_status,
-                                sent_date=recipient['created_at'],
-                                type=recipient_types[recipient['sign_as']],
-                                pdf_filenames=filename,
-                                document=document,
-                                tenant=tenant,
-                            )
+                        if create_signer:
+                            try:
+                                logging.info('passou aqui 21')
+                                signer = Signer(
+                                    name=recipient['name'],
+                                    email=recipient['email'],
+                                    status=recipient_status,
+                                    sent_date=recipient['created_at'],
+                                    type=recipient_types[recipient['sign_as']],
+                                    pdf_filenames=filename,
+                                    document=document,
+                                    tenant=tenant,
+                                )
 
-                            signer.save()
-                        except Exception as e:
-                            logging.info('passou aqui 22')
-                            message = 'Não foi possível salvar o Signer: ' + str(e)
-                            logging.info(message)
-                            logger.exception(message)
+                                signer.save()
+                            except Exception as e:
+                                logging.info('passou aqui 22')
+                                message = 'Não foi possível salvar o Signer: ' + str(e)
+                                logging.info(message)
+                                logger.exception(message)
 
         logging.info('passou aqui 23')
 
