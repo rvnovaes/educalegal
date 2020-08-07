@@ -155,8 +155,9 @@ ACCOUNT_EMAIL_VERIFICATION = None
 # the logout redirect.
 LOGIN_REDIRECT_URL = "interview:interview-list"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
-ACCOUNT_FORMS = {"signup": "tenant.forms.EducaLegalSignupForm"}
-
+ACCOUNT_FORMS = {"signup": "tenant.forms.EducaLegalSignupForm",
+                 'change_password': 'users.forms.CustomUserChangePasswordForm'}
+ACCOUNT_ADAPTER = 'users.adaptor.CustomUserAccountAdapter'
 
 # E-mail sending Settings
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
