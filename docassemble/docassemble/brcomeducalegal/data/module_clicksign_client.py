@@ -87,8 +87,6 @@ class ClickSignClient:
         """
 
         response_dict = dict()
-        log("module 1", "console")
-        log(recipients, "console")
         for recipient in recipients:
             payload = {
                 "signer": {
@@ -105,9 +103,7 @@ class ClickSignClient:
             endpoint = 'api/v1/signers'
             final_url = self.base_url + endpoint
 
-            log("module 2", "console")
             try:
-                log("module 3", "console")
                 response = self.session.post(final_url, json=payload)
 
                 if recipient['email'] not in response_dict.keys():
@@ -117,23 +113,27 @@ class ClickSignClient:
                         "routingOrder": recipient['routingOrder']
                     }
             except RequestException:
-                log("module 4", "console")
-                log(response.json(), "console")
                 request_json = {
                     "endpoint": endpoint,
                     "recipients": recipients,
                     "status_code": response.status_code,
                     "response_json": response.json(),
                 }
+                if el_environment == "production":
+                    log(request_json)
+                else:
+                    log(request_json, "console")
                 return None, request_json
             except Exception as e:
-                log("module 5", "console")
-                log(e, "console")
                 request_json = {
                     "endpoint": endpoint,
                     "recipients": recipients,
                     "exception": e,
                 }
+                if el_environment == "production":
+                    log(request_json)
+                else:
+                    log(request_json, "console")
                 return None, request_json
 
         return response_dict, None
@@ -148,8 +148,6 @@ class ClickSignClient:
         """
 
         response_dict = dict()
-        log("module 6", "console")
-        log(signers, "console")
         for signer in signers:
             payload = {
                 "list": {
@@ -164,7 +162,6 @@ class ClickSignClient:
             endpoint = 'api/v1/lists'
             final_url = self.base_url + endpoint
 
-            log("module 7", "console")
             try:
                 response = self.session.post(final_url, json=payload)
 
@@ -174,10 +171,7 @@ class ClickSignClient:
                         "status_code": response.status_code,
                         "signer": signers[signer]['response_json']['signer']
                     }
-                log("module 8", "console")
             except RequestException:
-                log("module 9", "console")
-                log(response.json(), "console")
                 request_json = {
                     "endpoint": endpoint,
                     "document_uuid": document_uuid,
@@ -185,16 +179,22 @@ class ClickSignClient:
                     "response_json": response.json(),
                     "status_code": response.status_code,
                 }
+                if el_environment == "production":
+                    log(request_json)
+                else:
+                    log(request_json, "console")
                 return None, request_json
             except Exception as e:
-                log("module 10", "console")
-                log(e, "console")
                 request_json = {
                     "endpoint": endpoint,
                     "document_uuid": document_uuid,
                     "signers": signers,
                     "exception": e,
                 }
+                if el_environment == "production":
+                    log(request_json)
+                else:
+                    log(request_json, "console")
                 return None, request_json
 
         return response_dict, None
@@ -209,7 +209,6 @@ class ClickSignClient:
         """
 
         response_dict = dict()
-        log("module 11", "console")
         for signature_key in signature_keys:
             # envia email somente para os destinatarios do grupo 1 (primeiro na ordem)
             if signature_keys[signature_key]['response_json']['list']['group'] == 1:
@@ -220,35 +219,37 @@ class ClickSignClient:
 
                 endpoint = 'api/v1/notifications'
                 final_url = self.base_url + endpoint
-            log("module 12", "console")
-            try:
-                response = self.session.post(final_url, json=payload)
+        try:
+            response = self.session.post(final_url, json=payload)
 
-                if signature_key not in response_dict.keys():
-                    response_dict[signature_key] = {
-                        "status_code": response.status_code,
-                        "reason": response.reason
-                    }
-                log("module 13", "console")
-            except RequestException:
-                log("module 14", "console")
-                log(response.reason, "console")
-                request_json = {
-                    "endpoint": endpoint,
-                    "signature_keys": signature_keys,
+            if signature_key not in response_dict.keys():
+                response_dict[signature_key] = {
                     "status_code": response.status_code,
                     "reason": response.reason
                 }
-                return None, request_json
-            except Exception as e:
-                log("module 15", "console")
-                log(e, "console")
-                request_json = {
-                    "endpoint": endpoint,
-                    "signature_keys": signature_keys,
-                    "exception": e,
-                }
-                return None, request_json
+        except RequestException:
+            request_json = {
+                "endpoint": endpoint,
+                "signature_keys": signature_keys,
+                "status_code": response.status_code,
+                "reason": response.reason
+            }
+            if el_environment == "production":
+                log(request_json)
+            else:
+                log(request_json, "console")
+            return None, request_json
+        except Exception as e:
+            request_json = {
+                "endpoint": endpoint,
+                "signature_keys": signature_keys,
+                "exception": e,
+            }
+            if el_environment == "production":
+                log(request_json)
+            else:
+                log(request_json, "console")
+            return None, request_json
 
         return response_dict, None
 
@@ -258,17 +259,14 @@ class ClickSignClient:
         # cria os destinatarios
         signer_response, signer_request = self.add_signer(recipients)
 
-        log("module 16", "console")
         # se nao conseguiu criar algum destinatario, retorna erro
         if signer_response:
             for signer in signer_response:
                 if signer_response[signer]['status_code'] != 201:
-                    log("module 17", "console")
                     return signer_response[signer]['status_code'], \
                         signer_response[signer]['response_json'], \
                         signer_request
         else:
-            log("module 18", "console")
             return 0, None, signer_request
 
         # vincula o documento aos destinatarios criados
@@ -278,32 +276,25 @@ class ClickSignClient:
         if signer_doc_response:
             for signer_doc in signer_doc_response:
                 if signer_doc_response[signer_doc]['status_code'] != 201:
-                    log("module 19", "console")
                     return signer_doc_response[signer_doc]['status_code'], \
                         signer_doc_response[signer_doc]['response_json'], \
                         signer_doc_request
         else:
-            log("module 20", "console")
             return 0, None, signer_doc_request
 
         # envia por email o documento aos destinatarios
         signature_key_response, signature_key_request = self.send_email(signer_doc_response)
-        log("module 20-1", "console")
 
         # se nao conseguiu enviar o email para algum destinatario, retorna erro
         if signature_key_response:
-            log("module 20-2", "console")
             log(signature_key_response, "console")
             for signature_key in signature_key_response:
-                log("module 20-3", "console")
                 log(signature_key_response[signature_key]['status_code'], "console")
                 if signature_key_response[signature_key]['status_code'] != 202:
-                    log("module 21", "console")
                     return signature_key_response[signature_key]['status_code'], \
                         signature_key_response[signature_key]['reason'], \
                         signature_key_request
         else:
-            log("module 22", "console")
             return 0, None, signature_key_request
 
         return signature_key_response[signature_key]['status_code'], \

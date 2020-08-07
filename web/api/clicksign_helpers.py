@@ -67,23 +67,30 @@ secret_key = '6c49e1a0f98862bd735efec7548148b4'
 def verify_hmac(headers, request_data):
     # Note: HTTP headers are case insensitive
     mac = headers.get('Content-Hmac')
+    logging.info('hmac 5')
 
     if not mac:
-        print("HMAC não foi fornecido.")
+        logging.info('hmac 6')
+        logging.info("HMAC não foi fornecido.")
         return False
 
     key = secret_key.encode('utf-8')
+    logging.info('hmac 7')
 
     received_hmac_b64 = mac.encode('utf-8')
     generated_hmac = hmac.new(key=key, msg=request_data, digestmod=hashlib.sha256).digest()
     generated_hmac_b64 = base64.b64encode(generated_hmac)
+    logging.info('hmac 8')
 
     match = hmac.compare_digest(received_hmac_b64, generated_hmac_b64)
 
+    logging.info('hmac 9')
     if not match:
-        print('HMACs não correspondem: {} {}'.format(received_hmac_b64, generated_hmac_b64))
+        logging.info('hmac 10')
+        logging.info('HMACs não correspondem: {} {}'.format(received_hmac_b64, generated_hmac_b64))
         return False
 
+    logging.info('hmac 11')
     return True
 
 
@@ -93,15 +100,18 @@ def webhook_listener(request):
     try:
         # converte json para dict
         data = json.loads(request.body)
-        # headers = request.get('headers')
+        logging.info('hmac 1')
+        headers = request.get('headers')
+        logging.info('hmac 2')
+        logging.info(headers)
 
         # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
         # HMAC é uma forma de verificar a integridade das informações transmitidas em um meio não confiável, i.e. a
         # Internet, através de uma chave secreta compartilhada entre as partes para validar as informações transmitidas.
-        # verify_hmac(headers, data)
-
-        logging.info('passou aqui 1')
-        logging.info(data)
+        logging.info('hmac 3')
+        if not verify_hmac(headers, data):
+            return HttpResponse('HMACs não correspondem.')
+        logging.info('hmac 4')
 
         # localiza o documento pelo uuid
         envelope_number = data['document']['key']
