@@ -105,9 +105,11 @@ def webhook_listener(request):
         data = json.loads(request.body)
         logging.info('hmac 1')
         try:
-            headers = request.get('headers')
-        except Exception as e:
+            headers = request.headers
             logging.info('hmac 2')
+            logging.info(headers)
+        except Exception as e:
+            logging.info('hmac 2-1')
             logging.info(request)
 
         # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
