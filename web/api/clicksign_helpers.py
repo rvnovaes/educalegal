@@ -77,7 +77,7 @@ def verify_hmac(headers, request_body):
         return False
 
     key = secret_key.encode('utf-8')
-    msg = request_body.encode('utf-8')
+    msg = str(request_body).encode('utf-8')
 
     generated_hmac = 'sha256=' + hmac.new(key=key, msg=msg, digestmod=hashlib.sha256).hexdigest()
     logging.info('hmac 7-2')
