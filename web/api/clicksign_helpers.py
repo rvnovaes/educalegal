@@ -248,7 +248,7 @@ def webhook_listener(request):
                     elif recipient_status == 'finalizado':
                         # no evento sign vem uma tag 'signature' para o destinatario que assinou
                         for item in data['document']['signers']:
-                            if 'signature' in item:
+                            if recipient['email'] == item['email'] and 'signature' in item:
                                 create_signer = True
 
                     if create_signer:
