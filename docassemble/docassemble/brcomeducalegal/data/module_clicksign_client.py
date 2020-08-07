@@ -74,8 +74,8 @@ class ClickSignClient:
                 "exception": e,
             }
             return 0, None, '', request_json
-        else:
-            return response.status_code, response.json(), response.json()['document']['key'], None
+
+        return response.status_code, response.json(), response.json()['document']['key'], None
 
     def add_signer(self, recipients):
         """
@@ -135,8 +135,8 @@ class ClickSignClient:
                     "exception": e,
                 }
                 return None, request_json
-            else:
-                return response_dict, None
+
+        return response_dict, None
 
     def add_signer_to_document(self, document_uuid, signers):
         """
@@ -196,8 +196,8 @@ class ClickSignClient:
                     "exception": e,
                 }
                 return None, request_json
-            else:
-                return response_dict, None
+
+        return response_dict, None
 
     def send_email(self, signature_keys):
         """
@@ -249,8 +249,8 @@ class ClickSignClient:
                     "exception": e,
                 }
                 return None, request_json
-            else:
-                return response_dict, None
+
+        return response_dict, None
 
     def send_to_signers(self, doc_uuid, recipients):
         """Cria os destinatários, vincula ao documento e envia por e-mail para assinatura."""
