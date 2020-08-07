@@ -66,8 +66,11 @@ secret_key = '6c49e1a0f98862bd735efec7548148b4'
 
 def verify_hmac(headers, request_data):
     # Note: HTTP headers are case insensitive
-    mac = headers.get('Content-Hmac')
-    logging.info('hmac 5')
+    try:
+        mac = headers.get('Content-Hmac')
+    except Exception as e:
+        logging.info('hmac 5')
+        logging.info(e)
 
     if not mac:
         logging.info('hmac 6')
@@ -101,9 +104,11 @@ def webhook_listener(request):
         # converte json para dict
         data = json.loads(request.body)
         logging.info('hmac 1')
-        headers = request.get('headers')
-        logging.info('hmac 2')
-        logging.info(headers)
+        try:
+            headers = request.get('headers')
+        except Exception as e:
+            logging.info('hmac 2')
+            logging.info(request)
 
         # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
         # HMAC é uma forma de verificar a integridade das informações transmitidas em um meio não confiável, i.e. a
