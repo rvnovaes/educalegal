@@ -93,56 +93,55 @@ class ClickSignClient:
 
         response_dict = dict()
         for recipient in recipients:
-            log("recipient['group']", "console")
-            log(recipient['group'], "console")
-            if recipient['group'] == 'signers':
-                payload = {
-                    "signer": {
-                        "email": recipient['email'],
-                        "auths": [
-                            "email"
-                        ],
-                        "name": recipient['name'],
-                        "has_documentation": False,
-                        "delivery": "email"
-                    }
+            payload = {
+                "signer": {
+                    "email": recipient['email'],
+                    "auths": [
+                        "email"
+                    ],
+                    "name": recipient['name'],
+                    "has_documentation": False,
+                    "delivery": "email"
                 }
+            }
 
-                endpoint = 'api/v1/signers'
-                final_url = self.base_url + endpoint
+            endpoint = 'api/v1/signers'
+            final_url = self.base_url + endpoint
 
-                try:
-                    response = self.session.post(final_url, json=payload)
+            try:
+                response = self.session.post(final_url, json=payload)
 
-                    if recipient['email'] not in response_dict.keys():
-                        response_dict[recipient['email']] = {
-                            "response_json": response.json(),
-                            "status_code": response.status_code,
-                            "routingOrder": recipient['routingOrder']
-                        }
-                except RequestException:
-                    request_json = {
-                        "endpoint": endpoint,
-                        "recipients": recipients,
-                        "status_code": response.status_code,
+                if recipient['email'] not in response_dict.keys():
+                    response_dict[recipient['email']] = {
                         "response_json": response.json(),
+                        "status_code": response.status_code,
+                        "routingOrder": recipient['routingOrder']
                     }
-                    if el_environment == "production":
-                        log(request_json)
-                    else:
-                        log(request_json, "console")
-                    return None, request_json
-                except Exception as e:
-                    request_json = {
-                        "endpoint": endpoint,
-                        "recipients": recipients,
-                        "exception": e,
-                    }
-                    if el_environment == "production":
-                        log(request_json)
-                    else:
-                        log(request_json, "console")
-                    return None, request_json
+            except RequestException:
+                request_json = {
+                    "endpoint": endpoint,
+                    "recipients": recipients,
+                    "status_code": response.status_code,
+                    "response_json": response.json(),
+                }
+                if el_environment == "production":
+                    log(request_json)
+                else:
+                    log(request_json, "console")
+
+                return None, request_json
+            except Exception as e:
+                request_json = {
+                    "endpoint": endpoint,
+                    "recipients": recipients,
+                    "exception": e,
+                }
+                if el_environment == "production":
+                    log(request_json)
+                else:
+                    log(request_json, "console")
+
+                return None, request_json
 
         return response_dict, None
 
@@ -172,9 +171,6 @@ class ClickSignClient:
             endpoint = 'api/v1/lists'
             final_url = self.base_url + endpoint
 
-            log("response_dict[signer]", "console")
-            log(response_dict[signer], "console")
-
             try:
                 response = self.session.post(final_url, json=payload)
 
@@ -196,6 +192,7 @@ class ClickSignClient:
                     log(request_json)
                 else:
                     log(request_json, "console")
+
                 return None, request_json
             except Exception as e:
                 request_json = {
@@ -208,6 +205,7 @@ class ClickSignClient:
                     log(request_json)
                 else:
                     log(request_json, "console")
+
                 return None, request_json
 
         return response_dict, None
@@ -268,6 +266,11 @@ class ClickSignClient:
 
     def send_to_signers(self, doc_uuid, recipients):
         """Cria os destinatários, vincula ao documento e envia por e-mail para assinatura."""
+
+        # remove os signatarios que nao assinam o documento
+        for index, recipient in reversed(list(enumerate(recipients))):
+            if recipient['group'] != 'signers':
+                del recipients[index]
 
         # cria os destinatarios
         signer_response, signer_request = self.add_signer(recipients)

@@ -17,28 +17,28 @@ documents = [
 
 recipients = [
    {
-      'name':'IASMINI FURTADO DE MAGALHAES GOMES',
-      'email':'iasmini.gomes@gmail.com',
+      'name':'Development Sociedade de Ensino Colégio Bacana Ltda.',
+      'email':'silex@silexsistemas.com.br',
       'group':'signers',
       'routingOrder':1,
       'tabs':[
          {
             'type':'signHere',
-            'anchorString':610456158696009
+            'anchorString':125973285101946
          }
       ]
    },
    {
-      'name':'Development Sociedade de Ensino Colégio Bacana Ltda.',
-      'email':'silex@silexsistemas.com.br',
-      'group':'signers',
-      'routingOrder':2,
-      'tabs':[
-         {
-            'type':'signHere',
-            'anchorString':256912807153874
-         }
-      ]
+      'name':'IASMINI FURTADO DE MAGALHAES GOMES',
+      'email':'iasmini.gomes@gmail.com',
+      'group':'certifiedDeliveries',
+      'routingOrder':2
+   },
+   {
+      'name':'Contato Financeiro',
+      'email':'financeiro2@silexsistemas.com.br',
+      'group':'carbonCopies',
+      'routingOrder':3
    }
 ]
 
@@ -55,49 +55,28 @@ def add_signer():
 def add_signer_to_document():
     document_uuid = 'a127512e-7259-4719-ac06-0dfdfe209454'
     signers = {
-       "iasmini.gomes@gmail.com":{
-          "response_json":{
-             "signer":{
-                "key":"92287f1b-5d33-4bff-be3d-095ebebe16c0",
-                "email":"iasmini.gomes@gmail.com",
-                "auths":[
-                   "email"
-                ],
-                "delivery":"email",
-                "name":"IASMINI FURTADO DE MAGALHAES GOMES",
-                "documentation":None,
-                "birthday":None,
-                "phone_number":None,
-                "has_documentation":False,
-                "created_at":"2020-08-04T19:31:13.321-03:00",
-                "updated_at":"2020-08-04T19:31:13.321-03:00"
-             }
-          },
-          "status_code":201,
-          "routingOrder": 1
-       },
-       "silex@silexsistemas.com.br":{
-          "response_json":{
-             "signer":{
-                "key":"b6148307-0c45-4516-a223-51a6490dcbe8",
-                "email":"silex@silexsistemas.com.br",
-                "auths":[
-                   "email"
-                ],
-                "delivery":"email",
-                "name":"Development Sociedade de Ensino Col\u00e9gio Bacana Ltda.",
-                "documentation":None,
-                "birthday":None,
-                "phone_number":None,
-                "has_documentation":False,
-                "created_at":"2020-08-04T19:31:13.584-03:00",
-                "updated_at":"2020-08-04T19:31:13.584-03:00"
-             }
-          },
-          "status_code":201,
-          "routingOrder": 2
-       }
-    }
+   'silex@silexsistemas.com.br':{
+      'response_json':{
+         'signer':{
+            'key':'200d21b8-4af4-49e0-98e1-fa9b54b601a6',
+            'email':'silex@silexsistemas.com.br',
+            'auths':[
+               'email'
+            ],
+            'delivery':'email',
+            'name':'Development Sociedade de Ensino Colégio Bacana Ltda.',
+            'documentation':None,
+            'birthday':None,
+            'phone_number':None,
+            'has_documentation':False,
+            'created_at':'2020-08-07T17:53:05.677-03:00',
+            'updated_at':'2020-08-07T17:53:05.677-03:00'
+         }
+      },
+      'status_code':201,
+      'routingOrder':1
+   }
+}
     csc.add_signer_to_document(document_uuid, signers)
 
 
@@ -106,10 +85,10 @@ def send_to_signers(envelope_id):
 
 
 if __name__ == '__main__':
-    status_code, response_json, envelope_id, request_json = upload_document()
+    # status_code, response_json, envelope_id, request_json = upload_document()
 
     # print(add_signer())
 
-    # print(add_signer_to_document())
+    print(add_signer_to_document())
 
-    print(send_to_signers(envelope_id))
+    # print(send_to_signers(envelope_id))
