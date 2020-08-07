@@ -104,8 +104,7 @@ script: |
   </script>
 right: |
   <center><h5><strong>Saiba mais</strong></h5>
-  <p></p>
-  <p></p>
+  <p>A assembleia geral ordinária (AGO) é uma assembleia realizada no máximo em até 4 meses após o encerramento do exercício, com a finalidade de tomar as contas dos administradores, examinar, discutir e votar as demonstrações financeiras, deliberar sobre a destinação do lucro líquido do exercício e a distribuição de dividendos, e eleger os administradores e, se for o caso, os membros do conselho fiscal.</p>
   <center>[Clique para visualizar a minuta](${ example_ata_assembleia_geral_ordinaria.url_for() })</center>
 ---
 progress: 5
