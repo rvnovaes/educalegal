@@ -11,6 +11,7 @@ from docassemble.base.util import (
 
 __all__ = ["ClickSignClient"]
 
+
 el_environment = get_config('el environment')
 # el_environment = 'development'
 
@@ -46,15 +47,19 @@ class ClickSignClient:
         response = self.session.get(final_url).json()
         return response
 
-    def upload_document(self, documents):
-        for document in documents:
-            payload = {
-                "document": {
-                    "path": "/" + document['name'],
-                    "content_base64": 'data:application/pdf;base64,' + document['documentBase64'],
-                    "sequence_enabled": True
-                    }
+    def upload_document(self, document):
+        """
+        Faz o upload do documento no Clicksign.
+        :param document: documento que será enviado para a Clicksign
+        :return: JSON com dados do(s) documento(s) adicionado(s)
+        """
+        payload = {
+            "document": {
+                "path": "/" + document['name'],
+                "content_base64": 'data:application/pdf;base64,' + document['documentBase64'],
+                "sequence_enabled": True
                 }
+            }
 
         endpoint = 'api/v1/documents'
         final_url = self.base_url + endpoint
@@ -64,13 +69,13 @@ class ClickSignClient:
         except RequestException:
             request_json = {
                 "endpoint": endpoint,
-                "documents": documents,
+                "document": document,
             }
             return response.status_code, response.json(), '', request_json
         except Exception as e:
             request_json = {
                 "endpoint": endpoint,
-                "documents": documents,
+                "document": document,
                 "exception": e,
             }
             return 0, None, '', request_json
@@ -88,53 +93,56 @@ class ClickSignClient:
 
         response_dict = dict()
         for recipient in recipients:
-            payload = {
-                "signer": {
-                    "email": recipient['email'],
-                    "auths": [
-                        "email"
-                    ],
-                    "name": recipient['name'],
-                    "has_documentation": False,
-                    "delivery": "email"
-                }
-            }
-
-            endpoint = 'api/v1/signers'
-            final_url = self.base_url + endpoint
-
-            try:
-                response = self.session.post(final_url, json=payload)
-
-                if recipient['email'] not in response_dict.keys():
-                    response_dict[recipient['email']] = {
-                        "response_json": response.json(),
-                        "status_code": response.status_code,
-                        "routingOrder": recipient['routingOrder']
+            log("recipient['group']", "console")
+            log(recipient['group'], "console")
+            if recipient['group'] == 'signers':
+                payload = {
+                    "signer": {
+                        "email": recipient['email'],
+                        "auths": [
+                            "email"
+                        ],
+                        "name": recipient['name'],
+                        "has_documentation": False,
+                        "delivery": "email"
                     }
-            except RequestException:
-                request_json = {
-                    "endpoint": endpoint,
-                    "recipients": recipients,
-                    "status_code": response.status_code,
-                    "response_json": response.json(),
                 }
-                if el_environment == "production":
-                    log(request_json)
-                else:
-                    log(request_json, "console")
-                return None, request_json
-            except Exception as e:
-                request_json = {
-                    "endpoint": endpoint,
-                    "recipients": recipients,
-                    "exception": e,
-                }
-                if el_environment == "production":
-                    log(request_json)
-                else:
-                    log(request_json, "console")
-                return None, request_json
+
+                endpoint = 'api/v1/signers'
+                final_url = self.base_url + endpoint
+
+                try:
+                    response = self.session.post(final_url, json=payload)
+
+                    if recipient['email'] not in response_dict.keys():
+                        response_dict[recipient['email']] = {
+                            "response_json": response.json(),
+                            "status_code": response.status_code,
+                            "routingOrder": recipient['routingOrder']
+                        }
+                except RequestException:
+                    request_json = {
+                        "endpoint": endpoint,
+                        "recipients": recipients,
+                        "status_code": response.status_code,
+                        "response_json": response.json(),
+                    }
+                    if el_environment == "production":
+                        log(request_json)
+                    else:
+                        log(request_json, "console")
+                    return None, request_json
+                except Exception as e:
+                    request_json = {
+                        "endpoint": endpoint,
+                        "recipients": recipients,
+                        "exception": e,
+                    }
+                    if el_environment == "production":
+                        log(request_json)
+                    else:
+                        log(request_json, "console")
+                    return None, request_json
 
         return response_dict, None
 
@@ -143,6 +151,8 @@ class ClickSignClient:
         Adiciona no documento os destinatários para a assinatura eletrônica.
         :param document_uuid:
          Identificador único do documento
+        :param signers:
+         Lista de signatários que será adicionada ao documento
         :return:
         JSON com os dados do documento vinculado ao signatário.
         """
@@ -155,12 +165,15 @@ class ClickSignClient:
                     "signer_key": signers[signer]['response_json']['signer']['key'],
                     "sign_as": "sign",
                     "group": signers[signer]['routingOrder'],
-                    "message": 'Por favor assine o documento.'
+                    "message": 'Por favor, assine o documento.'
                 },
             }
 
             endpoint = 'api/v1/lists'
             final_url = self.base_url + endpoint
+
+            log("response_dict[signer]", "console")
+            log(response_dict[signer], "console")
 
             try:
                 response = self.session.post(final_url, json=payload)
@@ -201,11 +214,11 @@ class ClickSignClient:
 
     def send_email(self, signature_keys):
         """
-        Adiciona no documento os destinatários para a assinatura eletrônica.
-        :param document_uuid:
-         Identificador único do documento
+        Envia o email para os destinatários para a assinatura eletrônica.
+        :param signature_keys:
+         Lista de signatários para os quais o documento será enviado.
         :return:
-        JSON com os dados do documento vinculado ao signatário.
+        202 - Accepted.
         """
 
         response_dict = dict()

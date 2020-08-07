@@ -67,6 +67,8 @@ def verify_hmac(headers, request_body):
     # Note: HTTP headers are case insensitive
     try:
         received_mac = headers.get('Content-Hmac')
+        logging.info('received_mac')
+        logging.info(received_mac)
     except Exception as e:
         logging.info('hmac 5')
         logging.info(e)
@@ -78,6 +80,12 @@ def verify_hmac(headers, request_body):
 
     key = secret_key.encode('utf-8')
     msg = str(request_body).encode('utf-8')
+
+    logging.info('key')
+    logging.info(key)
+
+    logging.info('msg')
+    logging.info(msg)
 
     generated_hmac = 'sha256=' + hmac.new(key=key, msg=msg, digestmod=hashlib.sha256).hexdigest()
     logging.info('hmac 7-2')
@@ -106,10 +114,10 @@ def webhook_listener(request):
         # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
         # HMAC é uma forma de verificar a integridade das informações transmitidas em um meio não confiável, i.e. a
         # Internet, através de uma chave secreta compartilhada entre as partes para validar as informações transmitidas.
-        logging.info('hmac 3')
-        if not verify_hmac(headers, request.body):
-            return HttpResponse('HMACs não correspondem.')
-        logging.info('hmac 4')
+        # logging.info('hmac 3')
+        # if not verify_hmac(headers, request.body):
+        #     return HttpResponse('HMACs não correspondem.')
+        # logging.info('hmac 4')
 
         # localiza o documento pelo uuid
         envelope_number = data['document']['key']

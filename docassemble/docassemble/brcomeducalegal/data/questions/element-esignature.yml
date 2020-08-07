@@ -38,7 +38,7 @@ code: |
     log(recipients, "console")
 
     # faz o upload do documento no clicksign
-    status_code, response, envelope_id, data_sent = csc.upload_document(documents)
+    status_code, response, envelope_id, data_sent = csc.upload_document(documents[0])
     log("status_code upload", "console")
     log(status_code, "console")
     log("envelope_id upload", "console")
