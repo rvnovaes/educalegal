@@ -10,8 +10,6 @@ include:
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
   - element-ged.yml
-  - element-document-ready.yml
-  - element-school-email-reviewed.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -355,3 +353,75 @@ code: |
   email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
   email_category = interview_custom_file_name_string
   email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"
+---
+include:
+  - element-esignature.yml
+  - element-send-email.yml
+---
+undefine:
+  - button_send_list
+ga id: |
+  code: ga_id_end
+event: document_ready_screen
+section: Conclusão
+progress: 100
+back button: False
+question: |
+  Seu documento foi gerado com sucesso!
+subquestion: |
+  ${ generated_file.pdf.filename }
+under: |
+  Você pode baixar os documentos:
+  [PDF](${ generated_file.pdf.url_for() })
+  ou
+  [DOCX](${ generated_file.docx.url_for() })
+
+
+  % if plan_use_ged:
+    % if ged_response_status_code == 201:
+      O documento foi inserido com sucesso no GED - id: ${ ged_id }
+    % else:
+      <p>Houve erro ao inserir o documento no GED</p>
+      ${ ged_response }
+    % endif
+  % endif
+
+
+action buttons:
+  code: |
+    button_list
+---
+code: |
+  esignature_button = {'action': 'submit_to_esignature',
+                       'arguments': {'target': 'signature'},
+                       'label': 'Enviar para assinatura eletrônica',
+                       'color': 'info',
+                       'icon': 'signature'}
+---
+code: |
+  email_button = {'action': 'el_send_email',
+                       'arguments': {'target': 'email'},
+                       'label': 'Enviar por e-mail',
+                       'color': 'info',
+                       'icon': 'envelope'}
+---
+code: |
+  el_button = {'action': educalegal_url,
+                'label': 'Fim',
+                'color': 'success',
+                'icon': 'check'}
+---
+code: |
+  button_list = list()
+  button_list.append(el_button)
+  button_list.append(email_button)
+  if plan_use_esignature:
+    button_list.append(esignature_button)
+---
+event: all_done
+back button: False
+question: Você já completou todas as etapas desta entrevista
+action buttons:
+  code: |
+    [el_button]
+---
