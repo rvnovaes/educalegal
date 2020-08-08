@@ -13,7 +13,7 @@ __all__ = ["ClickSignClient"]
 
 
 el_environment = get_config('el environment')
-# el_environment = 'development'
+el_environment = 'development'
 
 if el_environment == "production":
     webhook_url = "https://app.educalegal.com.br/v1/clicksign/webhook"
@@ -115,7 +115,8 @@ class ClickSignClient:
                     response_dict[recipient['email']] = {
                         "response_json": response.json(),
                         "status_code": response.status_code,
-                        "routingOrder": recipient['routingOrder']
+                        "routingOrder": recipient['routingOrder'],
+                        "group": recipient['group'],
                     }
             except RequestException:
                 request_json = {
@@ -162,7 +163,7 @@ class ClickSignClient:
                 "list": {
                     "document_key": document_uuid,
                     "signer_key": signers[signer]['response_json']['signer']['key'],
-                    "sign_as": "sign",
+                    "sign_as": signers[signer]['group'],
                     "group": signers[signer]['routingOrder'],
                     "message": 'Por favor, assine o documento.'
                 },
@@ -267,9 +268,12 @@ class ClickSignClient:
     def send_to_signers(self, doc_uuid, recipients):
         """Cria os destinatários, vincula ao documento e envia por e-mail para assinatura."""
 
+        # adiciona em lista separada para envio apenas do email e
         # remove os signatarios que nao assinam o documento
+        recipients_no_sign = list()
         for index, recipient in reversed(list(enumerate(recipients))):
             if recipient['group'] != 'signers':
+                recipients_no_sign.append(recipient)
                 del recipients[index]
 
         # cria os destinatarios
@@ -309,9 +313,10 @@ class ClickSignClient:
                 if signature_key_response[signature_key]['status_code'] != 202:
                     return signature_key_response[signature_key]['status_code'], \
                         signature_key_response[signature_key]['reason'], \
-                        signature_key_request
+                        signature_key_request, recipients_no_sign
         else:
-            return 0, None, signature_key_request
+            return 0, None, signature_key_request, recipients_no_sign
 
         return signature_key_response[signature_key]['status_code'], \
-            signature_key_response[signature_key]['reason'], None
+            signature_key_response[signature_key]['reason'], None, \
+            recipients_no_sign
