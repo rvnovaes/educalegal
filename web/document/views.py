@@ -495,8 +495,8 @@ def generate_bulk_documents(request, bulk_document_generation_id):
             )
 
             # Se for enviar por e-mail nao enviar para Docusign
-            if interview_variables["el_send_email"] == True:
-                interview_variables["submit_to_esignature"] = False
+            if interview_variables["submit_to_esignature"] == True:
+                interview_variables["el_send_email"] = False
 
             if interview_variables["submit_to_esignature"]:
                 result = chain(
