@@ -218,10 +218,12 @@ fields:
     validate: validate_cpf
   - 'Número do RG: ': contractors[i].rg
     datatype: text
+    required: False
   - 'Nacionalidade:': contractors[i].nationality
     datatype: text
     default: brasileiro(a)
   - 'Estado Civil: ': contractors[i].marital_status
+    required: False
     choices:
       - solteiro(a): solteiro(a)
       - casado(a): casado(a)
