@@ -13,7 +13,7 @@ __all__ = ["ClickSignClient"]
 
 
 el_environment = get_config('el environment')
-el_environment = 'development'
+# el_environment = 'development'
 
 if el_environment == "production":
     webhook_url = "https://app.educalegal.com.br/v1/clicksign/webhook"
@@ -268,16 +268,19 @@ class ClickSignClient:
     def send_to_signers(self, doc_uuid, recipients):
         """Cria os destinatários, vincula ao documento e envia por e-mail para assinatura."""
 
-        # adiciona em lista separada para envio apenas do email e
-        # remove os signatarios que nao assinam o documento
+        # separa em 2 listas os destinatarios: uma para envio apenas do email e
+        # outra com os destinatarios que assinam o documento
         recipients_no_sign = list()
-        for index, recipient in reversed(list(enumerate(recipients))):
-            if recipient['group'] != 'signers':
+        recipients_sign = list()
+        for recipient in recipients:
+            if recipient['group'] == 'signers':
+                recipient['group'] = 'sign'
+                recipients_sign.append(recipient)
+            else:
                 recipients_no_sign.append(recipient)
-                del recipients[index]
 
         # cria os destinatarios
-        signer_response, signer_request = self.add_signer(recipients)
+        signer_response, signer_request = self.add_signer(recipients_sign)
 
         # se nao conseguiu criar algum destinatario, retorna erro
         if signer_response:
@@ -285,9 +288,9 @@ class ClickSignClient:
                 if signer_response[signer]['status_code'] != 201:
                     return signer_response[signer]['status_code'], \
                         signer_response[signer]['response_json'], \
-                        signer_request
+                        signer_request, recipients_no_sign
         else:
-            return 0, None, signer_request
+            return 0, None, signer_request, recipients_no_sign
 
         # vincula o documento aos destinatarios criados
         signer_doc_response, signer_doc_request = self.add_signer_to_document(doc_uuid, signer_response)
@@ -298,18 +301,16 @@ class ClickSignClient:
                 if signer_doc_response[signer_doc]['status_code'] != 201:
                     return signer_doc_response[signer_doc]['status_code'], \
                         signer_doc_response[signer_doc]['response_json'], \
-                        signer_doc_request
+                        signer_doc_request, recipients_no_sign
         else:
-            return 0, None, signer_doc_request
+            return 0, None, signer_doc_request, recipients_no_sign
 
         # envia por email o documento aos destinatarios
         signature_key_response, signature_key_request = self.send_email(signer_doc_response)
 
         # se nao conseguiu enviar o email para algum destinatario, retorna erro
         if signature_key_response:
-            log(signature_key_response, "console")
             for signature_key in signature_key_response:
-                log(signature_key_response[signature_key]['status_code'], "console")
                 if signature_key_response[signature_key]['status_code'] != 202:
                     return signature_key_response[signature_key]['status_code'], \
                         signature_key_response[signature_key]['reason'], \

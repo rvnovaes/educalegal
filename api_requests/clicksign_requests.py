@@ -8,8 +8,7 @@ token = "dc0251e3-bb8e-4813-84c0-1158ba0bdbcf"
 
 csc = ClickSignClient(token, True)
 
-document_uuid = 'd69ea216-d3d8-4cc6-aef5-036bc0fcdfe9'
-'e28264e6-5619-446e-9258-b9e2c48739e6'
+document_uuid = 'e28264e6-5619-446e-9258-b9e2c48739e6'
 
 document = {'name': '20200806-091843-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.pdf',
     'fileExtension': 'pdf',
@@ -229,21 +228,18 @@ def send_email():
     csc.send_email(signature_keys)
 
 
-def send_to_signers(envelope_id):
-    csc.send_to_signers(envelope_id, recipients)
+def send_to_signers():
+    p1, p2, p3, p4 = csc.send_to_signers(document_uuid, recipients)
+    print(p1, p2, p3, p4)
 
 
 if __name__ == '__main__':
-    # status_code, response_json, envelope_id, request_json = upload_document()
-
-    # remove os signatarios que nao assinam o documento
-    for recipient in recipients:
-        if recipient['group'] == 'signers':
-            recipient['group'] = 'sign'
-        else:
-            recipient['group'] = 'receipt'
+    # upload_document()
 
     # print(upload_document())
     # print(add_signer())
     # print(add_signer_to_document())
-    print(send_email())
+    # print(send_email())
+
+    send_to_signers()
+

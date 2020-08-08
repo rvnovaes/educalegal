@@ -73,8 +73,10 @@ code: |
         log("failed 2", "console")
 
       if len(recipients_no_sign) > 0:
+        all_recipients = recipients
         recipients = recipients_no_sign
         el_send_email
+        recipients = all_recipients
 
   if e_signature_response_status_code == 201:
     log("success", "console")
