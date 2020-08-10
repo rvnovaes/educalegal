@@ -56,9 +56,6 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 
 class SchoolSerializer(serializers.ModelSerializer):
-    city = serializers.StringRelatedField()
-    state = serializers.StringRelatedField()
-    country = serializers.StringRelatedField()
     school_units = serializers.StringRelatedField(many=True)
 
     class Meta:
