@@ -1,4 +1,4 @@
-FROM python:3.8.3
+FROM python:3.8.5
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH "${PYTHONPATH}:/opt/educalegal:/opt/educalegal/web"

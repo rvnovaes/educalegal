@@ -31,7 +31,7 @@ django-bootstrap4~=2.2.0
 # Debug
 django-debug-toolbar~=2.2
 # API Debugging
-django-silk~=4.0.1
+django-silk~=4.1.0
 # Read csv
 pandas~=1.1.0
 # Django models currency
@@ -47,7 +47,7 @@ PyJWT~=1.7.1
 validator-collection~=1.4.2
 validator-collection-br~=0.0.10
 # Celery
-celery~=4.4.6
+celery~=4.4.7
 django-celery-results~=1.2.1
 future~=0.18.2
 # Tests

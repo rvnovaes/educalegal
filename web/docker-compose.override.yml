@@ -31,7 +31,7 @@ services:
       - "80:80"
   ged:
     container_name: ged
-    image: mayanedms/mayanedms:3.4.4
+    image: mayanedms/mayanedms:3.4.13
     environment: &mayan_env
       MAYAN_CELERY_BROKER_URL: amqp://mayan:mayanrabbitpass@rabbitmq_ged:5672/mayan
       MAYAN_CELERY_RESULT_BACKEND: "redis://:mayanredispassword@redis:6379/0"
