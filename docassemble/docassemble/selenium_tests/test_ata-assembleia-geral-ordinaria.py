@@ -66,6 +66,7 @@ class TestAtaassembleiageralordinaria(WebTest):
                                                                                                   "Integrantes da administração da companhia presentes na assembleia"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/input").send_keys("Bento")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
+        self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Data e Horário da Assembleia"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("2020-08-06")
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/input").send_keys("04:00")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
