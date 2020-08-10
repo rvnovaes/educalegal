@@ -1,0 +1,25 @@
+mutation updateSchool($id: ID!,
+  									  $name: String
+  										){
+  updateSchool(id: $id,
+    					 name: $name
+  ){
+    school{
+      id
+      name
+      legalName
+      legalNature
+    	cnpj
+    	phone
+    	site
+    	email
+    	zip
+      street
+      streetNumber
+    	unit
+    	neighborhood
+    	city
+    	state
+    }
+  }
+}

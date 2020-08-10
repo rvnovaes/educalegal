@@ -14,9 +14,10 @@
       <div class="row">
         <div class="col">
           <div class="card-wrapper">
-            <escola-form :name="school.name"
+            <escola-form :id="school.id"
+                         :name="school.name"
                          :legal-name="school.legalName"
-                         :legal-type="school.legalType"
+                         :legal-nature="school.legalNature"
                          :cnpj="school.cnpj"
                          :phone="school.phone"
                          :site="school.site"
@@ -38,28 +39,8 @@
 
 <script>
   import EscolaForm from '@/components/pages/forms/EscolaForm'
-  import gql from 'graphql-tag'
+  import school from '~/queries/school'
 
-  export const SCHOOL = gql`
-    query school($id: Int!) {
-        school(id: $id) {
-        id,
-        name,
-        legalName,
-        legalType,
-        cnpj,
-        phone,
-        site,
-        email,
-        zip,
-        street,
-        streetNumber,
-        unit,
-        neighborhood,
-        city,
-        state
-    }
-  }`
 
   export default {
     name: 'escola-edicao',
@@ -74,7 +55,8 @@
     },
     apollo: {
       school:{
-        query: SCHOOL,
+        query: school,
+        prefetch: ({ route }) => ({ id: route.params.id }),
         variables () {
           return {
             id: this.$route.params.id

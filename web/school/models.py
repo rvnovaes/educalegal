@@ -5,7 +5,7 @@ from django.urls import reverse
 from tenant.models import TenantAwareModel
 
 
-class LegalType(Enum):
+class LegalNature(Enum):
     FISICA = "F"
     JURIDICA = "J"
 
@@ -33,11 +33,11 @@ class LegalType(Enum):
 class School(TenantAwareModel):
     legal_name = models.CharField(max_length=255, verbose_name="Razão social")
     name = models.CharField(max_length=255, blank=True, verbose_name="Nome Fantasia")
-    legal_type = models.CharField(
+    legal_nature = models.CharField(
         verbose_name="Tipo",
         max_length=1,
-        choices=((x.value, x.format(x.value)) for x in LegalType),
-        default=LegalType.JURIDICA,
+        choices=((x.value, x.format(x.value)) for x in LegalNature),
+        default=LegalNature.JURIDICA,
     )
     # https://docs.djangoproject.com/en/3.0/ref/models/fields/
     # when a CharField has both unique=True and blank=True set null=True is required to

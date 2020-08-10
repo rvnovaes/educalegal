@@ -116,16 +116,16 @@
           </div>
         </card>
       </div>
-    </div></div
-  ></template>
+    </div>
+  </div>
+</template>
 <script>
 import { Table, TableColumn, Select, Option } from 'element-ui';
 import RouteBreadCrumb from '@/components/argon-core/Breadcrumb/RouteBreadcrumb'
 import { BasePagination } from '@/components/argon-core';
 import clientPaginationMixin from '@/components/tables/PaginatedTables/clientPaginationMixin'
 import Swal from 'sweetalert2';
-// import users from '~/components/tables/users2'; Os dados eram importados daqui
-import gql from 'graphql-tag'
+import allSchools from '~/queries/allSchools'
 
 export default {
   mixins: [clientPaginationMixin],
@@ -252,15 +252,8 @@ export default {
   },
   apollo: {
     tableData:{
-      query: gql`{
-        allSchools {
-          id,
-          name,
-          legalName,
-          city,
-          state
-        }
-      }`,
+      query: allSchools,
+      prefetch: true,
       loadingKey: 'carregando...',
       /*
       O apollo tenta carregar allSchools em uma variavel chamada allSchools. Mas a chave que queremos usar e tableData

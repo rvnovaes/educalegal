@@ -1,0 +1,19 @@
+query school($id: Int!) {
+    school(id: $id) {
+    id
+    name
+    legalName
+    legalNature
+    cnpj
+    phone
+    site
+    email
+    zip
+    street
+    streetNumber
+    unit
+    neighborhood
+    city
+    state
+  }
+}

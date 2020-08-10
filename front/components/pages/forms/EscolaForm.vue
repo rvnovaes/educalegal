@@ -41,7 +41,7 @@
                           placeholder="Tipo "
                           rules="required"
                           success-message="Parece correto!"
-                          v-model="model.legalType">
+                          v-model="model.legalNature">
 <!--                <select class="form-control">-->
 <!--                  <option>J</option>-->
 <!--                  <option>F</option>-->
@@ -108,7 +108,6 @@
             <base-input label="Complemento"
                         name="Complemento"
                         placeholder="Complemento"
-                        rules="required"
                         v-model="model.unit">
             </base-input>
           </div>
@@ -146,8 +145,11 @@
   </card>
 </template>
 <script>
+// import updateSchool from '~/queries/updateSchool'
+import updateSchool from '~/queries/updateSchoolSimple'
+
   export default {
-    props: ['id', 'name', 'legalName', 'legalType', 'cnpj', 'phone', 'site', 'email', 'zip', 'street', 'streetNumber', 'unit', 'neighborhood', 'city', 'state', 'zip'],
+    props: ['id', 'name', 'legalName', 'legalNature', 'cnpj', 'phone', 'site', 'email', 'zip', 'street', 'streetNumber', 'unit', 'neighborhood', 'city', 'state', 'zip'],
     components: {},
     data() {
       return {
@@ -156,7 +158,7 @@
           id: this.id,
           name: this.name,
           legalName: this.legalName,
-          legalType: this.legalType,
+          legalNature: this.legalNature,
           cnpj: this.cnpj,
           phone: this.phone,
           site: this.site,
@@ -172,11 +174,17 @@
       }
     },
     watch: {
+      id: function (newVal, oldVal){
+        this.model.id = newVal
+      },
       name: function (newVal, oldVal){
         this.model.name = newVal
       },
       legalName: function (newVal, oldVal){
         this.model.legalName = newVal
+      },
+      legalNature: function (newVal, oldVal){
+        this.model.legalNature = newVal
       },
       cnpj: function (newVal, oldVal){
         this.model.cnpj = newVal
@@ -215,7 +223,31 @@
     },
     methods: {
       async firstFormSubmit() {
-        // Form submit here
+        console.log("FORM SUBMIT");
+        const id = this.model.id;
+        console.log(id);
+        const name = this.model.name;
+        console.log(name);
+        const result = await this.$apollo.mutate({
+          mutation: updateSchool,
+          variables: {
+            id: id,
+            name: name,
+            // legalName: legalName,
+            // legalNature: legalNature,
+            // cnpj: cnpj,
+            // phone: phone,
+            // site: site,
+            // email: email,
+            // zip: zip,
+            // street: street,
+            // streetNumber: this.mode.streetNumber,
+            // unit: unit,
+            // neighborhood: neighborhood,
+            // city: city,
+            // state: state,
+          },
+        })
       },
       cancel: function () {
         this.$router.push({

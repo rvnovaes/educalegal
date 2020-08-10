@@ -1,6 +1,6 @@
 import graphene
+from django.shortcuts import get_object_or_404
 from graphene_django import DjangoObjectType, DjangoConnectionField
-
 
 from document.models import Document
 from school.models import School, SchoolUnit
@@ -15,18 +15,33 @@ class SchoolType(DjangoObjectType):
     class Meta:
         model = School
 
+
 class SchoolMutation(graphene.Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.ID()
+        id = graphene.ID(required=True)
         name = graphene.String()
+        legal_name = graphene.String()
+        legal_nature = graphene.String()
+        cnpj = graphene.String()
+        phone = graphene.String()
+        site = graphene.String()
+        email = graphene.String()
+        zip = graphene.String()
+        street = graphene.String()
+        streetNumber = graphene.String()
+        unit = graphene.String()
+        neighborhood = graphene.String()
+        city = graphene.String()
+        state = graphene.String()
 
     # The class attributes define the response of the mutation
     school = graphene.Field(SchoolType)
 
-    def mutate(self, info, id, name):
-        school = School.objects.get(pk=id)
-        school.name = name
+    def mutate(self, info, **kwargs):
+        school = get_object_or_404(School, pk=kwargs["id"])
+        for k, v in kwargs.items():
+            setattr(school, k, v)
         school.save()
         return SchoolMutation(school=school)
 
