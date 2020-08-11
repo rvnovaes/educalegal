@@ -32,17 +32,8 @@ code: |
   elif tenant_esignature_provider == 'CLICKSIGN':
     csc = ClickSignClient(tenant_private_key, tenant_test_mode)
 
-    log("documents console", "console")
-    log(documents, "console")
-    log("recipients console", "console")
-    log(recipients, "console")
-
     # faz o upload do documento no clicksign
     status_code, response, envelope_id, data_sent = csc.upload_document(documents[0])
-    log("status_code upload", "console")
-    log(status_code, "console")
-    log("envelope_id upload", "console")
-    log(envelope_id, "console")
 
     if status_code == 201:
       status = 'enviado'
@@ -56,33 +47,17 @@ code: |
       # adiciona os signatarios ao documento e envia por email para o primeiro signatario
       # o envelope_id eh a key do documento no clicksign
       status_code, reason, data_sent, recipients_no_sign = csc.send_to_signers(envelope_id, recipients)
-      log(status_code, "console")
-      log(reason, "console")
-      log(data_sent, "console")
 
       if status_code == 202:
         e_signature_response_status_code = 201
-        log("success", "console")
-        log(e_signature_response_status_code, "console")
       else:
-        log("failed", "console")
         e_signature_response_status_code = 0
-        log(e_signature_response_status_code, "console")
         log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=reason))
         log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=reason), "console")
-        log("failed 2", "console")
-
-      if len(recipients_no_sign) > 0:
-        all_recipients = recipients
-        recipients = recipients_no_sign
-        el_send_email
-        recipients = all_recipients
 
   if e_signature_response_status_code == 201:
-    log("success", "console")
     signature_success
   else:
-    log("success", "console")
     signature_fail
 ---
 event: signature_success
