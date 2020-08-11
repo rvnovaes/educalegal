@@ -39,7 +39,7 @@ class SchoolMutation(graphene.Mutation):
     school = graphene.Field(SchoolType)
 
     @classmethod
-    def mutate(cls, info, **kwargs):
+    def mutate(cls, root, info, **kwargs):
         school = get_object_or_404(School, pk=kwargs["id"])
         for k, v in kwargs.items():
             setattr(school, k, v)

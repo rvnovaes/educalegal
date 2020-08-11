@@ -186,7 +186,7 @@ module.exports = {
     clientConfigs: {
       default: {
         // required
-        // httpEndpoint: 'http://localhost:3000',
+        // httpEndpoint: 'http://localhost:8008/graphql',
         httpEndpoint: 'http://localhost:8001/graphql',
         // getAuth: () => ''
         // optional
