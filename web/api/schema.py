@@ -38,12 +38,26 @@ class SchoolMutation(graphene.Mutation):
     # The class attributes define the response of the mutation
     school = graphene.Field(SchoolType)
 
-    def mutate(self, info, **kwargs):
+    @classmethod
+    def mutate(cls, info, **kwargs):
         school = get_object_or_404(School, pk=kwargs["id"])
         for k, v in kwargs.items():
             setattr(school, k, v)
         school.save()
         return SchoolMutation(school=school)
+
+
+class DeleteSchool(graphene.Mutation):
+    ok = graphene.Boolean()
+
+    class Arguments:
+        id = graphene.ID()
+
+    @classmethod
+    def mutate(cls, root, info, **kwargs):
+        school = get_object_or_404(School, pk=kwargs["id"])
+        school.delete()
+        return cls(ok=True)
 
 
 class Query(graphene.ObjectType):
@@ -70,6 +84,7 @@ class Query(graphene.ObjectType):
 
 class Mutation(graphene.ObjectType):
     update_school = SchoolMutation.Field()
+    delete_school = DeleteSchool.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

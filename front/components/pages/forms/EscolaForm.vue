@@ -223,35 +223,48 @@ import Swal from 'sweetalert2';
     },
     methods: {
       async firstFormSubmit() {
-        const result = await this.$apollo.mutate({
-          mutation: updateSchool,
-          variables: {
-            id: this.model.id,
-            name: this.model.name,
-            legalName: this.model.legalName,
-            legalNature: this.model.legalNature,
-            cnpj: this.model.cnpj,
-            phone: this.model.phone,
-            site: this.model.site,
-            email: this.model.email,
-            zip: this.model.zip,
-            street: this.model.street,
-            streetNumber: this.model.streetNumber,
-            unit: this.model.unit,
-            neighborhood: this.model.neighborhood,
-            city: this.model.city,
-            state: this.model.state
-          },
-        }).then((data) => {
-          Swal.fire({
-            title: `Você atualizou ${name} com sucesso!`,
-            buttonsStyling: false,
-            icon: 'success',
-            customClass: {
-              confirmButton: 'btn btn-success btn-fill',
+        try {
+          const result = await this.$apollo.mutate({
+            mutation: updateSchool,
+            variables: {
+              id: this.model.id,
+              name: this.model.name,
+              legalName: this.model.legalName,
+              legalNature: this.model.legalNature,
+              cnpj: this.model.cnpj,
+              phone: this.model.phone,
+              site: this.model.site,
+              email: this.model.email,
+              zip: this.model.zip,
+              street: this.model.street,
+              streetNumber: this.model.streetNumber,
+              unit: this.model.unit,
+              neighborhood: this.model.neighborhood,
+              city: this.model.city,
+              state: this.model.state
             },
+          }).then((data) => {
+            Swal.fire({
+              title: `Você atualizou ${this.model.name} com sucesso!`,
+              buttonsStyling: false,
+              icon: 'success',
+              customClass: {
+                confirmButton: 'btn btn-success btn-fill',
+              }
+            });
+          })
+        } catch (e) {
+          await Swal.fire({
+            title: `Erro ao editar ${this.model.name}`,
+            text: e,
+            icon: 'error',
+            customClass: {
+              confirmButton: 'btn btn-info btn-fill',
+            },
+            confirmButtonText: 'OK',
+            buttonsStyling: false
           });
-        })
+        }
       },
       back: function () {
         this.$router.push({

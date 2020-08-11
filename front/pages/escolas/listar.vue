@@ -101,7 +101,7 @@
                 Showing {{ from + 1 }} to {{ to }} of {{ total }} entries
 
                 <span v-if="selectedRows.length">
-                  &nbsp; &nbsp; {{selectedRows.length}} rows selected
+                  &nbsp; &nbsp; {{ selectedRows.length }} rows selected
                 </span>
               </p>
 
@@ -120,16 +120,17 @@
   </div>
 </template>
 <script>
-import { Table, TableColumn, Select, Option } from 'element-ui';
-import RouteBreadCrumb from '@/components/argon-core/Breadcrumb/RouteBreadcrumb'
-import { BasePagination } from '@/components/argon-core';
-import clientPaginationMixin from '@/components/tables/PaginatedTables/clientPaginationMixin'
-import Swal from 'sweetalert2';
-import allSchools from '~/queries/allSchools'
+import {Table, TableColumn, Select, Option} from "element-ui";
+import RouteBreadCrumb from "@/components/argon-core/Breadcrumb/RouteBreadcrumb";
+import {BasePagination} from "@/components/argon-core";
+import clientPaginationMixin from "@/components/tables/PaginatedTables/clientPaginationMixin";
+import Swal from "sweetalert2";
+import allSchools from "~/queries/allSchools";
+import deleteSchool from "~/queries/deleteSchool";
 
 export default {
   mixins: [clientPaginationMixin],
-  layout: 'DashboardLayout',
+  layout: "DashboardLayout",
   components: {
     BasePagination,
     RouteBreadCrumb,
@@ -140,32 +141,32 @@ export default {
   },
   data() {
     return {
-      propsToSearch: ['name', 'legalName', 'city', 'state'],
+      propsToSearch: ["name", "legalName", "city", "state"],
       tableColumns: [
         {
-          type: 'selection'
+          type: "selection"
         },
         {
-          prop: 'name',
-          label: 'Nome',
+          prop: "name",
+          label: "Nome",
           minWidth: 160,
           sortable: true
         },
         {
-          prop: 'legalName',
-          label: 'Razão Social',
+          prop: "legalName",
+          label: "Razão Social",
           minWidth: 220,
           sortable: true
         },
         {
-          prop: 'city',
-          label: 'Cidade',
+          prop: "city",
+          label: "Cidade",
           minWidth: 135,
           sortable: true
         },
         {
-          prop: 'state',
-          label: 'Estado',
+          prop: "state",
+          label: "Estado",
           minWidth: 100,
           sortable: true
         },
@@ -179,82 +180,88 @@ export default {
       Swal.fire({
         title: `Você marcou ${row.name} como favorita`,
         buttonsStyling: false,
-        icon: 'success',
+        icon: "success",
         customClass: {
-          confirmButton: 'btn btn-success btn-fill',
+          confirmButton: "btn btn-success btn-fill",
         },
       });
     },
     handleEdit(index, row) {
-      Swal.fire({
-        title: `Você deseja editar ${row.name}?`,
-        buttonsStyling: false,
-        showCancelButton: true,
-        icon: 'question',
-        customClass: {
-          confirmButton: 'btn btn-success btn-fill',
-          cancelButton: 'btn btn-danger btn-fill'
-        },
-        cancelButtonText: 'Cancelar'
-      }).then(result => {
-          if (result.value){
-          this.editRow(row);
-          }
-        }
-      )
+      this.editRow(row);
     },
     handleDelete(index, row) {
       Swal.fire({
         title: `Tem certeza que quer excluir ${row.name}?`,
         text: `Não é possível desfazer essa ação!`,
-        icon: 'warning',
+        icon: "warning",
         showCancelButton: true,
         customClass: {
-          confirmButton: 'btn btn-success btn-fill',
-          cancelButton: 'btn btn-danger btn-fill'
+          confirmButton: "btn btn-success btn-fill",
+          cancelButton: "btn btn-danger btn-fill"
         },
-        confirmButtonText: 'Sim, excluir!',
-        cancelButtonText: 'Cancelar',
-        buttonsStyling: false,
-
+        confirmButtonText: "Sim, excluir!",
+        cancelButtonText: "Cancelar",
+        buttonsStyling: false
       }).then(result => {
         if (result.value) {
           this.deleteRow(row);
           Swal.fire({
-            title: 'Excluída!',
+            title: "Excluída!",
             text: `Você excluiu ${row.name}`,
-            icon: 'success',
+            icon: "success",
             customClass: {
-              confirmButton: 'btn btn-success btn-fill',
+              confirmButton: "btn btn-success btn-fill",
             },
             buttonsStyling: false
           });
         }
       });
     },
-    editRow(row){
+    editRow(row) {
       let indexToEdit = row.id;
       this.$router.push({
-        path: '/escolas/' + indexToEdit
-      })
+        path: "/escolas/" + indexToEdit
+      });
     },
-    deleteRow(row) {
+    async deleteRow(row) {
       let indexToDelete = this.tableData.findIndex(
         tableRow => tableRow.id === row.id
       );
       if (indexToDelete >= 0) {
-        this.tableData.splice(indexToDelete, 1);
+        try {
+          const result = await this.$apollo.mutate({
+            mutation: deleteSchool,
+            variables: {
+              id: row.id
+            }
+          }).then((data) => {
+            console.log(data);
+            this.tableData.splice(indexToDelete, 1);
+          });
+        } catch (e) {
+          await Swal.fire({
+            title: `Erro ao excluir ${row.name}`,
+            text: e,
+            icon: 'error',
+            customClass: {
+              confirmButton: 'btn btn-info btn-fill',
+            },
+            confirmButtonText: 'OK',
+            buttonsStyling: false
+          });
+
+        }
       }
     },
     selectionChange(selectedRows) {
-      this.selectedRows = selectedRows
+      this.selectedRows = selectedRows;
     }
   },
   apollo: {
-    tableData:{
+    tableData: {
       query: allSchools,
       prefetch: true,
-      loadingKey: 'carregando...',
+      loadingKey: "carregando...",
       /*
       O apollo tenta carregar allSchools em uma variavel chamada allSchools. Mas a chave que queremos usar e tableData
       que e a usada pelo componente. Portanto, e preciso informar ao apollo pelo comando abaixo, ou seja, atualize
@@ -267,7 +274,7 @@ export default {
 };
 </script>
 <style>
-.no-border-card .card-footer{
+.no-border-card .card-footer {
   border-top: 0;
 }
 </style>
