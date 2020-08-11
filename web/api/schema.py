@@ -16,7 +16,34 @@ class SchoolType(DjangoObjectType):
         model = School
 
 
-class SchoolMutation(graphene.Mutation):
+class CreateSchool(graphene.Mutation):
+    class Arguments:
+        name = graphene.String(required=True)
+        legal_name = graphene.String(required=True)
+        legal_nature = graphene.String(required=True)
+        cnpj = graphene.String(required=True)
+        phone = graphene.String(required=True)
+        site = graphene.String(required=True)
+        email = graphene.String(required=True)
+        zip = graphene.String(required=True)
+        street = graphene.String(required=True)
+        street_number = graphene.String(required=True)
+        unit = graphene.String()
+        neighborhood = graphene.String(required=True)
+        city = graphene.String(required=True)
+        state = graphene.String(required=True)
+
+    # The class attributes define the response of the mutation
+    school = graphene.Field(SchoolType)
+
+    @classmethod
+    def mutate(cls, root, info, **kwargs):
+        school = School(**kwargs)
+        school.save()
+        return CreateSchool(school=school)
+
+
+class UpdateSchool(graphene.Mutation):
     class Arguments:
         # The input arguments for this mutation
         id = graphene.ID(required=True)
@@ -29,7 +56,7 @@ class SchoolMutation(graphene.Mutation):
         email = graphene.String()
         zip = graphene.String()
         street = graphene.String()
-        streetNumber = graphene.String()
+        street_number = graphene.String()
         unit = graphene.String()
         neighborhood = graphene.String()
         city = graphene.String()
@@ -44,7 +71,7 @@ class SchoolMutation(graphene.Mutation):
         for k, v in kwargs.items():
             setattr(school, k, v)
         school.save()
-        return SchoolMutation(school=school)
+        return UpdateSchool(school=school)
 
 
 class DeleteSchool(graphene.Mutation):
@@ -83,7 +110,8 @@ class Query(graphene.ObjectType):
 
 
 class Mutation(graphene.ObjectType):
-    update_school = SchoolMutation.Field()
+    create_school = CreateSchool.Field()
+    update_school = UpdateSchool.Field()
     delete_school = DeleteSchool.Field()
 
 
