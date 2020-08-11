@@ -9,9 +9,13 @@
         {% endif %}
         <button class="btn btn-danger" type="submit">Sair</button>
     </form>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $(".navbar-nav").hide();
-        });
-    </script>
+
+    {# esconde os menus caso seja obrigatorio que o usuario troque a senha #}
+    {% if user.force_password_change %}
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $(".navbar-nav").hide();
+            });
+        </script>
+    {% endif %}
 {% endblock %}

@@ -8,18 +8,19 @@ ga id: |
 event: submit_to_esignature
 code: |
   log("Executando element-esignature.yml")
+  el_log_to_console = get_config('el log to console')
+
   if tenant_esignature_provider == 'Docusign':
     dsc = DocuSignClient(tenant_client_id, tenant_impersonated_user_guid, tenant_test_mode, tenant_private_key)
 
     data_sent, data_received, e_signature_response_status_code = dsc.send_to_docusign(recipients, documents, send_immediately=True, email_subject="Documento para sua assinatura")
 
     log("Docusign data_received: {data_received}".format(data_received=data_received))
-    el_log_to_console = get_config('el log to console')
     if el_log_to_console:
       log("Docusign data_received: {data_received}".format(data_received=data_received), "console")
     status = data_received['status'].lower()
     envelope_id = data_received['envelopeId']
-  el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, tenant_esignature_provider, True)
+  el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, True)
   log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
   if el_log_to_console:
     log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")

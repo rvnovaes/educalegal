@@ -1,9 +1,7 @@
 from rest_framework import serializers
-from rest_framework.fields import CurrentUserDefault
-
 
 from billing.models import Plan
-from document.models import Document, BulkDocumentGeneration, DocumentTaskView, EnvelopeLog, SignerLog
+from document.models import Document
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Tenant, TenantGedData, ESignatureApp

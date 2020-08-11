@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 
 from billing.models import Plan
-from document.models import Document, EnvelopeLog, SignerLog
+from document.models import Document, Envelope, Signer
 from document.views import query_documents_by_args
 from interview.models import Interview
 from school.models import School
@@ -13,11 +13,11 @@ from tenant.models import Tenant, TenantGedData
 
 from .serializers import (
     DocumentSerializer,
-    EnvelopeLogSerializer,
+    EnvelopeSerializer,
     InterviewSerializer,
     PlanSerializer,
     SchoolSerializer,
-    SignerLogSerializer,
+    SignerSerializer,
     TenantSerializer,
     TenantGedDataSerializer
 )
@@ -41,49 +41,18 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class EnvelopeLogViewSet(viewsets.ModelViewSet):
-    queryset = EnvelopeLog.objects.all()
-    serializer_class = EnvelopeLogSerializer
+class EnvelopeViewSet(viewsets.ModelViewSet):
+    queryset = Envelope.objects.all()
+    serializer_class = EnvelopeSerializer
+
+
+class SignerViewSet(viewsets.ModelViewSet):
+    queryset = Signer.objects.all()
+    serializer_class = SignerSerializer
 
     def create(self, request, *args, **kwargs):
         """
-        Cria um novo log do envelope (envelope log), caso não exista.
-        Se já existir, retorna o envelope log encontrado.
-        """
-
-        try:
-            document = Document.objects.filter(doc_uuid=self.kwargs['uuid']).first()
-        except Exception as e:
-            message = 'O documento {doc_uuid} não existe.'.format(doc_uuid=self.kwargs['uuid'])
-            logger.debug(message)
-            logger.debug(e)
-        else:
-            envelope_log = EnvelopeLog.objects.filter(document=document).first()
-            # copia o dicionario, pois o request.data eh immutable e deve
-            # ser inserida a chave id do documento no dict do envelope
-            data_complete = request.data.copy()
-            data_complete['document'] = document.id
-            serializer = self.get_serializer(data=data_complete)
-            serializer.is_valid(raise_exception=True)
-
-            if envelope_log:
-                # copia o dicionario, pois o serializer.data eh immutable e deve
-                # ser inserida a chave 'id'
-                data_complete = serializer.data.copy()
-                data_complete['id'] = envelope_log.id
-                return Response(data_complete, status=status.HTTP_200_OK)
-            else:
-                self.perform_create(serializer)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class SignerLogViewSet(viewsets.ModelViewSet):
-    queryset = SignerLog.objects.all()
-    serializer_class = SignerLogSerializer
-
-    def create(self, request, *args, **kwargs):
-        """
-        Cria um novo log do assinante (signer log).
+        Cria um novo log do assinante (signer).
         """
         # By default, Django Rest Framework assumes you are passing it a single object.
         # To serialize a queryset or list of objects instead of a single object instance,

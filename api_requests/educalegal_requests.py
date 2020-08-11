@@ -45,8 +45,7 @@ if __name__ == "__main__":
     name = "---"
     # status = "criado"
     status = "rascunho"
-    envelope_id = None
-    signing_provider = None
+    envelope_number = None
     # ged_id = 1
     # ged_link = "http://whatever"
     # ged_uuid = "179dad8b-9bg6-4945-8f81-257d37050111"
@@ -91,14 +90,31 @@ if __name__ == "__main__":
 
     ged_id = 1
     new_status = "modificado"
-    new_envelope_id = "035322ff-6acc-4c1d-992d-a6a68ca6b68a"
-    new_signing_provider = "Docusign"
+    new_envelope_number = '3fc59949-23ab-4301-b4ce-1176f1246954'
     response = elc.patch_document_with_esignature_data(
-        el_document_created_doc_uuid, new_status, new_envelope_id, new_signing_provider, submit_to_esignature=False
+        el_document_created_doc_uuid, new_status, new_envelope_number, submit_to_esignature=False
     )
     print(response)
 
-    # =========== elc.post_signers_log ============= #
+    # =========== elc.post_envelope ============= #
+    # tid = 1
+    # data_received = {
+    #   "envelopeId": "aaa",
+    #   "status": "sent",
+    #   "statusDateTime": "2020-07-30T16:49:23.7938569Z",
+    #   "uri": "/envelopes/b08b6022-fbb9-4e47-955f-eda4ac3f13a0"
+    # }
+    # esignature_provider = 'Docusign'
+    #
+    # response, status_code = elc.post_envelope(tid, esignature_provider, data_received)
+    #
+    # print(status_code)
+    #
+    # print(response)
+    # =========== elc.post_envelope ============= #
+
+
+    # =========== elc.post_signers ============= #
     # el_recipients = [
     #     {'name': 'Ut est sed sed ipsa', 'email': 'dogoka@mailinator.com', 'group': 'signers', 'status': 'gerado',
     #      'sent_date': '', 'tenant': '1', 'envelope_log': 27,
@@ -118,5 +134,4 @@ if __name__ == "__main__":
     # print(status_code)
     #
     # print(el_post_signers_log)
-    # =========== elc.post_signers_log ============= #
-
+    # =========== elc.post_signers ============= #

@@ -185,8 +185,7 @@ class EducaLegalClient:
         self,
         doc_uuid,
         status,
-        envelope_id,
-        signing_provider,
+        envelope_number,
         submit_to_esignature,
         related_documents=None
     ):
@@ -203,8 +202,7 @@ class EducaLegalClient:
         payload = {
             "doc_uuid": doc_uuid,
             "status": status,
-            "envelope_id": envelope_id,
-            "signing_provider": signing_provider,
+            "envelope_number": envelope_number,
             "submit_to_esignature": submit_to_esignature,
             "related_documents": related_documents
         }
@@ -212,29 +210,30 @@ class EducaLegalClient:
         response = self.session.patch(final_url, data=payload)
         return response.json()
 
-    def post_envelope_log(self, tenant_id, doc_uuid, data_received):
+    def post_envelope(self, tenant_id, signing_provider, data_received):
         """Cria registro com o log do envio do email para cada assinante"""
 
         # formato da data usado no django rest framework: YYYY-MM-DDThh:mm[:ss[.uuuuuu]]
         payload = {
-            "envelope_id": data_received['envelopeId'],
+            "identifier": data_received['envelopeId'],
+            "signing_provider": signing_provider,
             "status": "enviado",
             "envelope_created_date": data_received['statusDateTime'][:26],
             "sent_date": data_received['statusDateTime'][:26],
             'status_update_date': '',
             "tenant": tenant_id,
         }
-        final_url = self.api_base_url + "/v1/documents/{uuid}/envelope_logs/".format(uuid=doc_uuid)
+        final_url = self.api_base_url + "/v1/envelopes/"
 
         try:
             response = self.session.post(final_url, data=payload)
         except Exception as e:
-            log("Erro ao gravar o envelope_log", "console")
+            log("Erro ao gravar o envelope", "console")
             log(e, "console")
 
         return response.json(), response.status_code
 
-    def post_signers_log(self, recipients, documents, tenant_id, envelope_log_id):
+    def post_signers(self, recipients, documents, document_id, tenant_id):
         """Cria registro com o log do envio do email para cada assinante"""
 
         # acrescenta no recipient o restante dos campos
@@ -242,7 +241,7 @@ class EducaLegalClient:
             recipient['status'] = 'gerado'
             recipient['sent_date'] = None
             recipient['tenant'] = tenant_id
-            recipient['envelope_log'] = envelope_log_id
+            recipient['document'] = document_id
             recipient['type'] = recipient_group_types_dict[recipient['group']]['pt-br']
 
             if 'tabs' in recipient.keys():
@@ -261,7 +260,7 @@ class EducaLegalClient:
 
             recipient['pdf_filenames'] = pdf_filenames
 
-        final_url = self.api_base_url + "/v1/envelope_logs/{id}/signer_logs/".format(id=envelope_log_id)
+        final_url = self.api_base_url + "/v1/documents/{id}/signers/".format(id=document_id)
 
         try:
             # when sending a list, use json keyword argument (not data) so the data is encoded to JSON and the

@@ -7,18 +7,19 @@ from .models import CustomUser
 class CustomUserAdmin(UserAdmin):
     list_display = (
         "tenant",
-        "username",
         "first_name",
         "last_name",
         "email",
-        "is_staff",
+        "force_password_change",
         "is_active",
+        "is_staff",
         "is_superuser",
     )
-    list_display_links = ("username",)
+    list_display_links = ("email",)
     list_editable = (
-        "is_staff",
+        "force_password_change",
         "is_active",
+        "is_staff",
         "is_superuser",
     )
     list_filter = (

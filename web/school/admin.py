@@ -4,6 +4,6 @@ from .models import School
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
-    list_display = ["name", "cnpj", "legal_name", "letterhead"]
+    list_display = ["name", "cnpj", "legal_name", "created_date", "letterhead"]
     search_fields = ["name", "cnpj"]
 
