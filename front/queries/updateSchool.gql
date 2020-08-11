@@ -8,7 +8,7 @@ mutation updateSchool($id: ID!,
 											$email: String,
 											$zip: String,
 											$street: String,
-											$streetNumber:String
+											$streetNumber: String
 											$unit: String,
 											$neighborhood: String,
 											$city: String,

@@ -139,14 +139,14 @@
           </div>
         </div>
         <base-button type="success" native-type="submit"><i class="fa fa-check"></i>Salvar</base-button>
-        <base-button @click="cancel()" type="danger"><i class="fa fa-window-close"></i>Cancelar</base-button>
+        <base-button @click="back()" type="danger"><i class="fa fa-window-close"></i>Voltar</base-button>
       </form>
     </validation-observer>
   </card>
 </template>
 <script>
-// import updateSchool from '~/queries/updateSchool'
-import updateSchool from '~/queries/updateSchoolSimple'
+import updateSchool from '~/queries/updateSchool'
+import Swal from 'sweetalert2';
 
   export default {
     props: ['id', 'name', 'legalName', 'legalNature', 'cnpj', 'phone', 'site', 'email', 'zip', 'street', 'streetNumber', 'unit', 'neighborhood', 'city', 'state', 'zip'],
@@ -223,33 +223,37 @@ import updateSchool from '~/queries/updateSchoolSimple'
     },
     methods: {
       async firstFormSubmit() {
-        console.log("FORM SUBMIT");
-        const id = this.model.id;
-        console.log(id);
-        const name = this.model.name;
-        console.log(name);
         const result = await this.$apollo.mutate({
           mutation: updateSchool,
           variables: {
-            id: id,
-            name: name,
-            // legalName: legalName,
-            // legalNature: legalNature,
-            // cnpj: cnpj,
-            // phone: phone,
-            // site: site,
-            // email: email,
-            // zip: zip,
-            // street: street,
-            // streetNumber: this.mode.streetNumber,
-            // unit: unit,
-            // neighborhood: neighborhood,
-            // city: city,
-            // state: state,
+            id: this.model.id,
+            name: this.model.name,
+            legalName: this.model.legalName,
+            legalNature: this.model.legalNature,
+            cnpj: this.model.cnpj,
+            phone: this.model.phone,
+            site: this.model.site,
+            email: this.model.email,
+            zip: this.model.zip,
+            street: this.model.street,
+            streetNumber: this.model.streetNumber,
+            unit: this.model.unit,
+            neighborhood: this.model.neighborhood,
+            city: this.model.city,
+            state: this.model.state
           },
+        }).then((data) => {
+          Swal.fire({
+            title: `Você atualizou ${name} com sucesso!`,
+            buttonsStyling: false,
+            icon: 'success',
+            customClass: {
+              confirmButton: 'btn btn-success btn-fill',
+            },
+          });
         })
       },
-      cancel: function () {
+      back: function () {
         this.$router.push({
           path: '/escolas/listar'
         })
