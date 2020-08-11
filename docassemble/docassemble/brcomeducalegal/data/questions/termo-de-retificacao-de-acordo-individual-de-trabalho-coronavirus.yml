@@ -1,5 +1,5 @@
 metadata:
-  title: Termo de Rescisão de Acordo Individual de Trabalho
+  title: Termo de Retificação de Acordo Individual de Trabalho - Coronavírus
 ---
 include:
   - element-tenant-school-interview.yml
@@ -199,13 +199,13 @@ fields:
     datatype: date
 ---
 objects:
-  - review_clauses: DAList.using(object_type=Thing, there_are_any=True)
+  - clause_reviews: DAList.using(object_type=Thing, there_are_any=True)
 ---
 progress: 75
 section: Agenda
 question: Cláusulas de Retificação
 fields:
-  - "Cláusula:": review_clauses[i].name.text
+  - "Cláusula:": clause_reviews[i].name.text
     input type: area
     rows: 10
     required: True
