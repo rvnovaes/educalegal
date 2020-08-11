@@ -64,7 +64,13 @@ class Tenant(models.Model):
         default=False, verbose_name="Autoinscrito"
     )
 
-    esignature_app = models.ForeignKey(ESignatureApp, null=True, blank=True, on_delete=models.PROTECT, default=1)
+    esignature_app = models.ForeignKey(
+        ESignatureApp,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        default=1,
+        verbose_name='App de assinatura eletrônica')
 
     class Meta:
         ordering = ["name"]

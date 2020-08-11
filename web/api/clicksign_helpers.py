@@ -109,13 +109,12 @@ def webhook_listener(request):
     try:
         # converte json para dict
         data = json.loads(request.body)
-        headers = request.headers
 
         # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
         # HMAC é uma forma de verificar a integridade das informações transmitidas em um meio não confiável, i.e. a
         # Internet, através de uma chave secreta compartilhada entre as partes para validar as informações transmitidas.
         # logging.info('hmac 3')
-        # if not verify_hmac(headers, request.body):
+        # if not verify_hmac(request.headers, request.body):
         #     return HttpResponse('HMACs não correspondem.')
         # logging.info('hmac 4')
 
