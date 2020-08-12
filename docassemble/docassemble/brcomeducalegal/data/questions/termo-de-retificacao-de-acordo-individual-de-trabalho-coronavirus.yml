@@ -23,7 +23,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "termo-de-rescisao-de-acordo-individual-de-trabalho.docx"
+  content_document = "termo-de-retificacao-de-acordo-individual-de-trabalho-coronavirus.docx"
 ---
 id: logic
 mandatory: True
@@ -42,7 +42,7 @@ code: |
     if plan_use_esignature:
       valid_workers_table
     term_type
-    for item in workers:
+    for item in clause_reviews:
       item.name.text
     signature_local
     generated_file
