@@ -30,6 +30,9 @@ code: |
     if el_log_to_console:
       log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
   elif tenant_esignature_provider == 'CLICKSIGN':
+    # verifica se signer jah tem chave
+    status_code, recipients = elc.get_signer_key_by_email(recipients)
+
     csc = ClickSignClient(tenant_private_key, tenant_test_mode)
 
     # faz o upload do documento no clicksign

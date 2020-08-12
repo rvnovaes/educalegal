@@ -1,19 +1,19 @@
-from requests import Session, RequestException
+from requests import Session, RequestException, status_codes
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
-from docassemble.base.util import (
-    log,
-    get_config,
-    url_of,
-)
+# from docassemble.base.util import (
+#     log,
+#     get_config,
+#     url_of,
+# )
 
 __all__ = ["ClickSignClient"]
 
 
-el_environment = get_config('el environment')
-# el_environment = 'development'
+# el_environment = get_config('el environment')
+el_environment = 'development'
 
 if el_environment == "production":
     webhook_url = "https://app.educalegal.com.br/v1/clicksign/webhook"
@@ -25,7 +25,6 @@ class ClickSignClient:
     def __init__(self, token, test_mode):
         self.test_mode = test_mode
         self.token = token
-        self.target_uri = url_of("interview", _external=True)
 
         if self.test_mode:
             self.base_url = "https://sandbox.clicksign.com/"
@@ -93,56 +92,58 @@ class ClickSignClient:
 
         response_dict = dict()
         for recipient in recipients:
-            payload = {
-                "signer": {
-                    "email": recipient['email'],
-                    "auths": [
-                        "email"
-                    ],
-                    "name": recipient['name'],
-                    "has_documentation": False,
-                    "delivery": "email"
-                }
-            }
-
-            endpoint = 'api/v1/signers'
-            final_url = self.base_url + endpoint
-
-            try:
-                response = self.session.post(final_url, json=payload)
-
-                if recipient['email'] not in response_dict.keys():
-                    response_dict[recipient['email']] = {
-                        "response_json": response.json(),
-                        "status_code": response.status_code,
-                        "routingOrder": recipient['routingOrder'],
-                        "group": recipient['group'],
+            if 'key' in recipient:
+                if recipient['key'] == '':
+                    payload = {
+                        "signer": {
+                            "email": recipient['email'],
+                            "auths": [
+                                "email"
+                            ],
+                            "name": recipient['name'],
+                            "has_documentation": False,
+                            "delivery": "email"
+                        }
                     }
-            except RequestException:
-                request_json = {
-                    "endpoint": endpoint,
-                    "recipients": recipients,
-                    "status_code": response.status_code,
-                    "response_json": response.json(),
-                }
-                if el_environment == "production":
-                    log(request_json)
-                else:
-                    log(request_json, "console")
 
-                return None, request_json
-            except Exception as e:
-                request_json = {
-                    "endpoint": endpoint,
-                    "recipients": recipients,
-                    "exception": e,
-                }
-                if el_environment == "production":
-                    log(request_json)
-                else:
-                    log(request_json, "console")
+                    endpoint = 'api/v1/signers'
+                    final_url = self.base_url + endpoint
 
-                return None, request_json
+                    try:
+                        response = self.session.post(final_url, json=payload)
+                    except RequestException:
+                        request_json = {
+                            "endpoint": endpoint,
+                            "recipients": recipients,
+                            "status_code": response.status_code,
+                            "response_json": response.json(),
+                        }
+                        if el_environment == "production":
+                            print(request_json)
+                        else:
+                            print(request_json, "console")
+
+                        return None, request_json
+                    except Exception as e:
+                        request_json = {
+                            "endpoint": endpoint,
+                            "recipients": recipients,
+                            "exception": e,
+                        }
+                        if el_environment == "production":
+                            print(request_json)
+                        else:
+                            print(request_json, "console")
+
+                            return None, request_json
+                    else:
+                        if recipient['email'] not in response_dict.keys():
+                            response_dict[recipient['email']] = {
+                                "response_json": response.json(),
+                                "status_code": response.status_code,
+                                "routingOrder": recipient['routingOrder'],
+                                "group": recipient['group'],
+                            }
 
         return response_dict, None
 
@@ -190,9 +191,9 @@ class ClickSignClient:
                     "status_code": response.status_code,
                 }
                 if el_environment == "production":
-                    log(request_json)
+                    print(request_json)
                 else:
-                    log(request_json, "console")
+                    print(request_json, "console")
 
                 return None, request_json
             except Exception as e:
@@ -203,9 +204,9 @@ class ClickSignClient:
                     "exception": e,
                 }
                 if el_environment == "production":
-                    log(request_json)
+                    print(request_json)
                 else:
-                    log(request_json, "console")
+                    print(request_json, "console")
 
                 return None, request_json
 
@@ -247,9 +248,9 @@ class ClickSignClient:
                 "reason": response.reason
             }
             if el_environment == "production":
-                log(request_json)
+                print(request_json)
             else:
-                log(request_json, "console")
+                print(request_json, "console")
             return None, request_json
         except Exception as e:
             request_json = {
@@ -258,9 +259,9 @@ class ClickSignClient:
                 "exception": e,
             }
             if el_environment == "production":
-                log(request_json)
+                print(request_json)
             else:
-                log(request_json, "console")
+                print(request_json, "console")
             return None, request_json
 
         return response_dict, None

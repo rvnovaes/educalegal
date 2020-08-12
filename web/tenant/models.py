@@ -135,3 +135,20 @@ class TenantGedData(models.Model):
 
     def __str__(self):
         return self.url
+
+
+class ESignatureAppSignerKey(TenantAwareModel):
+    email = models.EmailField(max_length=255, unique=True, verbose_name="E-mail")
+    key = models.CharField(max_length=255, unique=True, verbose_name="Chave")
+
+    class Meta:
+        ordering = ["email"]
+        verbose_name = "Chave do signatário para assinatura eletrônica"
+        verbose_name_plural = "Chaves do signatário para assinatura eletrônica"
+        unique_together = (('email', 'key'),)
+        indexes = [
+            models.Index(fields=['email']),
+        ]
+
+    def __str__(self):
+        return self.email + ' - ' + self.key

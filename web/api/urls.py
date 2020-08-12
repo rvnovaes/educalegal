@@ -4,6 +4,7 @@ from django.urls import path
 from .views import (
     DocumentViewSet,
     EnvelopeViewSet,
+    ESignatureAppSignerKeyViewSet,
     InterviewViewSet,
     PlanViewSet,
     SignerViewSet,
@@ -38,6 +39,10 @@ urlpatterns = [
     path("tenants/<int:pk>/schools/", TenantSchoolViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>/schools/<int:spk>", TenantSchoolViewSet.as_view({"get": "retrieve"})),
     path("tenants/<int:pk>/ged/", TenantGedDataViewSet.as_view({"get": "retrieve"})),
+
+    path("esignature-app-signer-key/<str:email>", ESignatureAppSignerKeyViewSet.as_view(
+        {"get": "retrieve", "post": "create"})),
+
     path("clicksign/webhook", webhook_listener),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),

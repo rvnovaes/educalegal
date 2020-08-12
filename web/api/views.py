@@ -9,11 +9,12 @@ from document.models import Document, Envelope, Signer
 from document.views import query_documents_by_args
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData
+from tenant.models import Tenant, TenantGedData, ESignatureAppSignerKey
 
 from .serializers import (
     DocumentSerializer,
     EnvelopeSerializer,
+    ESignatureAppSignerKey,
     InterviewSerializer,
     PlanSerializer,
     SchoolSerializer,
@@ -139,3 +140,25 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return TenantGedData.objects.filter(tenant=self.kwargs["pk"])
+
+
+class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
+    serializer_class = ESignatureAppSignerKey
+
+    def get_queryset(self):
+        return ESignatureAppSignerKey.objects.filter(email=self.kwargs["email"])
+
+    def create(self, request, *args, **kwargs):
+        """
+        Cria uma nova chave para o assinante (signer).
+        """
+        # By default, Django Rest Framework assumes you are passing it a single object.
+        # To serialize a queryset or list of objects instead of a single object instance,
+        # you should pass the many=True flag when instantiating the serializer.
+        # You can then pass a queryset or list of objects to be serialized.
+        many = True if isinstance(request.data, list) else False
+
+        serializer = self.get_serializer(data=request.data, many=many)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

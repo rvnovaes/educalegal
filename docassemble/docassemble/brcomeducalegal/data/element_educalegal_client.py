@@ -2,7 +2,7 @@ import json
 
 from docassemble.base.util import log
 from enum import Enum
-from requests import Session
+from requests import Session, status_codes
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
@@ -270,3 +270,17 @@ class EducaLegalClient:
             log("Erro ao gravar o signers_log", "console")
             log(e, "console")
         return response.json(), response.status_code
+
+    def get_signer_key_by_email(self, recipients):
+        for recipient in recipients:
+            final_url = self.api_base_url + "/v1/esignature-app-signer-key{email}".format(
+                email=recipient['email'])
+            response = self.session.get(final_url).json()
+
+            if response.status_code == 200:
+                recipient['key'] = response.json()['key']
+            elif response.status_code == 400:
+                recipient['key'] = ''
+
+        return response.status_code, recipients
+
