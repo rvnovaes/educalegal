@@ -34,12 +34,15 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    reviewed_school_email_answer
     workers.target_number = 1
     for item in workers:
       item.name.text
     if plan_use_esignature:
       valid_workers_table
     term_type
+    for item in workers:
+      item.name.text
     signature_local
     generated_file
     el_document_patched_with_docassemble_data
