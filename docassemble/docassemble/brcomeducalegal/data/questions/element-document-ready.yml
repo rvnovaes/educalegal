@@ -2,8 +2,6 @@ include:
   - element-esignature.yml
   - element-send-email.yml
 ---
-undefine:
-  - button_send_list
 ga id: |
   code: ga_id_end
 event: document_ready_screen
@@ -37,14 +35,12 @@ action buttons:
 ---
 code: |
   esignature_button = {'action': 'submit_to_esignature',
-                       'arguments': {'target': 'signature'},
                        'label': 'Enviar para assinatura eletrônica',
                        'color': 'info',
                        'icon': 'signature'}
 ---
 code: |
   email_button = {'action': 'el_send_email',
-                       'arguments': {'target': 'email'},
                        'label': 'Enviar por e-mail',
                        'color': 'info',
                        'icon': 'envelope'}
