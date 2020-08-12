@@ -170,9 +170,13 @@ if __name__ == "__main__":
         }
     ]
 
-    status_code, recipients = elc.get_signer_key_by_email(recipients)
+    # verifica se o signer ja foi enviado para a clicksign
+    data_sent, data_received, status_code = elc.get_signer_key_by_email(recipients)
 
     # cria os destinatarios
-    recipients_sign, data_sent = csc.add_signer(recipients)
+    data_sent, data_received, status_code = csc.add_signer(data_received)
+
+    # adiciona signer key no educa legal
+    data_sent, data_received, status_code = elc.post_signer_key(data_received, 1)
 
     # =========== elc.get_signer_key_by_email ============= #

@@ -40,8 +40,9 @@ urlpatterns = [
     path("tenants/<int:pk>/schools/<int:spk>", TenantSchoolViewSet.as_view({"get": "retrieve"})),
     path("tenants/<int:pk>/ged/", TenantGedDataViewSet.as_view({"get": "retrieve"})),
 
-    path("esignature-app-signer-key/<str:email>", ESignatureAppSignerKeyViewSet.as_view(
-        {"get": "retrieve", "post": "create"})),
+    path("esignature-app-signer-keys/<str:email>", ESignatureAppSignerKeyViewSet.as_view({"get": "retrieve"})),
+    path("esignature-app-signer-keys/", ESignatureAppSignerKeyViewSet.as_view(
+        {"post": "create"})),
 
     path("clicksign/webhook", webhook_listener),
     path("docusign/webhook", docusign_webhook_listener),

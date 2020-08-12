@@ -154,27 +154,9 @@ class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
 
         return esignature_app_signer_key
 
-    # def get_object(self):
-    #     queryset = self.filter_queryset(self.get_queryset())
-    #
-    #     try:
-    #         esignature_app_signer_key = queryset.get(email=self.request.query_params['email'])
-    #     except ESignatureAppSignerKey.DoesNotExist:
-    #         return None
-    #
-    #     return esignature_app_signer_key
-
-    def create(self, request, *args, **kwargs):
-        """
-        Cria uma nova chave para o assinante (signer).
-        """
-        # By default, Django Rest Framework assumes you are passing it a single object.
-        # To serialize a queryset or list of objects instead of a single object instance,
-        # you should pass the many=True flag when instantiating the serializer.
-        # You can then pass a queryset or list of objects to be serialized.
-        many = True if isinstance(request.data, list) else False
-
-        serializer = self.get_serializer(data=request.data, many=many)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(json=json.dumps(request.data))
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

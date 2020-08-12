@@ -280,9 +280,8 @@ class EducaLegalClient:
                 recipients_sign.append(recipient)
 
         for recipient in recipients_sign:
-            final_url = self.api_base_url + "/v1/esignature-app-signer-key/{email}".format(
-                email=recipient['email']
-            )
+            final_url = self.api_base_url + "/v1/esignature-app-signer-keys/{email}".format(
+                email=recipient['email'])
             try:
                 response = self.session.get(final_url)
             except RequestException as e:
@@ -292,9 +291,32 @@ class EducaLegalClient:
 
             if response.status_code == 404:
                 recipient['key'] = ''
-            else:
-                if response.status_code == 200:
-                    recipient['key'] = response.json()['key']
+                recipient['new_signer'] = True
+            elif response.status_code == 200:
+                recipient['key'] = response.json()['key']
+                recipient['new_signer'] = False
 
-        return response.status_code, recipients_sign
+            recipient['status_code'] = response.status_code
+            recipient['response_json'] = response.json()
 
+        return recipients, recipients_sign, response.status_code
+
+    def post_signer_key(self, recipients, tenant_id):
+        for recipient in recipients:
+            if recipient['new_signer'] and recipient['status_code'] == 201:
+                payload = {
+                    "email": recipient['email'],
+                    "key": recipient['key'],
+                    "tenant": tenant_id,
+                }
+                final_url = self.api_base_url + "/v1/esignature-app-signer-keys/"
+
+                try:
+                    response = self.session.post(final_url, data=json.dumps(payload))
+                except Exception as e:
+                    print("Erro ao gravar a chave do signatário.", "console")
+                    print(e, "console")
+                    return recipients, e, 0
+
+        # data_sent, data_received, status_code
+        return recipients, response.json(), response.status_code

@@ -36,7 +36,7 @@ code: |
     csc = ClickSignClient(tenant_private_key, tenant_test_mode)
 
     # faz o upload do documento no clicksign
-    status_code, response, envelope_id, data_sent = csc.upload_document(documents[0])
+    data_sent, response, status_code, envelope_id  = csc.upload_document(documents[0])
 
     if status_code == 201:
       status = 'enviado'
@@ -47,12 +47,18 @@ code: |
       if el_log_to_console:
         log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
 
+      # verifica se o signer ja foi enviado para a clicksign
+      recipients_sign = elc.get_signer_key_by_email(recipients)
+
       # cria os destinatarios
-      status_code, reason, data_sent = csc.add_signer(recipients)
+      status_code, reason, data_sent = csc.add_signer(recipients_sign)
+
+      # adiciona signer key no educa legal
+      data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, tid)
 
       # adiciona os signatarios ao documento e envia por email para o primeiro signatario
       # o envelope_id eh a key do documento no clicksign
-      recipients_sign, data_sent = csc.send_to_signers(envelope_id, recipients)
+      data_sent, data_received, status_code = csc.send_to_signers(envelope_id, recipients)
 
       if status_code == 202:
         e_signature_response_status_code = 201

@@ -66,20 +66,12 @@ class ClickSignClient:
         try:
             response = self.session.post(final_url, json=payload)
         except RequestException:
-            request_json = {
-                "endpoint": endpoint,
-                "document": document,
-            }
-            return response.status_code, response.json(), '', request_json
+            return document, response.json(), response.status_code, ''
         except Exception as e:
-            request_json = {
-                "endpoint": endpoint,
-                "document": document,
-                "exception": e,
-            }
-            return 0, None, '', request_json
+            return document, e, 0, ''
 
-        return response.status_code, response.json(), response.json()['document']['key'], None
+        # data_sent, data_received, status_code
+        return document, response.json(), response.status_code, response.json()['document']['key']
 
     def add_signer(self, recipients):
         """
@@ -93,6 +85,7 @@ class ClickSignClient:
         for recipient in recipients:
             if 'key' not in recipient:
                 recipient['key'] == ''
+                recipient['status_code'] == '404'
 
             if recipient['key'] == '':
                 payload = {
@@ -113,37 +106,29 @@ class ClickSignClient:
                 try:
                     response = self.session.post(final_url, json=payload)
                 except RequestException:
-                    request_json = {
-                        "endpoint": endpoint,
-                        "recipients": recipients,
-                        "status_code": response.status_code,
-                        "response_json": response.json(),
-                    }
                     if el_environment == "production":
-                        print(request_json)
+                        print(response.json())
                     else:
-                        print(request_json, "console")
+                        print(response.json(), "console")
 
-                    return None, request_json
+                    # data_sent, data_received, status_code
+                    return recipients, response.json(), response.status_code
                 except Exception as e:
-                    request_json = {
-                        "endpoint": endpoint,
-                        "recipients": recipients,
-                        "exception": e,
-                    }
                     if el_environment == "production":
-                        print(request_json)
+                        print(e)
                     else:
-                        print(request_json, "console")
+                        print(e, "console")
 
-                        return None, request_json
+                        # data_sent, data_received, status_code
+                        return recipients, e, 0
                 else:
                     recipient['key'] = response.json()['signer']['key']
 
             recipient['response_json'] = response.json()
             recipient['status_code'] = response.status_code
 
-        return recipients, None
+        # data_sent, data_received, status_code
+        return recipients, recipients, response.status_code
 
     def add_signer_to_document(self, document_uuid, signers):
         """
@@ -156,14 +141,14 @@ class ClickSignClient:
         JSON com os dados do documento vinculado ao signatário.
         """
 
-        response_dict = dict()
+        data_sent = {'doc_uuid': document_uuid, 'signers': signers}
         for signer in signers:
             payload = {
                 "list": {
                     "document_key": document_uuid,
-                    "signer_key": signers[signer]['response_json']['signer']['key'],
-                    "sign_as": signers[signer]['group'],
-                    "group": signers[signer]['routingOrder'],
+                    "signer_key": signer['key'],
+                    "sign_as": signer['group'],
+                    "group": signer['routingOrder'],
                     "message": 'Por favor, assine o documento.'
                 },
             }
@@ -173,42 +158,23 @@ class ClickSignClient:
 
             try:
                 response = self.session.post(final_url, json=payload)
-
-                if signer not in response_dict.keys():
-                    response_dict[signer] = {
-                        "response_json": response.json(),
-                        "status_code": response.status_code,
-                        "signer": signers[signer]['response_json']['signer']
-                    }
             except RequestException:
-                request_json = {
-                    "endpoint": endpoint,
-                    "document_uuid": document_uuid,
-                    "signers": signers,
-                    "response_json": response.json(),
-                    "status_code": response.status_code,
-                }
                 if el_environment == "production":
-                    print(request_json)
+                    print(response.json())
                 else:
-                    print(request_json, "console")
+                    print(response.json(), "console")
 
-                return None, request_json
+                return data_sent, response.json(), response.status_code
             except Exception as e:
-                request_json = {
-                    "endpoint": endpoint,
-                    "document_uuid": document_uuid,
-                    "signers": signers,
-                    "exception": e,
-                }
                 if el_environment == "production":
-                    print(request_json)
+                    print(e)
                 else:
-                    print(request_json, "console")
+                    print(e, "console")
 
-                return None, request_json
+                return data_sent, e, 0
 
-        return response_dict, None
+        # data_sent, data_received, status_code
+        return data_sent, response.json(), response.status_code
 
     def send_email(self, signature_keys):
         """
@@ -304,6 +270,7 @@ class ClickSignClient:
         else:
             return 0, None, signature_key_request
 
-        return signature_key_response[signature_key]['status_code'], \
-            signature_key_response[signature_key]['reason'], None, \
-            recipients_no_sign
+        # data_sent, data_received, status_code
+        data_sent = {'doc_uuid': doc_uuid, 'recipients': recipients}
+        return data_sent, signature_key_response[signature_key]['reason'], \
+            signature_key_response[signature_key]['status_code']
