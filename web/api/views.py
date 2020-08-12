@@ -9,7 +9,7 @@ from document.models import Document, Envelope, Signer
 from document.views import query_documents_by_args
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData, ESignatureAppSignerKey
+from tenant.models import Tenant, TenantGedData
 
 from .serializers import (
     DocumentSerializer,
@@ -144,9 +144,25 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
     serializer_class = ESignatureAppSignerKey
+    lookup_field = 'email'
 
     def get_queryset(self):
-        return ESignatureAppSignerKey.objects.filter(email=self.kwargs["email"])
+        try:
+            esignature_app_signer_key = ESignatureAppSignerKey.objects.get(email=self.kwargs['email'])
+        except ESignatureAppSignerKey.DoesNotExist:
+            return ESignatureAppSignerKey.objects.none()
+
+        return esignature_app_signer_key
+
+    # def get_object(self):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #
+    #     try:
+    #         esignature_app_signer_key = queryset.get(email=self.request.query_params['email'])
+    #     except ESignatureAppSignerKey.DoesNotExist:
+    #         return None
+    #
+    #     return esignature_app_signer_key
 
     def create(self, request, *args, **kwargs):
         """

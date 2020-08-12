@@ -1,8 +1,8 @@
 import json
 
-from docassemble.base.util import log
+# from docassemble.base.util import log
 from enum import Enum
-from requests import Session, status_codes
+from requests import Session, RequestException
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
@@ -228,8 +228,8 @@ class EducaLegalClient:
         try:
             response = self.session.post(final_url, data=payload)
         except Exception as e:
-            log("Erro ao gravar o envelope", "console")
-            log(e, "console")
+            print("Erro ao gravar o envelope", "console")
+            print(e, "console")
 
         return response.json(), response.status_code
 
@@ -267,20 +267,34 @@ class EducaLegalClient:
             # Content-Type header is set to application/json.
             response = self.session.post(final_url, json=recipients)
         except Exception as e:
-            log("Erro ao gravar o signers_log", "console")
-            log(e, "console")
+            print("Erro ao gravar o signers_log", "console")
+            print(e, "console")
         return response.json(), response.status_code
 
     def get_signer_key_by_email(self, recipients):
+        # separa somente os destinatarios que assinam o documento
+        recipients_sign = list()
         for recipient in recipients:
-            final_url = self.api_base_url + "/v1/esignature-app-signer-key{email}".format(
-                email=recipient['email'])
-            response = self.session.get(final_url).json()
+            if recipient['group'] == 'signers':
+                recipient['group'] = 'sign'
+                recipients_sign.append(recipient)
 
-            if response.status_code == 200:
-                recipient['key'] = response.json()['key']
-            elif response.status_code == 400:
+        for recipient in recipients_sign:
+            final_url = self.api_base_url + "/v1/esignature-app-signer-key/{email}".format(
+                email=recipient['email']
+            )
+            try:
+                response = self.session.get(final_url)
+            except RequestException as e:
+                print(e)
+            except Exception as e:
+                print(e)
+
+            if response.status_code == 404:
                 recipient['key'] = ''
+            else:
+                if response.status_code == 200:
+                    recipient['key'] = response.json()['key']
 
-        return response.status_code, recipients
+        return response.status_code, recipients_sign
 

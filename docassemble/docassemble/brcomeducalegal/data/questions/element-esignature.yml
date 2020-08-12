@@ -47,9 +47,12 @@ code: |
       if el_log_to_console:
         log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
 
+      # cria os destinatarios
+      status_code, reason, data_sent = csc.add_signer(recipients)
+
       # adiciona os signatarios ao documento e envia por email para o primeiro signatario
       # o envelope_id eh a key do documento no clicksign
-      status_code, reason, data_sent, recipients_no_sign = csc.send_to_signers(envelope_id, recipients)
+      recipients_sign, data_sent = csc.send_to_signers(envelope_id, recipients)
 
       if status_code == 202:
         e_signature_response_status_code = 201

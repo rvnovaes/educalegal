@@ -90,62 +90,60 @@ class ClickSignClient:
         Lista de responses em JSON com os dados do(s) destinatário(s) criado(s).
         """
 
-        response_dict = dict()
         for recipient in recipients:
-            if 'key' in recipient:
-                if recipient['key'] == '':
-                    payload = {
-                        "signer": {
-                            "email": recipient['email'],
-                            "auths": [
-                                "email"
-                            ],
-                            "name": recipient['name'],
-                            "has_documentation": False,
-                            "delivery": "email"
-                        }
+            if 'key' not in recipient:
+                recipient['key'] == ''
+
+            if recipient['key'] == '':
+                payload = {
+                    "signer": {
+                        "email": recipient['email'],
+                        "auths": [
+                            "email"
+                        ],
+                        "name": recipient['name'],
+                        "has_documentation": False,
+                        "delivery": "email"
                     }
+                }
 
-                    endpoint = 'api/v1/signers'
-                    final_url = self.base_url + endpoint
+                endpoint = 'api/v1/signers'
+                final_url = self.base_url + endpoint
 
-                    try:
-                        response = self.session.post(final_url, json=payload)
-                    except RequestException:
-                        request_json = {
-                            "endpoint": endpoint,
-                            "recipients": recipients,
-                            "status_code": response.status_code,
-                            "response_json": response.json(),
-                        }
-                        if el_environment == "production":
-                            print(request_json)
-                        else:
-                            print(request_json, "console")
+                try:
+                    response = self.session.post(final_url, json=payload)
+                except RequestException:
+                    request_json = {
+                        "endpoint": endpoint,
+                        "recipients": recipients,
+                        "status_code": response.status_code,
+                        "response_json": response.json(),
+                    }
+                    if el_environment == "production":
+                        print(request_json)
+                    else:
+                        print(request_json, "console")
+
+                    return None, request_json
+                except Exception as e:
+                    request_json = {
+                        "endpoint": endpoint,
+                        "recipients": recipients,
+                        "exception": e,
+                    }
+                    if el_environment == "production":
+                        print(request_json)
+                    else:
+                        print(request_json, "console")
 
                         return None, request_json
-                    except Exception as e:
-                        request_json = {
-                            "endpoint": endpoint,
-                            "recipients": recipients,
-                            "exception": e,
-                        }
-                        if el_environment == "production":
-                            print(request_json)
-                        else:
-                            print(request_json, "console")
+                else:
+                    recipient['key'] = response.json()['signer']['key']
 
-                            return None, request_json
-                    else:
-                        if recipient['email'] not in response_dict.keys():
-                            response_dict[recipient['email']] = {
-                                "response_json": response.json(),
-                                "status_code": response.status_code,
-                                "routingOrder": recipient['routingOrder'],
-                                "group": recipient['group'],
-                            }
+            recipient['response_json'] = response.json()
+            recipient['status_code'] = response.status_code
 
-        return response_dict, None
+        return recipients, None
 
     def add_signer_to_document(self, document_uuid, signers):
         """
@@ -269,32 +267,19 @@ class ClickSignClient:
     def send_to_signers(self, doc_uuid, recipients):
         """Cria os destinatários, vincula ao documento e envia por e-mail para assinatura."""
 
-        # separa em 2 listas os destinatarios: uma para envio apenas do email e
-        # outra com os destinatarios que assinam o documento
-        recipients_no_sign = list()
-        recipients_sign = list()
-        for recipient in recipients:
-            if recipient['group'] == 'signers':
-                recipient['group'] = 'sign'
-                recipients_sign.append(recipient)
-            else:
-                recipients_no_sign.append(recipient)
-
-        # cria os destinatarios
-        signer_response, signer_request = self.add_signer(recipients_sign)
-
-        # se nao conseguiu criar algum destinatario, retorna erro
-        if signer_response:
-            for signer in signer_response:
-                if signer_response[signer]['status_code'] != 201:
-                    return signer_response[signer]['status_code'], \
-                        signer_response[signer]['response_json'], \
-                        signer_request, recipients_no_sign
-        else:
-            return 0, None, signer_request, recipients_no_sign
-
+        #
+        # # se nao conseguiu criar algum destinatario, retorna erro
+        # if signer_response:
+        #     for signer in signer_response:
+        #         if signer_response[signer]['status_code'] != 201:
+        #             return signer_response[signer]['status_code'], \
+        #                 signer_response[signer]['response_json'], \
+        #                 signer_request
+        # else:
+        #     return 0, None, signer_request
+        #
         # vincula o documento aos destinatarios criados
-        signer_doc_response, signer_doc_request = self.add_signer_to_document(doc_uuid, signer_response)
+        signer_doc_response, signer_doc_request = self.add_signer_to_document(doc_uuid, recipients)
 
         # se nao vincular algum destinatario ao documento, retorna erro
         if signer_doc_response:
@@ -302,9 +287,9 @@ class ClickSignClient:
                 if signer_doc_response[signer_doc]['status_code'] != 201:
                     return signer_doc_response[signer_doc]['status_code'], \
                         signer_doc_response[signer_doc]['response_json'], \
-                        signer_doc_request, recipients_no_sign
+                        signer_doc_request
         else:
-            return 0, None, signer_doc_request, recipients_no_sign
+            return 0, None, signer_doc_request
 
         # envia por email o documento aos destinatarios
         signature_key_response, signature_key_request = self.send_email(signer_doc_response)
@@ -315,9 +300,9 @@ class ClickSignClient:
                 if signature_key_response[signature_key]['status_code'] != 202:
                     return signature_key_response[signature_key]['status_code'], \
                         signature_key_response[signature_key]['reason'], \
-                        signature_key_request, recipients_no_sign
+                        signature_key_request
         else:
-            return 0, None, signature_key_request, recipients_no_sign
+            return 0, None, signature_key_request
 
         return signature_key_response[signature_key]['status_code'], \
             signature_key_response[signature_key]['reason'], None, \
