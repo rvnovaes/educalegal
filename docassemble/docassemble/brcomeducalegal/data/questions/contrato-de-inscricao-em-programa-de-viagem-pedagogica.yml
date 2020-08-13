@@ -33,6 +33,8 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
     contractor.name.text
     contractor.address.zip
     participants.gather()
