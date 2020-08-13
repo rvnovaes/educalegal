@@ -230,6 +230,7 @@ class EducaLegalClient:
         except Exception as e:
             print("Erro ao gravar o envelope", "console")
             print(e, "console")
+            return e, 0
 
         return response.json(), response.status_code
 
@@ -312,7 +313,7 @@ class EducaLegalClient:
                 final_url = self.api_base_url + "/v1/esignature-app-signer-keys/"
 
                 try:
-                    response = self.session.post(final_url, data=json.dumps(payload))
+                    response = self.session.post(final_url, data=payload)
                 except Exception as e:
                     print("Erro ao gravar a chave do signatário.", "console")
                     print(e, "console")

@@ -9,12 +9,12 @@ from document.models import Document, Envelope, Signer
 from document.views import query_documents_by_args
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData
+from tenant.models import Tenant, TenantGedData, ESignatureAppSignerKey
 
 from .serializers import (
     DocumentSerializer,
     EnvelopeSerializer,
-    ESignatureAppSignerKey,
+    ESignatureAppSignerKeySerializer,
     InterviewSerializer,
     PlanSerializer,
     SchoolSerializer,
@@ -143,7 +143,7 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
-    serializer_class = ESignatureAppSignerKey
+    serializer_class = ESignatureAppSignerKeySerializer
     lookup_field = 'email'
 
     def get_queryset(self):

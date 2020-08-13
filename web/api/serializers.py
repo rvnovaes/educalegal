@@ -89,5 +89,5 @@ class TenantSerializer(serializers.ModelSerializer):
 class ESignatureAppSignerKeySerializer(serializers.ModelSerializer):
     class Meta:
         model = ESignatureAppSignerKey
-        ref_name = "Signer v1"
+        ref_name = "ESignatureAppSignerKey v1"
         fields = "__all__"

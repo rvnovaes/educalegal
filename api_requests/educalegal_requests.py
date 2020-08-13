@@ -178,5 +178,4 @@ if __name__ == "__main__":
 
     # adiciona signer key no educa legal
     data_sent, data_received, status_code = elc.post_signer_key(data_received, 1)
-
     # =========== elc.get_signer_key_by_email ============= #
