@@ -11,9 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.conf import settings
 
-from document.models import Document, EnvelopeLog, SignerLog, DocumentStatus
+from document.models import Document, Envelope, Signer, DocumentStatus
 from interview.models import Interview
-from tenant.models import Tenant, TenantGedData
+from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
 
 from .mayan_helpers import MayanClient
 
@@ -177,24 +177,29 @@ def docusign_webhook_listener(request):
         filepath = os.path.join(envelope_dir, filename)
         with open(filepath, "wb") as xml_file:
             xml_file.write(data)
-
     except Exception as e:
-        msg = str(e)
-        logger.exception(msg)
-        return HttpResponse(msg)
+        message = str(e)
+        logger.exception(message)
+        return HttpResponse(message)
 
     try:
-        document = Document.objects.get(envelope_id=envelope_data["envelope_id"])
+        document = Document.objects.get(envelope_number=envelope_data["envelope_id"])
     except Document.DoesNotExist:
-        message = 'O envelope {envelope_id} não existe.'.format(envelope_id=envelope_data["envelope_id"])
+        message = 'O documento do envelope {envelope_number} não existe.'.format(
+            envelope_number=envelope_data["envelope_id"])
         logger.debug(message)
+        return HttpResponse(message)
+    except Exception as e:
+        message = str(e)
+        logger.exception(message)
+        logging.info(message)
         return HttpResponse(message)
     else:
         # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test, por isso, não irá
         # encontrar o documento no banco
         envelope_status = str(envelope_data["envelope_status"]).lower()
 
-        # variável para salvar o nome dos pdfs no signer_log
+        # variável para salvar o nome dos pdfs no signer
         pdf_filenames = ''
 
         tenant = Tenant.objects.get(pk=document.tenant.pk)
@@ -233,60 +238,68 @@ def docusign_webhook_listener(request):
                     # separa os documentos com ENTER
                     pdf_filenames = chr(10).join(pdf_filenames)
             except Exception as e:
-                msg = str(e)
-                logger.exception(msg)
-                return HttpResponse(msg)
+                message = str(e)
+                logger.exception(message)
+                logging.info(message)
+                return HttpResponse(message)
 
         if envelope_status in envelope_statuses.keys():
             document.status = envelope_statuses[envelope_status]['el']
         else:
             document.status = DocumentStatus.NAO_ENCONTRADO.value
 
-        document.save()
+        # atualiza o status do documento
+        document.save(update_fields=['status'])
 
-        # se o log do envelope já existe atualiza status, caso contrário, cria o envelope
+        # se o envelope já existe atualiza o status, caso contrário, cria o envelope
         try:
-            envelope_log = EnvelopeLog.objects.get(document=document)
-        except EnvelopeLog.DoesNotExist:
-            envelope_log = EnvelopeLog(
-                envelope_id=envelope_data['envelope_id'],
+            envelope = Envelope.objects.get(identifier=envelope_data["envelope_id"])
+        except Envelope.DoesNotExist:
+            envelope = Envelope(
+                identifier=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
                 envelope_created_date=envelope_data['envelope_created'],
                 sent_date=envelope_data['envelope_sent'],
                 status_update_date=envelope_data['envelope_time_generated'],
-                document=document,
+                signing_provider=ESignatureAppProvider.DOCUSIGN.value,
                 tenant=tenant,
             )
-            envelope_log.save()
+            envelope.save()
+
+            # vincula o envelope criado ao documento
+            document.envelope = envelope
+            document.envelope_number = envelope.identifier
+            document.save(update_fields=['envelope', 'envelope_number'])
         else:
-            envelope_log.status = envelope_data_translated['envelope_status']
-            envelope_log.status_update_date = envelope_data['envelope_time_generated']
-            envelope_log.save(update_fields=['status', 'status_update_date'])
+            envelope.status = envelope_data_translated['envelope_status']
+            envelope.status_update_date = envelope_data['envelope_time_generated']
+            envelope.save(update_fields=['status', 'status_update_date'])
 
         for recipient_status in recipient_statuses:
             try:
-                # se já tem o status para o email e para o envelope_log, não salva outro igual
+                # se já tem o status para o email e para o documento, não salva outro igual
                 # só cria outro se o status do recipient mudou
-                signer_log = SignerLog.objects.get(
-                    envelope_log=envelope_log,
+                signer = Signer.objects.get(
+                    document=document,
                     email=recipient_status['Email'],
                     status=recipient_status['Status'])
-            except SignerLog.DoesNotExist:
+            except Signer.DoesNotExist:
                 try:
-                    signer_log = SignerLog(
+                    signer = Signer(
                         name=recipient_status['UserName'],
                         email=recipient_status['Email'],
                         status=recipient_status['Status'],
                         sent_date=recipient_status['data_envio'],
                         type=recipient_status['Type'],
                         pdf_filenames=pdf_filenames,
-                        envelope_log=envelope_log,
+                        document=document,
                         tenant=tenant,
                     )
 
-                    signer_log.save()
+                    signer.save()
                 except Exception as e:
-                    message = 'Não foi possível salvar o SignerLog: ' + str(e)
+                    message = 'Não foi possível salvar o Signer: ' + str(e)
+                    logging.info(message)
                     logger.exception(message)
 
     return HttpResponse("Success!")

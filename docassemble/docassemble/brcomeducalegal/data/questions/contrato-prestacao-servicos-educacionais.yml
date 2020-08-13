@@ -12,6 +12,7 @@ include:
   - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -37,6 +38,7 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
+    reviewed_school_email_answer
     if len(school_units_list) == 0:
       # nao pode ser usado school_unit pq essa variavel foi usada no endereco da escola
       school_division = None
@@ -218,10 +220,12 @@ fields:
     validate: validate_cpf
   - 'Número do RG: ': contractors[i].rg
     datatype: text
+    required: False
   - 'Nacionalidade:': contractors[i].nationality
     datatype: text
     default: brasileiro(a)
   - 'Estado Civil: ': contractors[i].marital_status
+    required: False
     choices:
       - solteiro(a): solteiro(a)
       - casado(a): casado(a)
@@ -365,28 +369,19 @@ fields:
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#dmFsb3JBbnVhbA').mask('000000000000000.00', {reverse: true});
+        $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
       });
   </script>
 ---
 code: |
   recipients = list()
-
-  sistemas_recipient = dict()
-  sistemas_recipient['name'] = "Sistemas Educa Legal"
-  sistemas_recipient['email'] = "sistemas@educalegal.com.br"
-  sistemas_recipient['group'] = "carbonCopies"
-  sistemas_recipient['routingOrder'] = 1
-  recipients.append(sistemas_recipient)
-
-
   for item in contractors:
       if item.email:
           new_recipient = dict()
           new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 2
+          new_recipient['routingOrder'] = 1
           new_recipient['tabs'] = [
               {
                   'type': 'signHere',
@@ -399,7 +394,7 @@ code: |
   new_recipient['name'] = school_legal_name
   new_recipient['email'] = school_email
   new_recipient['group'] = 'signers'
-  new_recipient['routingOrder'] = 3
+  new_recipient['routingOrder'] = 2
   new_recipient['tabs'] = [
       {
           'type': 'signHere',
@@ -417,14 +412,3 @@ code: |
           'documentBase64': make_document_base64(generated_file.pdf.path())
       }
   ]
----
-code: |
-  if plan_use_esignature:
-    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
-  else:
-    help_email_msg = "Digite um e-mail válido."
----
-code: |
-  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
-  email_category = interview_custom_file_name_string
-  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"

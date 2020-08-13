@@ -13,6 +13,7 @@ include:
   - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -36,6 +37,7 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
+    reviewed_school_email_answer
     fornecedores.target_number = 1
     for item in fornecedores:
       item.name.text
@@ -142,14 +144,3 @@ code: |
           'documentBase64': make_document_base64(generated_file.pdf.path())
       }
   ]
----
-code: |
-  if plan_use_esignature:
-    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
-  else:
-    help_email_msg = "Digite um e-mail válido."
----
-code: |
-  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
-  email_category = interview_custom_file_name_string
-  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"

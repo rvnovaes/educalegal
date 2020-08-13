@@ -42,6 +42,15 @@ class TestContratodoaluno(WebTest):
             ).click()
         except NoSuchElementException:
             pass
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/a").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").clear()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("educalegal@gmail.com")
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         try:
             self.driver.find_element(
                 By.XPATH, "//h1[contains(.,'Escolha a unidade escolar')]"
@@ -99,7 +108,7 @@ class TestContratodoaluno(WebTest):
         )
         dropdown = self.driver.find_element(By.ID, "c3R1ZGVudHNbaV0uZ3JhZGU")
         dropdown.find_element(
-            By.XPATH, "//option[. = '1ª série do ensino fundamental']"
+            By.XPATH, "//option[. = '1º ano do ensino fundamental']"
         ).click()
         dropdown = self.driver.find_element(By.ID, "c3R1ZGVudHNbaV0ucGVyaW9k")
         dropdown.find_element(By.XPATH, "//option[. = 'matutino']").click()

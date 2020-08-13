@@ -54,15 +54,39 @@ class BulkDocumentGeneration(TenantAwareModel):
     status = models.CharField(max_length=256, default="", verbose_name="Status")
 
 
+class Envelope(TenantAwareModel):
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
+    altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
+    identifier = models.CharField(max_length=256, verbose_name="ID")
+    status = models.CharField(max_length=256, verbose_name="Status")
+    envelope_created_date = models.DateTimeField(verbose_name="Criação do envelope")
+    sent_date = models.DateTimeField(null=True, verbose_name="Envio")
+    # salva o TimeGenerated - Specifies the time of the status change.
+    status_update_date = models.DateTimeField(null=True, verbose_name="Alteração do status")
+    signing_provider = models.CharField(
+        max_length=256, blank=True, default="", verbose_name="Provedor"
+    )
+    envelope_log_id = models.IntegerField(null=True, blank=True, verbose_name="envelope_log_id")
+
+    class Meta:
+        ordering = ["-envelope_created_date"]
+        verbose_name = "Envelope"
+        verbose_name_plural = "Envelopes"
+        indexes = [
+            models.Index(fields=['identifier']),
+            models.Index(fields=['status']),
+        ]
+
+    def __str__(self):
+        return self.status + " | " + str(self.created_date)
+
+
 class Document(TenantAwareModel):
     name = models.CharField(max_length=512, verbose_name="Nome")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
     altered_date = models.DateTimeField(auto_now=True, verbose_name="Alteração")
-    signing_provider = models.CharField(
-        max_length=256, blank=True, default="", verbose_name="Provedor"
-    )
-    envelope_id = models.CharField(
-        max_length=256, blank=True, default="", verbose_name="Id do Envelope"
+    envelope_number = models.CharField(
+        max_length=256, blank=True, default="", verbose_name="N° do Envelope"
     )
     status = models.CharField(max_length=256, default="", verbose_name="Status")
     ged_id = models.CharField(
@@ -105,11 +129,58 @@ class Document(TenantAwareModel):
         max_length=256, blank=True, default="", verbose_name="UUID do Mongo"
     )
 
+    envelope = models.ForeignKey(
+        Envelope,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Envelope",
+        related_name="documents")
+
+    class Meta:
+        ordering = ["-created_date"]
+        verbose_name = "Documento"
+        verbose_name_plural = "Documentos"
+        indexes = [
+            models.Index(fields=['envelope_number']),
+        ]
+
     def __str__(self):
         if self.school is not None:
             return self.name + ' - ' + self.school.name
         else:
             return self.name
+
+
+class Signer(TenantAwareModel):
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
+    name = models.CharField(max_length=256, verbose_name="Nome")
+    email = models.EmailField(max_length=256, verbose_name="E-mail")
+    type = models.CharField(max_length=256, verbose_name="Tipo")
+    status = models.CharField(max_length=256, verbose_name="Status")
+    sent_date = models.DateTimeField(null=True, blank=True, verbose_name="Envio")
+    pdf_filenames = models.TextField(blank=True, verbose_name="PDFs")
+    envelope_log_id = models.IntegerField(null=True, blank=True, verbose_name="envelope_log_id")
+    signer_log_id = models.IntegerField(null=True, blank=True, verbose_name="signer_log_id")
+
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.CASCADE,
+        verbose_name="Documento",
+        related_name="signers")
+
+    class Meta:
+        ordering = ["-created_date"]
+        verbose_name = "Signatário"
+        verbose_name_plural = "Signatários"
+        indexes = [
+            models.Index(fields=['name']),
+            models.Index(fields=['email']),
+            models.Index(fields=['status']),
+        ]
+
+    def __str__(self):
+        return self.status + " | " + str(self.created_date)
 
 
 # DEPRECATED - Um dia vamos apagar você - Huahauahauha TODO

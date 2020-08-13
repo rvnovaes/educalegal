@@ -12,6 +12,7 @@ include:
   - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -34,6 +35,8 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
     workers.target_number = 1
     for item in workers:
       item.name.text
@@ -195,14 +198,21 @@ question: |
 subquestion: |
   1. Fica acordada entre as Partes, a redução salarial de [FIELD pc_reducao]%.
 
-  2. O EMPREGADOR pagará ao EMPREGADO ajuda compensatória mensal no valor de [FIELD valor].
+  2. O valor do salário reduzido será de [FIELD low_salary_value]
 
-  3. O presente acordo terá um prazo de [FIELD prazo] dias.
+  3. O EMPREGADOR pagará ao EMPREGADO ajuda compensatória mensal no valor de [FIELD valor].
+
+  4. O presente acordo terá um prazo de [FIELD prazo] dias.
 fields:
   - Redução: pc_reducao
     datatype: number
     hint: 000,00
     inline width: 5em
+    required: True
+  - Salário Reduzido: low_salary_value
+    datatype: currency
+    hint: 0000,00
+    inline width: 10em
     required: True
   - Valor: valor
     datatype: currency
@@ -219,6 +229,7 @@ script: |
     $(document).ready(function(){
       $('#cGNfcmVkdWNhbw').mask("###0.00", {reverse: true});
       $('#dmFsb3I').mask("###0.00", {reverse: true});
+      $('#bG93X3NhbGFyeV92YWx1ZQ').mask("###0.00", {reverse: true});
     });
   </script>
 ---
@@ -227,6 +238,7 @@ code: |
   valor_extenso = num2words(valor, lang='pt_BR', to='currency')
   pc_reducao_extenso = num2words(pc_reducao, lang='pt_BR')
   prazo_extenso = num2words(prazo, lang='pt_BR')
+  low_salary_value_extenso = num2words(low_salary_value, lang='pt_BR', to='currency')
 ---
 section: Acordo
 progress: 70
@@ -295,14 +307,3 @@ code: |
           'documentBase64': make_document_base64(generated_file.pdf.path())
       }
   ]
----
-code: |
-  if plan_use_esignature:
-    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
-  else:
-    help_email_msg = "Digite um e-mail válido."
----
-code: |
-  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
-  email_category = interview_custom_file_name_string
-  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"
