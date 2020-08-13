@@ -12,7 +12,6 @@ include:
   - element-educalegal-patch-document.yml
   - element-ged.yml
   - element-document-ready.yml
-  - element-school-email-reviewed.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
