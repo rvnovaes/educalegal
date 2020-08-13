@@ -54,18 +54,18 @@ code: |
       valid_contractors_table
     school_year
     if method_payment == 'a vista':
-        single_installment_date_format = format_date(single_installment_date, format='dd/MM/yyyy')
-      if method_payment == 'parcelado':
-        if has_input_value == 'sim':
-          input_date_format = format_date(input_date, format='dd/MM/yyyy')
-        installments_list = list()
-        for v in range(0, quantity_installments):
-          installments = dict()
-          installments_due = installments_date.plus(months=v)
-          installments_due = format_date(installments_due, format='dd/MM/yyyy')
-          installments['installments_due'] = installments_due
-          installments['installments_value'] = installments_value
-          installments_list.append(installments)
+      single_installment_date_format = format_date(single_installment_date, format='dd/MM/yyyy')
+    if method_payment == 'parcelado':
+      if has_input_value == 'sim':
+        input_date_format = format_date(input_date, format='dd/MM/yyyy')
+      installments_list = list()
+      for v in range(0, quantity_installments):
+        installments = dict()
+        installments_due = installments_date.plus(months=v)
+        installments_due = format_date(installments_due, format='dd/MM/yyyy')
+        installments['installments_due'] = installments_due
+        installments['installments_value'] = installments_value
+        installments_list.append(installments)
     signature_local
     generated_file
     el_document_patched_with_docassemble_data
