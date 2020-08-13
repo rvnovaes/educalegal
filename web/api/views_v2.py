@@ -3,6 +3,7 @@ import io
 
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
@@ -19,6 +20,7 @@ from document.models import *
 from interview.models import *
 from school.models import *
 from tenant.models import *
+from users.models import CustomUser
 from .mayan_helpers import MayanClient
 
 from .serializers_v2 import (
@@ -28,6 +30,7 @@ from .serializers_v2 import (
     SchoolSerializer,
     SchoolUnitSerializer,
     TenantSerializer,
+    UserSerializer
 )
 
 logger = logging.getLogger(__name__)
@@ -38,7 +41,7 @@ UUID = "([a-z]|[0-9]){8}-([a-z]|[0-9]){4}-([a-z]|[0-9]){4}-([a-z]|[0-9]){4}-([a-
 class TenantAwareAPIMixin:
     """
     Todas os ViewSets que restringem seu retorno às entidades pertencentes a um tenant apenas devem ser compostos
-    por este mixim. Ele filtra o queryset a partir do Tenant do Usuário que faz a requisição. O usuário da requisição
+    por este mixin. Ele filtra o queryset a partir do Tenant do Usuário que faz a requisição. O usuário da requisição
     é o dono to token nela usado.
     """
 
@@ -47,7 +50,7 @@ class TenantAwareAPIMixin:
         return self.queryset.filter(tenant=tenant)
 
 
-# Administrative Views - Not filtered by Tenant - Requires Administrative Rigthes (is_staff = True )####################
+# Administrative Views - Not filtered by Tenant - Requires Administrative Rigths (is_staff = True )#####################
 
 class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -444,3 +447,16 @@ class TenantPlanViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         tenant = self.request.user.tenant
         return self.queryset.get(pk=tenant.plan_id)
+
+#################################### OTHERS ############################################################################
+
+# Aparentemente essa view e necessaria para voltar os dados de usuario para o front
+class UserView(APIView):
+    def get(self, request):
+        """
+        Return a list of all users.
+        """
+        user = request.user
+        user_data = UserSerializer(user)
+        return Response(user_data.data)
+

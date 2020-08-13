@@ -12,7 +12,8 @@ from .views_v2 import (
     DocumentDownloadViewSet,
     TenantSchoolViewSet,
     TenantSchoolUnitViewSet,
-    TenantPlanViewSet
+    TenantPlanViewSet,
+    UserView
 )
 
 from .docusign_helpers import docusign_webhook_listener
@@ -49,9 +50,9 @@ urlpatterns = [
     # path("tenant/ged_data/", TenantGedDataViewSet.as_view({"post": "create", "get": "list"})),
     # path("tenant/ged_data/<int:pk>", TenantGedDataViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     # Other
+    path("user/", UserView.as_view(), name="users"),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
     path("token/", TokenObtainPairView.as_view(), name="token"),
-    path("refresh_token/", TokenRefreshView.as_view(), name="refresh_token")
-
+    path("token_refresh/", TokenRefreshView.as_view(), name="token_refresh")
 ]

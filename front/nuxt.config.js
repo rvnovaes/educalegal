@@ -1,22 +1,3 @@
-
-/*!
-
-=========================================================
-* Nuxt Argon Dashboard PRO - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/nuxt-argon-dashboard-pro
-* Copyright 2019 Creative Tim (https://www.creative-tim.com)
-
-* Coded by www.creative-tim.com and www.binarcode.com
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-
 const pkg = require('./package')
 console.log('ENV', process.env.NODE_ENV)
 
@@ -63,6 +44,7 @@ module.exports = {
   */
   plugins: [
     '~/plugins/dashboard/dashboard-plugin',
+    '~/plugins/axios-educa-legal',
     {src: '~/plugins/dashboard/full-calendar', ssr: false },
     {src: '~/plugins/dashboard/world-map', ssr: false },
   ],
@@ -86,7 +68,8 @@ module.exports = {
     // Default: http://[HOST]:[PORT][PREFIX]
     // Defines the base URL which is used and prepended to make server side requests.
     // Environment variable API_URL can be used to override baseURL.
-    baseURL: 'http://localhost:8008'
+    // baseURL: 'http://localhost:8008'
+    baseURL: 'http://localhost:8001'
   },
 
   toast: {
@@ -116,30 +99,23 @@ module.exports = {
       }
     ]
   },
-
   auth: {
     strategies: {
       local: {
         endpoints: {
-          login: {
-            url: '/v2/token/',
-            method: 'post',
-            propertyName: 'access',
-            altProperty: 'refresh'
-          },
-          logout: {},
-          user: false
+          login: { url: '/v2/token/', method: 'post', propertyName: 'access', altProperty: 'refresh' },
+          logout: false,
+          user: { url: '/v2/user/', method: 'get', propertyName: false }
+          // user: false
         }
       }
     },
-
     redirect: {
       login: '/',
       logout: '/',
       home: '/painel'
     },
   },
-
   // Give apollo module options
   apollo: {
     // tokenName: 'apollo-token', // optional, default: apollo-token

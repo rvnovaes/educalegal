@@ -1,9 +1,12 @@
+import logging
 import graphene
-from django.shortcuts import get_object_or_404
+from graphql import GraphQLError
+from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType, DjangoConnectionField
-
 from document.models import Document
 from school.models import School, SchoolUnit
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentType(DjangoObjectType):
@@ -67,7 +70,13 @@ class UpdateSchool(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, **kwargs):
-        school = get_object_or_404(School, pk=kwargs["id"])
+        tenant = info.context.user.tenant
+        try:
+            school = School.objects.get(pk=kwargs["id"], tenant=tenant)
+        except ObjectDoesNotExist as e:
+            message = str(e)
+            logger.error(message)
+            raise GraphQLError(message)
         for k, v in kwargs.items():
             setattr(school, k, v)
         school.save()
@@ -82,9 +91,16 @@ class DeleteSchool(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, **kwargs):
-        school = get_object_or_404(School, pk=kwargs["id"])
-        school.delete()
-        return cls(ok=True)
+        tenant = info.context.user.tenant
+        try:
+            school = School.objects.get(pk=kwargs["id"], tenant=tenant)
+        except ObjectDoesNotExist as e:
+            message = str(e)
+            logger.error(message)
+            raise GraphQLError(message)
+        else:
+            school.delete()
+            return cls(ok=True)
 
 
 class Query(graphene.ObjectType):
@@ -100,12 +116,16 @@ class Query(graphene.ObjectType):
     #     tenant = info.context.user.tenant
     #     return School.objects.filter(tenant=tenant)
 
-    @graphene.resolve_only_args
-    def resolve_all_schools(self):
+    @classmethod
+    def resolve_all_schools(cls, root, info, **kwargs):
+        # tenant = info.context.user.tenant
+        # return School.objects.filter(tenant=tenant)
         return School.objects.all()
 
-    def resolve_school(self, info, **kwargs):
-        id = kwargs.get('id')
+    @classmethod
+    def resolve_school(cls, root, info, **kwargs):
+        user = info.context.user
+        id = kwargs.get("id")
         return School.objects.get(pk=id)
 
 

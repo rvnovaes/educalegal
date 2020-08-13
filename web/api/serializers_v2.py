@@ -5,6 +5,7 @@ from document.models import Document
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Tenant, TenantGedData, ESignatureApp
+from users.models import CustomUser
 
 
 class ESignatureAppSerializer(serializers.ModelSerializer):
@@ -47,10 +48,10 @@ class DocumentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_interview_name(self, obj):
-        return obj.interview.name if obj.interview else ''
+        return obj.interview.name if obj.interview else ""
 
     def get_school_name(self, obj):
-        return obj.school.name if obj.school else ''
+        return obj.school.name if obj.school else ""
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -76,7 +77,22 @@ class TenantGedDataSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
-
-
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        ref_name = "User v2"
+        fields = [
+            "id",
+            "last_login",
+            "is_superuser",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "is_staff",
+            "is_active",
+            "date_joined",
+            "tenant",
+            "groups",
+            "user_permissions",
+        ]

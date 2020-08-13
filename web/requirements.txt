@@ -6,7 +6,7 @@ django-cors-headers~=3.4.0
 drf-yasg~=1.17.1
 django-rest-auth~=0.9.5
 retry-requests~=1.0.1
-# For Nuxt Authetication
+# FOr JWT authentication. Userd with Nuxt Authetication
 djangorestframework-simplejwt~=4.4.0
 # Formating of forms
 django-crispy-forms~=1.9.1

@@ -62,7 +62,7 @@
                 <div class="col ml--2">
                   <div class="d-flex justify-content-between align-items-center">
                     <div>
-                      <h4 class="mb-0 text-sm">John Snow</h4>
+                      <h4 class="mb-0 text-sm"> ROBERTO </h4>
                     </div>
                     <div class="text-right text-muted">
                       <small>2 hrs ago</small>
@@ -213,7 +213,7 @@
                     <img alt="Image placeholder" src="img/theme/team-4.jpg">
                   </span>
             <div class="media-body ml-2 d-none d-lg-block">
-              <span class="mb-0 text-sm  font-weight-bold">John Snow</span>
+              <span class="mb-0 text-sm  font-weight-bold">{{ fullName }}</span>
             </div>
           </div>
         </a>
@@ -276,6 +276,10 @@
       routeName() {
         const { name } = this.$route;
         return this.capitalizeFirstLetter(name);
+      },
+
+      fullName: function () {
+        return this.$auth.user.first_name + ' ' + this.$auth.user.last_name;
       }
 
     },
