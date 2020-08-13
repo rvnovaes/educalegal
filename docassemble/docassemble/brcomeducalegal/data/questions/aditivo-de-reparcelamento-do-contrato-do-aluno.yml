@@ -36,6 +36,7 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
+    reviewed_school_email_answer
     contractors.gather()
     if plan_use_esignature:
       valid_contractors_table

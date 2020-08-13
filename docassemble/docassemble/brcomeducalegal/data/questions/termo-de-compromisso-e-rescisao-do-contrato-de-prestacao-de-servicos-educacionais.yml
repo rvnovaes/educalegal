@@ -36,6 +36,7 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
+    reviewed_school_email_answer
     rescindentes.target_number = 1
     if plan_use_esignature:
       valid_rescindente_table

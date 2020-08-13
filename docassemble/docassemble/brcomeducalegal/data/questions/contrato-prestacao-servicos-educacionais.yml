@@ -37,6 +37,7 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
+    reviewed_school_email_answer
     if len(school_units_list) == 0:
       # nao pode ser usado school_unit pq essa variavel foi usada no endereco da escola
       school_division = None
