@@ -53,7 +53,6 @@ class TestAcordosindividuaistrabalhistascoronavirus(WebTest):
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
-        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"),
                                                                                                   "Selecione documentos a serem gerados"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/fieldset/label/span[2]").click()
