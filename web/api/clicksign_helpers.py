@@ -22,7 +22,7 @@ from .mayan_helpers import MayanClient
 envelope_statuses = {
     "running": {"clicksign": "enviado", "el": DocumentStatus.ENVIADO_ASS_ELET.value},
     "closed": {"clicksign": "finalizado", "el": DocumentStatus.ASSINADO.value},
-    "cancel": {"clicksign": "recusado", "el": DocumentStatus.RECUSADO_INVALIDO.value},
+    "canceled": {"clicksign": "cancelado", "el": DocumentStatus.RECUSADO_INVALIDO.value},
 }
 
 recipient_types = {
@@ -244,6 +244,8 @@ def webhook_listener(request):
                 recipient_status = 'criado'
             elif data['event']['name'] == 'sign':
                 recipient_status = 'finalizado'
+            elif data['event']['name'] == 'cancel':
+                recipient_status = 'recusado'
 
             if recipient_status:
                 logging.info('passou aqui 18')
@@ -260,7 +262,7 @@ def webhook_listener(request):
                     except Signer.DoesNotExist:
                         logging.info('passou aqui 20')
                         create_signer = False
-                        if recipient_status == 'criado':
+                        if recipient_status == 'criado' or recipient_status == 'recusado':
                             create_signer = True
                         elif recipient_status == 'finalizado':
                             # no evento sign vem uma tag 'signature' para o destinatario que assinou
