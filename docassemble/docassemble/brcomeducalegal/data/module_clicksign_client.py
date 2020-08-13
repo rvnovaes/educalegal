@@ -1,19 +1,18 @@
-from requests import Session, RequestException, status_codes
+from requests import Session, RequestException
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
-# from docassemble.base.util import (
-#     log,
-#     get_config,
-#     url_of,
-# )
+from docassemble.base.util import (
+    log,
+    get_config,
+)
 
 __all__ = ["ClickSignClient"]
 
 
-# el_environment = get_config('el environment')
-el_environment = 'development'
+el_environment = get_config('el environment')
+# el_environment = 'development'
 
 if el_environment == "production":
     webhook_url = "https://app.educalegal.com.br/v1/clicksign/webhook"
@@ -43,8 +42,16 @@ class ClickSignClient:
 
     def get_document(self, uuid):
         final_url = self.base_url + "api/v1/documents/{uuid}".format(uuid=uuid)
-        response = self.session.get(final_url).json()
-        return response
+        try:
+            response = self.session.get(final_url).json()
+        except Exception as e:
+            if el_environment == "production":
+                log('Erro ao buscar o documento. Erro: {e}'.format(e=e))
+            else:
+                log('Erro ao buscar o documento. Erro: {e}'.format(e=e), "console")
+            return e
+        else:
+            return response
 
     def upload_document(self, document):
         """
@@ -60,18 +67,27 @@ class ClickSignClient:
                 }
             }
 
-        endpoint = 'api/v1/documents'
-        final_url = self.base_url + endpoint
+        final_url = self.base_url + 'api/v1/documents'
 
         try:
             response = self.session.post(final_url, json=payload)
         except RequestException:
+            if el_environment == "production":
+                log('Erro ao fazer o upload do documento. Erro: {status_code} - {response}'.format(
+                    status_code=response.status_code, response=response.json()))
+            else:
+                log('Erro ao fazer o upload do documento. Erro: {status_code} - {response}'.format(
+                    status_code=response.status_code, response=response.json()), "console")
             return document, response.json(), response.status_code, ''
         except Exception as e:
+            if el_environment == "production":
+                log('Erro ao fazer o upload do documento. Erro: {e}'.format(e=e))
+            else:
+                log('Erro ao fazer o upload do documento. Erro: {e}'.format(e=e), "console")
             return document, e, 0, ''
-
-        # data_sent, data_received, status_code
-        return document, response.json(), response.status_code, response.json()['document']['key']
+        else:
+            # data_sent, data_received, status_code
+            return document, response.json(), response.status_code, response.json()['document']['key']
 
     def add_signer(self, recipients):
         """
@@ -100,35 +116,36 @@ class ClickSignClient:
                     }
                 }
 
-                endpoint = 'api/v1/signers'
-                final_url = self.base_url + endpoint
+                final_url = self.base_url + 'api/v1/signers'
 
                 try:
                     response = self.session.post(final_url, json=payload)
                 except RequestException:
                     if el_environment == "production":
-                        print(response.json())
+                        log('Erro ao adicionar o signatário. Erro: {status_code} - {response}'.format(
+                            status_code=response.status_code, response=response.json()))
                     else:
-                        print(response.json(), "console")
-
+                        log('Erro ao adicionar o signatário. Erro: {status_code} - {response}'.format(
+                            status_code=response.status_code, response=response.json()), "console")
                     # data_sent, data_received, status_code
                     return recipients, response.json(), response.status_code
                 except Exception as e:
                     if el_environment == "production":
-                        print(e)
+                        log('Erro ao adicionar o signatário. Erro: {e}'.format(e=e))
                     else:
-                        print(e, "console")
-
-                        # data_sent, data_received, status_code
-                        return recipients, e, 0
+                        log('Erro ao adicionar o signatário. Erro: {e}'.format(e=e), "console")
+                    # data_sent, data_received, status_code
+                    return recipients, e, 0
                 else:
                     recipient['key'] = response.json()['signer']['key']
+                    recipient['response_json'] = response.json()
+                    recipient['status_code'] = response.status_code
 
-            recipient['response_json'] = response.json()
-            recipient['status_code'] = response.status_code
+                    # data_sent, data_received, status_code
+                    return recipients, recipients, response.status_code
 
         # data_sent, data_received, status_code
-        return recipients, recipients, response.status_code
+        return recipients, recipients, 200
 
     def add_signer_to_document(self, document_uuid, signers):
         """
@@ -141,7 +158,6 @@ class ClickSignClient:
         JSON com os dados do documento vinculado ao signatário.
         """
 
-        data_sent = {'doc_uuid': document_uuid, 'signers': signers}
         for signer in signers:
             payload = {
                 "list": {
@@ -153,28 +169,29 @@ class ClickSignClient:
                 },
             }
 
-            endpoint = 'api/v1/lists'
-            final_url = self.base_url + endpoint
+            final_url = self.base_url + 'api/v1/lists'
 
             try:
                 response = self.session.post(final_url, json=payload)
             except RequestException:
                 if el_environment == "production":
-                    print(response.json())
+                    log('Erro ao vincular o signatário ao documento. Erro: {status_code} - {response}'.format(
+                        status_code=response.status_code, response=response.json()))
                 else:
-                    print(response.json(), "console")
-
-                return data_sent, response.json(), response.status_code
+                    log('Erro ao vincular o signatário ao documento. Erro: {status_code} - {response}'.format(
+                        status_code=response.status_code, response=response.json()), "console")
+                return signers, response.json(), response.status_code
             except Exception as e:
                 if el_environment == "production":
-                    print(e)
+                    log('Erro ao vincular o signatário ao documento. Erro: {e}'.format(e=e))
                 else:
-                    print(e, "console")
+                    log('Erro ao vincular o signatário ao documento. Erro: {e}'.format(e=e), "console")
+                return signers, e, 0
+            else:
+                if response.status_code == 201:
+                    signer['request_signature_key'] = response.json()['list']['request_signature_key']
 
-                return data_sent, e, 0
-
-        # data_sent, data_received, status_code
-        return data_sent, response.json(), response.status_code
+                return signers, response.json(), response.status_code
 
     def send_email(self, signature_keys):
         """
@@ -185,92 +202,53 @@ class ClickSignClient:
         202 - Accepted.
         """
 
-        response_dict = dict()
         for signature_key in signature_keys:
             # envia email somente para os destinatarios do grupo 1 (primeiro na ordem)
-            if signature_keys[signature_key]['response_json']['list']['group'] == 1:
+            if signature_key['routingOrder'] == 1:
                 payload = {
-                    "request_signature_key": signature_keys[signature_key]['response_json']['list']['request_signature_key'],
-                    "message": "Prezado(a) {signer_name},\n\nPor favor, assine o documento.".format(signer_name=signature_keys[signature_key]['signer']['name'])
+                    "request_signature_key": signature_key['request_signature_key'],
+                    "message": "Prezado(a) {signer_name},\n\nPor favor, assine o documento.".format(
+                        signer_name=signature_key['name'])
                 }
 
-                endpoint = 'api/v1/notifications'
-                final_url = self.base_url + endpoint
-        try:
-            response = self.session.post(final_url, json=payload)
+                final_url = self.base_url + 'api/v1/notifications'
 
-            if signature_key not in response_dict.keys():
-                response_dict[signature_key] = {
-                    "status_code": response.status_code,
-                    "reason": response.reason
-                }
-        except RequestException:
-            request_json = {
-                "endpoint": endpoint,
-                "signature_keys": signature_keys,
-                "status_code": response.status_code,
-                "reason": response.reason
-            }
-            if el_environment == "production":
-                print(request_json)
-            else:
-                print(request_json, "console")
-            return None, request_json
-        except Exception as e:
-            request_json = {
-                "endpoint": endpoint,
-                "signature_keys": signature_keys,
-                "exception": e,
-            }
-            if el_environment == "production":
-                print(request_json)
-            else:
-                print(request_json, "console")
-            return None, request_json
-
-        return response_dict, None
+                try:
+                    response = self.session.post(final_url, json=payload)
+                except RequestException:
+                    if el_environment == "production":
+                        log('Erro ao enviar o email. Erro: {status_code} - {response}'.format(
+                            status_code=response.status_code, response=response.reason))
+                    else:
+                        log('Erro ao enviar o email. Erro: {status_code} - {response}'.format(
+                            status_code=response.status_code, response=response.reason), "console")
+                    return signature_keys, response.reason, response.status_code
+                except Exception as e:
+                    if el_environment == "production":
+                        log('Erro ao enviar o email. Erro: {e}'.format(e=e))
+                    else:
+                        log('Erro ao enviar o email. Erro: {e}'.format(e=e), "console")
+                    return signature_keys, e, 0
+                else:
+                    # data_sent, data_received, status_code
+                    return signature_keys, response.reason, response.status_code
 
     def send_to_signers(self, doc_uuid, recipients):
         """Cria os destinatários, vincula ao documento e envia por e-mail para assinatura."""
 
-        #
-        # # se nao conseguiu criar algum destinatario, retorna erro
-        # if signer_response:
-        #     for signer in signer_response:
-        #         if signer_response[signer]['status_code'] != 201:
-        #             return signer_response[signer]['status_code'], \
-        #                 signer_response[signer]['response_json'], \
-        #                 signer_request
-        # else:
-        #     return 0, None, signer_request
-        #
-        # vincula o documento aos destinatarios criados
-        signer_doc_response, signer_doc_request = self.add_signer_to_document(doc_uuid, recipients)
-
-        # se nao vincular algum destinatario ao documento, retorna erro
-        if signer_doc_response:
-            for signer_doc in signer_doc_response:
-                if signer_doc_response[signer_doc]['status_code'] != 201:
-                    return signer_doc_response[signer_doc]['status_code'], \
-                        signer_doc_response[signer_doc]['response_json'], \
-                        signer_doc_request
-        else:
-            return 0, None, signer_doc_request
-
-        # envia por email o documento aos destinatarios
-        signature_key_response, signature_key_request = self.send_email(signer_doc_response)
-
-        # se nao conseguiu enviar o email para algum destinatario, retorna erro
-        if signature_key_response:
-            for signature_key in signature_key_response:
-                if signature_key_response[signature_key]['status_code'] != 202:
-                    return signature_key_response[signature_key]['status_code'], \
-                        signature_key_response[signature_key]['reason'], \
-                        signature_key_request
-        else:
-            return 0, None, signature_key_request
-
         # data_sent, data_received, status_code
         data_sent = {'doc_uuid': doc_uuid, 'recipients': recipients}
-        return data_sent, signature_key_response[signature_key]['reason'], \
-            signature_key_response[signature_key]['status_code']
+
+        # vincula o documento aos destinatarios criados
+        recipients, signer_doc_response, status_code = self.add_signer_to_document(doc_uuid, recipients)
+
+        if status_code == 201:
+            # envia por email o documento aos destinatarios
+            if len(recipients) > 0:
+                data_sent, signature_key_response, status_code = self.send_email(recipients)
+            else:
+                signature_key_response, status_code = 'Não foram encontrados emails para o envio', 0
+        else:
+            return data_sent, signer_doc_response, status_code
+
+        return data_sent, signature_key_response, status_code

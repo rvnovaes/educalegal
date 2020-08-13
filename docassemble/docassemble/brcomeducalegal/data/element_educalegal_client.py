@@ -270,6 +270,8 @@ class EducaLegalClient:
         except Exception as e:
             print("Erro ao gravar o signers_log", "console")
             print(e, "console")
+            return e
+
         return response.json(), response.status_code
 
     def get_signer_key_by_email(self, recipients):
@@ -285,10 +287,10 @@ class EducaLegalClient:
                 email=recipient['email'])
             try:
                 response = self.session.get(final_url)
-            except RequestException as e:
-                print(e)
             except Exception as e:
-                print(e)
+                print("Erro ao obter a chave do signatário.", "console")
+                print(e, "console")
+                return recipients, e, 0
 
             if response.status_code == 404:
                 recipient['key'] = ''
@@ -318,6 +320,9 @@ class EducaLegalClient:
                     print("Erro ao gravar a chave do signatário.", "console")
                     print(e, "console")
                     return recipients, e, 0
+                else:
+                    # data_sent, data_received, status_code
+                    return recipients, response.json(), response.status_code
 
         # data_sent, data_received, status_code
-        return recipients, response.json(), response.status_code
+        return recipients, 'Todos os destinatários já existiam.', 200

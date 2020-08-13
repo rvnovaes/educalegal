@@ -144,19 +144,15 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
     serializer_class = ESignatureAppSignerKeySerializer
+    # default 'pk', se quiser pesquisar por outro campo deve alterar o lookup_field
     lookup_field = 'email'
 
     def get_queryset(self):
         try:
-            esignature_app_signer_key = ESignatureAppSignerKey.objects.get(email=self.kwargs['email'])
+            # deve ser usada a funcao filter e nao a get para que seja retornado um queryset e nao um
+            # ESignatureAppSignerKey
+            esignature_app_signer_key = ESignatureAppSignerKey.objects.filter(email=self.kwargs['email'])
         except ESignatureAppSignerKey.DoesNotExist:
             return ESignatureAppSignerKey.objects.none()
 
         return esignature_app_signer_key
-
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(json=json.dumps(request.data))
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
