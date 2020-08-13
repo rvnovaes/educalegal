@@ -34,6 +34,8 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
     authorizers.gather()
     if plan_use_esignature:
       valid_authorizers_table

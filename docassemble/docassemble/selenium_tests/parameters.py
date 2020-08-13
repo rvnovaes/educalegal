@@ -6,6 +6,6 @@ CNPJ = "40.536.054/0001-90"
 # quando uma nova versao esta pra ser liberada os testes sao executados somente no autotest
 # e assim que a versao eh liberada, os testes sao executados nos 2 ambientes
 RUN_TESTS_AUTOTEST = True
-RUN_TESTS_PRODUCTION = True
+RUN_TESTS_PRODUCTION = False
 
 LOCAL_DRIVER = False
