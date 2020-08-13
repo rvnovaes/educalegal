@@ -12,6 +12,7 @@ include:
   - element-educalegal-patch-document.yml
   - element-ged.yml
   - element-document-ready.yml
+  - element-school-email-reviewed.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -35,6 +36,8 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
     if school_party_type == "revealing":
       receptors.gather()
       if plan_use_esignature:
@@ -449,7 +452,7 @@ code: |
       new_recipient['name'] = rev.name.text
       new_recipient['email'] = rev.email
       new_recipient['group'] = 'signers'
-      new_recipient['routingOrder'] = 2
+      new_recipient['routingOrder'] = 1
       new_recipient['tabs'] = [
         {
           'type': 'signHere',

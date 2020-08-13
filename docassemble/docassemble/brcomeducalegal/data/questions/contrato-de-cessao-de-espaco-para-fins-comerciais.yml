@@ -12,6 +12,7 @@ include:
   - element-educalegal-patch-document.yml
   - element-ged.yml
   - element-document-ready.yml
+  - element-school-email-reviewed.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -35,6 +36,8 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
     if school_party_type == "cedente":
       parte_insert_manager
       cessionarias.gather()
