@@ -141,11 +141,12 @@ class ClickSignClient:
                     recipient['response_json'] = response.json()
                     recipient['status_code'] = response.status_code
 
-                    # data_sent, data_received, status_code
-                    return recipients, recipients, response.status_code
-
-        # data_sent, data_received, status_code
-        return recipients, recipients, 200
+        try:
+            # data_sent, data_received, status_code
+            return recipients, recipients, response.status_code
+        except NameError as e:
+            # data_sent, data_received, status_code
+            return recipients, recipients, 200
 
     def add_signer_to_document(self, document_uuid, signers):
         """
@@ -191,7 +192,12 @@ class ClickSignClient:
                 if response.status_code == 201:
                     signer['request_signature_key'] = response.json()['list']['request_signature_key']
 
-        return signers, response.json(), response.status_code
+        try:
+            # data_sent, data_received, status_code
+            return signers, response.json(), response.status_code
+        except NameError as e:
+            # data_sent, data_received, status_code
+            return signers, 'Signatários já adicionados ao documento', 200
 
     def send_email(self, signature_keys):
         """
@@ -230,14 +236,18 @@ class ClickSignClient:
                         log('Erro ao enviar o email. Erro: {e}'.format(e=e), "console")
                     return signature_keys, e, 0
 
-        # data_sent, data_received, status_code
-        return signature_keys, response.reason, response.status_code
+        try:
+            # data_sent, data_received, status_code
+            return signature_keys, response.reason, response.status_code
+        except NameError:
+            # data_sent, data_received, status_code
+            return signature_keys, 'E-mails enviados', 200
 
     def send_to_signers(self, doc_uuid, recipients):
         """Cria os destinatários, vincula ao documento e envia por e-mail para assinatura."""
 
-        # data_sent, data_received, status_code
-        data_sent = {'doc_uuid': doc_uuid, 'recipients': recipients}
+        # data_sent
+        data_sent = {'endpoint': 'add_signer_to_document', 'doc_uuid': doc_uuid, 'recipients': recipients}
 
         # vincula o documento aos destinatarios criados
         recipients, signer_doc_response, status_code = self.add_signer_to_document(doc_uuid, recipients)

@@ -302,7 +302,10 @@ class EducaLegalClient:
             recipient['status_code'] = response.status_code
             recipient['response_json'] = response.json()
 
-        return recipients, recipients_sign, response.status_code
+        try:
+            return recipients, recipients_sign, response.status_code
+        except NameError:
+            return recipients, recipients_sign, 200
 
     def post_signer_key(self, recipients, tenant_id):
         for recipient in recipients:
@@ -320,9 +323,9 @@ class EducaLegalClient:
                     print("Erro ao gravar a chave do signatário.", "console")
                     print(e, "console")
                     return recipients, e, 0
-                else:
-                    # data_sent, data_received, status_code
-                    return recipients, response.json(), response.status_code
-
-        # data_sent, data_received, status_code
-        return recipients, 'Todos os destinatários já existiam.', 200
+        try:
+            # data_sent, data_received, status_code
+            return recipients, response.json(), response.status_code
+        except NameError:
+            # data_sent, data_received, status_code
+            return recipients, 'Todos os destinatários já existiam.', 200
