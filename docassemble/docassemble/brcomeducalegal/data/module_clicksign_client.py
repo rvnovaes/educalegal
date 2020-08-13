@@ -191,7 +191,7 @@ class ClickSignClient:
                 if response.status_code == 201:
                     signer['request_signature_key'] = response.json()['list']['request_signature_key']
 
-                return signers, response.json(), response.status_code
+        return signers, response.json(), response.status_code
 
     def send_email(self, signature_keys):
         """
@@ -229,9 +229,9 @@ class ClickSignClient:
                     else:
                         log('Erro ao enviar o email. Erro: {e}'.format(e=e), "console")
                     return signature_keys, e, 0
-                else:
-                    # data_sent, data_received, status_code
-                    return signature_keys, response.reason, response.status_code
+
+        # data_sent, data_received, status_code
+        return signature_keys, response.reason, response.status_code
 
     def send_to_signers(self, doc_uuid, recipients):
         """Cria os destinatários, vincula ao documento e envia por e-mail para assinatura."""

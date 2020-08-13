@@ -32,13 +32,16 @@ code: |
   elif tenant_esignature_provider == 'CLICKSIGN':
     import copy
 
+    log("recipients", "console")
+    log(recipients, "console")
+
     csc = ClickSignClient(tenant_private_key, tenant_test_mode)
 
     # faz o upload do documento no clicksign
     data_sent, data_received, status_code, envelope_id = csc.upload_document(documents[0])
 
     if status_code == 201:
-      status = 'enviado'
+      status = 'sent'
 
       # salva no documento do educa legal o status e o envelope_id do documento criado no clicksign
       el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, True)
