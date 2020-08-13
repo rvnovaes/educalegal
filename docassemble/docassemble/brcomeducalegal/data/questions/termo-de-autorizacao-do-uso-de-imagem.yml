@@ -90,12 +90,12 @@ fields:
     required: True
     validate: validate_cpf
   - "Número do RG:": authorizers[i].rg
-    required: True
+    required: False
   - "Nacionalidade:": authorizers[i].nationality
     required: True
     default: brasileiro(a)
   - "Estado civil:": authorizers[i].marital_status
-    required: True
+    required: False
     choices:
       - solteiro(a): solteiro(a)
       - casado(a): casado(a)

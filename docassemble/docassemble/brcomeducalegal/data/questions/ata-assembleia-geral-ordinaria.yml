@@ -183,7 +183,7 @@ fields:
 ---
 section: Assembleia
 progress: 15
-question: Presidente e secretário da mesa da Assembleia
+question: Integrantes da mesa da Assembleia
 fields:
   - "Presidente: ": chairman_name
     required: True

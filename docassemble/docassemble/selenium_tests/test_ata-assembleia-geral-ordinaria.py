@@ -66,17 +66,15 @@ class TestAtaassembleiageralordinaria(WebTest):
                                                                                                   "Integrantes da administração da companhia presentes na assembleia"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/input").send_keys("Bento")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
+        self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Data e Horário da Assembleia"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("2020-08-06")
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/input").send_keys("04:00")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
-        self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"),
-                                                                                                  "Presidente e secretário da mesa da Assembleia"))
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("Caio")
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/input").send_keys(
-            "josue.signatario@gmail.com")
+        self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Integrantes da mesa da Assembleia"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("Josué")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/input").send_keys("josue.signatario@gmail.com")
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[4]/div/input").send_keys("Francisco")
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[5]/div/input").send_keys(
-            "fiador.educalegal@gmail.com")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[5]/div/input").send_keys("fiador.educalegal@gmail.com")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Exercício Social"))
