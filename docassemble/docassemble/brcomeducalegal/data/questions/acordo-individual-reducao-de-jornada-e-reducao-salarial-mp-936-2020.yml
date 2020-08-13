@@ -307,5 +307,3 @@ code: |
           'documentBase64': make_document_base64(generated_file.pdf.path())
       }
   ]
-
-
