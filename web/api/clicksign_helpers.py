@@ -22,7 +22,7 @@ from .mayan_helpers import MayanClient
 envelope_statuses = {
     "running": {"clicksign": "enviado", "el": DocumentStatus.ENVIADO_ASS_ELET.value},
     "closed": {"clicksign": "finalizado", "el": DocumentStatus.ASSINADO.value},
-    "canceled": {"clicksign": "cancelado", "el": DocumentStatus.RECUSADO_INVALIDO.value},
+    "canceled": {"clicksign": "recusado", "el": DocumentStatus.RECUSADO_INVALIDO.value},
 }
 
 recipient_types = {
@@ -120,13 +120,9 @@ def webhook_listener(request):
 
         # localiza o documento pelo uuid
         envelope_number = data['document']['key']
-        logging.info('passou aqui 3')
-        logging.info(envelope_number)
         try:
-            logging.info('passou aqui 4')
             document = Document.objects.get(envelope_number=envelope_number)
         except Document.DoesNotExist:
-            logging.info('passou aqui 5')
             # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test,
             # por isso, não encontra o documento no banco
             message = 'O documento do envelope {envelope_number} não existe.'.format(
@@ -134,48 +130,27 @@ def webhook_listener(request):
             logger.debug(message)
             return HttpResponse(message)
         except Exception as e:
-            logging.info('passou aqui 6')
             message = str(e)
             logger.exception(message)
             logging.info(message)
             return HttpResponse(message)
         else:
-            logging.info('passou aqui 7')
             envelope_status = str(data['document']['status']).lower()
-            logging.info('status do clicksign helpers 1')
-            logging.info('passou aqui 7-1')
-            logging.info(envelope_status)
             if envelope_status in envelope_statuses.keys():
-                logging.info('passou aqui 7-2')
                 document_status = envelope_statuses[envelope_status]['el']
-                logging.info(document_status)
-                logging.info('passou aqui 7-3')
                 envelope_status = envelope_statuses[envelope_status]['clicksign']
-                logging.info(envelope_status)
             else:
                 document_status = DocumentStatus.NAO_ENCONTRADO.value
-                logging.info('passou aqui 7-4')
-                logging.info(document_status)
                 envelope_status = DocumentStatus.NAO_ENCONTRADO.value
-                logging.info('passou aqui 7-5')
-                logging.info(envelope_status)
-            logging.info('status do clicksign helpers 2')
 
             filename = ''
             tenant = Tenant.objects.get(pk=document.tenant.pk)
-            logging.info('passou aqui 8')
-            logging.info('status do clicksign helpers 3')
-            logging.info(envelope_status)
-            logging.info('passou aqui 8-1')
-            logging.info(document_status)
             # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
             if envelope_status == "finalizado":
-                logging.info('passou aqui 9')
                 fullpath, filename = pdf_file_saver(
                     data['document']['downloads']['signed_file_url'], envelope_number, document.name)
 
                 if tenant.plan.use_ged:
-                    logging.info('passou aqui 10')
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
                     document_type_pk = interview.document_type.pk
@@ -186,9 +161,7 @@ def webhook_listener(request):
                     tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
                     mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
 
-                    logging.info('passou aqui 11')
                     try:
-                        logging.info('passou aqui 12')
                         # salva documento no ged
                         response = mc.document_create(
                             fullpath,
@@ -200,7 +173,6 @@ def webhook_listener(request):
                         logger.debug("Posting document to GED: " + filename)
                         logger.debug(response.text)
                     except Exception as e:
-                        logging.info('passou aqui 13')
                         message = str(e)
                         logger.exception(message)
                         logging.info(message)
@@ -210,13 +182,10 @@ def webhook_listener(request):
             document.status = document_status
             document.save(update_fields=['status'])
 
-            logging.info('passou aqui 14')
             # se o envelope já existe atualiza o status, caso contrário, cria o envelope
             try:
-                logging.info('passou aqui 15')
                 envelope = Envelope.objects.get(identifier=envelope_number)
             except Envelope.DoesNotExist:
-                logging.info('passou aqui 16')
                 envelope = Envelope(
                     identifier=envelope_number,
                     status=envelope_status,
@@ -233,7 +202,6 @@ def webhook_listener(request):
                 document.envelope_number = envelope.identifier
                 document.save(update_fields=['envelope', 'envelope_number'])
             else:
-                logging.info('passou aqui 17')
                 envelope.status = envelope_status
                 envelope.status_update_date = data['document']['updated_at']
                 envelope.save(update_fields=['status', 'status_update_date'])
@@ -248,11 +216,8 @@ def webhook_listener(request):
                 recipient_status = 'recusado'
 
             if recipient_status:
-                logging.info('passou aqui 18')
-                logging.info(recipient_status)
                 for recipient in data['document']['signers']:
                     try:
-                        logging.info('passou aqui 19')
                         # se já tem o status para o email e para o documento, não salva outro igual
                         # só cria outro se o status do recipient mudou
                         signer = Signer.objects.get(
@@ -260,7 +225,6 @@ def webhook_listener(request):
                             email=recipient['email'],
                             status=recipient_status)
                     except Signer.DoesNotExist:
-                        logging.info('passou aqui 20')
                         create_signer = False
                         if recipient_status == 'criado' or recipient_status == 'recusado':
                             create_signer = True
@@ -272,7 +236,6 @@ def webhook_listener(request):
 
                         if create_signer:
                             try:
-                                logging.info('passou aqui 21')
                                 signer = Signer(
                                     name=recipient['name'],
                                     email=recipient['email'],
@@ -286,15 +249,11 @@ def webhook_listener(request):
 
                                 signer.save()
                             except Exception as e:
-                                logging.info('passou aqui 22')
                                 message = 'Não foi possível salvar o Signer: ' + str(e)
                                 logging.info(message)
                                 logger.exception(message)
-
-        logging.info('passou aqui 23')
-
     except Exception as e:
-        logging.info('passou aqui 24')
+        logging.info('Exceção webhook clicksign')
         logging.info(e)
 
     return HttpResponse("Success!")

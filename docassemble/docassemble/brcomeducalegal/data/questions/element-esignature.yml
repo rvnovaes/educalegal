@@ -11,9 +11,6 @@ code: |
   log("Executando element-esignature.yml")
   el_log_to_console = get_config('el log to console')
 
-  log("tenant_esignature_provider console", "console")
-  log(tenant_esignature_provider, "console")
-
   if tenant_esignature_provider == 'DOCUSIGN':
     dsc = DocuSignClient(tenant_client_id, tenant_impersonated_user_guid, tenant_test_mode, tenant_private_key)
 
@@ -32,9 +29,6 @@ code: |
   elif tenant_esignature_provider == 'CLICKSIGN':
     import copy
 
-    log("recipients", "console")
-    log(recipients, "console")
-
     csc = ClickSignClient(tenant_private_key, tenant_test_mode)
 
     # faz o upload do documento no clicksign
@@ -51,28 +45,18 @@ code: |
 
       # verifica se o signer ja foi enviado para a clicksign
       data_sent, data_received, status_code = elc.get_signer_key_by_email(recipients)
-      log("get_signer_key_by_email", "console")
-      log(status_code, "console")
 
       recipients_sign = copy.deepcopy(data_received)
-      log("recipients_sign", "console")
-      log(recipients_sign, "console")
 
       # cria os destinatarios
       status_code, reason, data_sent = csc.add_signer(recipients_sign)
-      log("add_signer", "console")
-      log(status_code, "console")
 
       # adiciona signer key no educa legal
       data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, tid)
-      log("post_signer_key", "console")
-      log(status_code, "console")
 
       # adiciona os signatarios ao documento e envia por email para o primeiro signatario
       # o envelope_id eh a key do documento no clicksign
       data_sent, data_received, status_code = csc.send_to_signers(envelope_id, recipients_sign)
-      log("send_to_signers", "console")
-      log(status_code, "console")
 
       if status_code == 202:
         e_signature_response_status_code = 201
