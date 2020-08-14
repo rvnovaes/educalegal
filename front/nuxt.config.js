@@ -118,7 +118,7 @@ module.exports = {
   },
   // Give apollo module options
   apollo: {
-    // tokenName: 'apollo-token', // optional, default: apollo-token
+    // tokenName: 'auth._token.local', // optional, default: apollo-token
     // cookieAttributes: {
     //   /**
     //    * Define when the cookie will be removed. Value can be a Number
@@ -145,6 +145,7 @@ module.exports = {
     // },
     // includeNodeModules: false, // optional, default: false (this includes graphql-tag for node_modules folder)
     // authenticationType: 'Bearer', // optional, default: 'Bearer'
+    authenticationType: 'Bearer', // optional, default: 'Bearer'
     // // (Optional) Default 'apollo' definition
     // defaultOptions: {
     //   // See 'apollo' definition
@@ -170,17 +171,17 @@ module.exports = {
         // browserHttpEndpoint: '/graphql',
         // optional
         // See https://www.apollographql.com/docs/link/links/http.html#options
-        // httpLinkOptions: {
+        httpLinkOptions: {
         //   headers : {
         //     'X-CSRFToken': Cookies.get('csrftoken')
-        //   }
-        //   // credentials: 'same-origin'
-        // },
+        //   },
+          credentials: 'same-origin'
+        },
         // You can use `wss` for secure connection (recommended in production)
         // Use `null` to disable subscriptions
         // wsEndpoint: 'ws://localhost:8008', // optional
         // LocalStorage token
-        // tokenName: 'apollo-token', // optional
+        // tokenName: 'auth._token.local', // optional
         // Enable Automatic Query persisting with Apollo Engine
         // persisting: false, // Optional
         // Use websockets for everything (no HTTP)
@@ -194,7 +195,7 @@ module.exports = {
       // },
       // alternative: user path to config which returns exact same config options
       // test2: '~/plugins/my-alternative-apollo-config.js'
-    }
+    },
   },
 
   /*
