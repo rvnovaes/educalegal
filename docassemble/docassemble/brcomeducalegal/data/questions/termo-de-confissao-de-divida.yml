@@ -600,7 +600,7 @@ code: |
   new_recipient['name'] = school_legal_name
   new_recipient['email'] = school_email
   new_recipient['group'] = 'signers'
-  new_recipient['routingOrder'] = 1
+  new_recipient['routingOrder'] = 2
   new_recipient['tabs'] = [
       {
           'type': 'signHere',
