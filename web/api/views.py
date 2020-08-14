@@ -151,7 +151,9 @@ class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
         try:
             # deve ser usada a funcao filter e nao a get para que seja retornado um queryset e nao um
             # ESignatureAppSignerKey
-            esignature_app_signer_key = ESignatureAppSignerKey.objects.filter(email=self.kwargs['email'])
+            # como cada cliente tem uma conta da clicksig, deve ser verificado o tenant tbm
+            esignature_app_signer_key = ESignatureAppSignerKey.objects.filter(
+                pk=self.request.user.tenant.id, email=self.kwargs['email'])
         except ESignatureAppSignerKey.DoesNotExist:
             return ESignatureAppSignerKey.objects.none()
 
