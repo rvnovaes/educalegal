@@ -50,20 +50,13 @@ class ESignatureApp(models.Model):
 
 class Tenant(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    subdomain_prefix = models.CharField(
-        max_length=100, null=True, blank=True, unique=True
-    )
-    eua_agreement = models.BooleanField(
-        default=True, verbose_name="Concordo com os termos de uso"
-    )
+    subdomain_prefix = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    eua_agreement = models.BooleanField(default=True, verbose_name="Concordo com os termos de uso")
     plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="tenants", verbose_name="Plano", default=1)
-
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
-
     auto_enrolled = models.BooleanField(
         default=False, verbose_name="Autoinscrito"
     )
-
     esignature_app = models.ForeignKey(
         ESignatureApp,
         null=True,
@@ -71,8 +64,7 @@ class Tenant(models.Model):
         on_delete=models.PROTECT,
         default=1,
         verbose_name='App de assinatura eletrônica')
-
-    phone = models.CharField(max_length=255, verbose_name="Telefone")
+    phone = models.CharField(max_length=50, blank=True, verbose_name="Telefone")
 
     class Meta:
         ordering = ["name"]

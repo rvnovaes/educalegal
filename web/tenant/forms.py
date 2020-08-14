@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import RegexValidator
 
 from allauth.account.forms import SignupForm
 
@@ -11,16 +12,22 @@ from tenant.models import (
 from interview.models import Interview
 from billing.models import Plan
 
-
 class EducaLegalSignupForm(SignupForm):
     full_name = forms.CharField(label="Nome Completo", required=True)
     tenant_name = forms.CharField(label="Nome da Escola", required=True)
-    tenant_phone = forms.CharField(label="Telefone/Whatsapp", required=True)
+    phone = forms.CharField(
+        label="Telefone/Whatsapp",
+        required=True,  # Note: validators are not run against empty fields
+        help_text="Formatos válidos para o telefone: (00) 0000-0000 ou (00) 00000-0000.",
+        validators=[RegexValidator(r"\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}",
+                                   "Formatos válidos para o telefone: (00) 0000-0000 ou (00) 00000-0000.")]
+    )
+
     eua = forms.BooleanField(
         label="Concordo com a política de privacidade e os termos de uso", required=True
     )
 
-    field_order = ["full_name", "tenant_name", "tenant_phone", "email", "password1", "password2", "eua"]
+    field_order = ["full_name", "tenant_name", "phone", "email", "password1", "password2", "eua"]
 
     def clean(self):
         super().clean()
@@ -43,7 +50,7 @@ class EducaLegalSignupForm(SignupForm):
             plan=essential_plan,
             auto_enrolled=True,
             esignature_app=None,
-            phone=self.cleaned_data.get("tenant_phone"),
+            phone=self.cleaned_data.get("phone"),
         )
         tenant.save()
         # Selects every freemium interview and adds to newly created tenant
