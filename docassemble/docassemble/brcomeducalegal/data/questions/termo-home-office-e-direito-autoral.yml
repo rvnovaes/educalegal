@@ -191,11 +191,10 @@ edit:
 ---
 section: Cláusulas
 progress: 75
-question: 'O regime de home office perdurará até a data:'
+question: 'O regime de home office perdurará até:'
 fields:
   - "Data:": data_regime
     required: True
-    datatype: date
 ---
 code: |
   recipients = list()

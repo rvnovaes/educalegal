@@ -220,11 +220,10 @@ edit:
 ---
 section: Cláusulas
 progress: 60
-question: 'O regime de home office perdurará até a data:'
+question: 'O regime de home office perdurará até:'
 fields:
   - "Data:": data_regime
     required: True
-    datatype: date
 ---
 section: Cláusulas
 progress: 70
