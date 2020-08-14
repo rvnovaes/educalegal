@@ -109,14 +109,14 @@ code: |
             new_recipient['name'] = item.name.text
             new_recipient['email'] = item.email
             new_recipient['group'] = 'certifiedDeliveries'
-            new_recipient['routingOrder'] = 1
+            new_recipient['routingOrder'] = 2
             recipients.append(new_recipient)
 
   new_recipient = dict()
   new_recipient['name'] = school_legal_name
   new_recipient['email'] = school_email
   new_recipient['group'] = 'signers'
-  new_recipient['routingOrder'] = 2
+  new_recipient['routingOrder'] = 1
   new_recipient['tabs'] = [
       {
           'type': 'signHere',
