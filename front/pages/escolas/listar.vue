@@ -125,8 +125,8 @@ import RouteBreadCrumb from "@/components/argon-core/Breadcrumb/RouteBreadcrumb"
 import {BasePagination} from "@/components/argon-core";
 import clientPaginationMixin from "@/components/tables/PaginatedTables/clientPaginationMixin";
 import Swal from "sweetalert2";
-import allSchools from "~/queries/allSchools";
-import deleteSchool from "~/queries/deleteSchool";
+import allSchools from "@/queries/allSchools.graphql";
+import deleteSchool from "@/queries/deleteSchool.graphql";
 
 export default {
   mixins: [clientPaginationMixin],

@@ -49,7 +49,7 @@
                               :rules="{required: true, email: true}"
                               prepend-icon="ni ni-email-83"
                               placeholder="Email"
-                              v-model="model.username">
+                              v-model="credentials.username">
                   </base-input>
 
                   <base-input alternative
@@ -59,10 +59,10 @@
                               prepend-icon="ni ni-lock-circle-open"
                               type="password"
                               placeholder="Senha"
-                              v-model="model.password">
+                              v-model="credentials.password">
                   </base-input>
 
-                  <base-checkbox v-model="model.rememberMe">Lembrar</base-checkbox>
+                  <base-checkbox v-model="rememberMe">Lembrar</base-checkbox>
                   <div class="text-center">
                     <base-button type="primary" native-type="submit" class="my-4">Entrar</base-button>
                   </div>
@@ -84,35 +84,63 @@
   </div>
 </template>
 <script>
+import tokenAuth from "@/queries/tokenAuth";
+import { mapActions } from 'vuex'
+import { mapMutations } from 'vuex'
+
   export default {
     layout: 'AuthLayout',
     data() {
       return {
-        model: {
+        credentials: {
           // passamos o email em username uma vez que a API do EL espera um post com username e password
           // Entretanto, aceita tanto o username quanto email nesse campo
           username: '',
           password: '',
-          rememberMe: false
-        }
+        },
+        rememberMe: false,
+        sucessfulData: null,
+        isAuthenticated: false
+
       };
     },
     methods: {
-      // onSubmit() {
-      //   // this will be called only after form is valid. You can do api call here to login
-      // }
+      // ...mapActions(['login']),
+
+
+      // loginUser() {
+        // this.$apollo.mutate({
+        //   mutation: tokenAuth,
+        //   variables: {
+        //     username: this.credentials.username,
+        //     password: this.credentials.password
+        //   }
+        // // }).then(data => this.login(data).then(() => this.$router.push('/painel'))
+        // }).then(data => console.log(data)
+        // );
+      // },
+
       async onSubmit() {
+        const credentials = this.credentials;
         try {
-          await this.$auth.loginWith('local', {
-            data: this.model
+          // await this.$store.dispatch('auth/login', credentials).then(
+            const res = await this.$apollo.mutate({
+              mutation: tokenAuth,
+              variables: credentials
+            }).then(({data}) => data && data.tokenAuth)
+            await this.$apolloHelpers.onLogin(res.token, undefined, {expires: 2});
+            this.sucessfulData = res;
+            this.isAuthenticated = true;
+            await this.$router.push({
+              path: "/painel"
+            });
+            this.$toasted.global.defaultSuccess({
+              msg: 'Usuário autenticado com sucesso'
           })
-          this.$toasted.global.defaultSuccess({
-            msg: 'Usuário autenticado com sucesso'
-          })
-        } catch (err) {
-          this.$toasted.global.defaultError({
+          } catch (e) {
+            this.$toasted.global.defaultError({
             msg: 'Usuário ou senha inválidos.'
-          })
+            })
         }
       }
     }

@@ -145,7 +145,7 @@
   </card>
 </template>
 <script>
-import updateSchool from '~/queries/updateSchool'
+import updateSchool from '@/queries/updateSchool.graphql'
 import Swal from 'sweetalert2';
 
   export default {

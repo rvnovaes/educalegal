@@ -7,7 +7,8 @@ module.exports = {
     base: '/',
     linkExactActiveClass: 'active',
     // Força autenticacao para acessar as paginas
-    middleware: ['auth'],
+    // middleware: ['auth'],
+    middleware: [],
   },
   /*
   ** Headers of the page
@@ -56,7 +57,7 @@ module.exports = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
-    '@nuxtjs/auth',
+    // '@nuxtjs/auth',
     '@nuxtjs/toast',
     '@nuxtjs/apollo'
   ],
@@ -99,105 +100,32 @@ module.exports = {
       }
     ]
   },
-  auth: {
-    strategies: {
-      local: {
-        endpoints: {
-          login: { url: '/v2/token/', method: 'post', propertyName: 'access', altProperty: 'refresh' },
-          logout: false,
-          user: { url: '/v2/user/', method: 'get', propertyName: false }
-          // user: false
-        }
-      }
-    },
-    redirect: {
-      login: '/',
-      logout: '/',
-      home: '/painel'
-    },
-  },
+  // auth: {
+  //   strategies: {
+  //     local: {
+  //       endpoints: {
+  //         login: { url: '/v2/token/', method: 'post', propertyName: 'access', altProperty: 'refresh' },
+  //         logout: false,
+  //         user: { url: '/v2/user/', method: 'get', propertyName: false }
+  //         // user: false
+  //       }
+  //     }
+  //   },
+  //   redirect: {
+  //     login: '/',
+  //     logout: '/',
+  //     home: '/painel'
+  //   },
+  // },
   // Give apollo module options
   apollo: {
-    // tokenName: 'auth._token.local', // optional, default: apollo-token
-    // cookieAttributes: {
-    //   /**
-    //    * Define when the cookie will be removed. Value can be a Number
-    //    * which will be interpreted as days from time of creation or a
-    //    * Date instance. If omitted, the cookie becomes a session cookie.
-    //    */
-    //   expires: 7, // optional, default: 7 (days)
-    //
-    //   /**
-    //    * Define the path where the cookie is available. Defaults to '/'
-    //    */
-    //   path: '/', // optional
-    //   /**
-    //    * Define the domain where the cookie is available. Defaults to
-    //    * the domain of the page where the cookie was created.
-    //    */
-    //   // domain: 'example.com', // optional
-    //
-    //   /**
-    //    * A Boolean indicating if the cookie transmission requires a
-    //    * secure protocol (https). Defaults to false.
-    //    */
-    //   secure: false,
-    // },
-    // includeNodeModules: false, // optional, default: false (this includes graphql-tag for node_modules folder)
-    // authenticationType: 'Bearer', // optional, default: 'Bearer'
-    authenticationType: 'Bearer', // optional, default: 'Bearer'
-    // // (Optional) Default 'apollo' definition
-    // defaultOptions: {
-    //   // See 'apollo' definition
-    //   // For example: default query options
-    //   $query: {
-    //     loadingKey: 'loading',
-    //     fetchPolicy: 'cache-and-network',
-    //   },
-    // },
-    // optional
-    // watchLoading: '~/plugins/apollo-watch-loading-handler.js',
-    // optional
-    // errorHandler: '~/plugins/apollo-error-handler.js',
-    // required
     clientConfigs: {
       default: {
-        // required
         // httpEndpoint: 'http://localhost:8008/graphql',
         httpEndpoint: 'http://localhost:8001/graphql',
-        // getAuth: () => ''
-        // optional
-        // override HTTP endpoint in browser only
-        // browserHttpEndpoint: '/graphql',
-        // optional
-        // See https://www.apollographql.com/docs/link/links/http.html#options
-        httpLinkOptions: {
-        //   headers : {
-        //     'X-CSRFToken': Cookies.get('csrftoken')
-        //   },
-          credentials: 'same-origin'
-        },
-        // You can use `wss` for secure connection (recommended in production)
-        // Use `null` to disable subscriptions
-        // wsEndpoint: 'ws://localhost:8008', // optional
-        // LocalStorage token
-        // tokenName: 'auth._token.local', // optional
-        // Enable Automatic Query persisting with Apollo Engine
-        // persisting: false, // Optional
-        // Use websockets for everything (no HTTP)
-        // You need to pass a `wsEndpoint` for this to work
-        // websocketsOnly: false // Optional
-      },
-      // test: {
-      //   httpEndpoint: 'http://localhost:3000',
-      //   wsEndpoint: 'ws://localhost:8008',
-      //   tokenName: 'apollo-token'
-      // },
-      // alternative: user path to config which returns exact same config options
-      // test2: '~/plugins/my-alternative-apollo-config.js'
+      }
     },
   },
-
   /*
   ** Build configuration
   */

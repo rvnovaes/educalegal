@@ -39,7 +39,7 @@
 
 <script>
   import EscolaForm from '@/components/pages/forms/EscolaForm'
-  import school from '~/queries/school'
+  import school from '@/queries/school.graphql'
 
 
   export default {
