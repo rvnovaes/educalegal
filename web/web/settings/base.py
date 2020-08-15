@@ -141,6 +141,9 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     # `allauth` specific authentication methods, such as login by e-mail
     "allauth.account.auth_backends.AuthenticationBackend",
+    # https://pypi.org/project/django-graphql-jwt/
+    #https://django-graphql-jwt.domake.io/en/latest/
+    "graphql_jwt.backends.JSONWebTokenBackend"
 )
 
 SITE_ID = 1
@@ -290,5 +293,8 @@ CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_BROKER_URL = 'amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal'
 
 GRAPHENE = {
-    'SCHEMA': 'api.schema.schema' # Where your Graphene schema lives
+    'SCHEMA': 'api.schema.schema', # Where your Graphene schema lives
+    'MIDDLEWARE': [
+        'graphql_jwt.middleware.JSONWebTokenMiddleware',
+    ],
 }

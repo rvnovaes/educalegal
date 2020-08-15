@@ -1,12 +1,22 @@
 import logging
 import graphene
 from graphql import GraphQLError
+import graphql_jwt
+from graphql_jwt.decorators import login_required
+
+from django.contrib.auth import authenticate, login
 from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType, DjangoConnectionField
 from document.models import Document
 from school.models import School, SchoolUnit
+from users.models import CustomUser
 
 logger = logging.getLogger(__name__)
+
+
+class UserType(DjangoObjectType):
+    class Meta:
+        model = CustomUser
 
 
 class DocumentType(DjangoObjectType):
@@ -47,6 +57,9 @@ class CreateSchool(graphene.Mutation):
 
 
 class UpdateSchool(graphene.Mutation):
+    # The class attributes define the response of the mutation
+    school = graphene.Field(SchoolType)
+
     class Arguments:
         # The input arguments for this mutation
         id = graphene.ID(required=True)
@@ -65,8 +78,6 @@ class UpdateSchool(graphene.Mutation):
         city = graphene.String()
         state = graphene.String()
 
-    # The class attributes define the response of the mutation
-    school = graphene.Field(SchoolType)
 
     @classmethod
     def mutate(cls, root, info, **kwargs):
@@ -107,6 +118,7 @@ class Query(graphene.ObjectType):
     all_documents = graphene.List(DocumentType)
     all_schools = graphene.List(SchoolType)
     school = graphene.Field(SchoolType, id=graphene.Int())
+    user = graphene.Field(UserType)
 
     def resolve_all_documents(self, info):
         tenant = info.context.user.tenant
@@ -128,11 +140,18 @@ class Query(graphene.ObjectType):
         id = kwargs.get("id")
         return School.objects.get(pk=id)
 
+    @login_required
+    def resolve_user(self, info, **kwargs):
+        return info.context.user
+
 
 class Mutation(graphene.ObjectType):
     create_school = CreateSchool.Field()
     update_school = UpdateSchool.Field()
     delete_school = DeleteSchool.Field()
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

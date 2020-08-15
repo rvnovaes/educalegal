@@ -7,7 +7,10 @@ drf-yasg~=1.17.1
 django-rest-auth~=0.9.5
 retry-requests~=1.0.1
 # FOr JWT authentication. Userd with Nuxt Authetication
-djangorestframework-simplejwt~=4.4.0
+# https://pypi.org/project/django-graphql-jwt/
+# https://django-graphql-jwt.domake.io/en/latest/
+django-graphql-jwt~=0.3.1
+# djangorestframework-simplejwt~=4.4.0
 # Formating of forms
 django-crispy-forms~=1.9.1
 # Database Access
