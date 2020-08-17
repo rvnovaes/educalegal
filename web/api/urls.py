@@ -4,6 +4,7 @@ from django.urls import path
 from .views import (
     DocumentViewSet,
     EnvelopeViewSet,
+    ESignatureAppSignerKeyViewSet,
     InterviewViewSet,
     PlanViewSet,
     SignerViewSet,
@@ -14,6 +15,7 @@ from .views import (
     TenantGedDataViewSet
 )
 
+from .clicksign_helpers import webhook_listener
 from .docusign_helpers import docusign_webhook_listener
 
 API_TITLE = "Educa Legal API"
@@ -37,6 +39,9 @@ urlpatterns = [
     path("tenants/<int:pk>/schools/", TenantSchoolViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>/schools/<int:spk>", TenantSchoolViewSet.as_view({"get": "retrieve"})),
     path("tenants/<int:pk>/ged/", TenantGedDataViewSet.as_view({"get": "retrieve"})),
+    path("esignature-app-signer-keys/<str:email>", ESignatureAppSignerKeyViewSet.as_view({"get": "retrieve"})),
+    path("esignature-app-signer-keys/", ESignatureAppSignerKeyViewSet.as_view({"post": "create"}),),
+    path("clicksign/webhook", webhook_listener),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
     # path("docs/", include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),

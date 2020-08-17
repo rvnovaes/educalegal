@@ -1,8 +1,8 @@
 import json
 
-from docassemble.base.util import log
+# from docassemble.base.util import log
 from enum import Enum
-from requests import Session
+from requests import Session, RequestException
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
@@ -228,8 +228,9 @@ class EducaLegalClient:
         try:
             response = self.session.post(final_url, data=payload)
         except Exception as e:
-            log("Erro ao gravar o envelope", "console")
-            log(e, "console")
+            print("Erro ao gravar o envelope", "console")
+            print(e, "console")
+            return e, 0
 
         return response.json(), response.status_code
 
@@ -267,6 +268,64 @@ class EducaLegalClient:
             # Content-Type header is set to application/json.
             response = self.session.post(final_url, json=recipients)
         except Exception as e:
-            log("Erro ao gravar o signers_log", "console")
-            log(e, "console")
+            print("Erro ao gravar o signers_log", "console")
+            print(e, "console")
+            return e
+
         return response.json(), response.status_code
+
+    def get_signer_key_by_email(self, recipients):
+        # separa somente os destinatarios que assinam o documento
+        recipients_sign = list()
+        for recipient in recipients:
+            if recipient['group'] == 'signers':
+                recipient['group'] = 'sign'
+                recipients_sign.append(recipient)
+
+        for recipient in recipients_sign:
+            final_url = self.api_base_url + "/v1/esignature-app-signer-keys/{email}".format(
+                email=recipient['email'])
+            try:
+                response = self.session.get(final_url)
+            except Exception as e:
+                print("Erro ao obter a chave do signatário.", "console")
+                print(e, "console")
+                return recipients, e, 0
+
+            if response.status_code == 404:
+                recipient['key'] = ''
+                recipient['new_signer'] = True
+            elif response.status_code == 200:
+                recipient['key'] = response.json()['key']
+                recipient['new_signer'] = False
+
+            recipient['status_code'] = response.status_code
+            recipient['response_json'] = response.json()
+
+        try:
+            return recipients, recipients_sign, response.status_code
+        except NameError:
+            return recipients, recipients_sign, 200
+
+    def post_signer_key(self, recipients, tenant_id):
+        for recipient in recipients:
+            if recipient['new_signer'] and recipient['status_code'] == 201:
+                payload = {
+                    "email": recipient['email'],
+                    "key": recipient['key'],
+                    "tenant": tenant_id,
+                }
+                final_url = self.api_base_url + "/v1/esignature-app-signer-keys/"
+
+                try:
+                    response = self.session.post(final_url, data=payload)
+                except Exception as e:
+                    print("Erro ao gravar a chave do signatário.", "console")
+                    print(e, "console")
+                    return recipients, e, 0
+        try:
+            # data_sent, data_received, status_code
+            return recipients, response.json(), response.status_code
+        except NameError:
+            # data_sent, data_received, status_code
+            return recipients, 'Todos os destinatários já existiam.', 200
