@@ -132,6 +132,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome completo:": receptors[i].name.text
+    validate: validate_person_full_name
     show if:
       variable: receptors[i].person_type
       is: individual
@@ -291,6 +292,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome completo:": revealings[i].name.text
+    validate: validate_person_full_name
     show if:
       variable: revealings[i].person_type
       is: individual

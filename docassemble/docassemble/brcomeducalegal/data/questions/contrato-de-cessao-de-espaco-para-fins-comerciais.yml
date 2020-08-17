@@ -131,6 +131,7 @@ question: |
 fields:
   - "Razão social:": cedentes[i].name.text
     help: "Nome da pessoa jurídica, conforme consta no CNPJ."
+    validate: validate_person_full_name
     required: True
   - "CNPJ:": cedentes[i].cnpj
     required: True
@@ -270,6 +271,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome completo:": cessionarias[i].name.text
+    validate: validate_person_full_name
     required: True
     show if:
       variable: cessionarias[i].person_type

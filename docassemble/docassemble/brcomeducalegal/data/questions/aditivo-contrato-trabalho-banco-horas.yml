@@ -75,6 +75,7 @@ question: |
   Dados do(a) Trabalhador
 fields:
   - "Nome completo:": workers[i].name.text
+    validate: validate_person_full_name
     required: True
   - "CPF:": workers[i].cpf
     required: True

@@ -142,6 +142,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome Completo:": locadores[i].name.text
+    validate: validate_person_full_name
     required: True
     show if: 
       variable: locadores[i].person_type
@@ -333,6 +334,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome Completo:": locatarios[i].name.text
+    validate: validate_person_full_name
     required: True
     show if: 
       variable: locatarios[i].person_type
@@ -526,6 +528,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome Completo:": fiadores[i].name.text
+    validate: validate_person_full_name
     required: True
     show if: 
       variable: fiadores[i].person_type

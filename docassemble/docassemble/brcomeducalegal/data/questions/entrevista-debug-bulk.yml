@@ -54,6 +54,7 @@ question: Dados do(a) Aluno(a)
 subquestion: ${ doc_uuid }
 fields:
   - 'Nome completo: ': nomeAluno
+    validate: validate_person_full_name
     datatype: text
     default: "Anton Bruckner"
 ---

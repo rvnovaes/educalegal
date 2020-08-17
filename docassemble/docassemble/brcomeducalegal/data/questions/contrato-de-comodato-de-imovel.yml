@@ -137,6 +137,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome Completo:": comodantes[i].name.text
+    validate: validate_person_full_name
     required: True
     show if: 
       variable: comodantes[i].person_type
@@ -328,6 +329,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome Completo:": comodatarias[i].name.text
+    validate: validate_person_full_name
     required: True
     show if: 
       variable: comodatarias[i].person_type

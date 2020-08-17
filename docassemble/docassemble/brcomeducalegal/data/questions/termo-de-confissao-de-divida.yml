@@ -121,6 +121,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome completo:": devedores[i].name.first
+    validate: validate_person_full_name
     required: True
     show if:
       variable: devedores[i].person_type
@@ -315,6 +316,7 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome completo:": fiadores[i].name.first
+    validate: validate_person_full_name
     required: True
     show if:
       variable: fiadores[i].person_type
