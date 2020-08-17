@@ -4,3 +4,10 @@
 //     let client = context.app.apolloProvider.defaultClient
 //   }
 // }
+//
+// export default {
+//   nuxtServerInit({commit}, {req}) {
+//     const token = getTokenFromCookie(req);
+//     token && commit("SET_AUTH_TOKEN", token);
+//   }
+// };
