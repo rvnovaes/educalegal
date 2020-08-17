@@ -181,6 +181,7 @@ fields:
       variable: locadores[i].person_type
       is: individual
   - "Razão social:": locadores[i].name.text
+    validate: validate_person_full_name
     required: True
     help: "Nome da pessoa jurídica, conforme consta no CNPJ."
     show if: 
@@ -373,6 +374,7 @@ fields:
       variable: locatarios[i].person_type
       is: individual
   - "Razão social:": locatarios[i].name.text
+    validate: validate_person_full_name
     required: True
     help: "Nome da pessoa jurídica, conforme consta no CNPJ."
     show if: 
@@ -567,6 +569,7 @@ fields:
       variable: fiadores[i].person_type
       is: individual
   - "Razão social:": fiadores[i].name.text
+    validate: validate_person_full_name
     required: True
     help: "Nome da pessoa jurídica, conforme consta no CNPJ."
     show if: 

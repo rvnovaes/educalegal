@@ -176,6 +176,7 @@ fields:
       variable: comodantes[i].person_type
       is: individual
   - "Razão social:": comodantes[i].name.text
+    validate: validate_person_full_name
     required: True
     help: "Nome da pessoa jurídica, conforme consta no CNPJ."
     show if: 
@@ -329,9 +330,9 @@ fields:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
   - "Nome Completo:": comodatarias[i].name.text
-    validate: validate_person_full_name
     required: True
-    show if: 
+    validate: validate_person_full_name
+    show if:
       variable: comodatarias[i].person_type
       is: individual
   - "CPF:": comodatarias[i].cpf
@@ -368,6 +369,7 @@ fields:
       variable: comodatarias[i].person_type
       is: individual
   - "Razão social:": comodatarias[i].name.text
+    validate: validate_person_full_name
     required: True
     help: "Nome da pessoa jurídica, conforme consta no CNPJ."
     show if: 

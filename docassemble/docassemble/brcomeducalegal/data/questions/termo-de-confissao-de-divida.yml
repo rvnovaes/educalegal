@@ -160,6 +160,7 @@ fields:
       variable: devedores[i].person_type
       is: individual
   - "Razão social:": devedores[i].name.first
+    validate: validate_person_full_name
     help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
     required: True
     show if:
@@ -356,6 +357,7 @@ fields:
       variable: fiadores[i].person_type
       is: individual
   - "Razão social:": fiadores[i].name.first
+    validate: validate_person_full_name
     help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
     required: True
     show if:

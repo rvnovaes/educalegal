@@ -129,6 +129,7 @@ fields:
       variable: contratadas[i].tipo_pessoa
       is: Jurídica
   - 'Nome completo:': contratadas[i].name.first
+    validate: validate_person_full_name
     datatype: text
     show if:
       variable: contratadas[i].tipo_pessoa

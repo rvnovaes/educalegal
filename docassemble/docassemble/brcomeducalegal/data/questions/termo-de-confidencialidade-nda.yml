@@ -166,6 +166,7 @@ fields:
       variable: receptors[i].person_type
       is: individual
   - "Razão social:": receptors[i].name.text
+    validate: validate_person_full_name
     help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
     show if:
       variable: receptors[i].person_type
@@ -326,6 +327,7 @@ fields:
       variable: revealings[i].person_type
       is: individual
   - "Razão social:": revealings[i].name.text
+    validate: validate_person_full_name
     help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
     show if:
       variable: revealings[i].person_type

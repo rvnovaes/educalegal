@@ -310,6 +310,7 @@ fields:
       variable: cessionarias[i].person_type
       is: individual
   - "Razão social:": cessionarias[i].name.text
+    validate: validate_person_full_name
     required: True
     help: "Nome da pessoa jurídica, conforme consta no CNPJ."
     show if:
