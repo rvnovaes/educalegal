@@ -84,9 +84,6 @@
   </div>
 </template>
 <script>
-import tokenAuth from "@/queries/tokenAuth";
-import { mapActions } from 'vuex'
-import { mapMutations } from 'vuex'
 
   export default {
     layout: 'AuthLayout',
@@ -102,43 +99,12 @@ import { mapMutations } from 'vuex'
       };
     },
     methods: {
-      // ...mapActions(['login']),
-
-
-      // loginUser() {
-        // this.$apollo.mutate({
-        //   mutation: tokenAuth,
-        //   variables: {
-        //     username: this.credentials.username,
-        //     password: this.credentials.password
-        //   }
-        // // }).then(data => this.login(data).then(() => this.$router.push('/painel'))
-        // }).then(data => console.log(data)
-        // );
-      // },
 
       async onSubmit() {
         const credentials = this.credentials
         try {
-          // await this.$store.dispatch('auth/login', credentials).then(
-            const res = await this.$apollo.mutate({
-              mutation: tokenAuth,
-              variables: credentials
-            }).then(({data}) => data && data.tokenAuth)
-            await this.$apolloHelpers.onLogin(res.token, undefined, {expires: 2});
-            console.log(res)
-            // console.log(this.$apolloHelpers.getToken())
-            // Store user and token on vuex
-            const username = res.payload.username
-            const token = res.token
-            this.$store.commit('graphql_auth/login_user', username)
-            this.$store.commit('graphql_auth/set_token', {token: token, exp: res.payload.exp, origlat: res.payload.origlat})
-
-
-            await this.$router.push({
-              path: "/painel"
-            });
-            this.$toasted.global.defaultSuccess({
+          await this.$auth.loginWith('local', { data: credentials })
+          this.$toasted.global.defaultSuccess({
               msg: 'Usuário autenticado com sucesso'
           })
           } catch (e) {

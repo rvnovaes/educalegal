@@ -1,6 +1,10 @@
 from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 from django.urls import path, include
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 
 from .views_v2 import (
@@ -52,4 +56,8 @@ urlpatterns = [
     path("user/", UserView.as_view(), name="users"),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
+
+    path("token/", TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path("token_refresh/", TokenRefreshView.as_view(), name='token_refresh')
+
 ]

@@ -16,15 +16,15 @@
           <div class="card-wrapper">
             <escola-form :id="school.id"
                          :name="school.name"
-                         :legal-name="school.legalName"
-                         :legal-nature="school.legalNature"
+                         :legal_name="school.legal_name"
+                         :legal_nature="school.legal_nature"
                          :cnpj="school.cnpj"
                          :phone="school.phone"
                          :site="school.site"
                          :email="school.email"
                          :zip="school.zip"
                          :street="school.street"
-                         :streetNumber="school.streetNumber"
+                         :street_number="school.street_number"
                          :unit="school.unit"
                          :neighborhood="school.neighborhood"
                          :city="school.city"
@@ -39,8 +39,6 @@
 
 <script>
   import EscolaForm from '@/components/pages/forms/EscolaForm'
-  import school from '@/queries/school.graphql'
-
 
   export default {
     name: 'escola-edicao',
@@ -50,21 +48,14 @@
     },
     data() {
       return {
-        school: '',
+        school_id: this.$route.params.id
       }
     },
-    apollo: {
-      school:{
-        query: school,
-        prefetch: ({ route }) => ({ id: route.params.id }),
-        variables () {
-          return {
-            id: this.$route.params.id
-          }
-        },
-        loadingKey: 'carregando...',
-        // update: data => data.school
-      }
+    async asyncData({ params, $axios }){
+      return $axios.$get(`http://localhost:8001/v2/tenant/schools/${params.id}`).then((response) => {
+        console.log(response)
+        return {school: response}
+      })
     }
   }
 </script>

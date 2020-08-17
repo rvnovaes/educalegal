@@ -213,7 +213,7 @@
                     <img alt="Image placeholder" src="img/theme/team-4.jpg">
                   </span>
             <div class="media-body ml-2 d-none d-lg-block">
-              <span class="mb-0 text-sm  font-weight-bold">NADA</span>
+              <span class="mb-0 text-sm  font-weight-bold">{{ fullName }}</span>
             </div>
           </div>
         </a>
@@ -241,7 +241,7 @@
           </a>
           <div class="dropdown-divider"></div>
 <!--          <a href="#!" class="dropdown-item">-->
-          <nuxt-link @click="onLogout" class="dropdown-item" to="/">
+          <nuxt-link @click.native="onLogout" class="dropdown-item" to="/">
             <i class="ni ni-user-run"></i>
             <span>Sair</span>
           </nuxt-link>
@@ -272,15 +272,14 @@
       }
     },
     computed: {
-      ...mapState('auth', ['loggedIn']),
       routeName() {
         const { name } = this.$route;
         return this.capitalizeFirstLetter(name);
       },
 
-      // fullName: function () {
-      //   return this.$auth.user.first_name + ' ' + this.$auth.user.last_name;
-      // }
+      fullName: function () {
+        return this.$auth.user.first_name + ' ' + this.$auth.user.last_name;
+      }
 
     },
     data() {
@@ -308,7 +307,9 @@
         this.$sidebar.displaySidebar(false);
       },
       onLogout(){
-        this.$apolloHelpers.onLogout()
+        this.$auth.logout();
+        // Certifique-se que sai da aplicacao. TODO: Pq o redirect do nuxt auth não funciona?
+        this.$router.push({path: '/'})
       }
     }
   };

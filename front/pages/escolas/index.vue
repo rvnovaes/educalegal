@@ -125,8 +125,8 @@ import RouteBreadCrumb from "@/components/argon-core/Breadcrumb/RouteBreadcrumb"
 import {BasePagination} from "@/components/argon-core";
 import clientPaginationMixin from "@/components/tables/PaginatedTables/clientPaginationMixin";
 import Swal from "sweetalert2";
-import allSchools from "@/queries/allSchools.graphql";
-import deleteSchool from "@/queries/deleteSchool.graphql";
+// import allSchools from "@/queries/allSchools.graphql";
+// import deleteSchool from "@/queries/deleteSchool.graphql";
 
 export default {
   mixins: [clientPaginationMixin],
@@ -141,7 +141,7 @@ export default {
   },
   data() {
     return {
-      propsToSearch: ["name", "legalName", "city", "state"],
+      propsToSearch: ["name", "legal_name", "city", "state"],
       tableColumns: [
         {
           type: "selection"
@@ -153,7 +153,7 @@ export default {
           sortable: true
         },
         {
-          prop: "legalName",
+          prop: "legal_name",
           label: "Razão Social",
           minWidth: 220,
           sortable: true
@@ -228,48 +228,40 @@ export default {
         tableRow => tableRow.id === row.id
       );
       if (indexToDelete >= 0) {
-        try {
-          const result = await this.$apollo.mutate({
-            mutation: deleteSchool,
-            variables: {
-              id: row.id
-            }
-          }).then((data) => {
-            console.log(data);
-            this.tableData.splice(indexToDelete, 1);
-          });
-        } catch (e) {
-          await Swal.fire({
-            title: `Erro ao excluir ${row.name}`,
-            text: e,
-            icon: 'error',
-            customClass: {
-              confirmButton: 'btn btn-info btn-fill',
-            },
-            confirmButtonText: 'OK',
-            buttonsStyling: false
-          });
-
-        }
+        // try {
+        //   const result = await this.$apollo.mutate({
+        //     mutation: deleteSchool,
+        //     variables: {
+        //       id: row.id
+        //     }
+        //   }).then((data) => {
+        //     console.log(data);
+        //     this.tableData.splice(indexToDelete, 1);
+        //   });
+        // } catch (e) {
+        //   await Swal.fire({
+        //     title: `Erro ao excluir ${row.name}`,
+        //     text: e,
+        //     icon: 'error',
+        //     customClass: {
+        //       confirmButton: 'btn btn-info btn-fill',
+        //     },
+        //     confirmButtonText: 'OK',
+        //     buttonsStyling: false
+        //   });
+        //
+        // }
       }
     },
     selectionChange(selectedRows) {
       this.selectedRows = selectedRows;
-    }
+    },
   },
-  apollo: {
-    tableData: {
-      query: allSchools,
-      prefetch: true,
-      loadingKey: "carregando...",
-      /*
-      O apollo tenta carregar allSchools em uma variavel chamada allSchools. Mas a chave que queremos usar e tableData
-      que e a usada pelo componente. Portanto, e preciso informar ao apollo pelo comando abaixo, ou seja, atualize
-      tableData (data) com o retorno (data.allSchools)
-      Ver https://apollo.vuejs.org/guide/apollo/queries.html#name-matching
-       */
-      update: data => data.allSchools
-    }
+  async asyncData({ $axios }){
+    return $axios.$get('http://localhost:8001/v2/tenant/schools').then((response) => {
+      console.log(response)
+      return {tableData: response.results}
+    })
   }
 };
 </script>

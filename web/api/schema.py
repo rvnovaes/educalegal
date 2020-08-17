@@ -131,20 +131,20 @@ class Query(graphene.ObjectType):
 
     @login_required
     def resolve_all_schools(self, info, **kwargs):
-        # tenant = info.context.user.tenant
-        # return School.objects.filter(tenant=tenant)
-        headers_authorization = info.context.headers['authorization']
-        return School.objects.all()
+        tenant = info.context.user.tenant
+        return School.objects.filter(tenant=tenant)
+        # headers_authorization = info.context.headers['authorization']
+        # return School.objects.all()
 
 
     @login_required
     def resolve_school(self, info, **kwargs):
-        # tenant = info.context.user.tenant
-        # return School.objects.get(pk=kwargs.get("id"), tenant=tenant)
-        headers_authorization = info.context.headers['authorization']
-        # payload = headers_authorization.split('.')[1]
-
-        return School.objects.get(pk=kwargs.get("id"))
+        tenant = info.context.user.tenant
+        return School.objects.get(pk=kwargs.get("id"), tenant=tenant)
+        # headers_authorization = info.context.headers['authorization']
+        # # payload = headers_authorization.split('.')[1]
+        #
+        # return School.objects.get(pk=kwargs.get("id"))
 
 
     @login_required

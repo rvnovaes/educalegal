@@ -23,7 +23,7 @@
                         placeholder="Razão Social"
                         rules="required"
                         success-message="Parece correto!"
-                        v-model="model.legalName">
+                        v-model="model.legal_name">
             </base-input>
           </div>
           <div class="col-md-2">
@@ -41,7 +41,7 @@
                           placeholder="Tipo "
                           rules="required"
                           success-message="Parece correto!"
-                          v-model="model.legalNature">
+                          v-model="model.legal_nature">
 <!--                <select class="form-control">-->
 <!--                  <option>J</option>-->
 <!--                  <option>F</option>-->
@@ -101,7 +101,7 @@
                         name="Número"
                         placeholder="Número"
                         rules="required"
-                        v-model="model.streetNumber">
+                        v-model="model.street_number">
             </base-input>
           </div>
           <div class="col-md-2">
@@ -145,11 +145,11 @@
   </card>
 </template>
 <script>
-import updateSchool from '@/queries/updateSchool.graphql'
+// import updateSchool from '@/queries/updateSchool.graphql'
 import Swal from 'sweetalert2';
 
   export default {
-    props: ['id', 'name', 'legalName', 'legalNature', 'cnpj', 'phone', 'site', 'email', 'zip', 'street', 'streetNumber', 'unit', 'neighborhood', 'city', 'state', 'zip'],
+    props: ['id', 'name', 'legal_name', 'legal_nature', 'cnpj', 'phone', 'site', 'email', 'zip', 'street', 'street_number', 'unit', 'neighborhood', 'city', 'state', 'zip'],
     components: {},
     data() {
       return {
@@ -157,15 +157,15 @@ import Swal from 'sweetalert2';
         model: {
           id: this.id,
           name: this.name,
-          legalName: this.legalName,
-          legalNature: this.legalNature,
+          legal_name: this.legal_name,
+          legal_nature: this.legal_nature,
           cnpj: this.cnpj,
           phone: this.phone,
           site: this.site,
           email: this.email,
           zip: this.zip,
           street: this.street,
-          streetNumber: this.streetNumber,
+          street_number: this.street_number,
           unit: this.unit,
           neighborhood: this.neighborhood,
           city: this.city,
@@ -180,11 +180,11 @@ import Swal from 'sweetalert2';
       name: function (newVal, oldVal){
         this.model.name = newVal
       },
-      legalName: function (newVal, oldVal){
-        this.model.legalName = newVal
+      legal_name: function (newVal, oldVal){
+        this.model.legal_name = newVal
       },
-      legalNature: function (newVal, oldVal){
-        this.model.legalNature = newVal
+      legal_nature: function (newVal, oldVal){
+        this.model.legal_nature = newVal
       },
       cnpj: function (newVal, oldVal){
         this.model.cnpj = newVal
@@ -204,8 +204,8 @@ import Swal from 'sweetalert2';
       street: function (newVal, oldVal){
         this.model.street = newVal
       },
-      streetNumber: function (newVal, oldVal){
-        this.model.streetNumber = newVal
+      street_number: function (newVal, oldVal){
+        this.model.street_number = newVal
       },
       unit: function (newVal, oldVal){
         this.model.unit = newVal
@@ -223,27 +223,26 @@ import Swal from 'sweetalert2';
     },
     methods: {
       async firstFormSubmit() {
+        const payload = {
+          id: this.model.id,
+          name: this.model.name,
+          legal_name: this.model.legal_name,
+          legal_nature: this.model.legal_nature,
+          cnpj: this.model.cnpj,
+          phone: this.model.phone,
+          site: this.model.site,
+          email: this.model.email,
+          zip: this.model.zip,
+          street: this.model.street,
+          street_number: this.model.street_number,
+          unit: this.model.unit,
+          neighborhood: this.model.neighborhood,
+          city: this.model.city,
+          state: this.model.state
+          }
         try {
-          const result = await this.$apollo.mutate({
-            mutation: updateSchool,
-            variables: {
-              id: this.model.id,
-              name: this.model.name,
-              legalName: this.model.legalName,
-              legalNature: this.model.legalNature,
-              cnpj: this.model.cnpj,
-              phone: this.model.phone,
-              site: this.model.site,
-              email: this.model.email,
-              zip: this.model.zip,
-              street: this.model.street,
-              streetNumber: this.model.streetNumber,
-              unit: this.model.unit,
-              neighborhood: this.model.neighborhood,
-              city: this.model.city,
-              state: this.model.state
-            },
-          }).then((data) => {
+          this.$axios.patch(`/tenant/schools/${this.model.id}`, payload)
+          .then((data) => {
             Swal.fire({
               title: `Você atualizou ${this.model.name} com sucesso!`,
               buttonsStyling: false,
@@ -268,7 +267,7 @@ import Swal from 'sweetalert2';
       },
       back: function () {
         this.$router.push({
-          path: '/escolas/listar'
+          path: '/escolas'
         })
       }
     }

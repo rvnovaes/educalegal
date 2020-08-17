@@ -10,7 +10,7 @@ retry-requests~=1.0.1
 # https://pypi.org/project/django-graphql-jwt/
 # https://django-graphql-jwt.domake.io/en/latest/
 django-graphql-jwt~=0.3.1
-# djangorestframework-simplejwt~=4.4.0
+djangorestframework-simplejwt
 # Formating of forms
 django-crispy-forms~=1.9.1
 # Database Access

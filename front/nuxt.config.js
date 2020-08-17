@@ -7,8 +7,7 @@ module.exports = {
     base: '/',
     linkExactActiveClass: 'active',
     // Força autenticacao para acessar as paginas
-    // middleware: ['auth'],
-    middleware: [],
+    middleware: ['auth'],
   },
   /*
   ** Headers of the page
@@ -45,8 +44,7 @@ module.exports = {
   */
   plugins: [
     '~/plugins/dashboard/dashboard-plugin',
-    // '~/plugins/axios-educa-legal',
-    // '~/plugins/http',
+    '~/plugins/axios-educa-legal',
     {src: '~/plugins/dashboard/full-calendar', ssr: false },
     {src: '~/plugins/dashboard/world-map', ssr: false },
   ],
@@ -56,34 +54,23 @@ module.exports = {
   */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    // '@nuxtjs/axios',
+    '@nuxtjs/axios',
     '@nuxtjs/pwa',
-    // '@nuxtjs/auth',
+    '@nuxtjs/auth',
     '@nuxtjs/toast',
-    '@nuxtjs/apollo',
-    // '@nuxt/http'
   ],
-
-  /*
-  ** Http module configuration
-  */
-
-  // http: {
-  //   debug: true
-  // },
-
 
   /*
   ** Axios module configuration
   */
-  // axios: {
-  //   // See https://github.com/nuxt-community/axios-module#options
-  //   // Default: http://[HOST]:[PORT][PREFIX]
-  //   // Defines the base URL which is used and prepended to make server side requests.
-  //   // Environment variable API_URL can be used to override baseURL.
-  //   // baseURL: 'http://localhost:8008'
-  //   baseURL: 'http://localhost:8001'
-  // },
+  axios: {
+    // See https://github.com/nuxt-community/axios-module#options
+    // Default: http://[HOST]:[PORT][PREFIX]
+    // Defines the base URL which is used and prepended to make server side requests.
+    // Environment variable API_URL can be used to override baseURL.
+    // baseURL: 'http://localhost:8008'
+    baseURL: 'http://localhost:8001'
+  },
 
   toast: {
     position: 'top-center',
@@ -112,32 +99,22 @@ module.exports = {
       }
     ]
   },
-  // auth: {
-  //   strategies: {
-  //     local: {
-  //       endpoints: {
-  //         login: { url: '/v2/token/', method: 'post', propertyName: 'access', altProperty: 'refresh' },
-  //         logout: false,
-  //         user: { url: '/v2/user/', method: 'get', propertyName: false }
-  //         // user: false
-  //       }
-  //     }
-  //   },
-  //   redirect: {
-  //     login: '/',
-  //     logout: '/',
-  //     home: '/painel'
-  //   },
-  // },
-  // Give apollo module options
-  apollo: {
-    clientConfigs: {
-      default: '~/plugins/apollo-config.js'
-    }
+  auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: '/v2/token/', method: 'post', propertyName: 'access', altProperty: 'refresh' },
+          user: { url: '/v2/user/', method: 'get', propertyName: false },
+          logout: false,
+        }
+      }
+    },
+    redirect: {
+      login: '/',
+      logout: '/',
+      home: '/painel'
+    },
   },
-  /*
-  ** Build configuration
-  */
   build: {
     transpile: [
       'vee-validate/dist/rules'
