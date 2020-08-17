@@ -31,6 +31,7 @@ urlpatterns = [
     url(r"^interview/", include("interview.urls")),
     url(r"^document/", include("document.urls")),
     url(r"^school/", include("school.urls")),
+    url(r"^users/", include("users.urls")),
     path("v1/", include("api.urls")),
     path("v1/api-auth/", include("rest_framework.urls")),
     url(

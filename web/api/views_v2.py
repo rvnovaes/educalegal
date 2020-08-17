@@ -15,7 +15,6 @@ from rest_framework.exceptions import (
 from rest_framework import status
 from validator_collection import checkers
 
-from billing.models import *
 from document.models import *
 from interview.models import *
 from school.models import *
@@ -29,7 +28,6 @@ from .serializers_v2 import (
     SchoolSerializer,
     SchoolUnitSerializer,
     TenantSerializer,
-    TenantGedDataSerializer,
 )
 
 logger = logging.getLogger(__name__)
