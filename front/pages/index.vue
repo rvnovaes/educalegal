@@ -99,9 +99,6 @@ import { mapMutations } from 'vuex'
           password: '',
         },
         rememberMe: false,
-        sucessfulData: null,
-        isAuthenticated: false
-
       };
     },
     methods: {
@@ -121,7 +118,7 @@ import { mapMutations } from 'vuex'
       // },
 
       async onSubmit() {
-        const credentials = this.credentials;
+        const credentials = this.credentials
         try {
           // await this.$store.dispatch('auth/login', credentials).then(
             const res = await this.$apollo.mutate({
@@ -129,8 +126,15 @@ import { mapMutations } from 'vuex'
               variables: credentials
             }).then(({data}) => data && data.tokenAuth)
             await this.$apolloHelpers.onLogin(res.token, undefined, {expires: 2});
-            this.sucessfulData = res;
-            this.isAuthenticated = true;
+            console.log(res)
+            // console.log(this.$apolloHelpers.getToken())
+            // Store user and token on vuex
+            const username = res.payload.username
+            const token = res.token
+            this.$store.commit('graphql_auth/login_user', username)
+            this.$store.commit('graphql_auth/set_token', {token: token, exp: res.payload.exp, origlat: res.payload.origlat})
+
+
             await this.$router.push({
               path: "/painel"
             });
@@ -138,6 +142,7 @@ import { mapMutations } from 'vuex'
               msg: 'Usuário autenticado com sucesso'
           })
           } catch (e) {
+            console.log(e)
             this.$toasted.global.defaultError({
             msg: 'Usuário ou senha inválidos.'
             })

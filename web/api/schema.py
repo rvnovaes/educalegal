@@ -3,21 +3,22 @@ import graphene
 from graphql import GraphQLError
 import graphql_jwt
 from graphql_jwt.decorators import login_required
+import jwt
 
 from django.contrib.auth import authenticate, login
 from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType, DjangoConnectionField
 from document.models import Document
 from school.models import School, SchoolUnit
-from users.models import CustomUser
+from graphql_jwt.decorators import login_required
+from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
 
 
 class UserType(DjangoObjectType):
     class Meta:
-        model = CustomUser
-
+        model = get_user_model()
 
 class DocumentType(DjangoObjectType):
     class Meta:
@@ -128,17 +129,23 @@ class Query(graphene.ObjectType):
     #     tenant = info.context.user.tenant
     #     return School.objects.filter(tenant=tenant)
 
-    @classmethod
-    def resolve_all_schools(cls, root, info, **kwargs):
+    @login_required
+    def resolve_all_schools(self, info, **kwargs):
         # tenant = info.context.user.tenant
         # return School.objects.filter(tenant=tenant)
+        headers_authorization = info.context.headers['authorization']
         return School.objects.all()
 
-    @classmethod
-    def resolve_school(cls, root, info, **kwargs):
-        user = info.context.user
-        id = kwargs.get("id")
-        return School.objects.get(pk=id)
+
+    @login_required
+    def resolve_school(self, info, **kwargs):
+        # tenant = info.context.user.tenant
+        # return School.objects.get(pk=kwargs.get("id"), tenant=tenant)
+        headers_authorization = info.context.headers['authorization']
+        # payload = headers_authorization.split('.')[1]
+
+        return School.objects.get(pk=kwargs.get("id"))
+
 
     @login_required
     def resolve_user(self, info, **kwargs):

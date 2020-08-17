@@ -21,7 +21,7 @@ module.exports = {
       { hid: 'description', name: 'description', content: 'Educa Legal - Advocacia Virtual para Escolas' }
     ],
     link: [
-      { rel: 'icon', type: 'image/png', href: 'favicon.png' },
+      { rel: 'icon', type: 'image/x-icon', href: 'favicon.ico' },
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700'},
       { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.6.3/css/all.css', integrity: "sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/", crossorigin: "anonymous"}
     ]
@@ -45,7 +45,8 @@ module.exports = {
   */
   plugins: [
     '~/plugins/dashboard/dashboard-plugin',
-    '~/plugins/axios-educa-legal',
+    // '~/plugins/axios-educa-legal',
+    // '~/plugins/http',
     {src: '~/plugins/dashboard/full-calendar', ssr: false },
     {src: '~/plugins/dashboard/world-map', ssr: false },
   ],
@@ -55,23 +56,34 @@ module.exports = {
   */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    '@nuxtjs/axios',
+    // '@nuxtjs/axios',
     '@nuxtjs/pwa',
     // '@nuxtjs/auth',
     '@nuxtjs/toast',
-    '@nuxtjs/apollo'
+    '@nuxtjs/apollo',
+    // '@nuxt/http'
   ],
+
+  /*
+  ** Http module configuration
+  */
+
+  // http: {
+  //   debug: true
+  // },
+
+
   /*
   ** Axios module configuration
   */
-  axios: {
-    // See https://github.com/nuxt-community/axios-module#options
-    // Default: http://[HOST]:[PORT][PREFIX]
-    // Defines the base URL which is used and prepended to make server side requests.
-    // Environment variable API_URL can be used to override baseURL.
-    // baseURL: 'http://localhost:8008'
-    baseURL: 'http://localhost:8001'
-  },
+  // axios: {
+  //   // See https://github.com/nuxt-community/axios-module#options
+  //   // Default: http://[HOST]:[PORT][PREFIX]
+  //   // Defines the base URL which is used and prepended to make server side requests.
+  //   // Environment variable API_URL can be used to override baseURL.
+  //   // baseURL: 'http://localhost:8008'
+  //   baseURL: 'http://localhost:8001'
+  // },
 
   toast: {
     position: 'top-center',
@@ -120,11 +132,8 @@ module.exports = {
   // Give apollo module options
   apollo: {
     clientConfigs: {
-      default: {
-        // httpEndpoint: 'http://localhost:8008/graphql',
-        httpEndpoint: 'http://localhost:8001/graphql',
-      }
-    },
+      default: '~/plugins/apollo-config.js'
+    }
   },
   /*
   ** Build configuration

@@ -213,7 +213,7 @@
                     <img alt="Image placeholder" src="img/theme/team-4.jpg">
                   </span>
             <div class="media-body ml-2 d-none d-lg-block">
-              <span class="mb-0 text-sm  font-weight-bold">{{ fullName }}</span>
+              <span class="mb-0 text-sm  font-weight-bold">NADA</span>
             </div>
           </div>
         </a>
@@ -241,7 +241,7 @@
           </a>
           <div class="dropdown-divider"></div>
 <!--          <a href="#!" class="dropdown-item">-->
-          <nuxt-link class="dropdown-item" to="/logout">
+          <nuxt-link @click="onLogout" class="dropdown-item" to="/">
             <i class="ni ni-user-run"></i>
             <span>Sair</span>
           </nuxt-link>
@@ -278,9 +278,9 @@
         return this.capitalizeFirstLetter(name);
       },
 
-      fullName: function () {
-        return this.$auth.user.first_name + ' ' + this.$auth.user.last_name;
-      }
+      // fullName: function () {
+      //   return this.$auth.user.first_name + ' ' + this.$auth.user.last_name;
+      // }
 
     },
     data() {
@@ -306,6 +306,9 @@
       },
       hideSidebar() {
         this.$sidebar.displaySidebar(false);
+      },
+      onLogout(){
+        this.$apolloHelpers.onLogout()
       }
     }
   };

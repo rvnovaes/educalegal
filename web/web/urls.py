@@ -12,6 +12,8 @@ from drf_yasg import openapi
 from graphene_django.views import GraphQLView
 from api.private_graphql import PrivateGraphQLView
 from api.schema import schema
+from graphql_jwt.decorators import jwt_cookie
+
 
 from allauth.account.views import LoginView
 
@@ -70,13 +72,14 @@ urlpatterns = [
       url(
           r"^v2/docs/redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
       ),
+      # url(r'^graphql$', csrf_exempt(jwt_cookie(GraphQLView.as_view(graphiql=True))))
       url(r'^graphql$', csrf_exempt(GraphQLView.as_view(graphiql=True)))
       # url(r'^graphql$', csrf_exempt(PrivateGraphQLView.as_view(graphiql=True, schema=schema)))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if settings.SILK:
-    urlpatterns.append(url(r"^silk/", include("silk.urls", namespace="silk")))
+# if settings.SILK:
+#     urlpatterns.append(url(r"^silk/", include("silk.urls", namespace="silk")))
 
 if settings.DEBUG:
     import debug_toolbar
