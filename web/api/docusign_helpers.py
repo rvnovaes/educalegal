@@ -13,7 +13,7 @@ from django.conf import settings
 
 from document.models import Document, Envelope, Signer, DocumentStatus
 from interview.models import Interview
-from tenant.models import Tenant, TenantGedData
+from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
 
 from .mayan_helpers import MayanClient
 
@@ -62,9 +62,6 @@ def docusign_xml_parser(data):
     envelope_data["envelope_sent"] = xml["EnvelopeStatus"]["Sent"]
     envelope_data["envelope_time_generated"] = xml["EnvelopeStatus"]["TimeGenerated"]
 
-    logger.info('Envelope_data antes do parse')
-    logger.info(envelope_data)
-
     # converte a data do docusign que vem no formato ISO 8601 (2020-04-15T11:20:19.693) para datetime
     envelope_data['envelope_created'] = dateparser.parse(envelope_data['envelope_created'])
     envelope_data['envelope_sent'] = dateparser.parse(envelope_data['envelope_sent'])
@@ -85,9 +82,6 @@ def docusign_xml_parser(data):
         envelope_data_translated["envelope_status"] = DocumentStatus.NAO_ENCONTRADO.value
 
     recipient_statuses = xml["EnvelopeStatus"]["RecipientStatuses"]["RecipientStatus"]
-
-    logger.info('recipient_statuses antes do parse')
-    logger.info(recipient_statuses)
 
     # translation of the type and status of the recipient
     for recipient_status in recipient_statuses:
@@ -261,7 +255,7 @@ def docusign_webhook_listener(request):
                 envelope_created_date=envelope_data['envelope_created'],
                 sent_date=envelope_data['envelope_sent'],
                 status_update_date=envelope_data['envelope_time_generated'],
-                signing_provider='Docusign',
+                signing_provider=ESignatureAppProvider.DOCUSIGN.value,
                 tenant=tenant,
             )
             envelope.save()

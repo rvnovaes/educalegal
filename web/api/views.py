@@ -9,11 +9,12 @@ from document.models import Document, Envelope, Signer
 from document.views import query_documents_by_args
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData
+from tenant.models import Tenant, TenantGedData, ESignatureAppSignerKey
 
 from .serializers import (
     DocumentSerializer,
     EnvelopeSerializer,
+    ESignatureAppSignerKeySerializer,
     InterviewSerializer,
     PlanSerializer,
     SchoolSerializer,
@@ -139,3 +140,21 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return TenantGedData.objects.filter(tenant=self.kwargs["pk"])
+
+
+class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
+    serializer_class = ESignatureAppSignerKeySerializer
+    # default 'pk', se quiser pesquisar por outro campo deve alterar o lookup_field
+    lookup_field = 'email'
+
+    def get_queryset(self):
+        try:
+            # deve ser usada a funcao filter e nao a get para que seja retornado um queryset e nao um
+            # ESignatureAppSignerKey
+            # como cada cliente tem uma conta da clicksig, deve ser verificado o tenant tbm
+            esignature_app_signer_key = ESignatureAppSignerKey.objects.filter(
+                pk=self.request.user.tenant.id, email=self.kwargs['email'])
+        except ESignatureAppSignerKey.DoesNotExist:
+            return ESignatureAppSignerKey.objects.none()
+
+        return esignature_app_signer_key

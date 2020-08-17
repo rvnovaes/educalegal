@@ -1,9 +1,18 @@
 from django.db import models
 from billing.models import Plan
-
+from enum import Enum
 
 # For genenral informations about the structure we used here, see:
 # https://books.agiliq.com/projects/django-multi-tenant/en/latest/
+
+
+class ESignatureAppProvider(Enum):
+    CLICKSIGN = "ClickSign"
+    DOCUSIGN = "Docusign"
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
 
 
 class ESignatureApp(models.Model):
@@ -11,7 +20,10 @@ class ESignatureApp(models.Model):
         max_length=255, default="Educa Legal Development", verbose_name="Nome da Aplicação Cliente",
     )
     provider = models.CharField(
-        max_length=255, default="Docusign", verbose_name="Fornecedor",
+        max_length=255,
+        choices=ESignatureAppProvider.choices(),
+        default=ESignatureAppProvider.CLICKSIGN.value,
+        verbose_name="Fornecedor",
     )
     private_key = models.TextField(verbose_name="Private Key")
     client_id = models.CharField(
@@ -38,21 +50,21 @@ class ESignatureApp(models.Model):
 
 class Tenant(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    subdomain_prefix = models.CharField(
-        max_length=100, null=True, blank=True, unique=True
-    )
-    eua_agreement = models.BooleanField(
-        default=True, verbose_name="Concordo com os termos de uso"
-    )
+    subdomain_prefix = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    eua_agreement = models.BooleanField(default=True, verbose_name="Concordo com os termos de uso")
     plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="tenants", verbose_name="Plano", default=1)
-
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
-
     auto_enrolled = models.BooleanField(
         default=False, verbose_name="Autoinscrito"
     )
-
-    esignature_app = models.ForeignKey(ESignatureApp, null=True, blank=True, on_delete=models.PROTECT, default=1)
+    esignature_app = models.ForeignKey(
+        ESignatureApp,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        default=1,
+        verbose_name='App de assinatura eletrônica')
+    phone = models.CharField(max_length=50, blank=True, verbose_name="Telefone")
 
     class Meta:
         ordering = ["name"]
@@ -117,3 +129,20 @@ class TenantGedData(models.Model):
 
     def __str__(self):
         return self.url
+
+
+class ESignatureAppSignerKey(TenantAwareModel):
+    email = models.EmailField(max_length=255, unique=True, verbose_name="E-mail")
+    key = models.CharField(max_length=255, unique=True, verbose_name="Chave")
+
+    class Meta:
+        ordering = ["email"]
+        verbose_name = "Chave do signatário para assinatura eletrônica"
+        verbose_name_plural = "Chaves do signatário para assinatura eletrônica"
+        unique_together = (('email', 'key'),)
+        indexes = [
+            models.Index(fields=['email']),
+        ]
+
+    def __str__(self):
+        return self.email + ' - ' + self.key

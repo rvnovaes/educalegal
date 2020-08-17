@@ -105,7 +105,6 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
             document["content_document"] = "notificacao-extrajudicial.docx"
 
-
         elif interview_type_id == DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['workers']
