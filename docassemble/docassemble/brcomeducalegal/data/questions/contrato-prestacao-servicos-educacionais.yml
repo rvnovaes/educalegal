@@ -60,6 +60,8 @@ code: |
       if has_input_value == 'sim':
         input_date_format = format_date(input_date, format='dd/MM/yyyy')
       installments_list = list()
+      installments_date_day = format_date(installments_date, format='dd')
+      installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
       for v in range(0, quantity_installments):
         installments = dict()
         installments_due = installments_date.plus(months=v)
@@ -408,9 +410,10 @@ fields:
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#X2ZpZWxkXzE').mask('000000000000000.00', {reverse: true});
-        $('#X2ZpZWxkXzc').mask('000000000000000.00', {reverse: true});
+        $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
         $('#X2ZpZWxkXzQ').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzEw').mask('000000000000000.00', {reverse: true});
       });
   </script>
 ---
