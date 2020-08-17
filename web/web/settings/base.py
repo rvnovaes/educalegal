@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     "rest_auth",
     # Swagger -> https://github.com/axnsan12/drf-yasg
     "drf_yasg",
-    # Not sure yet what it does...
+    # A Django App that adds Cross-Origin Resource Sharing (CORS) headers to responses.
+    # This allows in-browser requests to your Django application from other origins.
     "corsheaders",
     # Alternative storage for files in Django
     "storages",
@@ -67,9 +68,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -139,11 +140,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
-    # `allauth` specific authentication methods, such as login by e-mail
-    "allauth.account.auth_backends.AuthenticationBackend",
     # https://pypi.org/project/django-graphql-jwt/
     #https://django-graphql-jwt.domake.io/en/latest/
-    "graphql_jwt.backends.JSONWebTokenBackend"
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+
 )
 
 SITE_ID = 1
@@ -197,7 +199,6 @@ REST_FRAMEWORK = {
         # Session Authentication is kept here for the browseable API
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
-        "rest_framework_simplejwt.authentication.JWTAuthentication"
     ],
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -221,12 +222,15 @@ REST_FRAMEWORK = {
 }
 
 
-CORS_ORIGIN_WHITELIST = (
+CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-)
+    "http://localhost:8001",
+]
+
+# CORS_ALLOW_CREDENTIALS = True
+
+# CORS_ORIGIN_ALLOW_ALL = True
 
 LOGGING = {
     "version": 1,
@@ -295,6 +299,15 @@ CELERY_BROKER_URL = 'amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal
 GRAPHENE = {
     'SCHEMA': 'api.schema.schema', # Where your Graphene schema lives
     'MIDDLEWARE': [
+        'web.middleware.jwt_authentication_middleware.JWTAuthenticationMiddleware',
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
 }
+
+GRAPHQL_JWT = {
+    "JWT_AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "JWT_AUTH_HEADER_PREFIX": "JWT",
+    "JWT_COOKIE_NAME": "apollo-token",
+}
+
+
