@@ -76,6 +76,7 @@ question: |
   Nome do Fornecedor
 fields:
   - "Nome completo:": fornecedores[i].name.text
+    validate: validate_person_full_name
     required: True
   - "E-mail:": fornecedores[i].email
     help: ${ help_email_msg }

@@ -87,6 +87,7 @@ question: |
   % endif
 fields:
   - "Nome completo:": authorizers[i].name.first
+    validate: validate_person_full_name
     required: True
   - "CPF:": authorizers[i].cpf
     required: True

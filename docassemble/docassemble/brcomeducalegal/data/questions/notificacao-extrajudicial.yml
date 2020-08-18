@@ -70,6 +70,7 @@ question: |
   Dados do(a) notificado
 fields:
   - "Nome completo:": notifieds[i].name.text
+    validate: validate_person_full_name
     required: True
   - "CPF:": notifieds[i].cpf
     required: True

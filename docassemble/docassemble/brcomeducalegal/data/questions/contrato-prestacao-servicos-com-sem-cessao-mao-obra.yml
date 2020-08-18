@@ -116,24 +116,18 @@ fields:
     choices:
       - Física
       - Jurídica
-  - 'Razão social:': contratadas[i].name.first
-    datatype: text
-    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
-    show if:
-      variable: contratadas[i].tipo_pessoa
-      is: Jurídica
+  - 'Nome/Razão social:': contratadas[i].name.first
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("contratadas[i].tipo_pessoa")
   - 'CNPJ:': contratadas[i].cnpj
-    datatype: text
+    validate: validate_cnpj
     show if:
       variable: contratadas[i].tipo_pessoa
       is: Jurídica
-  - 'Nome completo:': contratadas[i].name.first
-    datatype: text
-    show if:
-      variable: contratadas[i].tipo_pessoa
-      is: Física
   - 'CPF:': contratadas[i].cpf
-    datatype: text
+    validate: validate_cpf
     show if:
       variable: contratadas[i].tipo_pessoa
       is: Física
@@ -174,7 +168,7 @@ script: |
   <script type='text/javascript'>
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('00.000.000/0000-00', {reverse: true});
-        $('#X2ZpZWxkXzQ').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzM').mask('000.000.000-00', {reverse: true});
       });
   </script>
 ---
@@ -362,12 +356,12 @@ fields:
       is: conta corrente
       variable: tipoPagamento
   - 'CNPJ:': cnpj_cc
-    datatype: text
+    validate: validate_cnpj
     show if:
       variable: tipo_pessoa_cc
       is: Jurídica
   - 'CPF:': cpf_cc
-    datatype: text
+    validate: validate_cpf
     show if:
       variable: tipo_pessoa_cc
       is: Física

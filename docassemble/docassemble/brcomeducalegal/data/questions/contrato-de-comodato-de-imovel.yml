@@ -136,11 +136,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome Completo:": comodantes[i].name.text
-    required: True
-    show if: 
-      variable: comodantes[i].person_type
-      is: individual
+  - 'Nome/Razão social:': comodantes[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("comodantes[i].person_type")
   - "CPF:": comodantes[i].cpf
     required: True
     validate: validate_cpf
@@ -174,12 +174,6 @@ fields:
     show if: 
       variable: comodantes[i].person_type
       is: individual
-  - "Razão social:": comodantes[i].name.text
-    required: True
-    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
-    show if: 
-      variable: comodantes[i].person_type
-      is: organization  
   - "CNPJ:": comodantes[i].cnpj
     required: True
     validate: validate_cnpj
@@ -196,7 +190,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 ---
@@ -327,11 +321,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome Completo:": comodatarias[i].name.text
-    required: True
-    show if: 
-      variable: comodatarias[i].person_type
-      is: individual
+  - 'Nome/Razão social:': comodatarias[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("comodatarias[i].person_type")
   - "CPF:": comodatarias[i].cpf
     required: True
     validate: validate_cpf
@@ -365,12 +359,6 @@ fields:
     show if: 
       variable: comodatarias[i].person_type
       is: individual
-  - "Razão social:": comodatarias[i].name.text
-    required: True
-    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
-    show if: 
-      variable: comodatarias[i].person_type
-      is: organization  
   - "CNPJ:": comodatarias[i].cnpj
     required: True
     validate: validate_cnpj
@@ -387,7 +375,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 ---
