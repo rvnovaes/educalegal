@@ -171,10 +171,18 @@ export default {
           sortable: true
         },
       ],
-      tableData: [],
+      // tableData: [],
       selectedRows: []
     };
   },
+  computed: {
+    tableData () {
+      return this.$store.getters["schools/getAllSchools"]
+    }
+  },
+  async fetch({store}) {
+   await store.dispatch('schools/fetchAllSchools')
+ },
   methods: {
     handleLike(index, row) {
       Swal.fire({
@@ -257,12 +265,12 @@ export default {
       this.selectedRows = selectedRows;
     },
   },
-  async asyncData({ $axios }){
-    return $axios.$get('http://localhost:8001/v2/tenant/schools').then((response) => {
-      console.log(response)
-      return {tableData: response.results}
-    })
-  }
+  // async asyncData({ $axios }){
+  //   return $axios.$get('http://localhost:8001/v2/tenant/schools').then((response) => {
+  //     console.log(response)
+  //     return {tableData: response.results}
+  //   })
+  // }
 };
 </script>
 <style>

@@ -48,14 +48,13 @@
     },
     data() {
       return {
-        school_id: this.$route.params.id
+        id: this.$route.params.id
       }
     },
-    async asyncData({ params, $axios }){
-      return $axios.$get(`http://localhost:8001/v2/tenant/schools/${params.id}`).then((response) => {
-        console.log(response)
-        return {school: response}
-      })
+    computed: {
+      school () {
+        return this.$store.state.schools.schools.find(school => school.id === Number(this.id))
+      }
     }
   }
 </script>
