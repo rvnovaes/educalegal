@@ -118,7 +118,7 @@ fields:
       - Jurídica
   - 'Nome/Razão social:': contratadas[i].name.first
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("contratadas[i].tipo_pessoa")
   - 'CNPJ:': contratadas[i].cnpj

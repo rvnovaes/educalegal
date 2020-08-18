@@ -133,7 +133,7 @@ fields:
       - Pessoa Jurídica: organization
   - 'Nome/Razão social:': receptors[i].name.text
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("receptors[i].person_type")
   - "CPF:": receptors[i].cpf
@@ -288,7 +288,7 @@ fields:
       - Pessoa Jurídica: organization
   - 'Nome/Razão social:': revealings[i].name.text
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("revealings[i].person_type")
   - "CPF:": revealings[i].cpf

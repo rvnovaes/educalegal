@@ -143,7 +143,7 @@ fields:
       - Pessoa Jurídica: organization
   - 'Nome/Razão social:': locadores[i].name.text
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("locadores[i].person_type")
   - "CPF:": locadores[i].cpf
@@ -328,7 +328,7 @@ fields:
       - Pessoa Jurídica: organization
   - 'Nome/Razão social:': locatarios[i].name.text
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("locatarios[i].person_type")
   - "CPF:": locatarios[i].cpf
@@ -515,7 +515,7 @@ fields:
       - Pessoa Jurídica: organization
   - 'Nome/Razão social:': fiadores[i].name.text
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("fiadores[i].person_type")
   - "CPF:": fiadores[i].cpf

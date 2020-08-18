@@ -272,7 +272,7 @@ fields:
       - Pessoa Jurídica: organization
   - 'Nome/Razão social:': cessionarias[i].name.text
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("cessionarias[i].person_type")
   - "CPF:": cessionarias[i].cpf

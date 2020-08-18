@@ -138,7 +138,7 @@ fields:
       - Pessoa Jurídica: organization
   - 'Nome/Razão social:': comodantes[i].name.text
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("comodantes[i].person_type")
   - "CPF:": comodantes[i].cpf
@@ -323,7 +323,7 @@ fields:
       - Pessoa Jurídica: organization
   - 'Nome/Razão social:': comodatarias[i].name.text
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("comodatarias[i].person_type")
   - "CPF:": comodatarias[i].cpf
