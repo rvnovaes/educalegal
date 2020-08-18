@@ -53,7 +53,9 @@
     },
     computed: {
       school () {
-        return this.$store.state.schools.schools.find(school => school.id === Number(this.id))
+        // return this.$store.state.schools.schools.find(school => school.id === Number(this.id))
+        // return this.$store.getters.schools.getSchool(Number(this.id))
+        return this.$store.getters["schools/getSchool"](this.id)
       }
     }
   }

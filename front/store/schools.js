@@ -5,7 +5,7 @@ export const state = () => ({
 
 export const mutations = {
   setSchool (state, school) {
-    state.schools = school
+    state.currentSchool = school
   },
   addSchool (state, school) {
     state.schools.push(school)
@@ -19,8 +19,9 @@ export const getters = {
   getAllSchools(state){
     return state.schools
   },
-  getCurrentSchool(state){
-    return state.currentSchool
+  // https://vuex.vuejs.org/guide/getters.html#method-style-access
+  getSchool:(state) => (id) => {
+    return state.schools.find(school => school.id === Number(id))
   }
 }
 
@@ -39,4 +40,11 @@ export const actions = {
       }
     })
   },
+  // fetchSchool({commit}, id) {
+  //   return this.$axios.get(`http://localhost:8001/v2/tenant/schools/${id}`).then(res => {
+  //     if (res.status === 200) {
+  //       commit('setSchool', res.data)
+  //     }
+  //   })
+  // },
 }
