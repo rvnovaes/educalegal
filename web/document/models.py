@@ -3,7 +3,8 @@ import uuid
 from enum import Enum
 
 from django.db import models
-from django.contrib.postgres.fields import JSONField
+# from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 
 from tenant.models import TenantAwareModel
 from interview.models import Interview
