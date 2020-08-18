@@ -264,6 +264,7 @@ question: |
 fields:
   - Número: shareholders.target_number
     datatype: integer
+    default: 1
     min: 1
 ---
 section: Acionistas
