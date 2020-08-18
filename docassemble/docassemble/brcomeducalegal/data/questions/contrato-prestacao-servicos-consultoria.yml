@@ -112,6 +112,7 @@ progress: 35
 question: Dados do(a) ${word(ordinal(i)) } Contratada
 fields:
   - 'Razão social:': contratadas[i].name.first
+    validate: validate_person_full_name
     datatype: text
     help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
   - 'CNPJ:': contratadas[i].cnpj

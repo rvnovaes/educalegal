@@ -131,6 +131,7 @@ question: |
 fields:
   - "Razão social:": cedentes[i].name.text
     help: "Nome da pessoa jurídica, conforme consta no CNPJ."
+    validate: validate_person_full_name
     required: True
   - "CNPJ:": cedentes[i].cnpj
     required: True
@@ -269,11 +270,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome completo:": cessionarias[i].name.text
-    required: True
-    show if:
-      variable: cessionarias[i].person_type
-      is: individual
+  - 'Nome/Razão social:': cessionarias[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("cessionarias[i].person_type")
   - "CPF:": cessionarias[i].cpf
     validate: validate_cpf
     required: True
@@ -307,12 +308,6 @@ fields:
     show if:
       variable: cessionarias[i].person_type
       is: individual
-  - "Razão social:": cessionarias[i].name.text
-    required: True
-    help: "Nome da pessoa jurídica, conforme consta no CNPJ."
-    show if:
-      variable: cessionarias[i].person_type
-      is: organization
   - "CNPJ:": cessionarias[i].cnpj
     validate: validate_cnpj
     required: True
@@ -329,7 +324,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $("#X2ZpZWxkXzI").mask("000.000.000-00", {reverse: true});
-        $("#X2ZpZWxkXzg").mask("00.000.000/0000-00", {reverse: true});
+        $("#X2ZpZWxkXzc").mask("00.000.000/0000-00", {reverse: true});
       });
   </script>
 ---

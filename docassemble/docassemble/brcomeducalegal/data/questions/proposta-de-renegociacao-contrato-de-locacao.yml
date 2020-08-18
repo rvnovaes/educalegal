@@ -78,6 +78,7 @@ question: |
   Nome do Locador
 fields:
   - "Nome completo:": locadores[i].name.text
+    validate: validate_person_full_name
     required: True
   - "E-mail:": locadores[i].email
     help: ${ help_email_msg }

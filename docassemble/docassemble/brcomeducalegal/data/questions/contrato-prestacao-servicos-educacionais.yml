@@ -214,6 +214,7 @@ section: Contratantes
 question: Dados do(a) ${word(ordinal(i)) } Contratante
 fields:
   - 'Nome completo: ': contractors[i].name.text
+    validate: validate_person_full_name
     datatype: text
   - 'CPF: ': contractors[i].cpf
     datatype: text

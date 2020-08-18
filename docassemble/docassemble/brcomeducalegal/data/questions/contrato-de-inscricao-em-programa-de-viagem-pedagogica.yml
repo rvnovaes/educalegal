@@ -157,6 +157,7 @@ question: |
   Dados do(a) ${ word(ordinal(i)) } participante
 fields:
   - "Nome Completo:": participants[i].name.first
+    validate: validate_person_full_name
     required: True
   - "CPF:": participants[i].cpf
     required: True
