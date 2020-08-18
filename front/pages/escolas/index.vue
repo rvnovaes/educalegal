@@ -9,8 +9,8 @@
           </nav>
         </div>
         <div class="col-lg-6 col-5 text-right">
-          <base-button size="sm" type="neutral">New</base-button>
-          <base-button size="sm" type="neutral">Filters</base-button>
+          <base-button size="sm" type="neutral" @click="handleNew">Nova</base-button>
+<!--          <base-button size="sm" type="neutral">Filters</base-button>-->
         </div>
       </div>
     </base-header>
@@ -184,6 +184,14 @@ export default {
    await store.dispatch('schools/fetchAllSchools')
  },
   methods: {
+    handleNew() {
+      this.$router.push({
+        path: "/escolas/criar"
+      });
+
+    },
+
+
     handleLike(index, row) {
       Swal.fire({
         title: `Você marcou ${row.name} como favorita`,

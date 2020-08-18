@@ -59,6 +59,15 @@ export const actions = {
       }
     })
   },
+  createSchool({commit}, school) {
+    return this.$axios.post(`/v2/tenant/schools/`, school).then(res => {
+      if (res.status === 200) {
+        console.log(res)
+        commit('addSchool', school)
+      }
+    })
+  }
+
   // fetchSchool({commit}, id) {
   //   return this.$axios.get(`http://localhost:8001/v2/tenant/schools/${id}`).then(res => {
   //     if (res.status === 200) {
