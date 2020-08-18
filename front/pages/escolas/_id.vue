@@ -14,21 +14,7 @@
       <div class="row">
         <div class="col">
           <div class="card-wrapper">
-            <escola-form :id="school.id"
-                         :name="school.name"
-                         :legal_name="school.legal_name"
-                         :legal_nature="school.legal_nature"
-                         :cnpj="school.cnpj"
-                         :phone="school.phone"
-                         :site="school.site"
-                         :email="school.email"
-                         :zip="school.zip"
-                         :street="school.street"
-                         :street_number="school.street_number"
-                         :unit="school.unit"
-                         :neighborhood="school.neighborhood"
-                         :city="school.city"
-                         :state="school.state">
+            <escola-form :school="school">
             </escola-form>
           </div>
         </div>
@@ -53,8 +39,6 @@
     },
     computed: {
       school () {
-        // return this.$store.state.schools.schools.find(school => school.id === Number(this.id))
-        // return this.$store.getters.schools.getSchool(Number(this.id))
         return this.$store.getters["schools/getSchool"](this.id)
       }
     }

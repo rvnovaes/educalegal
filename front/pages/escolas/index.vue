@@ -125,8 +125,7 @@ import RouteBreadCrumb from "@/components/argon-core/Breadcrumb/RouteBreadcrumb"
 import {BasePagination} from "@/components/argon-core";
 import clientPaginationMixin from "@/components/tables/PaginatedTables/clientPaginationMixin";
 import Swal from "sweetalert2";
-// import allSchools from "@/queries/allSchools.graphql";
-// import deleteSchool from "@/queries/deleteSchool.graphql";
+
 
 export default {
   mixins: [clientPaginationMixin],
@@ -180,6 +179,7 @@ export default {
       return this.$store.getters["schools/getAllSchools"]
     }
   },
+
   async fetch({store}) {
    await store.dispatch('schools/fetchAllSchools')
  },
@@ -231,46 +231,35 @@ export default {
         path: "/escolas/" + indexToEdit
       });
     },
-    async deleteRow(row) {
+    deleteRow(row) {
       let indexToDelete = this.tableData.findIndex(
         tableRow => tableRow.id === row.id
       );
       if (indexToDelete >= 0) {
-        // try {
-        //   const result = await this.$apollo.mutate({
-        //     mutation: deleteSchool,
-        //     variables: {
-        //       id: row.id
-        //     }
-        //   }).then((data) => {
-        //     console.log(data);
-        //     this.tableData.splice(indexToDelete, 1);
-        //   });
-        // } catch (e) {
-        //   await Swal.fire({
-        //     title: `Erro ao excluir ${row.name}`,
-        //     text: e,
-        //     icon: 'error',
-        //     customClass: {
-        //       confirmButton: 'btn btn-info btn-fill',
-        //     },
-        //     confirmButtonText: 'OK',
-        //     buttonsStyling: false
-        //   });
-        //
-        // }
+        try {
+          this.$store.dispatch('schools/deleteSchool', row)
+          .then((data) => {
+             console.log(data);
+             this.tableData.splice(indexToDelete, 1);
+           });
+         } catch (e) {
+           Swal.fire({
+             title: `Erro ao excluir ${row.name}`,
+             text: e,
+             icon: 'error',
+             customClass: {
+               confirmButton: 'btn btn-info btn-fill',
+             },
+             confirmButtonText: 'OK',
+             buttonsStyling: false
+           });
+        }
       }
     },
     selectionChange(selectedRows) {
       this.selectedRows = selectedRows;
     },
   },
-  // async asyncData({ $axios }){
-  //   return $axios.$get('http://localhost:8001/v2/tenant/schools').then((response) => {
-  //     console.log(response)
-  //     return {tableData: response.results}
-  //   })
-  // }
 };
 </script>
 <style>

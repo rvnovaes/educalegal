@@ -1,7 +1,7 @@
 <template>
-  <card>
+  <card v-if="school">
     <!-- Card header -->
-    <h3 slot="header" class="mb-0">Editar {{ model.name }}</h3>
+    <h3 slot="header" class="mb-0">Editar {{ school.name }}</h3>
 
     <!-- Card body -->
     <validation-observer v-slot="{handleSubmit}" ref="formValidator">
@@ -14,7 +14,8 @@
                         placeholder="Nome"
                         success-message="Parece correto!"
                         rules="required"
-                        v-model="model.name">
+                        :value="school.name"
+                        @input="updateName">
             </base-input>
           </div>
           <div class="col-md-5">
@@ -23,7 +24,8 @@
                         placeholder="Razão Social"
                         rules="required"
                         success-message="Parece correto!"
-                        v-model="model.legal_name">
+                        :value="school.legal_name"
+                        @input="updateLegalName">
             </base-input>
           </div>
           <div class="col-md-2">
@@ -32,7 +34,8 @@
                         placeholder="CNPJ/CPF"
                         rules="required"
                         success-message="Parece correto!"
-                        v-model="model.cnpj">
+                        :value="school.cnpj"
+                        @input="updateCNPJ">
             </base-input>
           </div>
             <div class="col-md-1">
@@ -41,7 +44,8 @@
                           placeholder="Tipo "
                           rules="required"
                           success-message="Parece correto!"
-                          v-model="model.legal_nature">
+                          :value="school.legal_nature"
+                          @input="updateLegalNature">
 <!--                <select class="form-control">-->
 <!--                  <option>J</option>-->
 <!--                  <option>F</option>-->
@@ -56,7 +60,7 @@
                         name="Telefone"
                         placeholder="Telefone"
                         rules="required"
-                        v-model="model.phone">
+                        v-model="school.phone">
             </base-input>
           </div>
           <div class="col-md-5">
@@ -64,7 +68,7 @@
                         name="Site"
                         placeholder="Site"
                         rules="required"
-                        v-model="model.site">
+                        v-model="school.site">
             </base-input>
           </div>
           <div class="col-md-5">
@@ -72,7 +76,7 @@
                         name="E-mail"
                         placeholder="E-mail"
                         rules="required"
-                        v-model="model.email">
+                        v-model="school.email">
             </base-input>
           </div>
         </div>
@@ -84,7 +88,7 @@
                         name="Zip"
                         placeholder="Zip"
                         rules="required"
-                        v-model="model.zip">
+                        v-model="school.zip">
             </base-input>
           </div>
 
@@ -93,7 +97,7 @@
                         name="Logradouro"
                         placeholder="Logradouro"
                         rules="required"
-                        v-model="model.street">
+                        v-model="school.street">
             </base-input>
           </div>
           <div class="col-md-1">
@@ -101,14 +105,14 @@
                         name="Número"
                         placeholder="Número"
                         rules="required"
-                        v-model="model.street_number">
+                        v-model="school.street_number">
             </base-input>
           </div>
           <div class="col-md-2">
             <base-input label="Complemento"
                         name="Complemento"
                         placeholder="Complemento"
-                        v-model="model.unit">
+                        v-model="school.unit">
             </base-input>
           </div>
           <div class="col-md-4">
@@ -116,7 +120,7 @@
                         name="Bairro"
                         placeholder="Bairro"
                         rules="required"
-                        v-model="model.neighborhood">
+                        v-model="school.neighborhood">
             </base-input>
           </div>
         </div>
@@ -126,7 +130,8 @@
                         name="Cidade"
                         placeholder="Cidade"
                         rules="required"
-                        v-model="model.city">
+                        :value="school.city"
+                        @input="updateCity">
             </base-input>
           </div>
           <div class="col-md-1">
@@ -134,7 +139,8 @@
                         name="UF"
                         placeholder="UF"
                         rules="required"
-                        v-model="model.state">
+                        :value="school.state"
+                        @input="updateUF">
             </base-input>
           </div>
         </div>
@@ -145,106 +151,69 @@
   </card>
 </template>
 <script>
-// import updateSchool from '@/queries/updateSchool.graphql'
 import Swal from 'sweetalert2';
 
   export default {
-    props: ['id', 'name', 'legal_name', 'legal_nature', 'cnpj', 'phone', 'site', 'email', 'zip', 'street', 'street_number', 'unit', 'neighborhood', 'city', 'state', 'zip'],
+    props: ['school'],
     components: {},
     data() {
       return {
+
         validated: false,
-        model: {
-          id: this.id,
-          name: this.name,
-          legal_name: this.legal_name,
-          legal_nature: this.legal_nature,
-          cnpj: this.cnpj,
-          phone: this.phone,
-          site: this.site,
-          email: this.email,
-          zip: this.zip,
-          street: this.street,
-          street_number: this.street_number,
-          unit: this.unit,
-          neighborhood: this.neighborhood,
-          city: this.city,
-          state: this.state,
-        }
       }
     },
-    watch: {
-      id: function (newVal, oldVal){
-        this.model.id = newVal
+
+    // Quando a pagina e recarrecada, o Vuex e totalmente limpado. Por isso, se o objeto schoo estiver vazio,
+    // recarregue todas as escolas. Funciona em reload da pagina
+    created() {
+      if(!this.school){
+        this.$store.dispatch('schools/fetchAllSchools')
+      }
+    },
+
+    methods: {
+      updateName (e) {
+        this.$store.commit('schools/updateName', {id: this.school.id, name: e})
       },
-      name: function (newVal, oldVal){
-        this.model.name = newVal
+      updateLegalName (e) {
+        this.$store.commit('schools/updateLegalName', {id: this.school.id, legal_name: e})
       },
-      legal_name: function (newVal, oldVal){
-        this.model.legal_name = newVal
+      updateCNPJ (e) {
+        this.$store.commit('schools/updateCNPJ', {id: this.school.id, cnpj: e})
       },
-      legal_nature: function (newVal, oldVal){
-        this.model.legal_nature = newVal
+      updateLegalNature (e) {
+        this.$store.commit('schools/updateLegalNature', {id: this.school.id, legal_nature: e})
       },
-      cnpj: function (newVal, oldVal){
-        this.model.cnpj = newVal
+      updateCity (e) {
+        this.$store.commit('schools/updateCity', {id: this.school.id, city: e})
       },
-      phone: function (newVal, oldVal){
-        this.model.phone = newVal
-      },
-      site: function (newVal, oldVal){
-        this.model.site = newVal
-      },
-      email: function (newVal, oldVal){
-        this.model.email = newVal
-      },
-      zip: function (newVal, oldVal){
-        this.model.zip = newVal
-      },
-      street: function (newVal, oldVal){
-        this.model.street = newVal
-      },
-      street_number: function (newVal, oldVal){
-        this.model.street_number = newVal
-      },
-      unit: function (newVal, oldVal){
-        this.model.unit = newVal
-      },
-      neighborhood: function (newVal, oldVal){
-        this.model.neighborhood = newVal
-      },
-      city: function (newVal, oldVal){
-        this.model.city = newVal
-      },
-      state: function (newVal, oldVal){
-        this.model.state = newVal
+      updateUF (e) {
+        this.$store.commit('schools/updateUF', {id: this.school.id, state: e})
       },
 
-    },
-    methods: {
       async firstFormSubmit() {
         const payload = {
-          id: this.model.id,
-          name: this.model.name,
-          legal_name: this.model.legal_name,
-          legal_nature: this.model.legal_nature,
-          cnpj: this.model.cnpj,
-          phone: this.model.phone,
-          site: this.model.site,
-          email: this.model.email,
-          zip: this.model.zip,
-          street: this.model.street,
-          street_number: this.model.street_number,
-          unit: this.model.unit,
-          neighborhood: this.model.neighborhood,
-          city: this.model.city,
-          state: this.model.state
+          id: this.school.id,
+          name: this.school.name,
+          legal_name: this.school.legal_name,
+          legal_nature: this.school.legal_nature,
+          cnpj: this.school.cnpj,
+          phone: this.school.phone,
+          site: this.school.site,
+          email: this.school.email,
+          zip: this.school.zip,
+          street: this.school.street,
+          street_number: this.school.street_number,
+          unit: this.school.unit,
+          neighborhood: this.school.neighborhood,
+          city: this.school.city,
+          state: this.school.state
           }
         try {
-          this.$axios.patch(`/tenant/schools/${this.model.id}`, payload)
+          this.$axios.patch(`v2/tenant/schools/${this.school.id}`, payload)
           .then((data) => {
             Swal.fire({
-              title: `Você atualizou ${this.model.name} com sucesso!`,
+              title: `Você atualizou ${this.school.name} com sucesso!`,
               buttonsStyling: false,
               icon: 'success',
               customClass: {
@@ -254,7 +223,7 @@ import Swal from 'sweetalert2';
           })
         } catch (e) {
           await Swal.fire({
-            title: `Erro ao editar ${this.model.name}`,
+            title: `Erro ao editar ${this.school.name}`,
             text: e,
             icon: 'error',
             customClass: {
