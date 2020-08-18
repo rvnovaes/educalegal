@@ -333,19 +333,18 @@ SIMPLE_JWT = {
 
 
 
-
-GRAPHENE = {
-    'SCHEMA': 'api.schema.schema', # Where your Graphene schema lives
-    'MIDDLEWARE': [
-        'web.middleware.jwt_authentication_middleware.JWTAuthenticationMiddleware',
-        'graphql_jwt.middleware.JSONWebTokenMiddleware',
-    ],
-}
-
-GRAPHQL_JWT = {
-    "JWT_AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
-    "JWT_AUTH_HEADER_PREFIX": "JWT",
-    "JWT_COOKIE_NAME": "apollo-token",
-}
+# Sem uso. Mantido como referencia
+# GRAPHENE = {
+#     'SCHEMA': 'api.schema.schema', # Where your Graphene schema lives
+#     'MIDDLEWARE': [
+#         'graphql_jwt.middleware.JSONWebTokenMiddleware',
+#     ],
+# }
+#
+# GRAPHQL_JWT = {
+#     "JWT_AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+#     "JWT_AUTH_HEADER_PREFIX": "JWT",
+#     "JWT_COOKIE_NAME": "apollo-token",
+# }
 
 

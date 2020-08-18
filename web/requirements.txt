@@ -6,10 +6,6 @@ django-cors-headers~=3.4.0
 drf-yasg~=1.17.1
 django-rest-auth~=0.9.5
 retry-requests~=1.0.1
-# FOr JWT authentication. Userd with Nuxt Authetication
-# https://pypi.org/project/django-graphql-jwt/
-# https://django-graphql-jwt.domake.io/en/latest/
-django-graphql-jwt~=0.3.1
 djangorestframework-simplejwt
 # Formating of forms
 django-crispy-forms~=1.9.1
@@ -60,5 +56,9 @@ djangorestframework-datatables
 PySimpleGUI~=4.26.0
 dateparser~=0.7.6
 # GraphQL
-graphene~=2.1.8
-graphene-django~=2.12.1
+# FOr JWT authentication. Userd with Nuxt Authetication
+# https://pypi.org/project/django-graphql-jwt/
+# https://django-graphql-jwt.domake.io/en/latest/
+# django-graphql-jwt~=0.3.1
+# graphene~=2.1.8
+# graphene-django~=2.12.1
