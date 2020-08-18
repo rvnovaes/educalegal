@@ -50,7 +50,30 @@ def send_to_clicksign():
         }
     ]
 
-    recipients = [{'name': 'Development Sociedade de Ensino Colégio Bacana Ltda.', 'email': 'silex@silexsistemas.com.br', 'group': 'signers', 'routingOrder': 2, 'tabs': [{'type': 'signHere', 'anchorString': 648501949174453}]}, {'name': 'IASMINI FURTADO DE MAGALHAES GOMES', 'email': 'iasmini.gomes@gmail.com', 'group': 'signers', 'routingOrder': 1, 'tabs': [{'type': 'signHere', 'anchorString': 843016660015220}]}]
+    recipients = [{
+   'name':'Development Sociedade de Ensino Colégio Bacana Ltda.',
+   'email':'silex@silexsistemas.com.br',
+   'group':'signers',
+   'routingOrder':2,
+   'tabs':[
+      {
+         'type':'signHere',
+         'anchorString':648501949174453
+      }
+   ]
+},
+{
+   'name':'IASMINI FURTADO DE MAGALHAES GOMES',
+   'email':'iasmini.gomes@gmail.com',
+   'group':'signers',
+   'routingOrder':1,
+   'tabs':[
+      {
+         'type':'signHere',
+         'anchorString':843016660015220
+      }
+   ]
+}]
 
     # faz o upload do documento no clicksign
     data_sent, data_received, status_code, envelope_id = csc.upload_document(document)

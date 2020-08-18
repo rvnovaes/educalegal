@@ -15,7 +15,7 @@ where
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tenant', '0008_auto_20200812_0956'),
+        ('tenant', '0006_auto_20200602_1339'),
     ]
 
     operations = [
