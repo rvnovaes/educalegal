@@ -127,11 +127,11 @@ def webhook_listener(request):
             # por isso, não encontra o documento no banco
             message = 'O documento do envelope {envelope_number} não existe.'.format(
                 envelope_number=envelope_number)
-            logger.debug(message)
+            logging.debug(message)
             return HttpResponse(message)
         except Exception as e:
             message = str(e)
-            logger.exception(message)
+            logging.exception(message)
             logging.info(message)
             return HttpResponse(message)
         else:
@@ -170,11 +170,11 @@ def webhook_listener(request):
                             document_language,
                             document_description,
                         )
-                        logger.debug("Posting document to GED: " + filename)
-                        logger.debug(response.text)
+                        logging.debug("Posting document to GED: " + filename)
+                        logging.debug(response.text)
                     except Exception as e:
                         message = str(e)
-                        logger.exception(message)
+                        logging.exception(message)
                         logging.info(message)
                         return HttpResponse(message)
 
@@ -251,7 +251,7 @@ def webhook_listener(request):
                             except Exception as e:
                                 message = 'Não foi possível salvar o Signer: ' + str(e)
                                 logging.info(message)
-                                logger.exception(message)
+                                logging.exception(message)
     except Exception as e:
         logging.info('Exceção webhook clicksign')
         logging.info(e)
