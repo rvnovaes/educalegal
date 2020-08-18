@@ -120,12 +120,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome completo:": devedores[i].name.first
+  - 'Nome/Razão social:': devedores[i].name.first
     validate: validate_person_full_name
-    required: True
-    show if:
-      variable: devedores[i].person_type
-      is: individual
+    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    js show if: |
+      val("devedores[i].person_type")
   - "CPF:": devedores[i].cpf
     validate: validate_cpf
     required: True
@@ -159,13 +158,6 @@ fields:
     show if:
       variable: devedores[i].person_type
       is: individual
-  - "Razão social:": devedores[i].name.first
-    validate: validate_person_full_name
-    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
-    required: True
-    show if:
-      variable: devedores[i].person_type
-      is: organization
   - "CNPJ:": devedores[i].cnpj
     validate: validate_cnpj
     required: True
@@ -182,7 +174,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
     });
   </script>
 ---
@@ -316,12 +308,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome completo:": fiadores[i].name.first
+  - 'Nome/Razão social:': fiadores[i].name.first
     validate: validate_person_full_name
-    required: True
-    show if:
-      variable: fiadores[i].person_type
-      is: individual
+    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    js show if: |
+      val("fiadores[i].person_type")
   - "CPF:": fiadores[i].cpf
     validate: validate_cpf
     required: True
@@ -356,13 +347,6 @@ fields:
     show if:
       variable: fiadores[i].person_type
       is: individual
-  - "Razão social:": fiadores[i].name.first
-    validate: validate_person_full_name
-    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
-    required: True
-    show if:
-      variable: fiadores[i].person_type
-      is: organization
   - "CNPJ:": fiadores[i].cnpj
     validate: validate_cnpj
     required: True
@@ -379,7 +363,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 ---

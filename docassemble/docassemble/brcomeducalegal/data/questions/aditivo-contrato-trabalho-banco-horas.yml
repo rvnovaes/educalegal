@@ -78,6 +78,7 @@ fields:
     validate: validate_person_full_name
     required: True
   - "CPF:": workers[i].cpf
+    validate: validate_cpf
     required: True
   - "Número do RG:": workers[i].rg
     required: True

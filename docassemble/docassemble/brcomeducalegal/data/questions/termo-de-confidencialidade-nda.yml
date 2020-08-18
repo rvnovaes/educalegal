@@ -131,11 +131,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome completo:": receptors[i].name.text
+  - 'Nome/Razão social:': receptors[i].name.text
     validate: validate_person_full_name
-    show if:
-      variable: receptors[i].person_type
-      is: individual
+    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    js show if: |
+      val("receptors[i].person_type")
   - "CPF:": receptors[i].cpf
     validate: validate_cpf
     show if:
@@ -165,12 +165,6 @@ fields:
     show if:
       variable: receptors[i].person_type
       is: individual
-  - "Razão social:": receptors[i].name.text
-    validate: validate_person_full_name
-    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
-    show if:
-      variable: receptors[i].person_type
-      is: organization
   - "CNPJ:": receptors[i].cnpj
     validate: validate_cnpj
     show if:
@@ -186,7 +180,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 ---
@@ -292,11 +286,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome completo:": revealings[i].name.text
+  - 'Nome/Razão social:': revealings[i].name.text
     validate: validate_person_full_name
-    show if:
-      variable: revealings[i].person_type
-      is: individual
+    help: 'Para pessoa jurídica, informe o nome conforme consta no CNPJ. Para pessoa física, informe o nome completo.'
+    js show if: |
+      val("revealings[i].person_type")
   - "CPF:": revealings[i].cpf
     validate: validate_cpf
     show if:
@@ -326,12 +320,6 @@ fields:
     show if:
       variable: revealings[i].person_type
       is: individual
-  - "Razão social:": revealings[i].name.text
-    validate: validate_person_full_name
-    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
-    show if:
-      variable: revealings[i].person_type
-      is: organization
   - "CNPJ:": revealings[i].cnpj
     validate: validate_cnpj
     show if:
@@ -347,7 +335,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 ---
