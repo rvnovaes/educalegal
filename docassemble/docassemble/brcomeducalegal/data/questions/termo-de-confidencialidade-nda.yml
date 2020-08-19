@@ -13,6 +13,7 @@ include:
   - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -130,10 +131,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome completo:": receptors[i].name.text
-    show if:
-      variable: receptors[i].person_type
-      is: individual
+  - 'Nome/Razão social:': receptors[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("receptors[i].person_type")
   - "CPF:": receptors[i].cpf
     validate: validate_cpf
     show if:
@@ -163,11 +165,6 @@ fields:
     show if:
       variable: receptors[i].person_type
       is: individual
-  - "Razão social:": receptors[i].name.text
-    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
-    show if:
-      variable: receptors[i].person_type
-      is: organization
   - "CNPJ:": receptors[i].cnpj
     validate: validate_cnpj
     show if:
@@ -183,7 +180,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 ---
@@ -289,10 +286,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome completo:": revealings[i].name.text
-    show if:
-      variable: revealings[i].person_type
-      is: individual
+  - 'Nome/Razão social:': revealings[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("revealings[i].person_type")
   - "CPF:": revealings[i].cpf
     validate: validate_cpf
     show if:
@@ -322,11 +320,6 @@ fields:
     show if:
       variable: revealings[i].person_type
       is: individual
-  - "Razão social:": revealings[i].name.text
-    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
-    show if:
-      variable: revealings[i].person_type
-      is: organization
   - "CNPJ:": revealings[i].cnpj
     validate: validate_cnpj
     show if:
@@ -342,7 +335,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 ---
@@ -470,14 +463,3 @@ code: |
           'documentBase64': make_document_base64(generated_file.pdf.path())
       }
   ]
----
-code: |
-  if plan_use_esignature:
-    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
-  else:
-    help_email_msg = "Digite um e-mail válido."
----
-code: |
-  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
-  email_category = interview_custom_file_name_string
-  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"

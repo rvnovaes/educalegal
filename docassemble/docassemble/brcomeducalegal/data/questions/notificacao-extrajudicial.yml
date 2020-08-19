@@ -13,6 +13,7 @@ include:
   - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -69,6 +70,7 @@ question: |
   Dados do(a) notificado
 fields:
   - "Nome completo:": notifieds[i].name.text
+    validate: validate_person_full_name
     required: True
   - "CPF:": notifieds[i].cpf
     required: True
@@ -243,14 +245,3 @@ code: |
           'documentBase64': make_document_base64(generated_file.pdf.path())
       }
   ]
----
-code: |
-  if plan_use_esignature:
-    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
-  else:
-    help_email_msg = "Digite um e-mail válido."
----
-code: |
-  email_subject = "IMPORTANTE: " + school_name + " | Notificação Extrajudicial"
-  email_category = interview_custom_file_name_string
-  email_html_content = "<h1>Notificação Extrajudicial</h1><p>Leia, com atenção o documento em anexo.</p>"

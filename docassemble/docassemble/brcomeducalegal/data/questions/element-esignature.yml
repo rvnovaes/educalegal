@@ -2,27 +2,68 @@
 modules:
   - .element_docusign_client
   - .element_educalegal_client
+  - .module_clicksign_client
 ---
 ga id: |
   code: ga_id_e_signature
 event: submit_to_esignature
 code: |
   log("Executando element-esignature.yml")
-  if tenant_esignature_provider == 'Docusign':
+  el_log_to_console = get_config('el log to console')
+
+  if tenant_esignature_provider == 'DOCUSIGN':
     dsc = DocuSignClient(tenant_client_id, tenant_impersonated_user_guid, tenant_test_mode, tenant_private_key)
 
     data_sent, data_received, e_signature_response_status_code = dsc.send_to_docusign(recipients, documents, send_immediately=True, email_subject="Documento para sua assinatura")
 
     log("Docusign data_received: {data_received}".format(data_received=data_received))
-    el_log_to_console = get_config('el log to console')
     if el_log_to_console:
       log("Docusign data_received: {data_received}".format(data_received=data_received), "console")
     status = data_received['status'].lower()
     envelope_id = data_received['envelopeId']
-  el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, tenant_esignature_provider, True)
-  log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
-  if el_log_to_console:
-    log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
+
+    el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, True)
+    log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
+    if el_log_to_console:
+      log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
+  elif tenant_esignature_provider == 'CLICKSIGN':
+    import copy
+
+    csc = ClickSignClient(tenant_private_key, tenant_test_mode)
+
+    # faz o upload do documento no clicksign
+    data_sent, data_received, status_code, envelope_id = csc.upload_document(documents[0])
+
+    if status_code == 201:
+      status = 'sent'
+
+      # salva no documento do educa legal o status e o envelope_id do documento criado no clicksign
+      el_document_patched_with_esignature_data = elc.patch_document_with_esignature_data(doc_uuid, status, envelope_id, True)
+      log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data))
+      if el_log_to_console:
+        log("el_document_patched_with_esignature_data: {el_document_patched_with_esignature_data}".format(el_document_patched_with_esignature_data=el_document_patched_with_esignature_data), "console")
+
+      # verifica se o signer ja foi enviado para a clicksign
+      data_sent, data_received, status_code = elc.get_signer_key_by_email(recipients)
+
+      recipients_sign = copy.deepcopy(data_received)
+
+      # cria os destinatarios
+      status_code, reason, data_sent = csc.add_signer(recipients_sign)
+
+      # adiciona signer key no educa legal
+      data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, tid)
+
+      # adiciona os signatarios ao documento e envia por email para o primeiro signatario
+      # o envelope_id eh a key do documento no clicksign
+      data_sent, data_received, status_code = csc.send_to_signers(envelope_id, recipients_sign)
+
+      if status_code == 202:
+        e_signature_response_status_code = 201
+      else:
+        e_signature_response_status_code = 0
+        log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=data_received))
+        log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(status_code=status_code, reason=data_received), "console")
 
   if e_signature_response_status_code == 201:
     signature_success

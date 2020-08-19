@@ -6,4 +6,6 @@ from tenant.models import TenantAwareModel
 
 
 class CustomUser(AbstractUser, TenantAwareModel):
-    pass
+    force_password_change = models.BooleanField(
+        default=False, verbose_name="Obriga a trocar a senha",
+        help_text="Obriga a trocar a senha no próximo login.")

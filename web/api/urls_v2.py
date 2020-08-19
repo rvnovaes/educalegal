@@ -1,4 +1,3 @@
-from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 from django.urls import path, include
 
@@ -10,10 +9,10 @@ from .views_v2 import (
     DocumentDownloadViewSet,
     TenantSchoolViewSet,
     TenantSchoolUnitViewSet,
-    TenantInterviewViewSet,
     TenantPlanViewSet
 )
 
+from .clicksign_helpers import webhook_listener
 from .docusign_helpers import docusign_webhook_listener
 
 API_TITLE = "Educa Legal API V2"
@@ -48,6 +47,7 @@ urlpatterns = [
     # path("tenant/ged_data/", TenantGedDataViewSet.as_view({"post": "create", "get": "list"})),
     # path("tenant/ged_data/<int:pk>", TenantGedDataViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     # Other
+    path("clicksign/webhook", webhook_listener),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
 ]

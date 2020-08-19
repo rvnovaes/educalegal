@@ -93,18 +93,18 @@ end note
 
 
 Docusign -> Docassemble: envelope_data
-Docassemble -> EducaLegal: PATCH patch_document_with_esignature_data(ged_id, status, envelope_id, signing_provider)
+Docassemble -> EducaLegal: PATCH patch_document_with_esignature_data(doc_uuid, status, envelope_number, submit_to_esignature)
 deactivate Docassemble
 activate EducaLegal
 
 Docusign -> Recipients: Send emails
 activate Recipients
 Recipients -> Docusign: Send Signatures
-Docusign -> EducaLegal: POST docusign_webhook_listener(statuses changes)
+Docusign/ClickSign -> EducaLegal: POST webhook_listener(statuses changes)
 Recipients -> Docusign: Send Signatures
 deactivate Recipients
 
-Docusign -> EducaLegal: POST docusign_webhook_listener(final status + signed document + certificate)
+Docusign/ClickSign -> EducaLegal: POST webhook_listener(final status + signed document + certificate)
 deactivate Docusign
 
 EducaLegal -> Mayan: POST mc.document_create(file, doc_type, file_name, lang, desc)
