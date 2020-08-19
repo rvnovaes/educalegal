@@ -222,11 +222,11 @@ edit:
 ---
 section: Cláusulas
 progress: 60
-question: 'O regime de home office perdurará até a data:'
+question: 'O regime de home office perdurará até:'
 fields:
-  - "Data:": data_regime
+  - "Periodo:": data_regime
     required: True
-    datatype: date
+    help: 'exemplos de preenchimento: "o final do ano letivo de 2020" ou "o dia 30/11/2020"'
 ---
 section: Cláusulas
 progress: 70

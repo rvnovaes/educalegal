@@ -54,7 +54,21 @@ code: |
     if plan_use_esignature:
       valid_contractors_table
     school_year
-    annual_value
+    if method_payment == 'parcelado':
+      if has_input_value:
+        input_date_format = format_date(input_date, format='dd/MM/yyyy')
+      installments_list = list()
+      installments_date_day = format_date(installments_date, format='dd')
+      installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
+      for v in range(0, quantity_installments):
+        installments = dict()
+        installments_due = installments_date.plus(months=v)
+        installments_due = format_date(installments_due, format='dd/MM/yyyy')
+        installments['installments_due'] = installments_due
+        installments['installments_value'] = installments_value
+        installments_list.append(installments)
+    else:
+      single_installment_date_format = format_date(single_installment_date, format='dd/MM/yyyy')
     signature_local
     generated_file
     el_document_patched_with_docassemble_data
@@ -326,11 +340,26 @@ question: Ano Letivo
 fields:
   - 'Ano Letivo: ': school_year
     datatype: integer
-    default: '2020'
+    default: |
+      ${ school_year_default }
+---
+code: |
+  from datetime import date
+  school_year_default = date.today().year + 1
 ---
 code: |
   from num2words import num2words
   annual_value_words = num2words(annual_value, lang='pt_BR', to='currency')
+---
+code: |
+  from num2words import num2words
+  if has_input_value:
+    input_value_words = num2words(input_value, lang='pt_BR', to='currency')
+---
+code: |
+  from num2words import num2words
+  if method_payment == "parcelado":
+    installments_value_words = num2words(installments_value, lang='pt_BR', to='currency')
 ---
 progress: 85
 section: Dados Contratuais
@@ -340,37 +369,64 @@ fields:
     datatype: currency
     hint: 0000,00
   - 'Inserir informações sobre desconto?': has_discount
-    choices:
-      - Sim: Sim
-      - Não: Não
+    datatype: yesnoradio
   - 'Desconto: ': discount_notes
     datatype: area
-    hint: "exemplo: 10% sobre o valor anual"
+    hint: "exemplo: foi concedido um desconto de 10% sobre o valor anual"
     help: Definir um percentual sobre o valor anual de contrato.
     show if:
       variable: has_discount
-      is: Sim
-  - 'Quantidade de parcelas: ': installments
+      is: True
+  - 'Forma de pagamento:': method_payment
+    datatype: radio
     choices:
       - à vista: à vista
-      - 5 parcelas: 5 parcelas
-      - 12 parcelas: 12 parcelas
-      - 13 parcelas: 13 parcelas
-    datatype: radio
-  - 'Condições de pagamento da primeira parcela: ': first_installment
-    choices:
-      - à vista: à vista
-      - 4 parcelas (na assinatura/30/60/90 dias): 4 parcelas (na assinatura/30/60/90 dias)
-    datatype: radio
-  - 'Dia de vencimento das demais parcelas: ': installments_due
-    datatype: text
-    default:
-      code: |
-        'dia 05 de cada mês a partir de janeiro de ' + str(school_year)
+      - parcelado: parcelado
+  - 'Valor da parcela única:': single_installment_value
+    datatype: currency
+    hint: 0000,00
+    js show if: |
+      val("method_payment") == "à vista"
+  - 'Data do vencimento da parcela única:': single_installment_date
+    datatype: date
+    js show if: |
+      val("method_payment") == "à vista"
+  - 'Haverá parcela de entrada:': has_input_value
+    datatype: yesnoradio
+    js show if: |
+      val("method_payment") == "parcelado"
+  - 'Valor da parcela de entrada': input_value
+    datatype: currency
+    hint: 0000,00
+    js show if: |
+      val("has_input_value") == true
+  - 'Data do vencimento da parcela de entrada': input_date
+    datatype: date
+    js show if: |
+      val("has_input_value") == true
+  - 'Quantidade de parcelas: ': quantity_installments
+    help: Quantidade de parcelas, excluindo a entrada, caso haja.
+    datatype: integer
+    default: 1
+    min: 1
+    js show if: |
+      val("method_payment") == "parcelado"
+  - 'Valor da parcela:': installments_value
+    datatype: currency
+    hint: 0000,00
+    js show if: |
+      val("method_payment") == "parcelado"
+  - 'Data de vencimento da primeira parcela: ': installments_date
+    datatype: date
+    js show if: |
+      val("method_payment") == "parcelado"
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzQ').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzEw').mask('000000000000000.00', {reverse: true});
       });
   </script>
 ---
