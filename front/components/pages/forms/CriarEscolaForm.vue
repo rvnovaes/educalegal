@@ -64,6 +64,7 @@
                         name="Site"
                         placeholder="Site"
                         rules="required"
+                        type="url"
                         v-model="school.site">
             </base-input>
           </div>
@@ -72,6 +73,7 @@
                         name="E-mail"
                         placeholder="E-mail"
                         rules="required"
+                        type="email"
                         v-model="school.email">
             </base-input>
           </div>
@@ -166,13 +168,15 @@ import Swal from 'sweetalert2';
           unit: null,
           neighborhood: null,
           city: null,
-          state: null
+          state: null,
+          school_units: []
         }
       }
     },
     methods: {
       async firstFormSubmit() {
         const payload = {
+          tenant: this.$auth.user.tenant,
           id: this.school.id,
           name: this.school.name,
           legal_name: this.school.legal_name,
@@ -187,7 +191,8 @@ import Swal from 'sweetalert2';
           unit: this.school.unit,
           neighborhood: this.school.neighborhood,
           city: this.school.city,
-          state: this.school.state
+          state: this.school.state,
+          school_units: []
           }
         try {
           await this.$store.dispatch('schools/createSchool', payload)
