@@ -1,24 +1,30 @@
-import logging
 import io
+import logging
+import pandas as pd
 
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
-from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.exceptions import (
     ValidationError,
     PermissionDenied,
     NotFound,
     APIException,
 )
-from rest_framework import status
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
 from validator_collection import checkers
 
-from document.models import *
-from interview.models import *
-from school.models import *
-from tenant.models import *
+from document.models import Document
+from document.views import validate_data_mongo
+from interview.models import Interview
+from school.models import School, SchoolUnit
+from tenant.models import Plan, Tenant, TenantGedData
+from util.file_import import is_metadata_valid, is_content_valid
+
 from .mayan_helpers import MayanClient
 
 from .serializers_v2 import (
@@ -444,3 +450,95 @@ class TenantPlanViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         tenant = self.request.user.tenant
         return self.queryset.get(pk=tenant.plan_id)
+
+
+# Clients should authenticate by passing the token key in the "Authorization"
+# HTTP header, prepended with the string "Token ".  For example:
+# Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+def validate_document(request, **kwargs):
+    """
+    Validate documents list received in request.body.
+
+    * Requires token authentication.
+    """
+
+    # Transforma o dicionario em um dataframe
+    # bulk_data = pd.read_csv(request.data, sep="#")
+    bulk_data = pd.DataFrame.from_dict(request.data)
+
+    try:
+        # Valida os metadados do recebidos (tipos de campos e flags booleanas)
+        # Se os dados forem validos, retorna dois dicionarios: o de tipos de campos e
+        # os de obrigatoriedade dos registros
+        # Ambos são usados para criar a classe dinamica
+        (
+            field_types_dict,
+            required_fields_dict,
+            metadata_valid,
+        ) = is_metadata_valid(bulk_data)
+
+    except ValueError as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+
+        return Response({"error": message})
+
+    # Valida o conteudo dos campos de acordo com seus tipos de dados e sua obrigadoriedade
+    # trata os registros para valores aceitáveis pelos documentos
+    # usando validators collection
+    # Também valida se existe a coluna selected_school e school_division
+    # Para outras validações de conteúdo, veja a função
+    # Os campos vazios são transformados em None e deve ser tratados posteriormente ao fazer a chamada de API
+    # do Docassemble para que não saiam como None ou com erro nos documentos
+    # O campo school_division é transformado em ---
+    try:
+        (
+            bulk_data_content,
+            parent_fields_dict,
+            error_messages,
+            content_valid,
+        ) = is_content_valid(bulk_data)
+    except ValueError as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+
+        return Response({"error": message})
+
+    if not content_valid:
+        return Response({"error": error_messages})
+
+    # Se houver registro invalido, esta variavel sera definida como False ao final da funcao.
+    # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
+    # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
+    # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
+    data_valid = metadata_valid and content_valid
+
+    interview = Interview.objects.get(pk=kwargs["interview_id"])
+
+    # valida os dados recebidos de forma automatica no mongo
+    bulk_generation_id, mongo_document = validate_data_mongo(
+        request, interview.pk, data_valid, bulk_data_content,
+        field_types_dict, required_fields_dict, parent_fields_dict
+    )
+
+    if data_valid:
+        response_data = {
+            "interview_id": interview.pk,
+            "data_valid": data_valid,
+            "bulk_generation_id": bulk_generation_id,
+        },
+        return Response({"response_data": response_data})
+
+    else:
+        mongo_document.drop_collection()
+        response_data = {
+            "interview_id": interview.pk,
+            "validation_error": True,
+            "data_valid": data_valid,
+        },
+        return Response({"response_data": response_data})
+
+    # user = Token.objects.get(key=request.user).user
+
