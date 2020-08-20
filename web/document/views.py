@@ -235,120 +235,125 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
             data_valid = metadata_valid and content_valid
 
-            tenant = Tenant.objects.get(pk=self.request.user.tenant_id)
-            schools = tenant.school_set.all()
-            # Monta os conjuntos de nomes de escolas e de unidades escolares para validacao
-            school_units_names_set = set()
-            for school in schools:
-                school_units = SchoolUnit.objects.filter(school=school).values_list(
-                    "name", flat=True
-                )
-                for school_unit in school_units:
-                    school_units_names_set.add(school_unit)
-            school_names_set = set(schools.values_list("name", flat=True))
-            # Adiciona como elemento valido "---" para ausencia de unidade escolar
-            school_units_names_set.add("---")
-
-            # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
-            # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
-            # O nome gerado e semelhante ao custom file name que usamos no docassemble
-            # YYYYMMDD_HHMMSS_custom_file_name
-            dynamic_document_class_name = (custom_class_name(interview.custom_file_name))
-
-            # Cria a classe do tipo Document (mongoengine) dinamicamente
-            DynamicDocumentClass = create_dynamic_document_class(
-                dynamic_document_class_name,
-                field_types_dict,
-                required_fields_dict,
-                parent_fields_dict,
-                school_names_set=school_names_set,
-                school_units_names_set=school_units_names_set,
+            bulk_generation_id, mongo_document = validate_data_mongo(
+                self.request, interview.pk, data_valid, bulk_data_content,
+                field_types_dict, required_fields_dict, parent_fields_dict
             )
 
-            # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
-            # no Mongo
-            mongo_document_data_list = list()
-
-            for register_index, row in enumerate(
-                bulk_data_content.itertuples(index=False)
-            ):
-                # Transforma a linha em dicionario
-                row_dict = row._asdict()
-                # Cria um objeto Documento a partir da classe dinamica
-                mongo_document = DynamicDocumentClass(**row_dict)
-
-                try:
-                    mongo_document_data = mongo_document.save()
-                    mongo_document_data_list.append(mongo_document_data)
-                    # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
-                    # mensagem de sucesso
-                    row_values = list(row_dict.values())
-                    message = "Registro {register_index} validado com sucesso".format(
-                        register_index=str(register_index + 1)
-                    )
-                    for value_index, value in enumerate(row_values):
-                        message += " | " + str(row_values[value_index])
-                    logger.info(message)
-                    messages.success(request, message)
-                except ValidationError as e:
-                    # Se a operacao for mal sucedida, itera sobre a lista de valores para gerar a
-                    # mensagem de erro
-                    row_values = list(row_dict.values())
-                    message = (
-                        "Erro ao validar o registro "
-                        + str(register_index + 1)
-                        + ": "
-                        + str(e)
-                    )
-                    for value_index, value in enumerate(row_values):
-                        message += " | " + str(row_values[value_index])
-                    logger.info(message)
-                    messages.error(request, message)
-
-            storage = get_messages(request)
-            for message in storage:
-                if message.level_tag == "error":
-                    data_valid = False
-                    break
+            # tenant = Tenant.objects.get(pk=self.request.user.tenant_id)
+            # schools = tenant.school_set.all()
+            # # Monta os conjuntos de nomes de escolas e de unidades escolares para validacao
+            # school_units_names_set = set()
+            # for school in schools:
+            #     school_units = SchoolUnit.objects.filter(school=school).values_list(
+            #         "name", flat=True
+            #     )
+            #     for school_unit in school_units:
+            #         school_units_names_set.add(school_unit)
+            # school_names_set = set(schools.values_list("name", flat=True))
+            # # Adiciona como elemento valido "---" para ausencia de unidade escolar
+            # school_units_names_set.add("---")
+            #
+            # # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
+            # # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
+            # # O nome gerado e semelhante ao custom file name que usamos no docassemble
+            # # YYYYMMDD_HHMMSS_custom_file_name
+            # dynamic_document_class_name = (custom_class_name(interview.custom_file_name))
+            #
+            # # Cria a classe do tipo Document (mongoengine) dinamicamente
+            # DynamicDocumentClass = create_dynamic_document_class(
+            #     dynamic_document_class_name,
+            #     field_types_dict,
+            #     required_fields_dict,
+            #     parent_fields_dict,
+            #     school_names_set=school_names_set,
+            #     school_units_names_set=school_units_names_set,
+            # )
+            #
+            # # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
+            # # no Mongo
+            # mongo_document_data_list = list()
+            #
+            # for register_index, row in enumerate(
+            #     bulk_data_content.itertuples(index=False)
+            # ):
+            #     # Transforma a linha em dicionario
+            #     row_dict = row._asdict()
+            #     # Cria um objeto Documento a partir da classe dinamica
+            #     mongo_document = DynamicDocumentClass(**row_dict)
+            #
+            #     try:
+            #         mongo_document_data = mongo_document.save()
+            #         mongo_document_data_list.append(mongo_document_data)
+            #         # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
+            #         # mensagem de sucesso
+            #         row_values = list(row_dict.values())
+            #         message = "Registro {register_index} validado com sucesso".format(
+            #             register_index=str(register_index + 1)
+            #         )
+            #         for value_index, value in enumerate(row_values):
+            #             message += " | " + str(row_values[value_index])
+            #         logger.info(message)
+            #         messages.success(request, message)
+            #     except ValidationError as e:
+            #         # Se a operacao for mal sucedida, itera sobre a lista de valores para gerar a
+            #         # mensagem de erro
+            #         row_values = list(row_dict.values())
+            #         message = (
+            #             "Erro ao validar o registro "
+            #             + str(register_index + 1)
+            #             + ": "
+            #             + str(e)
+            #         )
+            #         for value_index, value in enumerate(row_values):
+            #             message += " | " + str(row_values[value_index])
+            #         logger.info(message)
+            #         messages.error(request, message)
+            #
+            # storage = get_messages(request)
+            # for message in storage:
+            #     if message.level_tag == "error":
+            #         data_valid = False
+            #         break
 
             if data_valid:
-                bulk_generation = BulkDocumentGeneration(
-                    tenant=request.user.tenant,
-                    interview=interview,
-                    mongo_db_collection_name=dynamic_document_class_name,
-                    field_types_dict=field_types_dict,
-                    required_fields_dict=required_fields_dict,
-                    parent_fields_dict=parent_fields_dict,
-                    school_names_set=list(school_names_set),
-                    school_units_names_set=list(school_units_names_set),
-                    status="não executada"
-                )
-                bulk_generation.save()
-
-                el_document_list = list()
-                for mongo_document_data in mongo_document_data_list:
-                    school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
-                    el_document = Document(
-                        tenant=tenant,
-                        name=interview.name + "-rascunho-em-lote",
-                        status=DocumentStatus.RASCUNHO.value,
-                        description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
-                        interview=interview,
-                        school=school,
-                        bulk_generation=bulk_generation,
-                        mongo_uuid=mongo_document_data.id,
-                        submit_to_esignature=mongo_document_data.submit_to_esignature,
-                        send_email=mongo_document_data.el_send_email
-                    )
-                    el_document_list.append(el_document)
-
-                Document.objects.bulk_create(el_document_list)
-
-                logger.info(
-                    "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
-                        dynamic_document_class_name=dynamic_document_class_name
-                    )
-                )
+            #     bulk_generation = BulkDocumentGeneration(
+            #         tenant=request.user.tenant,
+            #         interview=interview,
+            #         mongo_db_collection_name=dynamic_document_class_name,
+            #         field_types_dict=field_types_dict,
+            #         required_fields_dict=required_fields_dict,
+            #         parent_fields_dict=parent_fields_dict,
+            #         school_names_set=list(school_names_set),
+            #         school_units_names_set=list(school_units_names_set),
+            #         status="não executada"
+            #     )
+            #     bulk_generation.save()
+            #
+            #     el_document_list = list()
+            #     for mongo_document_data in mongo_document_data_list:
+            #         school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
+            #         el_document = Document(
+            #             tenant=tenant,
+            #             name=interview.name + "-rascunho-em-lote",
+            #             status=DocumentStatus.RASCUNHO.value,
+            #             description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
+            #             interview=interview,
+            #             school=school,
+            #             bulk_generation=bulk_generation,
+            #             mongo_uuid=mongo_document_data.id,
+            #             submit_to_esignature=mongo_document_data.submit_to_esignature,
+            #             send_email=mongo_document_data.el_send_email
+            #         )
+            #         el_document_list.append(el_document)
+            #
+            #     Document.objects.bulk_create(el_document_list)
+            #
+            #     logger.info(
+            #         "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
+            #             dynamic_document_class_name=dynamic_document_class_name
+            #         )
+            #     )
 
                 return render(
                     request,
@@ -357,7 +362,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         "form": form,
                         "interview_id": interview.pk,
                         "data_valid": data_valid,
-                        "bulk_generation_id": bulk_generation.pk,
+                        "bulk_generation_id": bulk_generation_id,
                     },
                 )
 
@@ -656,3 +661,124 @@ def query_documents_by_args(pk=None, **kwargs):
         'draw': draw,
     }
     return data
+
+
+def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
+                        field_types_dict, required_fields_dict, parent_fields_dict):
+    tenant = Tenant.objects.get(pk=request.user.tenant_id)
+    interview = Interview.objects.get(pk=interview_id)
+    schools = tenant.school_set.all()
+    # Monta os conjuntos de nomes de escolas e de unidades escolares para validacao
+    school_units_names_set = set()
+    for school in schools:
+        school_units = SchoolUnit.objects.filter(school=school).values_list(
+            "name", flat=True
+        )
+        for school_unit in school_units:
+            school_units_names_set.add(school_unit)
+    school_names_set = set(schools.values_list("name", flat=True))
+    # Adiciona como elemento valido "---" para ausencia de unidade escolar
+    school_units_names_set.add("---")
+
+    # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
+    # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
+    # O nome gerado e semelhante ao custom file name que usamos no docassemble
+    # YYYYMMDD_HHMMSS_custom_file_name
+    dynamic_document_class_name = (custom_class_name(interview.custom_file_name))
+
+    # Cria a classe do tipo Document (mongoengine) dinamicamente
+    DynamicDocumentClass = create_dynamic_document_class(
+        dynamic_document_class_name,
+        field_types_dict,
+        required_fields_dict,
+        parent_fields_dict,
+        school_names_set=school_names_set,
+        school_units_names_set=school_units_names_set,
+    )
+
+    # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
+    # no Mongo
+    mongo_document_data_list = list()
+
+    for register_index, row in enumerate(
+            bulk_data_content.itertuples(index=False)
+    ):
+        # Transforma a linha em dicionario
+        row_dict = row._asdict()
+        # Cria um objeto Documento a partir da classe dinamica
+        mongo_document = DynamicDocumentClass(**row_dict)
+
+        try:
+            mongo_document_data = mongo_document.save()
+            mongo_document_data_list.append(mongo_document_data)
+            # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
+            # mensagem de sucesso
+            row_values = list(row_dict.values())
+            message = "Registro {register_index} validado com sucesso".format(
+                register_index=str(register_index + 1)
+            )
+            for value_index, value in enumerate(row_values):
+                message += " | " + str(row_values[value_index])
+            logger.info(message)
+            messages.success(request, message)
+        except ValidationError as e:
+            # Se a operacao for mal sucedida, itera sobre a lista de valores para gerar a
+            # mensagem de erro
+            row_values = list(row_dict.values())
+            message = (
+                    "Erro ao validar o registro "
+                    + str(register_index + 1)
+                    + ": "
+                    + str(e)
+            )
+            for value_index, value in enumerate(row_values):
+                message += " | " + str(row_values[value_index])
+            logger.info(message)
+            messages.error(request, message)
+
+    storage = get_messages(request)
+    for message in storage:
+        if message.level_tag == "error":
+            data_valid = False
+            break
+
+    if data_valid:
+        bulk_generation = BulkDocumentGeneration(
+            tenant=request.user.tenant,
+            interview=interview,
+            mongo_db_collection_name=dynamic_document_class_name,
+            field_types_dict=field_types_dict,
+            required_fields_dict=required_fields_dict,
+            parent_fields_dict=parent_fields_dict,
+            school_names_set=list(school_names_set),
+            school_units_names_set=list(school_units_names_set),
+            status="não executada"
+        )
+        bulk_generation.save()
+
+        el_document_list = list()
+        for mongo_document_data in mongo_document_data_list:
+            school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
+            el_document = Document(
+                tenant=tenant,
+                name=interview.name + "-rascunho-em-lote",
+                status=DocumentStatus.RASCUNHO.value,
+                description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
+                interview=interview,
+                school=school,
+                bulk_generation=bulk_generation,
+                mongo_uuid=mongo_document_data.id,
+                submit_to_esignature=mongo_document_data.submit_to_esignature,
+                send_email=mongo_document_data.el_send_email
+            )
+            el_document_list.append(el_document)
+
+        Document.objects.bulk_create(el_document_list)
+
+        logger.info(
+            "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
+                dynamic_document_class_name=dynamic_document_class_name
+            )
+        )
+
+    return bulk_generation.pk, mongo_document
