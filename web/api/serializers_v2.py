@@ -78,6 +78,7 @@ class TenantGedDataSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    tenant_name = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         ref_name = "User v2"
@@ -95,4 +96,8 @@ class UserSerializer(serializers.ModelSerializer):
             "tenant",
             "groups",
             "user_permissions",
+            "tenant_name"
         ]
+
+    def get_tenant_name(self, obj):
+        return obj.tenant.name if obj.tenant else ""
