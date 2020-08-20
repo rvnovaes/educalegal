@@ -125,3 +125,13 @@ class MayanClient:
         final_url = self.api_base_url + "/api/document_types/{id}".format(id=document_type_id)
         response = self.session.get(final_url).json()
         return response
+
+    def document_bulk_delete(self, start_id, end_id):
+        for document_id in range(start_id, end_id + 1):
+            final_url = self.api_base_url + "/api/documents/{id}".format(id=document_id)
+            response = self.session.delete(final_url)
+            if response.status_code == 404:
+                print('ID não encontrado: {id}'.format(id=document_id))
+            elif response.status_code == 204:
+                print('ID removido: {id}'.format(id=document_id))
+        return response
