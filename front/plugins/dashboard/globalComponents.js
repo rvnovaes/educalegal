@@ -16,6 +16,7 @@ import RouteBreadcrumb from '~/components/argon-core/Breadcrumb/RouteBreadcrumb'
 import StatsCard from '~/components/argon-core/Cards/StatsCard.vue';
 import { Input, Tooltip, Popover } from 'element-ui';
 import { ValidationProvider, ValidationObserver } from 'vee-validate';
+import {Select, Option} from 'element-ui'
 import Vue from 'vue';
 /**
  * You can register global components here and use them as a plugin in your main Vue instance
@@ -42,3 +43,5 @@ Vue.component('validation-provider', ValidationProvider)
 Vue.component('validation-observer', ValidationObserver)
 Vue.use(Tooltip);
 Vue.use(Popover);
+Vue.use(Select);
+Vue.use(Option);
