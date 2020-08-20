@@ -65,7 +65,8 @@
                         name="Telefone"
                         placeholder="Telefone"
                         rules="required"
-                        v-model="school.phone">
+                        :value="school.phone"
+                        @input="updatePhone">
             </base-input>
           </div>
           <div class="col-md-5">
@@ -73,7 +74,8 @@
                         name="Site"
                         placeholder="Site"
                         rules="required"
-                        v-model="school.site">
+                        :value="school.site"
+                        @input="updateSite">
             </base-input>
           </div>
           <div class="col-md-5">
@@ -81,7 +83,8 @@
                         name="E-mail"
                         placeholder="E-mail"
                         rules="required"
-                        v-model="school.email">
+                        :value="school.email"
+                        @input="updateEmail">
             </base-input>
           </div>
         </div>
@@ -93,7 +96,8 @@
                         name="Zip"
                         placeholder="Zip"
                         rules="required"
-                        v-model="school.zip">
+                        :value="school.zip"
+                        @input="updateZip">
             </base-input>
           </div>
 
@@ -102,7 +106,8 @@
                         name="Logradouro"
                         placeholder="Logradouro"
                         rules="required"
-                        v-model="school.street">
+                        :value="school.street"
+                        @input="updateStreet">
             </base-input>
           </div>
           <div class="col-md-1">
@@ -110,14 +115,16 @@
                         name="Número"
                         placeholder="Número"
                         rules="required"
-                        v-model="school.street_number">
+                        :value="school.street_number"
+                        @input="updateStreetNumber">
             </base-input>
           </div>
           <div class="col-md-2">
             <base-input label="Complemento"
                         name="Complemento"
                         placeholder="Complemento"
-                        v-model="school.unit">
+                        :value="school.unit"
+                        @input="updateUnit">
             </base-input>
           </div>
           <div class="col-md-4">
@@ -125,7 +132,8 @@
                         name="Bairro"
                         placeholder="Bairro"
                         rules="required"
-                        v-model="school.neighborhood">
+                        :value="school.neighborhood"
+                        @input="updateNeighborhood">
             </base-input>
           </div>
         </div>
@@ -169,6 +177,7 @@
 </template>
 <script>
 import Swal from "sweetalert2";
+import {mapMutations} from "vuex";
 
 export default {
   props: ["school"],
@@ -213,7 +222,6 @@ export default {
       validated: false,
     };
   },
-
   // Quando a pagina e recarrecada, o Vuex e totalmente limpado. Por isso, se o objeto schoo estiver vazio,
   // recarregue todas as escolas. Funciona em reload da pagina
   created() {
@@ -221,7 +229,6 @@ export default {
       this.$store.dispatch("schools/fetchAllSchools");
     }
   },
-
   methods: {
     updateName(e) {
       this.$store.commit("schools/updateName", {id: this.school.id, name: e});
@@ -234,6 +241,30 @@ export default {
     },
     updateLegalNature(e) {
       this.$store.commit("schools/updateLegalNature", {id: this.school.id, legal_nature: e});
+    },
+    updatePhone(e) {
+      this.$store.commit("schools/updatePhone", {id: this.school.id, phone: e});
+    },
+    updateSite(e) {
+      this.$store.commit("schools/updateSite", {id: this.school.id, site: e});
+    },
+    updateEmail(e) {
+      this.$store.commit("schools/updateEmail", {id: this.school.id, email: e});
+    },
+    updateZip(e) {
+      this.$store.commit("schools/updateZip", {id: this.school.id, zip: e});
+    },
+    updateStreet(e) {
+      this.$store.commit("schools/updateStreet", {id: this.school.id, street: e});
+    },
+    updateStreetNumber(e) {
+      this.$store.commit("schools/updateStreetNumber", {id: this.school.id, street_number: e});
+    },
+    updateUnit(e) {
+      this.$store.commit("schools/updateUnit", {id: this.school.id, unit: e});
+    },
+    updateNeighborhood(e) {
+      this.$store.commit("schools/updateNeighborhood", {id: this.school.id, neighborhood: e});
     },
     updateCity(e) {
       this.$store.commit("schools/updateCity", {id: this.school.id, city: e});
@@ -271,6 +302,7 @@ export default {
                 confirmButton: "btn btn-success btn-fill",
               }
             });
+            this.back();
           });
       } catch (e) {
         await Swal.fire({
