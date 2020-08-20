@@ -88,24 +88,25 @@ def test_boolean_flag_metadata(metadata_fixture):
         is_boolean_flag_valid("wrong_boolean_flag", metadata_fixture["wrong_boolean_flag"])
 
 
-def test_valid_csv_metadata(valid_csv):
-    field_types_dict, required_fields_dict, is_csv_valid = is_csv_metadata_valid(valid_csv)
-    assert is_csv_valid is True
+def test_valid_metadata(valid_csv):
+    field_types_dict, required_fields_dict, is_valid = is_metadata_valid(valid_csv)
+    assert is_valid is True
 
 
-def test_invalid_csv_metadata(only_headers):
+def test_invalid_metadata(only_headers):
     with pytest.raises(ValueError):
-        is_csv_metadata_valid(only_headers)
+        is_metadata_valid(only_headers)
 
 
 def test_no_school_column(no_school_name):
     with pytest.raises(ValueError):
-        is_csv_content_valid(no_school_name)
+        is_content_valid(no_school_name)
 
 
 def test_no_unidadeAluno(no_unidadeAluno):
     with pytest.raises(ValueError):
-        is_csv_content_valid(no_unidadeAluno)
+        is_content_valid(no_unidadeAluno)
+
 
 def test_string_date_format():
     assert string_date_format("12/12/2020") == datetime.strptime("12/12/2020", "%d/%m/%Y")

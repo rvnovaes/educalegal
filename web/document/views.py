@@ -26,7 +26,7 @@ from util.mongo_util import (
     create_dynamic_document_class,
     mongo_to_hierarchical_dict,
 )
-from util.file_import import is_csv_metadata_valid, is_csv_content_valid
+from util.file_import import is_metadata_valid, is_content_valid
 
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
@@ -139,7 +139,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             {
                 "form": form,
                 "interview_id": interview.pk,
-                "csv_valid": False,
+                "data_valid": False,
                 "validation_error": False,
             },
         )
@@ -178,8 +178,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 (
                     field_types_dict,
                     required_fields_dict,
-                    csv_metadata_valid,
-                ) = is_csv_metadata_valid(bulk_data)
+                    metadata_valid,
+                ) = is_metadata_valid(bulk_data)
 
             except ValueError as e:
                 message = str(type(e).__name__) + " : " + str(e)
@@ -193,7 +193,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         "form": form,
                         "interview_id": interview.pk,
                         "validation_error": True,
-                        "csv_valid": False,
+                        "data_valid": False,
                     },
                 )
 
@@ -210,8 +210,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     bulk_data_content,
                     parent_fields_dict,
                     error_messages,
-                    csv_content_valid,
-                ) = is_csv_content_valid(bulk_data)
+                    content_valid,
+                ) = is_content_valid(bulk_data)
             except ValueError as e:
                 message = str(type(e).__name__) + " : " + str(e)
                 messages.error(request, message)
@@ -224,11 +224,11 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         "form": form,
                         "interview_id": interview.pk,
                         "validation_error": True,
-                        "csv_valid": False,
+                        "data_valid": False,
                     },
                 )
 
-            if not csv_content_valid:
+            if not content_valid:
                 for message in error_messages:
                     messages.error(request, message)
 
@@ -239,7 +239,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         "form": form,
                         "interview_id": interview.pk,
                         "validation_error": True,
-                        "csv_valid": False,
+                        "data_valid": False,
                     },
                 )
 
@@ -247,7 +247,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
             # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
             # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
-            csv_valid = csv_metadata_valid and csv_content_valid
+            data_valid = metadata_valid and content_valid
 
             # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
             # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
@@ -308,10 +308,10 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             storage = get_messages(request)
             for message in storage:
                 if message.level_tag == "error":
-                    csv_valid = False
+                    data_valid = False
                     break
 
-            if csv_valid:
+            if data_valid:
                 bulk_generation = BulkDocumentGeneration(
                     tenant=request.user.tenant,
                     interview=interview,
@@ -356,7 +356,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     {
                         "form": form,
                         "interview_id": interview.pk,
-                        "csv_valid": csv_valid,
+                        "data_valid": data_valid,
                         "bulk_generation_id": bulk_generation.pk,
                     },
                 )
@@ -371,7 +371,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         "form": form,
                         "interview_id": interview.pk,
                         "validation_error": True,
-                        "csv_valid": csv_valid,
+                        "data_valid": data_valid,
                     },
                 )
 

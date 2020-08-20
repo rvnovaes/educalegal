@@ -62,7 +62,7 @@ def is_boolean_flag_valid(field_name, field_boolean_name):
         return True
 
 
-def is_csv_metadata_valid(bulk_data: pd.DataFrame):
+def is_metadata_valid(bulk_data: pd.DataFrame):
     if not isinstance(bulk_data, pd.DataFrame):
         raise ValueError("O valor não é um Dataframe Pandas.\n")
     is_dataframe_empty(bulk_data)
@@ -80,7 +80,7 @@ def is_csv_metadata_valid(bulk_data: pd.DataFrame):
     return field_types_dict, required_fields_dict, True
 
 
-def is_csv_content_valid(bulk_data: pd.DataFrame):
+def is_content_valid(bulk_data: pd.DataFrame):
 
     if not isinstance(bulk_data, pd.DataFrame):
         raise ValueError("O valor não é um Dataframe Pandas.\n")
@@ -143,11 +143,11 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
         bulk_data_content = bulk_data.drop(bulk_data.index[range(0, 4)])
 
     if len(error_messages) > 0:
-        csv_content_valid = False
+        content_valid = False
     else:
-        csv_content_valid = True
+        content_valid = True
 
-    return bulk_data_content, parent_fields_dict, error_messages, csv_content_valid
+    return bulk_data_content, parent_fields_dict, error_messages, content_valid
 
 
 def validate_field(column_name, row_index, field_type_name, field_required, value):
