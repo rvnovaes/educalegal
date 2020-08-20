@@ -149,20 +149,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
         if form.is_valid():
             # Consulta dados do aplicativo necessarios as validacoes
             interview = Interview.objects.get(pk=self.kwargs["interview_id"])
-            tenant = Tenant.objects.get(pk=self.request.user.tenant_id)
-            schools = tenant.school_set.all()
-            # Monta os conjuntos de nomes de escolas e de unidades escolares para validacao
-            school_units_names_set = set()
-            for school in schools:
-                school_units = SchoolUnit.objects.filter(school=school).values_list(
-                    "name", flat=True
-                )
-                for school_unit in school_units:
-                    school_units_names_set.add(school_unit)
-            school_names_set = set(schools.values_list("name", flat=True))
-            # Adiciona como elemento valido "---" para ausencia de unidade escolar
-            school_units_names_set.add("---")
-
             source_file = request.FILES["source_file"]
 
             logger.info("Carregado o arquivo: " + source_file.name)
@@ -248,6 +234,20 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
             # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
             data_valid = metadata_valid and content_valid
+
+            tenant = Tenant.objects.get(pk=self.request.user.tenant_id)
+            schools = tenant.school_set.all()
+            # Monta os conjuntos de nomes de escolas e de unidades escolares para validacao
+            school_units_names_set = set()
+            for school in schools:
+                school_units = SchoolUnit.objects.filter(school=school).values_list(
+                    "name", flat=True
+                )
+                for school_unit in school_units:
+                    school_units_names_set.add(school_unit)
+            school_names_set = set(schools.values_list("name", flat=True))
+            # Adiciona como elemento valido "---" para ausencia de unidade escolar
+            school_units_names_set.add("---")
 
             # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
             # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
