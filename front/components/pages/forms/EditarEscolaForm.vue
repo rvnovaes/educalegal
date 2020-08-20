@@ -38,19 +38,24 @@
                         @input="updateCNPJ">
             </base-input>
           </div>
-            <div class="col-md-1">
-              <base-input label="Tipo"
-                          name="TIpo"
-                          placeholder="Tipo "
-                          rules="required"
-                          success-message="Parece correto!"
-                          :value="school.legal_nature"
-                          @input="updateLegalNature">
-<!--                <select class="form-control">-->
-<!--                  <option>J</option>-->
-<!--                  <option>F</option>-->
-<!--                </select>-->
-              </base-input>
+          <div class="col-md-1">
+            <base-input label="Tipo"
+                        name="TIpo"
+                        placeholder="Tipo "
+                        rules="required"
+                        success-message="Parece correto!">
+              <el-select class="select-danger"
+                         placeholder="Tipo"
+                         :value="school.legal_nature"
+                         @input="updateLegalNature">
+                <el-option v-for="option in selects.legal_natures"
+                           class="select-danger"
+                           :value="option.value"
+                           :label="option.label"
+                           :key="option.label">
+                </el-option>
+              </el-select>
+            </base-input>
 
           </div>
         </div>
@@ -139,8 +144,20 @@
                         name="UF"
                         placeholder="UF"
                         rules="required"
-                        :value="school.state"
                         @input="updateUF">
+              <el-select class="select-danger"
+                         placeholder="UF"
+                         :value="school.state"
+                         @input="updateUF">
+                <el-option v-for="option in selects.ufs"
+                           class="select-danger"
+                           :value="option.value"
+                           :label="option.label"
+                           :key="option.label">
+                </el-option>
+              </el-select>
+
+
             </base-input>
           </div>
         </div>
@@ -151,96 +168,130 @@
   </card>
 </template>
 <script>
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
-  export default {
-    props: ['school'],
-    components: {},
-    data() {
-      return {
+export default {
+  props: ["school"],
+  components: {},
+  data() {
+    return {
+      selects: {
+        legal_natures: [
+          {value: "J", label: "Jurídica"},
+          {value: "F", label: "Física"},
+        ],
+        ufs: [
+          {value: "AC", label: "AC"},
+          {value: "AL", label: "AL"},
+          {value: "AP", label: "AP"},
+          {value: "AM", label: "AM"},
+          {value: "BA", label: "BA"},
+          {value: "CE", label: "CE"},
+          {value: "DF", label: "DF"},
+          {value: "ES", label: "ES"},
+          {value: "GO", label: "GO"},
+          {value: "MA", label: "MA"},
+          {value: "MT", label: "MT"},
+          {value: "MS", label: "MS"},
+          {value: "MG", label: "MG"},
+          {value: "PA", label: "PA"},
+          {value: "PB", label: "PB"},
+          {value: "PR", label: "PR"},
+          {value: "PE", label: "PE"},
+          {value: "PI", label: "PI"},
+          {value: "RJ", label: "RJ"},
+          {value: "RN", label: "RN"},
+          {value: "RS", label: "RS"},
+          {value: "RO", label: "RO"},
+          {value: "RR", label: "RR"},
+          {value: "SC", label: "SC"},
+          {value: "SP", label: "SP"},
+          {value: "SE", label: "SE"},
+          {value: "TO", label: "TO"},
+        ]
+      },
+      validated: false,
+    };
+  },
 
-        validated: false,
-      }
+  // Quando a pagina e recarrecada, o Vuex e totalmente limpado. Por isso, se o objeto schoo estiver vazio,
+  // recarregue todas as escolas. Funciona em reload da pagina
+  created() {
+    if (!this.school) {
+      this.$store.dispatch("schools/fetchAllSchools");
+    }
+  },
+
+  methods: {
+    updateName(e) {
+      this.$store.commit("schools/updateName", {id: this.school.id, name: e});
+    },
+    updateLegalName(e) {
+      this.$store.commit("schools/updateLegalName", {id: this.school.id, legal_name: e});
+    },
+    updateCNPJ(e) {
+      this.$store.commit("schools/updateCNPJ", {id: this.school.id, cnpj: e});
+    },
+    updateLegalNature(e) {
+      this.$store.commit("schools/updateLegalNature", {id: this.school.id, legal_nature: e});
+    },
+    updateCity(e) {
+      this.$store.commit("schools/updateCity", {id: this.school.id, city: e});
+    },
+    updateUF(e) {
+      this.$store.commit("schools/updateUF", {id: this.school.id, state: e});
     },
 
-    // Quando a pagina e recarrecada, o Vuex e totalmente limpado. Por isso, se o objeto schoo estiver vazio,
-    // recarregue todas as escolas. Funciona em reload da pagina
-    created() {
-      if(!this.school){
-        this.$store.dispatch('schools/fetchAllSchools')
-      }
-    },
-
-    methods: {
-      updateName (e) {
-        this.$store.commit('schools/updateName', {id: this.school.id, name: e})
-      },
-      updateLegalName (e) {
-        this.$store.commit('schools/updateLegalName', {id: this.school.id, legal_name: e})
-      },
-      updateCNPJ (e) {
-        this.$store.commit('schools/updateCNPJ', {id: this.school.id, cnpj: e})
-      },
-      updateLegalNature (e) {
-        this.$store.commit('schools/updateLegalNature', {id: this.school.id, legal_nature: e})
-      },
-      updateCity (e) {
-        this.$store.commit('schools/updateCity', {id: this.school.id, city: e})
-      },
-      updateUF (e) {
-        this.$store.commit('schools/updateUF', {id: this.school.id, state: e})
-      },
-
-      async firstFormSubmit() {
-        const payload = {
-          id: this.school.id,
-          name: this.school.name,
-          legal_name: this.school.legal_name,
-          legal_nature: this.school.legal_nature,
-          cnpj: this.school.cnpj,
-          phone: this.school.phone,
-          site: this.school.site,
-          email: this.school.email,
-          zip: this.school.zip,
-          street: this.school.street,
-          street_number: this.school.street_number,
-          unit: this.school.unit,
-          neighborhood: this.school.neighborhood,
-          city: this.school.city,
-          state: this.school.state
-          }
-        try {
-          this.$axios.patch(`v2/tenant/schools/${this.school.id}`, payload)
+    async firstFormSubmit() {
+      const payload = {
+        id: this.school.id,
+        name: this.school.name,
+        legal_name: this.school.legal_name,
+        legal_nature: this.school.legal_nature,
+        cnpj: this.school.cnpj,
+        phone: this.school.phone,
+        site: this.school.site,
+        email: this.school.email,
+        zip: this.school.zip,
+        street: this.school.street,
+        street_number: this.school.street_number,
+        unit: this.school.unit,
+        neighborhood: this.school.neighborhood,
+        city: this.school.city,
+        state: this.school.state
+      };
+      try {
+        this.$axios.patch(`v2/tenant/schools/${this.school.id}`, payload)
           .then((data) => {
             Swal.fire({
               title: `Você atualizou ${this.school.name} com sucesso!`,
               buttonsStyling: false,
-              icon: 'success',
+              icon: "success",
               customClass: {
-                confirmButton: 'btn btn-success btn-fill',
+                confirmButton: "btn btn-success btn-fill",
               }
             });
-          })
-        } catch (e) {
-          await Swal.fire({
-            title: `Erro ao editar ${this.school.name}`,
-            text: e,
-            icon: 'error',
-            customClass: {
-              confirmButton: 'btn btn-info btn-fill',
-            },
-            confirmButtonText: 'OK',
-            buttonsStyling: false
           });
-        }
-      },
-      back: function () {
-        this.$router.push({
-          path: '/escolas'
-        })
+      } catch (e) {
+        await Swal.fire({
+          title: `Erro ao editar ${this.school.name}`,
+          text: e,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
       }
+    },
+    back: function () {
+      this.$router.push({
+        path: "/escolas"
+      });
     }
   }
+};
 </script>
 <style>
 </style>

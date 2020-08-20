@@ -14,8 +14,8 @@
       <div class="row">
         <div class="col">
           <div class="card-wrapper">
-            <escola-form :school="school">
-            </escola-form>
+            <editar-escola-form :school="school">
+            </editar-escola-form>
           </div>
         </div>
       </div>
@@ -24,13 +24,13 @@
 </template>
 
 <script>
-  import EscolaForm from '@/components/pages/forms/EscolaForm'
+  import EditarEscolaForm from "@/components/pages/forms/EditarEscolaForm";
 
   export default {
     name: 'escola-edicao',
     layout: 'DashboardLayout',
     components: {
-      EscolaForm,
+      EditarEscolaForm,
     },
     data() {
       return {
