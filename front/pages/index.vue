@@ -104,6 +104,7 @@
         const credentials = this.credentials
         try {
           await this.$auth.loginWith('local', { data: credentials })
+          // await this.$auth.loginWith('customScheme', { data: credentials })
           this.$toasted.global.defaultSuccess({
               msg: 'Usuário autenticado com sucesso'
           })

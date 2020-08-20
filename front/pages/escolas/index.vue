@@ -10,7 +10,7 @@
         </div>
         <div class="col-lg-6 col-5 text-right">
           <base-button size="sm" type="neutral" @click="handleNew">Nova</base-button>
-<!--          <base-button size="sm" type="neutral">Filters</base-button>-->
+          <!--          <base-button size="sm" type="neutral">Filters</base-button>-->
         </div>
       </div>
     </base-header>
@@ -175,14 +175,13 @@ export default {
     };
   },
   computed: {
-    tableData () {
-      return this.$store.getters["schools/getAllSchools"]
+    tableData() {
+      return this.$store.getters["schools/getAllSchools"];
     }
   },
-
   async fetch({store}) {
-   await store.dispatch('schools/fetchAllSchools')
- },
+    await store.dispatch("schools/fetchAllSchools");
+  },
   methods: {
     handleNew() {
       this.$router.push({
@@ -190,8 +189,6 @@ export default {
       });
 
     },
-
-
     handleLike(index, row) {
       Swal.fire({
         title: `Você marcou ${row.name} como favorita`,
@@ -245,22 +242,22 @@ export default {
       );
       if (indexToDelete >= 0) {
         try {
-          this.$store.dispatch('schools/deleteSchool', row)
-          .then((data) => {
-             console.log(data);
-             this.tableData.splice(indexToDelete, 1);
-           });
-         } catch (e) {
-           Swal.fire({
-             title: `Erro ao excluir ${row.name}`,
-             text: e,
-             icon: 'error',
-             customClass: {
-               confirmButton: 'btn btn-info btn-fill',
-             },
-             confirmButtonText: 'OK',
-             buttonsStyling: false
-           });
+          this.$store.dispatch("schools/deleteSchool", row)
+            .then((data) => {
+              console.log(data);
+              this.tableData.splice(indexToDelete, 1);
+            });
+        } catch (e) {
+          Swal.fire({
+            title: `Erro ao excluir ${row.name}`,
+            text: e,
+            icon: "error",
+            customClass: {
+              confirmButton: "btn btn-info btn-fill",
+            },
+            confirmButtonText: "OK",
+            buttonsStyling: false
+          });
         }
       }
     },
