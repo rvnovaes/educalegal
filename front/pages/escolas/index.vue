@@ -9,7 +9,7 @@
           </nav>
         </div>
         <div class="col-lg-6 col-5 text-right">
-          <base-button size="sm" type="neutral" @click="handleNew">Nova</base-button>
+          <base-button size="lg" type="neutral" @click="handleNew">Nova</base-button>
           <!--          <base-button size="sm" type="neutral">Filters</base-button>-->
         </div>
       </div>
