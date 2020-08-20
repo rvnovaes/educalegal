@@ -35,18 +35,23 @@
                         v-model="school.cnpj">
             </base-input>
           </div>
-            <div class="col-md-1">
-              <base-input label="Tipo"
-                          name="Tipo"
-                          placeholder="Tipo "
-                          rules="required"
-                          success-message="Parece correto!"
-                          v-model="school.legal_nature">
-<!--                <select class="form-control">-->
-<!--                  <option>J</option>-->
-<!--                  <option>F</option>-->
-<!--                </select>-->
-              </base-input>
+          <div class="col-md-1">
+            <base-input label="Tipo"
+                        name="Tipo"
+                        placeholder="Tipo "
+                        rules="required"
+                        success-message="Parece correto!">
+                <el-select class="select-danger"
+                         placeholder="Tipo"
+                         v-model="school.legal_nature">
+                <el-option v-for="option in selects.legal_natures"
+                           class="select-danger"
+                           :value="option.value"
+                           :label="option.label"
+                           :key="option.label">
+                </el-option>
+              </el-select>
+            </base-input>
 
           </div>
         </div>
@@ -78,8 +83,6 @@
             </base-input>
           </div>
         </div>
-
-
         <div class="form-row">
           <div class="col-md-1">
             <base-input label="Zip"
@@ -135,8 +138,17 @@
             <base-input label="UF"
                         name="UF"
                         placeholder="UF"
-                        rules="required"
-                        v-model="school.state">
+                        rules="required">
+              <el-select class="select-danger"
+                         placeholder="UF"
+                         v-model="school.state">
+                <el-option v-for="option in selects.ufs"
+                           class="select-danger"
+                           :value="option.value"
+                           :label="option.label"
+                           :key="option.label">
+                </el-option>
+              </el-select>
             </base-input>
           </div>
         </div>
@@ -147,85 +159,120 @@
   </card>
 </template>
 <script>
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
-  export default {
-    components: {},
-    data() {
-      return {
-        validated: false,
-        school: {
-          name: null,
-          legal_name: null,
-          legal_nature: null,
-          cnpj: null,
-          phone: null,
-          site: null,
-          email: null,
-          zip: null,
-          street: null,
-          street_number: null,
-          unit: null,
-          neighborhood: null,
-          city: null,
-          state: null,
-          school_units: []
-        }
+export default {
+  components: {},
+  data() {
+    return {
+      selects: {
+        legal_natures: [
+          {value: "J", label: "Jurídica"},
+          {value: "F", label: "Física"},
+        ],
+        ufs: [
+          {value: "AC", label: "AC"},
+          {value: "AL", label: "AL"},
+          {value: "AP", label: "AP"},
+          {value: "AM", label: "AM"},
+          {value: "BA", label: "BA"},
+          {value: "CE", label: "CE"},
+          {value: "DF", label: "DF"},
+          {value: "ES", label: "ES"},
+          {value: "GO", label: "GO"},
+          {value: "MA", label: "MA"},
+          {value: "MT", label: "MT"},
+          {value: "MS", label: "MS"},
+          {value: "MG", label: "MG"},
+          {value: "PA", label: "PA"},
+          {value: "PB", label: "PB"},
+          {value: "PR", label: "PR"},
+          {value: "PE", label: "PE"},
+          {value: "PI", label: "PI"},
+          {value: "RJ", label: "RJ"},
+          {value: "RN", label: "RN"},
+          {value: "RS", label: "RS"},
+          {value: "RO", label: "RO"},
+          {value: "RR", label: "RR"},
+          {value: "SC", label: "SC"},
+          {value: "SP", label: "SP"},
+          {value: "SE", label: "SE"},
+          {value: "TO", label: "TO"},
+        ]
+      },
+      validated: false,
+      school: {
+        name: null,
+        legal_name: null,
+        legal_nature: null,
+        cnpj: null,
+        phone: null,
+        site: null,
+        email: null,
+        zip: null,
+        street: null,
+        street_number: null,
+        unit: null,
+        neighborhood: null,
+        city: null,
+        state: null,
+        school_units: []
       }
-    },
-    methods: {
-      async firstFormSubmit() {
-        const payload = {
-          tenant: this.$auth.user.tenant,
-          id: this.school.id,
-          name: this.school.name,
-          legal_name: this.school.legal_name,
-          legal_nature: this.school.legal_nature,
-          cnpj: this.school.cnpj,
-          phone: this.school.phone,
-          site: this.school.site,
-          email: this.school.email,
-          zip: this.school.zip,
-          street: this.school.street,
-          street_number: this.school.street_number,
-          unit: this.school.unit,
-          neighborhood: this.school.neighborhood,
-          city: this.school.city,
-          state: this.school.state,
-          school_units: []
-          }
-        try {
-          await this.$store.dispatch('schools/createSchool', payload)
+    };
+  },
+  methods: {
+    async firstFormSubmit() {
+      const payload = {
+        tenant: this.$auth.user.tenant,
+        id: this.school.id,
+        name: this.school.name,
+        legal_name: this.school.legal_name,
+        legal_nature: this.school.legal_nature,
+        cnpj: this.school.cnpj,
+        phone: this.school.phone,
+        site: this.school.site,
+        email: this.school.email,
+        zip: this.school.zip,
+        street: this.school.street,
+        street_number: this.school.street_number,
+        unit: this.school.unit,
+        neighborhood: this.school.neighborhood,
+        city: this.school.city,
+        state: this.school.state,
+        school_units: []
+      };
+      try {
+        await this.$store.dispatch("schools/createSchool", payload)
           .then((data) => {
             Swal.fire({
               title: `Você criou ${this.school.name} com sucesso!`,
               buttonsStyling: false,
-              icon: 'success',
+              icon: "success",
               customClass: {
-                confirmButton: 'btn btn-success btn-fill',
+                confirmButton: "btn btn-success btn-fill",
               }
             });
-          })
-        } catch (e) {
-          await Swal.fire({
-            title: `Erro ao criar ${this.school.name}`,
-            text: e,
-            icon: 'error',
-            customClass: {
-              confirmButton: 'btn btn-info btn-fill',
-            },
-            confirmButtonText: 'OK',
-            buttonsStyling: false
           });
-        }
-      },
-      back: function () {
-        this.$router.push({
-          path: '/escolas'
-        })
+      } catch (e) {
+        await Swal.fire({
+          title: `Erro ao criar ${this.school.name}`,
+          text: e,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
       }
+    },
+    back: function () {
+      this.$router.push({
+        path: "/escolas"
+      });
     }
   }
+};
 </script>
 <style>
 </style>
