@@ -148,13 +148,8 @@ class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
     lookup_field = 'email'
 
     def get_queryset(self):
-        try:
-            # deve ser usada a funcao filter e nao a get para que seja retornado um queryset e nao um
-            # ESignatureAppSignerKey
-            # como cada cliente tem uma conta da clicksig, deve ser verificado o tenant tbm
-            esignature_app_signer_key = ESignatureAppSignerKey.objects.filter(
-                pk=self.request.user.tenant.id, email=self.kwargs['email'])
-        except ESignatureAppSignerKey.DoesNotExist:
-            return ESignatureAppSignerKey.objects.none()
+        # deve ser usada a funcao filter e nao a get para que seja retornado um queryset e nao um
+        # ESignatureAppSignerKey
+        # como cada cliente tem uma conta da clicksig, deve ser verificado o tenant tbm
 
-        return esignature_app_signer_key
+        return ESignatureAppSignerKey.objects.filter(tenant=self.request.user.tenant.id, email=self.kwargs['email'])

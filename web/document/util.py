@@ -124,6 +124,9 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
             document["content_document"] = "acordos-individuais-trabalhistas-coronavirus.docx"
 
+        # insere campos fixos
+        document["reviewed_school_email_answer"] = True
+
         # remove campos herdados do mongo e que nao existem na entrevista e converte o objeto OB ID do mongo em campo doc_uuid
         mongo_id = str(document.get("id"))
         document.pop('id')
