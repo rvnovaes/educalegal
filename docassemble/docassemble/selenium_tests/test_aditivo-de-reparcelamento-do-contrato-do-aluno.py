@@ -88,7 +88,7 @@ class TestAditivodereparcelamentodocontratodoaluno(WebTest):
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Dados do(a) segundo(a) Contratante"))
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("FRANCISCO")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("FRANCISCO CHICO")
         for k in CPF:
             self.driver.find_element(
                 By.XPATH, "//form[@id=\'daform\']/div[3]/div/input"
@@ -104,7 +104,7 @@ class TestAditivodereparcelamentodocontratodoaluno(WebTest):
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[12]/div/input").send_keys("(31)90000-0000")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
-            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Endereço de FRANCISCO"))
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Endereço de FRANCISCO CHICO"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("30180-090")
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[4]/div/input").send_keys("000")
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[5]/div/input").send_keys("apto 00")
