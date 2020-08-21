@@ -1,8 +1,20 @@
 version: '3.7'
 
 services:
+  educalegal_front:
+    image: rvnovaes/educalegal-front:0.2
+    container_name: educalegal_front
+    restart: unless-stopped
+    build:
+      context: ../front
+      args:
+        BACKEND_URL: "http://educalegal:8008"
+    depends_on:
+      - educalegal
+    ports:
+      - "3000:3000"
   educalegal:
-    image: rvnovaes/educalegal:0.57
+    image: rvnovaes/educalegal:2.0
     container_name: educalegal
     restart: unless-stopped
     build: .
@@ -21,7 +33,7 @@ services:
       - educalegal_rabbitmq
       - mongo
   educalegal_celery:
-    image: rvnovaes/educalegal:0.57
+    image: rvnovaes/educalegal:2.0
     container_name: educalegal_celery
     build: .
     command: celery -A web worker -l info -c 1 -n educalegalworker1@%h
