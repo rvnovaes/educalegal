@@ -93,7 +93,6 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys(
             "até o final do ano letivo")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
-        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
 
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Local e Data"))

@@ -88,8 +88,9 @@ class TestAcordosindividuaistrabalhistascoronavirus(WebTest):
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Trabalhador:"))
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"),
-                                                                                                  "O regime de home office perdurará até a data:"))
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("2020-06-23")
+                                                         "O regime de home office perdurará até:"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys(
+            "até o final do ano letivo")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Dados do acordo"))
