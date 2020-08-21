@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def is_dataframe_empty(bulk_data: pd.DataFrame):
     if bulk_data.empty:
-        raise ValueError("O arquivo CSV está vazio ou contém apenas linhas de cabeçalho, sem nenhum dado.\n")
+        raise ValueError("O arquivo recebido está vazio ou contém apenas linhas de cabeçalho, sem nenhum dado.\n")
     else:
         return False
 

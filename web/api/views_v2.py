@@ -4,10 +4,9 @@ import pandas as pd
 
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import (
     ValidationError,
     PermissionDenied,
@@ -457,6 +456,7 @@ class TenantPlanViewSet(viewsets.ReadOnlyModelViewSet):
 # Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
 def validate_document(request, **kwargs):
     """
     Validate documents list received in request.body.

@@ -1,0 +1,386 @@
+{
+   "selected_school": [
+      "StringField",
+      "true",
+      "",
+      "Escola",
+      "Development Escola da Lagoa",
+      "Development Escola da Lagoa"
+   ],
+   "school_division": [
+      "StringField",
+      "true",
+      "",
+      "Unidade",
+      "System Super Bacana",
+      "---"
+   ],
+   "students_name_text": [
+      "StringField",
+      "true",
+      "students",
+      "Nome",
+      "Agatha Elza Teixeira",
+      "Renato Kauê Araújo"
+   ],
+   "students_nationality": [
+      "StringField",
+      "true",
+      "students",
+      "Nacionalidade",
+      "brasileiro(a)",
+      "brasileiro(a)"
+   ],
+   "students_cpf": [
+      "StringField",
+      "true",
+      "students",
+      "CPF",
+      "009.175.002-45",
+      "677.423.294-92"
+   ],
+   "students_rg": [
+      "StringField",
+      "true",
+      "students",
+      "RG",
+      "37.750.612-6",
+      "17.817.809-3"
+   ],
+   "students_zip": [
+      "StringField",
+      "true",
+      "students",
+      "CEP",
+      "69945-970",
+      "21381-040"
+   ],
+   "students_street_name": [
+      "StringField",
+      "true",
+      "students",
+      "Logradouro",
+      "Avenida Paraná",
+      "Travessa João de Matos"
+   ],
+   "students_street_number": [
+      "StringField",
+      "true",
+      "students",
+      "Número",
+      "206",
+      "192"
+   ],
+   "students_unit": [
+      "StringField",
+      "false",
+      "students",
+      "Complemento",
+      "",
+      ""
+   ],
+   "students_neighborhood": [
+      "StringField",
+      "true",
+      "students",
+      "Bairro",
+      "Centro",
+      "Quintino Bocaiúva"
+   ],
+   "students_city": [
+      "StringField",
+      "true",
+      "students",
+      "Cidade",
+      "Acrelândia",
+      "Rio de Janeiro"
+   ],
+   "students_state": [
+      "StringField",
+      "true",
+      "students",
+      "Estado",
+      "AC",
+      "RJ"
+   ],
+   "students_grade": [
+      "StringField",
+      "true",
+      "students",
+      "Série",
+      "1ª série do ensino fundamental",
+      "1° ano do ensino fundamental"
+   ],
+   "students_period": [
+      "StringField",
+      "true",
+      "students",
+      "Período",
+      "matutino",
+      "matutino"
+   ],
+   "school_year": [
+      "IntField",
+      "true",
+      "",
+      "Ano letivo",
+      "2020",
+      "2020"
+   ],
+   "annual_value": [
+      "FloatField",
+      "true",
+      "",
+      "Valor anual",
+      "3000",
+      "5000"
+   ],
+   "has_discount": [
+      "BooleanField",
+      "true",
+      "",
+      "Tem desconto",
+      "false",
+      "true"
+   ],
+   "discount_notes": [
+      "StringField",
+      "false",
+      "",
+      "Observações",
+      "",
+      "Desconto 10%"
+   ],
+   "method_payment": [
+      "StringField",
+      "true",
+      "",
+      "Forma de pagamento",
+      "à vista",
+      "parcelado"
+   ],
+   "single_installment_value": [
+      "FloatField",
+      "false",
+      "",
+      "Valor da parcela única",
+      "3000",
+      ""
+   ],
+   "single_installment_date": [
+      "DateTimeField",
+      "false",
+      "",
+      "Data do vencimento da parcela única",
+      "10/11/2020",
+      ""
+   ],
+   "has_input_value": [
+      "BooleanField",
+      "true",
+      "",
+      "Haverá parcela de entrada",
+      "false",
+      "true"
+   ],
+   "input_value": [
+      "FloatField",
+      "false",
+      "",
+      "Valor da parcela de entrada",
+      "",
+      "2000"
+   ],
+   "input_date": [
+      "DateTimeField",
+      "false",
+      "",
+      "Data do vencimento da parcela de entrada",
+      "",
+      "10/11/2020"
+   ],
+   "quantity_installments": [
+      "IntField",
+      "false",
+      "",
+      "Quantidade de parcelas",
+      "",
+      "3"
+   ],
+   "installments_value": [
+      "FloatField",
+      "false",
+      "",
+      "Valor da parcela",
+      "",
+      "1000"
+   ],
+   "installments_date": [
+      "DateTimeField",
+      "false",
+      "",
+      "Data de vencimento da primeira parcela",
+      "",
+      "20/11/2020"
+   ],
+   "signature_local": [
+      "StringField",
+      "true",
+      "",
+      "Local da assinatura",
+      "Belo Horizonte",
+      "Belo Horizonte"
+   ],
+   "signature_date": [
+      "DateTimeField",
+      "true",
+      "",
+      "Data da assinatura",
+      "09/04/2020",
+      "09/04/2020"
+   ],
+   "contractors_name_text": [
+      "StringField",
+      "true",
+      "contractors",
+      "Nome",
+      "Gabriel Luiz Juan Moura",
+      "Laura Sônia Jéssica Santos"
+   ],
+   "contractors_nationality": [
+      "StringField",
+      "true",
+      "contractors",
+      "nacionalidade",
+      "brasileiro(a)",
+      "brasileiro(a)"
+   ],
+   "contractors_marital_status": [
+      "StringField",
+      "true",
+      "contractors",
+      "estadocivil",
+      "casado(a)",
+      "casado(a)"
+   ],
+   "contractors_occupation": [
+      "StringField",
+      "true",
+      "contractors",
+      "Profissão",
+      "contador",
+      "engenheira"
+   ],
+   "contractors_cpf": [
+      "StringField",
+      "true",
+      "contractors",
+      "CPF",
+      "619.474.792-70",
+      "171.668.857-42"
+   ],
+   "contractors_rg": [
+      "StringField",
+      "true",
+      "contractors",
+      "RG",
+      "10.812.773-4",
+      "12.531.478-4"
+   ],
+   "contractors_phone_number": [
+      "StringField",
+      "true",
+      "contractors",
+      "Telefone",
+      "31 3213-6184",
+      "(21) 2885-1328"
+   ],
+   "contractors_whatsapp_number": [
+      "StringField",
+      "true",
+      "contractors",
+      "WhatsApp",
+      "31 99888-1122",
+      "(21) 98461-9677"
+   ],
+   "contractors_email": [
+      "EmailField",
+      "true",
+      "contractors",
+      "E-mail",
+      "fake@gmail.com",
+      "fake@gmail.com"
+   ],
+   "contractors_zip": [
+      "StringField",
+      "true",
+      "contractors",
+      "CEP",
+      "77405-105",
+      "21381-040"
+   ],
+   "contractors_street_name": [
+      "StringField",
+      "true",
+      "contractors",
+      "Logradouro",
+      "Rua Presidente Juscelino Kubitschek",
+      "Travessa João de Matos"
+   ],
+   "contractors_street_number": [
+      "StringField",
+      "true",
+      "contractors",
+      "Número",
+      "649",
+      "192"
+   ],
+   "contractors_unit": [
+      "StringField",
+      "false",
+      "contractors",
+      "complemento",
+      "1",
+      "2"
+   ],
+   "contractors_neighborhood": [
+      "StringField",
+      "true",
+      "contractors",
+      "bairro",
+      "Setor Central",
+      "Quintino Bocaiúva"
+   ],
+   "contractors_city": [
+      "StringField",
+      "true",
+      "contractors",
+      "Cidade",
+      "Gurupi",
+      "Rio de Janeiro"
+   ],
+   "contractors_state": [
+      "StringField",
+      "true",
+      "contractors",
+      "UF",
+      "TO",
+      "RJ"
+   ],
+   "submit_to_esignature": [
+      "BooleanField",
+      "true",
+      "",
+      "Enviar para assinatura eletrônica",
+      "true",
+      "true"
+   ],
+   "el_send_email": [
+      "BooleanField",
+      "true",
+      "",
+      "Enviar por e-mail",
+      "False",
+      "False"
+   ]
+}
