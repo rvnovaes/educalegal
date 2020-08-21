@@ -53,10 +53,10 @@
 
         </div>
         <div class="col-xl-3 col-md-6">
-          <stats-card title="Performance"
+          <stats-card title="Escolas"
                       type="gradient-info"
                       sub-title="49,65%"
-                      icon="ni ni-chart-bar-32">
+                      icon="ni ni-hat-3">
 
             <template slot="footer">
               <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 54.8%</span>
