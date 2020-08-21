@@ -1,3 +1,3 @@
-rm -R .nuxt
-rm -R node_modules
+rm -Rf .nuxt
+rm -Rf node_modules
 yarn install
