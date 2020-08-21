@@ -64,9 +64,6 @@ urlpatterns = [
       url(
           r"^v2/docs/redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
       ),
-      # url(r'^graphql$', csrf_exempt(jwt_cookie(GraphQLView.as_view(graphiql=True))))
-      # url(r'^graphql$', csrf_exempt(GraphQLView.as_view(graphiql=True)))
-      # url(r'^graphql$', csrf_exempt(PrivateGraphQLView.as_view(graphiql=True, schema=schema)))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
