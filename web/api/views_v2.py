@@ -17,7 +17,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from validator_collection import checkers
 
-from document.models import Document
+from document.models import Document, DocumentType
 from document.views import validate_data_mongo
 from interview.models import Interview
 from school.models import School, SchoolUnit
@@ -411,46 +411,6 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
-# and are composed by TenantAwareAPIMixin, which filters the queryset by tenant
-
-class TenantSchoolViewSet(TenantAwareAPIMixin, viewsets.ModelViewSet):
-
-    queryset = School.objects.all()
-    serializer_class = SchoolSerializer
-
-
-class TenantSchoolUnitViewSet(viewsets.ModelViewSet):
-    """
-    Permite criar, alterar, listar e apagar as unidades das escolas.
-    Só permite excluir escola vinculada ao tenant referente ao token informado.
-    """
-    queryset = SchoolUnit.objects.all()
-    serializer_class = SchoolUnitSerializer
-
-    def get_queryset(self):
-        school_pk = self.kwargs["spk"]
-        tenant = self.request.user.tenant
-        queryset = self.queryset.filter(school_id=school_pk, tenant=tenant)
-        return queryset
-
-
-class TenantInterviewViewSet(TenantAwareAPIMixin, viewsets.ModelViewSet):
-
-    queryset = Interview.objects.all()
-    serializer_class = InterviewSerializer
-
-
-class TenantPlanViewSet(viewsets.ReadOnlyModelViewSet):
-
-    queryset = Plan.objects.all()
-    serializer_class = PlanSerializer
-
-    def get_queryset(self):
-        tenant = self.request.user.tenant
-        return self.queryset.get(pk=tenant.plan_id)
-
-
 # Clients should authenticate by passing the token key in the "Authorization"
 # HTTP header, prepended with the string "Token ".  For example:
 # Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
@@ -465,7 +425,6 @@ def validate_document(request, **kwargs):
     """
 
     # Transforma o dicionario em um dataframe
-    # bulk_data = pd.read_csv(request.data, sep="#")
     bulk_data = pd.DataFrame.from_dict(request.data)
 
     try:
@@ -515,30 +474,71 @@ def validate_document(request, **kwargs):
     # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
     data_valid = metadata_valid and content_valid
 
-    interview = Interview.objects.get(pk=kwargs["interview_id"])
+    # verifica se informou um tipo de documento valido
+    if kwargs["interview_id"] not in DocumentType.id_choices():
+        return Response({"error": "Os tipos de documento que permitem geração via API são {}".format(
+            DocumentType.choices()
+        )})
+
+    try:
+        interview = Interview.objects.get(pk=kwargs["interview_id"])
+    except Interview.DoesNotExist:
+        return Response({"error": "Não existe um tipo de documento com ID = {interview_id}".format(
+            interview_id=kwargs["interview_id"]
+        )})
 
     # valida os dados recebidos de forma automatica no mongo
-    bulk_generation_id, mongo_document = validate_data_mongo(
+    mongo_document = validate_data_mongo(
         request, interview.pk, data_valid, bulk_data_content,
-        field_types_dict, required_fields_dict, parent_fields_dict
+        field_types_dict, required_fields_dict, parent_fields_dict, False
     )
 
-    if data_valid:
-        response_data = {
-            "interview_id": interview.pk,
-            "data_valid": data_valid,
-            "bulk_generation_id": bulk_generation_id,
-        },
-        return Response({"response_data": response_data})
+    response_data = {
+        "interview_id": interview.pk,
+        "data_valid": data_valid,
+    }
 
-    else:
+    if not data_valid:
         mongo_document.drop_collection()
-        response_data = {
-            "interview_id": interview.pk,
-            "validation_error": True,
-            "data_valid": data_valid,
-        },
-        return Response({"response_data": response_data})
 
-    # user = Token.objects.get(key=request.user).user
+    return Response({"response_data": response_data})
 
+
+# Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
+# and are composed by TenantAwareAPIMixin, which filters the queryset by tenant
+
+class TenantSchoolViewSet(TenantAwareAPIMixin, viewsets.ModelViewSet):
+
+    queryset = School.objects.all()
+    serializer_class = SchoolSerializer
+
+
+class TenantSchoolUnitViewSet(viewsets.ModelViewSet):
+    """
+    Permite criar, alterar, listar e apagar as unidades das escolas.
+    Só permite excluir escola vinculada ao tenant referente ao token informado.
+    """
+    queryset = SchoolUnit.objects.all()
+    serializer_class = SchoolUnitSerializer
+
+    def get_queryset(self):
+        school_pk = self.kwargs["spk"]
+        tenant = self.request.user.tenant
+        queryset = self.queryset.filter(school_id=school_pk, tenant=tenant)
+        return queryset
+
+
+class TenantInterviewViewSet(TenantAwareAPIMixin, viewsets.ModelViewSet):
+
+    queryset = Interview.objects.all()
+    serializer_class = InterviewSerializer
+
+
+class TenantPlanViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = Plan.objects.all()
+    serializer_class = PlanSerializer
+
+    def get_queryset(self):
+        tenant = self.request.user.tenant
+        return self.queryset.get(pk=tenant.plan_id)

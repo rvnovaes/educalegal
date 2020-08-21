@@ -2,7 +2,7 @@
    "selected_school": [
       "StringField",
       "true",
-      "",
+      null,
       "Escola",
       "Development Escola da Lagoa",
       "Development Escola da Lagoa"
@@ -10,7 +10,7 @@
    "school_division": [
       "StringField",
       "true",
-      "",
+      null,
       "Unidade",
       "System Super Bacana",
       "---"
@@ -76,8 +76,8 @@
       "false",
       "students",
       "Complemento",
-      "",
-      ""
+      null,
+      null
    ],
    "students_neighborhood": [
       "StringField",
@@ -122,7 +122,7 @@
    "school_year": [
       "IntField",
       "true",
-      "",
+      null,
       "Ano letivo",
       "2020",
       "2020"
@@ -130,7 +130,7 @@
    "annual_value": [
       "FloatField",
       "true",
-      "",
+      null,
       "Valor anual",
       "3000",
       "5000"
@@ -138,7 +138,7 @@
    "has_discount": [
       "BooleanField",
       "true",
-      "",
+      null,
       "Tem desconto",
       "false",
       "true"
@@ -146,15 +146,15 @@
    "discount_notes": [
       "StringField",
       "false",
-      "",
+      null,
       "Observações",
-      "",
+      null,
       "Desconto 10%"
    ],
    "method_payment": [
       "StringField",
       "true",
-      "",
+      null,
       "Forma de pagamento",
       "à vista",
       "parcelado"
@@ -162,23 +162,23 @@
    "single_installment_value": [
       "FloatField",
       "false",
-      "",
+      null,
       "Valor da parcela única",
       "3000",
-      ""
+      null
    ],
    "single_installment_date": [
       "DateTimeField",
       "false",
-      "",
+      null,
       "Data do vencimento da parcela única",
       "10/11/2020",
-      ""
+      null
    ],
    "has_input_value": [
       "BooleanField",
       "true",
-      "",
+      null,
       "Haverá parcela de entrada",
       "false",
       "true"
@@ -186,47 +186,47 @@
    "input_value": [
       "FloatField",
       "false",
-      "",
+      null,
       "Valor da parcela de entrada",
-      "",
+      null,
       "2000"
    ],
    "input_date": [
       "DateTimeField",
       "false",
-      "",
+      null,
       "Data do vencimento da parcela de entrada",
-      "",
+      null,
       "10/11/2020"
    ],
    "quantity_installments": [
       "IntField",
       "false",
-      "",
+      null,
       "Quantidade de parcelas",
-      "",
+      null,
       "3"
    ],
    "installments_value": [
       "FloatField",
       "false",
-      "",
+      null,
       "Valor da parcela",
-      "",
+      null,
       "1000"
    ],
    "installments_date": [
       "DateTimeField",
       "false",
-      "",
+      null,
       "Data de vencimento da primeira parcela",
-      "",
+      null,
       "20/11/2020"
    ],
    "signature_local": [
       "StringField",
       "true",
-      "",
+      null,
       "Local da assinatura",
       "Belo Horizonte",
       "Belo Horizonte"
@@ -234,7 +234,7 @@
    "signature_date": [
       "DateTimeField",
       "true",
-      "",
+      null,
       "Data da assinatura",
       "09/04/2020",
       "09/04/2020"
@@ -370,7 +370,7 @@
    "submit_to_esignature": [
       "BooleanField",
       "true",
-      "",
+      null,
       "Enviar para assinatura eletrônica",
       "true",
       "true"
@@ -378,7 +378,7 @@
    "el_send_email": [
       "BooleanField",
       "true",
-      "",
+      null,
       "Enviar por e-mail",
       "False",
       "False"

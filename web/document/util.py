@@ -7,15 +7,9 @@ from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
 from util.docassemble_client import DocassembleClient, DocassembleAPIException
 
-from .models import Document
+from .models import DocumentType
 
 logger = logging.getLogger(__name__)
-
-
-class DocumentType(Enum):
-    PRESTACAO_SERVICOS_ESCOLARES = 2
-    NOTIFICACAO_EXTRAJUDICIAL = 8
-    ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
 
 
 def custom_class_name(interview_custom_file_name):

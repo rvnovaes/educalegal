@@ -37,7 +37,7 @@ urlpatterns = [
         {"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     path("documents/<str:identifier>/download", DocumentDownloadViewSet.as_view(
         {"get": "retrieve", "delete": "destroy"})),
-    path("documents/validate/", validate_document),
+    path("documents/validate/<int:interview_id>", validate_document),
 
     # Front end views
     path("tenant/schools/", TenantSchoolViewSet.as_view({"post": "create", "get": "list"})),

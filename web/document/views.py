@@ -237,7 +237,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
 
             bulk_generation_id, mongo_document = validate_data_mongo(
                 self.request, interview.pk, data_valid, bulk_data_content,
-                field_types_dict, required_fields_dict, parent_fields_dict
+                field_types_dict, required_fields_dict, parent_fields_dict, True
             )
 
             # tenant = Tenant.objects.get(pk=self.request.user.tenant_id)
@@ -664,7 +664,7 @@ def query_documents_by_args(pk=None, **kwargs):
 
 
 def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
-                        field_types_dict, required_fields_dict, parent_fields_dict):
+                        field_types_dict, required_fields_dict, parent_fields_dict, is_bulk_generation):
     tenant = Tenant.objects.get(pk=request.user.tenant_id)
     interview = Interview.objects.get(pk=interview_id)
     schools = tenant.school_set.all()
@@ -684,7 +684,10 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
     # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
     # O nome gerado e semelhante ao custom file name que usamos no docassemble
     # YYYYMMDD_HHMMSS_custom_file_name
-    dynamic_document_class_name = (custom_class_name(interview.custom_file_name))
+    if is_bulk_generation:
+        dynamic_document_class_name = (custom_class_name(interview.custom_file_name))
+    else:
+        dynamic_document_class_name = 'api' + interview.custom_file_name
 
     # Cria a classe do tipo Document (mongoengine) dinamicamente
     DynamicDocumentClass = create_dynamic_document_class(
@@ -743,42 +746,44 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
             break
 
     if data_valid:
-        bulk_generation = BulkDocumentGeneration(
-            tenant=request.user.tenant,
-            interview=interview,
-            mongo_db_collection_name=dynamic_document_class_name,
-            field_types_dict=field_types_dict,
-            required_fields_dict=required_fields_dict,
-            parent_fields_dict=parent_fields_dict,
-            school_names_set=list(school_names_set),
-            school_units_names_set=list(school_units_names_set),
-            status="não executada"
-        )
-        bulk_generation.save()
-
-        el_document_list = list()
-        for mongo_document_data in mongo_document_data_list:
-            school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
-            el_document = Document(
-                tenant=tenant,
-                name=interview.name + "-rascunho-em-lote",
-                status=DocumentStatus.RASCUNHO.value,
-                description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
+        if is_bulk_generation:
+            bulk_generation = BulkDocumentGeneration(
+                tenant=request.user.tenant,
                 interview=interview,
-                school=school,
-                bulk_generation=bulk_generation,
-                mongo_uuid=mongo_document_data.id,
-                submit_to_esignature=mongo_document_data.submit_to_esignature,
-                send_email=mongo_document_data.el_send_email
+                mongo_db_collection_name=dynamic_document_class_name,
+                field_types_dict=field_types_dict,
+                required_fields_dict=required_fields_dict,
+                parent_fields_dict=parent_fields_dict,
+                school_names_set=list(school_names_set),
+                school_units_names_set=list(school_units_names_set),
+                status="não executada"
             )
-            el_document_list.append(el_document)
+            bulk_generation.save()
 
-        Document.objects.bulk_create(el_document_list)
+            el_document_list = list()
+            for mongo_document_data in mongo_document_data_list:
+                school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
+                el_document = Document(
+                    tenant=tenant,
+                    name=interview.name + "-rascunho-em-lote",
+                    status=DocumentStatus.RASCUNHO.value,
+                    description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
+                    interview=interview,
+                    school=school,
+                    bulk_generation=bulk_generation,
+                    mongo_uuid=mongo_document_data.id,
+                    submit_to_esignature=mongo_document_data.submit_to_esignature,
+                    send_email=mongo_document_data.el_send_email
+                )
+                el_document_list.append(el_document)
 
-        logger.info(
-            "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
-                dynamic_document_class_name=dynamic_document_class_name
+            Document.objects.bulk_create(el_document_list)
+
+            logger.info(
+                "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
+                    dynamic_document_class_name=dynamic_document_class_name
+                )
             )
-        )
-
-    return bulk_generation.pk, mongo_document
+            return bulk_generation.pk, mongo_document
+        else:
+            return mongo_document
