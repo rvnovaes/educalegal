@@ -69,25 +69,16 @@ class TestContratodePrestaodeServios(WebTest):
         self.driver.find_element(
             By.XPATH, "//form[@id='daform']/div[2]/div/fieldset/label/span[2]"
         ).click()
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[5]/div/div/input"
-        ).send_keys("JOSUÉ SIGNATARIO")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/div/input").send_keys("JOSUÉ SIGNATARIO")
         for k in CPF:
             self.driver.find_element(
-                By.XPATH, "//form[@id='daform']/div[6]/div/div/input"
+                By.XPATH, "//form[@id=\'daform\']/div[5]/div/div/input"
             ).send_keys(k)
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[7]/div/div/input"
-        ).send_keys("154324324")
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[9]/div/div/fieldset/label"
-        ).click()
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[10]/div/div/input"
-        ).send_keys("PROGRAMADOR")
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[11]/div/div/input"
-        ).send_keys("josue.signatario@gmail.com")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[6]/div/div/input").send_keys("4234234234")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[8]/div/div/fieldset/label").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[9]/div/div/input").send_keys("professor")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[10]/div/div/input").send_keys(
+            "josue.signatario@gmail.com")
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element(
