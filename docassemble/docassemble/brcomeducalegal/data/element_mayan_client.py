@@ -126,7 +126,7 @@ class MayanClient:
         response = self.session.get(final_url).json()
         return response
 
-    def document_bulk_delete(self, start_id, end_id):
+    def document_bulk_delete(self, start_id, end_id, delete_from_trash=True):
         for document_id in range(start_id, end_id + 1):
             final_url = self.api_base_url + "/api/documents/{id}".format(id=document_id)
             response = self.session.delete(final_url)
@@ -134,4 +134,20 @@ class MayanClient:
                 print('ID não encontrado: {id}'.format(id=document_id))
             elif response.status_code == 204:
                 print('ID removido: {id}'.format(id=document_id))
+
+                if delete_from_trash:
+                    start_id = end_id = document_id
+                    self.trashed_documents_bulk_delete(start_id, end_id)
+
         return response
+
+    def trashed_documents_bulk_delete(self, start_id, end_id):
+        for document_id in range(start_id, end_id + 1):
+            final_url = self.api_base_url + "/api/trashed_documents/{id}".format(id=document_id)
+            response = self.session.delete(final_url)
+            if response.status_code == 404:
+                print('ID não encontrado: {id}'.format(id=document_id))
+            elif response.status_code == 204:
+                print('ID removido da lixeira: {id}'.format(id=document_id))
+        return response
+

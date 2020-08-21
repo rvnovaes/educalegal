@@ -30,6 +30,6 @@ if __name__ == '__main__':
     # response = mc.document_download(document_id)
     # print(response)
 
-    # apaga os documentos no mayan
-    response = mc.document_bulk_delete(5787, 10000)
+    # apaga os documentos no mayan - 6209
+    response = mc.document_bulk_delete(23000, 23700)
     print(response)
