@@ -90,7 +90,7 @@ def send_to_clicksign():
     data_sent, data_received, status_code = csc.add_signer(recipients_sign)
 
     # adiciona signer key no educa legal
-    data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, 1)
+    data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, 1, 3)
 
     data_sent, data_received, status_code = csc.send_to_signers(envelope_id, recipients_sign)
     print(data_received, status_code)
