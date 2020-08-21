@@ -55,8 +55,6 @@ INSTALLED_APPS = [
     "django_celery_results",
     # https://github.com/izimobil/django-rest-framework-datatables
     "rest_framework_datatables",
-    # GraphQL
-    "graphene_django",
     # Local
     "tenant",
     "users",
@@ -140,9 +138,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
-    # https://pypi.org/project/django-graphql-jwt/
-    #https://django-graphql-jwt.domake.io/en/latest/
-    "graphql_jwt.backends.JSONWebTokenBackend",
     # `allauth` specific authentication methods, such as login by e-mail
     "allauth.account.auth_backends.AuthenticationBackend",
 
@@ -322,29 +317,3 @@ SIMPLE_JWT = {
     # 'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     # 'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
-
-
-
-
-
-
-
-
-
-
-
-# Sem uso. Mantido como referencia
-# GRAPHENE = {
-#     'SCHEMA': 'api.schema.schema', # Where your Graphene schema lives
-#     'MIDDLEWARE': [
-#         'graphql_jwt.middleware.JSONWebTokenMiddleware',
-#     ],
-# }
-#
-# GRAPHQL_JWT = {
-#     "JWT_AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
-#     "JWT_AUTH_HEADER_PREFIX": "JWT",
-#     "JWT_COOKIE_NAME": "apollo-token",
-# }
-
-
