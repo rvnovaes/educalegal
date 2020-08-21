@@ -340,3 +340,13 @@ class SignerLog(TenantAwareModel):
 
     def __str__(self):
         return self.status + " | " + str(self.created_date)
+
+
+class DocumentCount(TenantAwareModel):
+    tenant_name = models.CharField(max_length=512, verbose_name="Nome")
+    month_name = models.CharField(max_length=512, verbose_name="Nome do Mês")
+    month_number = models.IntegerField(verbose_name="Número do Mês")
+    count = models.IntegerField(verbose_name="Número de Documentos")
+    class Meta:
+        managed = False
+        db_table = 'document_count'

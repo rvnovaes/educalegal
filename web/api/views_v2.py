@@ -20,12 +20,12 @@ from document.models import *
 from interview.models import *
 from school.models import *
 from tenant.models import *
-from users.models import CustomUser
 from .mayan_helpers import MayanClient
 
 from .serializers_v2 import (
     PlanSerializer,
     DocumentSerializer,
+    DocumentCountSerializer,
     InterviewSerializer,
     SchoolSerializer,
     SchoolUnitSerializer,
@@ -407,6 +407,15 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
         else:
             document.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DocumentCountViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DocumentCount.objects.all()
+    serializer_class = DocumentCountSerializer
+
+    def get_queryset(self):
+        tenant = self.request.user.tenant
+        return self.queryset.get(pk=tenant.id)
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet

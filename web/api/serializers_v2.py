@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from billing.models import Plan
-from document.models import Document
+from document.models import Document, DocumentCount
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Tenant, TenantGedData, ESignatureApp
@@ -52,6 +52,12 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     def get_school_name(self, obj):
         return obj.school.name if obj.school else ""
+
+
+class DocumentCountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DocumentCount
+        fields = "__all__"
 
 
 class SchoolSerializer(serializers.ModelSerializer):
