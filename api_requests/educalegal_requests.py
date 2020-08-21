@@ -4,17 +4,20 @@ sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
 from element_educalegal_client import EducaLegalClient
 from module_clicksign_client import ClickSignClient
 
-###### LOCALHOST ######
+###### PRODUCTION ######
+# token_csc = "4806d373-89b8-4dcc-aa04-87dc8f1a31ea"
+# csc = ClickSignClient(token_csc, False)
+##### app.educalegal.com.br #####
+# api_base_url = "https://app.educalegal.com.br"
+# token = "9fa535d8bcfb4ce6410a59d46c61368334c96ddc"
+
+
+###### DEVELOPMENT ######
 token_csc = "dc0251e3-bb8e-4813-84c0-1158ba0bdbcf"
-
 csc = ClickSignClient(token_csc, True)
-
 ###### LOCALHOST ######
 api_base_url = "http://localhost:8001"
 token = "9fa535d8bcfb4ce6410a59d46c61368334c96ddc"
-##### app.educalegal.com.br #####
-# api_base_url = "https://app.educalegal.com.br"
-# token = "dbc67c03a50a11f974276fdb08a5820ecda6249b"
 
 
 def send_to_clicksign():
@@ -87,7 +90,7 @@ def send_to_clicksign():
     data_sent, data_received, status_code = csc.add_signer(recipients_sign)
 
     # adiciona signer key no educa legal
-    data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, 1)
+    data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, 1, 3)
 
     data_sent, data_received, status_code = csc.send_to_signers(envelope_id, recipients_sign)
     print(data_received, status_code)
