@@ -4,9 +4,9 @@
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-7">
           <h6 class="h2 text-white d-inline-block mb-0">Arquivo</h6>
-          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
-            <route-bread-crumb></route-bread-crumb>
-          </nav>
+          <p class="text-sm text-white font-weight-bold mb-0">
+            Documentos já gerados por sua escola
+          </p>
         </div>
         <div class="col-lg-6 col-5 text-right">
           <base-button size="sm" type="neutral">New</base-button>
@@ -17,12 +17,6 @@
     <div class="container-fluid mt--6">
       <div>
         <card class="no-border-card" body-classes="px-0 pb-1" footer-classes="pb-2">
-          <template slot="header">
-            <h3 class="mb-0">Arquivo</h3>
-            <p class="text-sm mb-0">
-              Pesquise os documentos já gerados por sua escola
-            </p>
-          </template>
           <div>
             <div class="col-12 d-flex justify-content-center justify-content-sm-between flex-wrap"
             >
@@ -98,10 +92,10 @@
           >
             <div class="">
               <p class="card-category">
-                Showing {{ from + 1 }} to {{ to }} of {{ total }} entries
+                Mostrando {{ from + 1 }} a {{ to }} de {{ total }} documentos
 
                 <span v-if="selectedRows.length">
-                  &nbsp; &nbsp; {{selectedRows.length}} rows selected
+                  &nbsp; &nbsp; {{ selectedRows.length }} rows selected
                 </span>
               </p>
 
@@ -111,114 +105,120 @@
               v-model="pagination.currentPage"
               :per-page="pagination.perPage"
               :total="total"
+              @input="updatePagination"
             >
             </base-pagination>
           </div>
         </card>
       </div>
-    </div></div
-  ></template>
+    </div>
+  </div
+  >
+</template>
 <script>
-import { Table, TableColumn, Select, Option } from 'element-ui';
-import RouteBreadCrumb from '@/components/argon-core/Breadcrumb/RouteBreadcrumb'
-import { BasePagination } from '@/components/argon-core';
-import clientPaginationMixin from '~/components/tables/PaginatedTables/clientPaginationMixin'
-import swal from 'sweetalert2';
-import users from '~/components/tables/users2';
+import {Table, TableColumn, Select, Option} from "element-ui";
+import {BasePagination} from "@/components/argon-core";
+import documentPaginationMixin from "~/components/tables/PaginatedTables/documentPaginationMixin";
+import Swal from "sweetalert2";
 
 export default {
-  mixins: [clientPaginationMixin],
-  layout: 'DashboardLayout',
+  mixins: [documentPaginationMixin],
+  layout: "DashboardLayout",
   components: {
     BasePagination,
-    RouteBreadCrumb,
     [Select.name]: Select,
     [Option.name]: Option,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn
   },
+  name: "documents-table",
   data() {
     return {
-      propsToSearch: ['name', 'email', 'age'],
+      propsToSearch: ["name", "interview_name", "school_name"],
       tableColumns: [
         {
-          type: 'selection'
-        },
-        {
-          prop: 'name',
-          label: 'Name',
-          minWidth: 160,
+          prop: "name",
+          label: "Documento",
+          minWidth: 140,
           sortable: true
         },
         {
-          prop: 'position',
-          label: 'Position',
-          minWidth: 220,
+          prop: "interview_name",
+          label: "Modelo",
+          minWidth: 140,
           sortable: true
         },
         {
-          prop: 'city',
-          label: 'Office',
-          minWidth: 135,
+          prop: "school_name",
+          label: "Escola",
+          minWidth: 140,
           sortable: true
         },
         {
-          prop: 'age',
-          label: 'Age',
-          minWidth: 100,
+          prop: "created_date",
+          label: "Criação",
+          minWidth: 80,
           sortable: true
         },
         {
-          prop: 'createdAt',
-          label: 'Start Date',
-          minWidth: 150,
+          prop: "altered_date",
+          label: "Alteração",
+          minWidth: 80,
           sortable: true
         },
         {
-          prop: 'salary',
-          label: 'Salary',
+          prop: "status",
+          label: "Status",
           minWidth: 120,
           sortable: true
-        }
+        },
       ],
-      tableData: users,
+      // tableData: users,
       selectedRows: []
     };
   },
+  computed: {
+    tableData() {
+      return this.$store.state.documents.documents;
+    }
+  },
+  created() {
+    this.$store.dispatch("documents/fetchPaginatedDocuments", 0);
+  },
   methods: {
     handleLike(index, row) {
-      swal({
+      Swal.fire({
         title: `You liked ${row.name}`,
         buttonsStyling: false,
-        type: 'success',
-        confirmButtonClass: 'btn btn-success btn-fill'
+        type: "success",
+        confirmButtonClass: "btn btn-success btn-fill"
       });
     },
     handleEdit(index, row) {
-      swal({
+      Swal.fire({
         title: `You want to edit ${row.name}`,
         buttonsStyling: false,
-        confirmButtonClass: 'btn btn-info btn-fill'
+        confirmButtonClass: "btn btn-info btn-fill"
       });
     },
     handleDelete(index, row) {
-      swal({
-        title: 'Are you sure?',
+      Swal.fire({
+        title: "Are you sure?",
         text: `You won't be able to revert this!`,
-        type: 'warning',
+        type: "warning",
         showCancelButton: true,
-        confirmButtonClass: 'btn btn-success btn-fill',
-        cancelButtonClass: 'btn btn-danger btn-fill',
-        confirmButtonText: 'Yes, delete it!',
+        confirmButtonClass: "btn btn-success btn-fill",
+        cancelButtonClass: "btn btn-danger btn-fill",
+        confirmButtonText: "Yes, delete it!",
         buttonsStyling: false
       }).then(result => {
         if (result.value) {
           this.deleteRow(row);
           swal({
-            title: 'Deleted!',
+            title: "Deleted!",
             text: `You deleted ${row.name}`,
-            type: 'success',
-            confirmButtonClass: 'btn btn-success btn-fill',
+            type: "success",
+            confirmButtonClass: "btn btn-success btn-fill",
             buttonsStyling: false
           });
         }
@@ -233,13 +233,33 @@ export default {
       }
     },
     selectionChange(selectedRows) {
-      this.selectedRows = selectedRows
+      this.selectedRows = selectedRows;
+    },
+    // Sempre que ocorre um evento  no componente de paginacao base-pagination essa funcao e chamada
+    updatePagination(args) {
+      console.log("Dispardo evento input no componente de paginacao");
+      console.log("Estamos na página: " + args);
+      /* demandedDocumens representa quantos docs o componente de tabela precisa conforme o ponto da navegacao. Ou seja,
+      se o usuario esta na pagina 2 e escolheu exibir 50 documentos por pagina, precisamos de ter no minimo 100
+      documentos ja carregados na aplicacao. Entretanto, somamos 1 à pagina atual para que ele possa carregar  os
+      documentos uma página antes de eles serem necessários. No exemplo (usuario na pagina 2 com 50 docs/pagina) o valor
+      de demandedDocuments sera (2 + 1) * 50 = 150, o que ira disparar a carga de mais documentos uma pagina antes.
+      */
+      const demandedDocuments = (this.pagination.currentPage + 1) * this.pagination.perPage;
+      console.log("Demanded:" + demandedDocuments);
+      const onStore = this.$store.getters["documents/getLoadedDocumentsListCount"];
+      console.log("On Store: " + onStore);
+      if (demandedDocuments >= onStore) {
+        console.log("Precisamos de mais documentos!");
+        this.$store.dispatch("documents/fetchPaginatedDocuments", onStore);
+      }
     }
-  }
-};
+  },
+}
+;
 </script>
 <style>
-.no-border-card .card-footer{
+.no-border-card .card-footer {
   border-top: 0;
 }
 </style>
