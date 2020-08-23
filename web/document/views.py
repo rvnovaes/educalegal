@@ -679,4 +679,4 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
             )
             return bulk_generation.pk, mongo_document
         else:
-            return mongo_document
+            return mongo_document, dynamic_document_class_name, school_names_set, school_units_names_set

@@ -18,9 +18,9 @@ from rest_framework.response import Response
 from validator_collection import checkers
 
 from document.models import Document, DocumentType
-from document.views import validate_data_mongo
+from document.views import validate_data_mongo, generate_document_from_mongo
 from interview.models import Interview
-from util.mongo_util import create_dynamic_document_class, mongo_to_hierarchical_dict
+from util.mongo_util import create_dynamic_document_class
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
 from util.file_import import is_metadata_valid, is_content_valid
@@ -426,7 +426,7 @@ def validate_document(request, **kwargs):
     """
 
     # Transforma o dicionario em um dataframe
-    bulk_data = pd.DataFrame.from_dict(request.data)
+    data = pd.DataFrame.from_dict(request.data)
 
     try:
         # Valida os metadados do recebidos (tipos de campos e flags booleanas)
@@ -437,7 +437,7 @@ def validate_document(request, **kwargs):
             field_types_dict,
             required_fields_dict,
             metadata_valid,
-        ) = is_metadata_valid(bulk_data)
+        ) = is_metadata_valid(data)
 
     except ValueError as e:
         message = str(type(e).__name__) + " : " + str(e)
@@ -457,11 +457,11 @@ def validate_document(request, **kwargs):
     # O campo school_division é transformado em ---
     try:
         (
-            bulk_data_content,
+            data_content,
             parent_fields_dict,
             error_messages,
             content_valid,
-        ) = is_content_valid(bulk_data)
+        ) = is_content_valid(data)
     except ValueError as e:
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
@@ -498,11 +498,18 @@ def validate_document(request, **kwargs):
                 interview_id=kwargs["interview_id"]
             )})
 
-    # valida os dados recebidos de forma automatica no mongo
-    mongo_document = validate_data_mongo(
-        request, interview.pk, data_valid, bulk_data_content,
-        field_types_dict, required_fields_dict, parent_fields_dict
-    )
+    try:
+        # valida os dados recebidos de forma automatica no mongo
+        mongo_document, dynamic_document_class_name, school_names_set, school_units_names_set = validate_data_mongo(
+            request, interview.pk, data_valid, data_content, field_types_dict, required_fields_dict, parent_fields_dict,
+            False)
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+
+        return Response({
+            "status_code": 400,
+            "error": message})
 
     response_data = {"interview_id": interview.pk, "data_valid": data_valid}
 
@@ -511,7 +518,14 @@ def validate_document(request, **kwargs):
 
     return Response({
         "status_code": 200,
-        "response_data": response_data})
+        "response_data": response_data,
+        "dynamic_document_class_name": dynamic_document_class_name,
+        "field_types_dict": field_types_dict,
+        "required_fields_dict": required_fields_dict,
+        "parent_fields_dict": parent_fields_dict,
+        "school_names_set": school_names_set,
+        "school_units_names_set": school_units_names_set
+    })
 
 
 # Clients should authenticate by passing the token key in the "Authorization"
@@ -527,25 +541,41 @@ def generate_document(request, **kwargs):
     * Requires token authentication.
     """
     try:
-        response = validate_document(request, kwargs)
+        response = validate_document(request._request, **kwargs)
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+        return Response(message)
+
+    # retorna erro caso os dados nao tenham sido validados
+    if response.data['status_code'] != 200:
+        return Response(response)
+
+    dynamic_document_class = create_dynamic_document_class(
+        response.data['dynamic_document_class_name'],
+        response.data['field_types_dict'],
+        response.data['required_fields_dict'],
+        response.data['parent_fields_dict'],
+        school_names_set=list(response.data['school_names_set']),
+        school_units_names_set=list(response.data['school_units_names_set']),
+    )
+
+    try:
+        total_task_size = generate_document_from_mongo(request._request, dynamic_document_class, kwargs["interview_id"])
+
+        response_data = {"interview_id": kwargs["interview_id"], "total_task_size": total_task_size}
+
+        return Response({
+            "status_code": 200,
+            "response_data": response_data
+        })
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
 
-    # retorna erro caso os dados nao tenham sido validados
-    if response['status_code'] != 200:
-        return Response(response)
-
-    # DynamicDocumentClass = create_dynamic_document_class(
-    #     bulk_document_generation.mongo_db_collection_name,
-    #     bulk_document_generation.field_types_dict,
-    #     bulk_document_generation.required_fields_dict,
-    #     bulk_document_generation.parent_fields_dict,
-    #     school_names_set=list(bulk_document_generation.school_names_set),
-    #     school_units_names_set=list(bulk_document_generation.school_units_names_set),
-    # )
-
-
+        return Response({
+            "status_code": 400,
+            "error": message})
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
