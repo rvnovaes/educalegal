@@ -3,6 +3,7 @@ import io
 
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
@@ -14,6 +15,7 @@ from rest_framework.exceptions import (
     APIException,
 )
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 from validator_collection import checkers
 
 from document.models import *
@@ -46,6 +48,10 @@ class TenantAwareAPIMixin:
     """
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            # queryset just for schema generation metadata
+            # https://github.com/axnsan12/drf-yasg/issues/333
+            return Tenant.objects.none()
         tenant = self.request.user.tenant
         return self.queryset.filter(tenant=tenant)
 
@@ -132,10 +138,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
         200 Sucesso
         """
+        # paginator = PageNumberPagination()
+        paginator = LimitOffsetPagination()
+        paginator.page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
         tenant_id = request.user.tenant.id
         queryset = self.queryset.filter(tenant_id=tenant_id)
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
+        page = paginator.paginate_queryset(queryset, request)
+        serializer = self.serializer_class(page, many=True)
+        # return Response(serializer.data)
+        return paginator.get_paginated_response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         """
@@ -436,6 +447,10 @@ class TenantSchoolUnitViewSet(viewsets.ModelViewSet):
     serializer_class = SchoolUnitSerializer
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            # queryset just for schema generation metadata
+            # https://github.com/axnsan12/drf-yasg/issues/333
+            return SchoolUnit.objects.none()
         school_pk = self.kwargs["spk"]
         tenant = self.request.user.tenant
         queryset = self.queryset.filter(school_id=school_pk, tenant=tenant)
@@ -448,14 +463,14 @@ class TenantInterviewViewSet(TenantAwareAPIMixin, viewsets.ModelViewSet):
     serializer_class = InterviewSerializer
 
 
-class TenantPlanViewSet(viewsets.ReadOnlyModelViewSet):
+class TenantPlanViewSet(viewsets.ModelViewSet):
 
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
 
     def get_queryset(self):
         tenant = self.request.user.tenant
-        return self.queryset.get(pk=tenant.plan_id)
+        return self.queryset.get(pk=tenant.plan.id)
 
 #################################### OTHERS ############################################################################
 

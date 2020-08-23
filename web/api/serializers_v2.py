@@ -45,7 +45,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         ref_name = "Document v2"
-        fields = "__all__"
+        fields = ["name", "interview_name", "school_name", "created_date", "altered_date", "status"]
 
     def get_interview_name(self, obj):
         return obj.interview.name if obj.interview else ""
