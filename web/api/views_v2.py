@@ -20,6 +20,7 @@ from validator_collection import checkers
 from document.models import Document, DocumentType
 from document.views import validate_data_mongo
 from interview.models import Interview
+from util.mongo_util import create_dynamic_document_class, mongo_to_hierarchical_dict
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
 from util.file_import import is_metadata_valid, is_content_valid
@@ -419,7 +420,7 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
 @permission_classes([permissions.IsAuthenticated])
 def validate_document(request, **kwargs):
     """
-    Validate documents list received in request.body.
+    Validate document received in request.body.
 
     * Requires token authentication.
     """
@@ -442,7 +443,9 @@ def validate_document(request, **kwargs):
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
 
-        return Response({"error": message})
+        return Response({
+            "status_code": 422,
+            "error": message})
 
     # Valida o conteudo dos campos de acordo com seus tipos de dados e sua obrigadoriedade
     # trata os registros para valores aceitáveis pelos documentos
@@ -463,10 +466,14 @@ def validate_document(request, **kwargs):
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
 
-        return Response({"error": message})
+        return Response({
+            "status_code": 422,
+            "error": message})
 
     if not content_valid:
-        return Response({"error": error_messages})
+        return Response({
+            "status_code": 422,
+            "error": error_messages})
 
     # Se houver registro invalido, esta variavel sera definida como False ao final da funcao.
     # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
@@ -476,32 +483,69 @@ def validate_document(request, **kwargs):
 
     # verifica se informou um tipo de documento valido
     if kwargs["interview_id"] not in DocumentType.id_choices():
-        return Response({"error": "Os tipos de documento que permitem geração via API são {}".format(
-            DocumentType.choices()
-        )})
+        return Response({
+            "status_code": 422,
+            "error": "Os tipos de documento que permitem geração via API são {}".format(
+                DocumentType.choices()
+            )})
 
     try:
         interview = Interview.objects.get(pk=kwargs["interview_id"])
     except Interview.DoesNotExist:
-        return Response({"error": "Não existe um tipo de documento com ID = {interview_id}".format(
-            interview_id=kwargs["interview_id"]
-        )})
+        return Response({
+            "status_code": 404,
+            "error": "Não existe um tipo de documento com ID = {interview_id}".format(
+                interview_id=kwargs["interview_id"]
+            )})
 
     # valida os dados recebidos de forma automatica no mongo
     mongo_document = validate_data_mongo(
         request, interview.pk, data_valid, bulk_data_content,
-        field_types_dict, required_fields_dict, parent_fields_dict, False
+        field_types_dict, required_fields_dict, parent_fields_dict
     )
 
-    response_data = {
-        "interview_id": interview.pk,
-        "data_valid": data_valid,
-    }
+    response_data = {"interview_id": interview.pk, "data_valid": data_valid}
 
     if not data_valid:
         mongo_document.drop_collection()
 
-    return Response({"response_data": response_data})
+    return Response({
+        "status_code": 200,
+        "response_data": response_data})
+
+
+# Clients should authenticate by passing the token key in the "Authorization"
+# HTTP header, prepended with the string "Token ".  For example:
+# Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def generate_document(request, **kwargs):
+    """
+    Validate and generate document received in request.body.
+
+    * Requires token authentication.
+    """
+    try:
+        response = validate_document(request, kwargs)
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+
+    # retorna erro caso os dados nao tenham sido validados
+    if response['status_code'] != 200:
+        return Response(response)
+
+    # DynamicDocumentClass = create_dynamic_document_class(
+    #     bulk_document_generation.mongo_db_collection_name,
+    #     bulk_document_generation.field_types_dict,
+    #     bulk_document_generation.required_fields_dict,
+    #     bulk_document_generation.parent_fields_dict,
+    #     school_names_set=list(bulk_document_generation.school_names_set),
+    #     school_units_names_set=list(bulk_document_generation.school_units_names_set),
+    # )
+
+
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet

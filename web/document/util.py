@@ -1,6 +1,4 @@
 import logging
-import uuid
-from enum import Enum
 from datetime import datetime
 
 from urllib3.exceptions import NewConnectionError
