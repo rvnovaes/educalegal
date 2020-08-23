@@ -4,7 +4,6 @@ from moneyed.localization import _FORMATTER
 from decimal import ROUND_HALF_EVEN
 from datetime import timedelta
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -21,7 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'django.contrib.postgres',
+    "django.contrib.postgres",
     # 3rd party ==========================================
     # Nice Boostrap Forms
     "crispy_forms",
@@ -83,7 +82,6 @@ FILE_UPLOAD_HANDLERS = (
 
 FILE_UPLOAD_TEMP_DIR = "/upload_temp_dir"
 
-
 # The Debug Toolbar is shown only if your IP address is listed in the INTERNAL_IPS setting. This means that for local
 # development, you must add '127.0.0.1' to INTERNAL_IPS; you’ll need to create this setting if it doesn’t already exist
 # in your settings module:
@@ -107,7 +105,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "web.wsgi.application"
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -140,7 +137,6 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     # `allauth` specific authentication methods, such as login by e-mail
     "allauth.account.auth_backends.AuthenticationBackend",
-
 )
 
 SITE_ID = 1
@@ -159,9 +155,11 @@ ACCOUNT_EMAIL_VERIFICATION = None
 # the logout redirect.
 LOGIN_REDIRECT_URL = "interview:interview-list"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
-ACCOUNT_FORMS = {"signup": "tenant.forms.EducaLegalSignupForm",
-                 'change_password': 'users.forms.CustomUserChangePasswordForm'}
-ACCOUNT_ADAPTER = 'users.adaptor.CustomUserAccountAdapter'
+ACCOUNT_FORMS = {
+    "signup": "tenant.forms.EducaLegalSignupForm",
+    "change_password": "users.forms.CustomUserChangePasswordForm",
+}
+ACCOUNT_ADAPTER = "users.adaptor.CustomUserAccountAdapter"
 
 # E-mail sending Settings
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -175,7 +173,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = "sistemas@educalegal.com.br"
 
-
 # API Settings
 LOGIN_URL = "/api/v2/login"
 
@@ -184,25 +181,24 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
 }
 
-
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         # "rest_framework.permissions.IsAuthenticated",
         "rest_framework.permissions.AllowAny",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-       'rest_framework_simplejwt.authentication.JWTAuthentication',
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         # Session Authentication is kept here for the browseable API
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-        'rest_framework_datatables.renderers.DatatablesRenderer',
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+        "rest_framework_datatables.renderers.DatatablesRenderer",
     ),
-    'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_datatables.filters.DatatablesFilterBackend',
+    "DEFAULT_FILTER_BACKENDS": (
+        "rest_framework_datatables.filters.DatatablesFilterBackend",
     ),
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     'DEFAULT_PAGINATION_CLASS': 'rest_framework_datatables.pagination.DatatablesPageNumberPagination',
@@ -216,7 +212,6 @@ REST_FRAMEWORK = {
     # "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "10000/day"},
     # 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' => Usado para CoreAPI (Deprecado)
 }
-
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
@@ -288,26 +283,23 @@ _FORMATTER.add_formatting_definition(
 
 CURRENCIES = ("BRL",)
 
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
-CELERY_BROKER_URL = 'amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal'
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "django-cache"
+CELERY_BROKER_URL = "amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal"
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=5),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
-
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-    'VERIFYING_KEY': None,
-    'AUDIENCE': None,
-    'ISSUER': None,
-
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
     # 'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     # 'TOKEN_TYPE_CLAIM': 'token_type',
     #
