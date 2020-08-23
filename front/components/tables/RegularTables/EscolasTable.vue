@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="border-0 card-header">
-      <h3 class="mb-0">Escolas</h3>
+<!--      <h3 class="mb-0">Escolas</h3>-->
     </div>
 
     <el-table class="table-responsive table-flush"
