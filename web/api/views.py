@@ -139,6 +139,10 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TenantGedDataSerializer
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            # queryset just for schema generation metadata
+            # https://github.com/axnsan12/drf-yasg/issues/333
+            return TenantGedData.objects.none()
         return TenantGedData.objects.filter(tenant=self.kwargs["pk"])
 
 
