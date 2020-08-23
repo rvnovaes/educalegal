@@ -285,19 +285,25 @@ def generate_bulk_documents(request, bulk_document_generation_id):
     )
 
     try:
-        total_task_size = generate_document_from_mongo(
+        success, data = generate_document_from_mongo(
             request, dynamic_document_class, bulk_document_generation.interview.pk)
 
-        bulk_document_generation.status = "em andamento..."
+        if success:
+            bulk_document_generation.status = "em andamento..."
 
-        bulk_document_generation.save()
+            bulk_document_generation.save()
 
-        payload = {
-            "success": True,
-            "total_task_size": total_task_size,
-            "bulk_status": bulk_document_generation.status,
-            "message": "A tarefa foi enviada para execução"
-        }
+            payload = {
+                "success": True,
+                "total_task_size": data,
+                "bulk_status": bulk_document_generation.status,
+                "message": "A tarefa foi enviada para execução"
+            }
+        else:
+            payload = {
+                "success": False,
+                "message": data,
+            }
 
         return HttpResponse(json.dumps(payload), content_type="application/json")
     except Exception as e:
@@ -399,7 +405,11 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id):
 
         for i, interview_variables in enumerate(interview_variables_list):
             # Recupera o registro do documento no Educa Legal e passa o doc_uuid como url_args
-            el_document = Document.objects.get(mongo_uuid=interview_variables["mongo_uuid"])
+            try:
+                el_document = Document.objects.get(mongo_uuid=interview_variables["mongo_uuid"])
+            except Document.DoesNotExist:
+                return False, 'Não foi encontrado o documento com mongo_uuid = {}'.format(
+                    interview_variables["mongo_uuid"])
             url_args["doc_uuid"] = str(el_document.doc_uuid)
             interview_variables["url_args"] = url_args
             interview_variables["interview_data"] = interview_data
@@ -413,7 +423,7 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id):
             )
 
             # Se for enviar por e-mail nao enviar para Docusign
-            if interview_variables["submit_to_esignature"] == True:
+            if interview_variables["submit_to_esignature"]:
                 interview_variables["el_send_email"] = False
 
             if interview_variables["submit_to_esignature"]:
@@ -467,9 +477,9 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id):
             el_document.save()
             logger.info(result_description)
 
-        return total_task_size
+        return True, total_task_size
     except Exception as e:
-        return e
+        return False, e
 
 
 @login_required
@@ -580,7 +590,7 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
     if is_bulk_generation:
         dynamic_document_class_name = (custom_class_name(interview.custom_file_name))
     else:
-        dynamic_document_class_name = 'api' + interview.custom_file_name
+        dynamic_document_class_name = 'api_' + interview.custom_file_name
 
     # Cria a classe do tipo Document (mongoengine) dinamicamente
     dynamic_document_class = create_dynamic_document_class(
@@ -653,30 +663,36 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
             )
             bulk_generation.save()
 
-            el_document_list = list()
-            for mongo_document_data in mongo_document_data_list:
-                school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
-                el_document = Document(
-                    tenant=tenant,
-                    name=interview.name + "-rascunho-em-lote",
-                    status=DocumentStatus.RASCUNHO.value,
-                    description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
-                    interview=interview,
-                    school=school,
-                    bulk_generation=bulk_generation,
-                    mongo_uuid=mongo_document_data.id,
-                    submit_to_esignature=mongo_document_data.submit_to_esignature,
-                    send_email=mongo_document_data.el_send_email
-                )
-                el_document_list.append(el_document)
+            interview_name = interview.name + "-rascunho-em-lote"
+        else:
+            interview_name = interview.name
 
-            Document.objects.bulk_create(el_document_list)
-
-            logger.info(
-                "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
-                    dynamic_document_class_name=dynamic_document_class_name
-                )
+        el_document_list = list()
+        for mongo_document_data in mongo_document_data_list:
+            school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
+            el_document = Document(
+                tenant=tenant,
+                name=interview_name,
+                status=DocumentStatus.RASCUNHO.value,
+                description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
+                interview=interview,
+                school=school,
+                bulk_generation=bulk_generation if is_bulk_generation else None,
+                mongo_uuid=mongo_document_data.id,
+                submit_to_esignature=mongo_document_data.submit_to_esignature,
+                send_email=mongo_document_data.el_send_email
             )
+            el_document_list.append(el_document)
+
+        Document.objects.bulk_create(el_document_list)
+
+        logger.info(
+            "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
+                dynamic_document_class_name=dynamic_document_class_name
+            )
+        )
+
+        if is_bulk_generation:
             return bulk_generation.pk, mongo_document
         else:
             return mongo_document, dynamic_document_class_name, school_names_set, school_units_names_set

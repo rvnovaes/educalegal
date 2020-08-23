@@ -481,14 +481,6 @@ def validate_document(request, **kwargs):
     # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
     data_valid = metadata_valid and content_valid
 
-    # verifica se informou um tipo de documento valido
-    if kwargs["interview_id"] not in DocumentType.id_choices():
-        return Response({
-            "status_code": 422,
-            "error": "Os tipos de documento que permitem geração via API são {}".format(
-                DocumentType.choices()
-            )})
-
     try:
         interview = Interview.objects.get(pk=kwargs["interview_id"])
     except Interview.DoesNotExist:
@@ -496,6 +488,14 @@ def validate_document(request, **kwargs):
             "status_code": 404,
             "error": "Não existe um tipo de documento com ID = {interview_id}".format(
                 interview_id=kwargs["interview_id"]
+            )})
+
+    # verifica se informou um tipo de documento valido
+    if interview.document_type.id not in DocumentType.id_choices():
+        return Response({
+            "status_code": 422,
+            "error": "Os tipos de documento que permitem geração via API são {}".format(
+                DocumentType.choices()
             )})
 
     try:
@@ -561,14 +561,19 @@ def generate_document(request, **kwargs):
     )
 
     try:
-        total_task_size = generate_document_from_mongo(request._request, dynamic_document_class, kwargs["interview_id"])
+        success, data = generate_document_from_mongo(
+            request._request, dynamic_document_class, kwargs["interview_id"])
 
-        response_data = {"interview_id": kwargs["interview_id"], "total_task_size": total_task_size}
-
-        return Response({
-            "status_code": 200,
-            "response_data": response_data
-        })
+        if success:
+            return Response({
+                "status_code": 200,
+                "response_data": 'Documento gerado com sucesso'
+            })
+        else:
+            return Response({
+                "status_code": 400,
+                "error": data
+            })
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
