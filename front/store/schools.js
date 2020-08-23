@@ -65,12 +65,11 @@ export const getters = {
 };
 
 export const actions = {
-  fetchAllSchools({commit}) {
-    return this.$axios.get("/v2/tenant/schools").then(res => {
-      if (res.status === 200) {
-        commit("setSchools", res.data.results);
-      }
-    });
+  async fetchAllSchools({commit}) {
+    const res = await this.$axios.get("/v2/tenant/schools");
+    if (res.status === 200) {
+      commit("setSchools", res.data.results);
+    }
   },
   async deleteSchool({commit}, school) {
     const res = await this.$axios.delete(`/v2/tenant/schools/${school.id}`);
