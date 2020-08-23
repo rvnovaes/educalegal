@@ -18,7 +18,7 @@
       <div>
         <card class="no-border-card" body-classes="px-0 pb-1" footer-classes="pb-2">
           <div>
-            <div class="col-12 d-flex justify-content-center justify-content-sm-between flex-wrap"
+            <div class="filters col-12 d-flex justify-content-center justify-content-sm-between flex-wrap"
             >
               <el-select
                 class="select-primary pagination-select"
@@ -36,11 +36,32 @@
               </el-select>
 
               <div>
-                <base-input v-model="searchQuery"
-                            prepend-icon="fas fa-search"
-                            placeholder="Search...">
-                </base-input>
+                <el-select multiple
+                           class="select-primary"
+                           placeholder="Status"
+                           v-model="selectedStatuses">
+                  <el-option
+                    class="select-primary"
+                    v-for="option in selects.statuses"
+                    :value="option.value"
+                    :label="option.label"
+                    :key="option.label">
+                  </el-option>
+                </el-select>
               </div>
+
+              <div>
+                <base-button type="primary">
+                  <i class="fa fa-search"></i> Buscar
+                </base-button>
+              </div>
+
+<!--              <div>-->
+<!--                <base-input v-model="searchQuery"-->
+<!--                            prepend-icon="fas fa-search"-->
+<!--                            placeholder="Search...">-->
+<!--                </base-input>-->
+<!--              </div>-->
             </div>
             <el-table :data="queriedData"
                       row-key="id"
@@ -120,6 +141,7 @@ import {Table, TableColumn, Select, Option} from "element-ui";
 import {BasePagination} from "@/components/argon-core";
 import documentPaginationMixin from "~/components/tables/PaginatedTables/documentPaginationMixin";
 import Swal from "sweetalert2";
+import Fuse from "fuse.js";
 
 export default {
   mixins: [documentPaginationMixin],
@@ -134,7 +156,7 @@ export default {
   name: "documents-table",
   data() {
     return {
-      propsToSearch: ["name", "interview_name", "school_name"],
+      propsToSearch: ["name", "interview_name", "school_name", "status"],
       tableColumns: [
         {
           prop: "name",
@@ -173,6 +195,24 @@ export default {
           sortable: true
         },
       ],
+      selectedStatuses: null,
+      selects: {
+        statuses: [
+          {value: "assinado", label: "assinado"},
+          {value: "assinatura recusada/inválida", label: "assinatura recusada/inválida"},
+          {value: "completado", label: "completado"},
+          {value: "criado", label: "criado"},
+          {value: "entregue", label: "entregue"},
+          {value: "enviado", label: "enviado"},
+          {value: "enviado para assinatura", label: "enviado para assinatura"},
+          {value: "enviado por e-mail", label: "enviado por e-mail"},
+          {value: "finalizado", label: "finalizado"},
+          {value: "inserido no GED", label: "inserido no GED"},
+          {value: "inválido", label: "inválido"},
+          {value: "rascunho", label: "rascunho"},
+          {value: "rascunho - em lote", label: "rascunho - em lote"}
+        ]
+      },
       // tableData: users,
       selectedRows: []
     };
@@ -184,6 +224,10 @@ export default {
   },
   created() {
     this.$store.dispatch("documents/fetchPaginatedDocuments", 0);
+    // this.fuseSearch = new Fuse(this.tableData, {
+    //   keys: ["name", "school_name", "interview_name", "status"],
+    //   threshold: 0.3
+    // });
   },
   methods: {
     handleLike(index, row) {
@@ -252,6 +296,10 @@ export default {
       if (demandedDocuments >= onStore) {
         console.log("Precisamos de mais documentos!");
         this.$store.dispatch("documents/fetchPaginatedDocuments", onStore);
+        // this.fuseSearch = new Fuse(this.tableData, {
+        //   keys: ["name", "school_name", "interview_name", "status"],
+        //   threshold: 0.3
+        // });
       }
     }
   },
@@ -261,5 +309,9 @@ export default {
 <style>
 .no-border-card .card-footer {
   border-top: 0;
+}
+
+.filters {
+  margin-bottom: 15px;
 }
 </style>

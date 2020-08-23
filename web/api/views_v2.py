@@ -1,6 +1,7 @@
 import logging
 import io
 
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from django.conf import settings
@@ -134,15 +135,34 @@ class DocumentViewSet(viewsets.ModelViewSet):
         """
         Lista todos os documentos do cliente (tenant).
 
-        Somente documetos que pertencem ao cliente ao qual o usuário está associado são listados.
+        Somente documentos que pertencem ao cliente ao qual o usuário está associado são listados.
 
         200 Sucesso
         """
-        # paginator = PageNumberPagination()
         paginator = LimitOffsetPagination()
         paginator.page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
         tenant_id = request.user.tenant.id
         queryset = self.queryset.filter(tenant_id=tenant_id)
+        status_filter_param = request.query_params.get("status")
+        school_filter_param = request.query_params.get("school_name")
+        if status_filter_param:
+            statuses_list = status_filter_param.split("$")
+            conditions = Q(status=statuses_list[0])
+            if len(statuses_list) > 1:
+                for s in statuses_list[1:]:
+                    conditions |= Q(status=s)
+            queryset = queryset.filter(conditions)
+        if school_filter_param:
+            school_names_list = school_filter_param.split("$")
+            school_list = list()
+            for school_name in school_names_list:
+                school_list.append(School.objects.get(name=school_name))
+            conditions = Q(school=school_list[0])
+            if len(school_list) > 1:
+                for s in school_list[1:]:
+                    conditions |= Q(school=s)
+            queryset = queryset.filter(conditions)
+
         page = paginator.paginate_queryset(queryset, request)
         serializer = self.serializer_class(page, many=True)
         # return Response(serializer.data)

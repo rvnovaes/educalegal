@@ -27,10 +27,12 @@ export default {
       return this.pagination.perPage * (this.pagination.currentPage - 1);
     },
     total() {
-      // return this.searchedData.length > 0
-      //   ? this.searchedData.length
-      //   : this.tableData.length;
-      return this.$store.state.documents.count
+      return this.searchedData.length > 0
+        ? this.searchedData.length
+        : this.$store.getters["documents/getTotalDocumentsCount"]
+        // : this.tableData.length;
+      // : this.$store.state.documents.count
+      // return this.$store.state.documents.count
     }
   },
   data() {
@@ -49,7 +51,8 @@ export default {
   methods: {
     sortChange({prop, order}) {
       if (prop) {
-        this.tableData.sort((a, b) => {
+        this.searchedData.sort((a, b) => {
+        // this.tableData.sort((a, b) => {
           let aVal = a[prop];
           let bVal = b[prop];
           if (order === "ascending") {
@@ -58,7 +61,8 @@ export default {
           return bVal - aVal ? 1 : -1;
         });
       } else {
-        this.tableData.sort((a, b) => {
+        this.searchedData.sort((a, b) => {
+        // this.tableData.sort((a, b) => {
           return a.id - b.id;
         });
       }
@@ -67,7 +71,7 @@ export default {
   // mounted() {
   //   // Fuse search initialization.
   //   this.fuseSearch = new Fuse(this.tableData, {
-  //     keys: ["name", "school_name", "interview_name"],
+  //     keys: ["name", "school_name", "interview_name", "status"],
   //     threshold: 0.3
   //   });
   // },

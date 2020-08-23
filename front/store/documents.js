@@ -23,6 +23,9 @@ export const getters = {
   },
   getLoadedDocumentsListCount: (state) => {
     return state.documents.length;
+  },
+  getTotalDocumentsCount: (state) => {
+    return state.count;
   }
 };
 
