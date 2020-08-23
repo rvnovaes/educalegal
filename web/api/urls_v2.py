@@ -51,7 +51,7 @@ urlpatterns = [
 
     # path("tenant/interviews/", TenantInterviewViewSet.as_view({"post": "create", "get": "list"})),
     # path("tenant/interviews/<int:pk>", TenantInterviewViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
-    path("tenant/plans/", TenantPlanViewSet.as_view({"get": "retrieve"})),
+    path("tenant/plan/<int:pk>", TenantPlanViewSet.as_view({"get": "retrieve"})),
     # path("tenant/ged_data/", TenantGedDataViewSet.as_view({"post": "create", "get": "list"})),
     # path("tenant/ged_data/<int:pk>", TenantGedDataViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     # Other
