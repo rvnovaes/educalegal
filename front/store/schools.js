@@ -61,7 +61,7 @@ export const getters = {
   // https://vuex.vuejs.org/guide/getters.html#method-style-access
   getSchool: (state) => (id) => {
     return state.schools.find(school => school.id === Number(id));
-  }
+  },
 };
 
 export const actions = {

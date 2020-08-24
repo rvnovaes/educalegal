@@ -1,6 +1,7 @@
 export const state = () => ({
   documents: [],
   count: 0,
+  loading: true
 
 });
 
@@ -13,6 +14,16 @@ export const mutations = {
   },
   setDocumentCount(state, count) {
     state.count = count;
+  },
+  cleanDocuments(state) {
+    state.documents = [];
+    state.count = 0
+  },
+  loadingFalse(state) {
+    state.loading = false;
+  },
+  loadingTrue(state) {
+    state.loading = true;
   }
 };
 
@@ -36,12 +47,15 @@ export const actions = {
   //     commit("setDocuments", res.data);
   //   }
   // },
-  async fetchPaginatedDocuments({commit}, offset) {
+  async fetchPaginatedDocuments({commit}, payload) {
+    commit("loadingTrue");
     const res = await this.$axios.get("/v2/documents/", {
       params:
         {
           limit: 50,
-          offset: offset
+          offset: payload.offset,
+          status: payload.status,
+          school: payload.school
         }
     });
     // console.log(res);
@@ -50,6 +64,7 @@ export const actions = {
     if (res.status === 200) {
       commit("setDocuments", res.data.results);
       commit("setDocumentCount", res.data.count);
+      commit("loadingFalse");
     }
   },
   deleteDocument({commit}) {

@@ -143,24 +143,19 @@ class DocumentViewSet(viewsets.ModelViewSet):
         paginator.page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
         tenant_id = request.user.tenant.id
         queryset = self.queryset.filter(tenant_id=tenant_id)
-        status_filter_param = request.query_params.get("status")
-        school_filter_param = request.query_params.get("school_name")
+        status_filter_param = request.query_params.getlist("status[]")
+        school_filter_param = request.query_params.getlist("school[]")
         if status_filter_param:
-            statuses_list = status_filter_param.split("$")
-            conditions = Q(status=statuses_list[0])
-            if len(statuses_list) > 1:
-                for s in statuses_list[1:]:
+            conditions = Q(status=status_filter_param[0])
+            if len(status_filter_param) > 1:
+                for s in status_filter_param[1:]:
                     conditions |= Q(status=s)
             queryset = queryset.filter(conditions)
         if school_filter_param:
-            school_names_list = school_filter_param.split("$")
-            school_list = list()
-            for school_name in school_names_list:
-                school_list.append(School.objects.get(name=school_name))
-            conditions = Q(school=school_list[0])
-            if len(school_list) > 1:
-                for s in school_list[1:]:
-                    conditions |= Q(school=s)
+            conditions = Q(school=school_filter_param[0])
+            if len(school_filter_param) > 1:
+                for id in school_filter_param[1:]:
+                    conditions |= Q(school=id)
             queryset = queryset.filter(conditions)
 
         page = paginator.paginate_queryset(queryset, request)

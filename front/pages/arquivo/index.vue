@@ -8,10 +8,10 @@
             Documentos já gerados por sua escola
           </p>
         </div>
-        <div class="col-lg-6 col-5 text-right">
-          <base-button size="sm" type="neutral">New</base-button>
-          <base-button size="sm" type="neutral">Filters</base-button>
-        </div>
+        <!--        <div class="col-lg-6 col-5 text-right">-->
+        <!--          <base-button size="sm" type="neutral">New</base-button>-->
+        <!--          <base-button size="sm" type="neutral">Filters</base-button>-->
+        <!--        </div>-->
       </div>
     </base-header>
     <div class="container-fluid mt--6">
@@ -38,6 +38,22 @@
               <div>
                 <el-select multiple
                            class="select-primary"
+                           placeholder="Escola"
+                           v-model="selectedSchools">
+                  <el-option
+                    class="select-primary"
+                    v-for="option in schools"
+                    :value="option.value"
+                    :label="option.label"
+                    :key="option.label">
+                  </el-option>
+                </el-select>
+              </div>
+
+
+              <div>
+                <el-select multiple
+                           class="select-primary"
                            placeholder="Status"
                            v-model="selectedStatuses">
                   <el-option
@@ -51,23 +67,29 @@
               </div>
 
               <div>
-                <base-button type="primary">
+                <base-button @click="applyFilters" type="primary">
                   <i class="fa fa-search"></i> Buscar
+                </base-button>
+                <base-button @click="cleanFilters" type="danger">
+                  <i class="fa fa-trash"></i> Limpar
                 </base-button>
               </div>
 
-<!--              <div>-->
-<!--                <base-input v-model="searchQuery"-->
-<!--                            prepend-icon="fas fa-search"-->
-<!--                            placeholder="Search...">-->
-<!--                </base-input>-->
-<!--              </div>-->
+              <!--              <div>-->
+
+              <!--                <base-input v-model="searchQuery"-->
+              <!--                            prepend-icon="fas fa-search"-->
+              <!--                            placeholder="Search...">-->
+              <!--                </base-input>-->
+              <!--              </div>-->
             </div>
-            <el-table :data="queriedData"
+            <el-table v-loading="loading"
+                      :data="queriedData"
                       row-key="id"
                       header-row-class-name="thead-light"
                       @sort-change="sortChange"
-                      @selection-change="selectionChange">
+                      @selection-change="selectionChange"
+                      style="width: 100%">
               <el-table-column
                 v-for="column in tableColumns"
                 :key="column.label"
@@ -196,6 +218,7 @@ export default {
         },
       ],
       selectedStatuses: null,
+      selectedSchools: null,
       selects: {
         statuses: [
           {value: "assinado", label: "assinado"},
@@ -211,19 +234,27 @@ export default {
           {value: "inválido", label: "inválido"},
           {value: "rascunho", label: "rascunho"},
           {value: "rascunho - em lote", label: "rascunho - em lote"}
-        ]
+        ],
       },
       // tableData: users,
-      selectedRows: []
+      selectedRows: [],
+
     };
   },
   computed: {
     tableData() {
       return this.$store.state.documents.documents;
+    },
+    schools() {
+      return this.$store.state.schools.schools.map(s => ({value: s.id, label: s.name}));
+    },
+    loading() {
+      return this.$store.state.documents.loading;
     }
   },
   created() {
-    this.$store.dispatch("documents/fetchPaginatedDocuments", 0);
+    this.$store.dispatch("schools/fetchAllSchools");
+    this.$store.dispatch("documents/fetchPaginatedDocuments", {offset: 0});
     // this.fuseSearch = new Fuse(this.tableData, {
     //   keys: ["name", "school_name", "interview_name", "status"],
     //   threshold: 0.3
@@ -295,12 +326,31 @@ export default {
       console.log("On Store: " + onStore);
       if (demandedDocuments >= onStore) {
         console.log("Precisamos de mais documentos!");
-        this.$store.dispatch("documents/fetchPaginatedDocuments", onStore);
+        this.$store.dispatch("documents/fetchPaginatedDocuments", {
+          offset: onStore,
+          status: this.selectedStatuses,
+          school: this.selectedSchools
+        });
         // this.fuseSearch = new Fuse(this.tableData, {
         //   keys: ["name", "school_name", "interview_name", "status"],
         //   threshold: 0.3
         // });
       }
+    },
+    applyFilters() {
+      this.$store.commit("documents/cleanDocuments");
+      this.$store.dispatch("documents/fetchPaginatedDocuments", {
+        offset: 0,
+        status: this.selectedStatuses,
+        school: this.selectedSchools
+      });
+
+    },
+
+    cleanFilters() {
+      this.selectedStatuses = null;
+      this.selectedSchools = null;
+      this.applyFilters();
     }
   },
 }
