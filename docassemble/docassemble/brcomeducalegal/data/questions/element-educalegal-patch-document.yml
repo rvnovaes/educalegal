@@ -6,10 +6,41 @@ include:
   - element-custom-file-name.yml
 ---
 code: |
-  cd_name = custom_file_name + '.pdf'
-  cd_status = 'criado'
-  cd_related_documents = None
-  cd_document_data = all_variables()
-  el_document_patched_with_docassemble_data = elc.patch_document_with_docassemble_data(doc_uuid, cd_name, interview_description, cd_status, school_id, cd_related_documents, cd_document_data)
-  log("Atualizado no app Educa Legal o documento {doc_uuid} - {el_document_patched_with_docassemble_data}".format(doc_uuid=doc_uuid, el_document_patched_with_docassemble_data=el_document_patched_with_docassemble_data))
----
+  # private=False - para que o arquivo fique acessivel fora do docassemble
+  # estando logado ou nao
+  generated_file.pdf.set_attributes(private=False)
+  generated_file.docx.set_attributes(private=False)
+
+  data = {
+     "name": custom_file_name + '.pdf',
+     "description": interview_description,
+     "status": "criado",
+     "school": school_id,
+     "related_documents": None,
+     "document_data": all_variables()
+  }
+
+  # external=True - acrescenta na url o protocolo and hostname (https://hostname)
+  params = {
+    "trigger": "docassemble",
+    "pdf_url": generated_file.pdf.url_for(external=True),
+    "docx_url": generated_file.docx.url_for(external=True),
+    "pdf_filename": custom_file_name + '.pdf',
+    "docx_filename": custom_file_name + '.docx',
+    "tenant_id": tid,
+  }
+
+  log("params", "console")
+  log(params, "console")
+
+  # atualiza no educa legal dados do documento gerado
+  status_code, el_patch_document = elc.patch_document(data, params=params)
+  log("status_code", "console")
+  log(status_code, "console")
+  log("el_patch_document", "console")
+  log(el_patch_document, "console")
+  if status_code == 200:
+    log("Atualizado o documento")
+  else:
+    log("Erro ao atualizar o documento")
+  log("{doc_uuid} - {data}".format(doc_uuid=doc_uuid, data=el_patch_document))

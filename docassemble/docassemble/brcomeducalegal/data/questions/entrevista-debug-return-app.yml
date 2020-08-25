@@ -1,0 +1,42 @@
+metadata:
+  title: Debug
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-generate-file.yml
+  - element-document-ready-app.yml
+---
+sections:
+  - Escola
+  - Aluno(a)
+  - Conclusão
+---
+code:  |
+  content_document = "entrevista-debug-return-app.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    nomeAluno
+    generated_file
+    el_patch_document
+    document_ready_screen_app
+---
+progress: 10
+section: Aluno(a)
+question: Dados do(a) Aluno(a)
+subquestion: ${ doc_uuid }
+fields:
+  - 'Nome completo: ': nomeAluno
+    datatype: text
+    default: "Anton Bruckner"

@@ -32,7 +32,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentSerializer
 
     def partial_update(self, request, *args, **kwargs):
-        doc_uuid = request.data["doc_uuid"]
+        doc_uuid = kwargs["doc_uuid"]
+        # doc_uuid = request.data["doc_uuid"]
         logger.info("Atualizando o documento {doc_uuid}".format(doc_uuid=str(doc_uuid)))
         instance = self.queryset.get(doc_uuid=doc_uuid)
         serializer = self.serializer_class(instance, data=request.data, partial=True)

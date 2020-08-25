@@ -1,0 +1,31 @@
+include:
+  - element-educalegal-patch-document.yml
+---
+ga id: |
+  code: ga_id_end
+event: document_ready_screen_app
+section: Conclusão
+progress: 100
+back button: False
+question: |
+  Seu documento foi gerado com sucesso!
+subquestion: |
+  Nome do documento: ${ generated_file.pdf.filename }
+under: |
+  Você pode baixar os documentos:
+  [PDF](${ generated_file.pdf.url_for() })
+  ou
+  [DOCX](${ generated_file.docx.url_for() })
+action buttons:
+  code: |
+    button_list
+---
+code: |
+  button_list = list()
+  button_list.append(el_button)
+---
+code: |
+  el_button = {'action': educalegal_url + '/v2/documents/' + doc_uuid,
+                'label': 'Ver detalhes',
+                'color': 'success',
+                'icon': 'check'}

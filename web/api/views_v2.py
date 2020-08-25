@@ -1,5 +1,6 @@
-import logging
 import io
+import logging
+import json
 
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
@@ -15,11 +16,11 @@ from rest_framework.exceptions import (
 from rest_framework import status
 from validator_collection import checkers
 
-from document.models import *
-from interview.models import *
-from school.models import *
-from tenant.models import *
-from .mayan_helpers import MayanClient
+from document.models import Document, DocumentStatus
+from interview.models import Interview
+from school.models import School, SchoolUnit
+from tenant.models import Plan, Tenant, TenantGedData
+from .mayan_client import MayanClient
 
 from .serializers_v2 import (
     PlanSerializer,
@@ -199,6 +200,50 @@ class DocumentViewSet(viewsets.ModelViewSet):
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
+
+            # se o parametro 'trigger' = docassemble indica que o patch veio do docassemble
+            # faz o download do arquivo e salva no ged
+            params = json.loads(self.request.query_params['params'])
+            if 'trigger' in params:
+                if params['trigger'] == 'docassemble':
+                    tenant = Tenant.objects.get(pk=params['tenant_id'])
+                    ged_url = tenant.tenantgeddata.url
+                    ged_token = tenant.tenantgeddata.token
+                    mc = MayanClient(ged_url, ged_token)
+                    try:
+                        data = {
+                           "document_type": instance.interview.document_type.id,
+                           "label": params['pdf_filename'],
+                           "language": instance.interview.language,
+                           "description": instance.interview.description,
+                        }
+
+                        ged_params = {
+                            "pdf_url": params['pdf_url'],
+                            "pdf_filename": params['pdf_filename'],
+                            "docx_url": params['docx_url'],
+                            "docx_filename": params['docx_filename'],
+                        }
+
+                        ged_status_code, ged_response, ged_id = mc.document_create(data, ged_params)
+                    except Exception as e:
+                        message = 'Não foi possível inserir o documento no GED. Erro: ' + str(e)
+                        logging.exception(message)
+                    else:
+                        try:
+                            ged_document_data = mc.document_read(ged_id)
+                        except Exception as e:
+                            message = 'Não foi possível localizar o documento no GED. Erro: ' + str(e)
+                            logging.exception(message)
+                        else:
+                            instance.ged_id = ged_document_data['id']
+                            instance.ged_link = ged_document_data['latest_version']['download_url']
+                            instance.ged_uuid = ged_document_data['uuid']
+                            instance.status = DocumentStatus.INSERIDO_GED.value
+
+                            # salva dados do ged do documento no educa legal
+                            instance.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'status'])
+
             return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):

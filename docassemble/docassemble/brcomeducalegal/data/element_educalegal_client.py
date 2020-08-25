@@ -2,7 +2,7 @@ import json
 
 # from docassemble.base.util import log
 from enum import Enum
-from requests import Session, RequestException
+from requests import Session
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
@@ -121,29 +121,14 @@ class EducaLegalClient:
         response = self.session.post(final_url, data=payload)
         return response.json()
 
-    def patch_document_with_docassemble_data(
-        self,
-        doc_uuid,
-        name,
-        description,
-        status,
-        school,
-        related_documents,
-        document_data
-    ):
-        payload = {
-            "doc_uuid": doc_uuid,
-            "name": name,
-            "description": description,
-            "status": status,
-            "school": school,
-            "related_documents": related_documents,
-            "document_data": json.dumps(document_data)
-        }
-
+    def patch_document(self, data=None, **kwargs):
         final_url = self.api_base_url + "/v1/documents/"
-        response = self.session.patch(final_url, data=payload)
-        return response.json()
+        try:
+            response = self.session.patch(final_url, data=data)
+        except Exception as e:
+            return None, str(e)
+        else:
+            return response.status_code, response.json()
 
     def patch_document_with_ged_data(
         self,
