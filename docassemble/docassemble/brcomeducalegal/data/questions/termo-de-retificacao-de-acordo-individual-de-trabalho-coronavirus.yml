@@ -54,7 +54,7 @@ code: |
 ---
 objects:
   - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
-  - example_termo_de_rescisao_de_acordo_individual_de_trabalho: DAStaticFile.using(filename='example-termo-de-rescisao-de-acordo-individual-de-trabalho.yml.pdf')
+  - example_termo_de_retificacao_de_acordo_individual_de_trabalho: DAStaticFile.using(filename='example-termo-de-retificacao-de-acordo-individual-de-trabalho.pdf')
 ---
 code: |
   workers[i].name.text
@@ -113,8 +113,8 @@ script: |
   </script>
 right: |
   <center><h5><strong>Saiba mais</strong></h5>
-  <p>Pelo presente Instrumento, fica rescindido o Acordo Individual de Trabalho a partir da data da assinatura.</p>
-  <center>[Clique para visualizar a minuta](${ example_termo_de_rescisao_de_acordo_individual_de_trabalho.url_for() })</center>
+  <p>Pelo presente Instrumento, as partes retificam o Acordo Individual de Trabalho a partir da data da assinatura.</p>
+  <center>[Clique para visualizar a minuta](${ example_termo_de_retificacao_de_acordo_individual_de_trabalho.url_for() })</center>
 ---
 section: Empregado
 progress: 30
@@ -193,7 +193,7 @@ progress: 70
 question: |
   Dados do acordo
 fields:
-  - As partes têm interesse na rescisão antecipada do: term_type
+  - As partes têm interesse na retificação do: term_type
     datatype: radio
     choices:
       - Acordo individual de Redução de Jornada e Redução Salarial
@@ -206,10 +206,12 @@ objects:
   - clause_reviews: DAList.using(object_type=Thing, there_are_any=True)
 ---
 progress: 75
-section: Agenda
+section: Acordo
 question: Cláusulas de Retificação
 fields:
   - "Cláusula:": clause_reviews[i].name.text
+    help: "Inserir a cláusula que deverá ser retificada com os valores/informações corretos."
+    default: "Fica acordada entre as Partes, a redução salarial de 50,00% (cinquenta por cento) com a correspondente redução da jornada de trabalho do EMPREGADO no mesmo percentual, qual seja, de 50,00% (cinquenta por cento)."
     input type: area
     rows: 10
     required: True
