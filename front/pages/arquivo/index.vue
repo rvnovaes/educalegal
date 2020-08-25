@@ -99,17 +99,17 @@
                 v-bind="column"
               >
               </el-table-column>
-              <el-table-column min-width="180px" align="right" label="Actions">
+              <el-table-column min-width="80px" align="right" label="Detalhes">
                 <div slot-scope="{$index, row}" class="d-flex">
-                  <base-button
-                    @click.native="handleLike($index, row)"
-                    class="like btn-link"
-                    type="info"
-                    size="sm"
-                    icon
-                  >
-                    <i class="text-white ni ni-like-2"></i>
-                  </base-button>
+<!--                  <base-button-->
+<!--                    @click.native="handleLike($index, row)"-->
+<!--                    class="like btn-link"-->
+<!--                    type="info"-->
+<!--                    size="sm"-->
+<!--                    icon-->
+<!--                  >-->
+<!--                    <i class="text-white ni ni-like-2"></i>-->
+<!--                  </base-button>-->
                   <base-button
                     @click.native="handleEdit($index, row)"
                     class="edit"
@@ -119,15 +119,15 @@
                   >
                     <i class="text-white fa fa-edit"></i>
                   </base-button>
-                  <base-button
-                    @click.native="handleDelete($index, row)"
-                    class="remove btn-link"
-                    type="danger"
-                    size="sm"
-                    icon
-                  >
-                    <i class="text-white ni ni-fat-remove"></i>
-                  </base-button>
+<!--                  <base-button-->
+<!--                    @click.native="handleDelete($index, row)"-->
+<!--                    class="remove btn-link"-->
+<!--                    type="danger"-->
+<!--                    size="sm"-->
+<!--                    icon-->
+<!--                  >-->
+<!--                    <i class="text-white ni ni-fat-remove"></i>-->
+<!--                  </base-button>-->
                 </div>
               </el-table-column>
             </el-table>
@@ -205,13 +205,13 @@ export default {
         {
           prop: "name",
           label: "Documento",
-          minWidth: 140,
+          minWidth: 240,
           sortable: false
         },
         {
           prop: "interview_name",
           label: "Modelo",
-          minWidth: 140,
+          minWidth: 240,
           sortable: false
         },
         {
@@ -307,7 +307,7 @@ export default {
       }).then(result => {
         if (result.value) {
           this.deleteRow(row);
-          swal({
+          Swal.fire({
             title: "Deleted!",
             text: `You deleted ${row.name}`,
             type: "success",

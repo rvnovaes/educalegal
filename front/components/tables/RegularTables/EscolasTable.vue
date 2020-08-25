@@ -1,9 +1,9 @@
 <template>
   <div class="card">
     <div class="border-0 card-header">
-      <div class="col-lg-6 col-5 text-right">
-        <base-button size="md" type="warning" @click="handleNew">
-          <i class="fa fa-plus-circle"></i> Novo
+      <div class="col-lg-12 col-5 text-right">
+        <base-button size="md" type="success" @click="handleNew">
+          <i class="fa fa-plus-circle"></i> Nova Escola
         </base-button>
       </div>
     </div>
@@ -15,7 +15,7 @@
         v-for="column in tableColumns"
         :key="column.label"
         v-bind="column"></el-table-column>
-      <el-table-column min-width="180px" align="right" label="Ações">
+      <el-table-column min-width="100px" align="right" label="Ações">
         <div slot-scope="{$index, row}" class="d-flex">
           <base-button
             @click.native="handleEdit($index, row)"
