@@ -82,6 +82,7 @@ question: |
   Dados do(a) Diretor(a)
 fields:
   - "Nome completo:": contratadas[i].name.first
+    validate: validate_person_full_name
     required: True
   - "CPF:": contratadas[i].cpf
     validate: validate_cpf

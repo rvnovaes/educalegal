@@ -185,12 +185,14 @@ section: Assembleia
 progress: 15
 question: Integrantes da mesa da Assembleia
 fields:
-  - "Presidente: ": chairman_name
+  - "Nome completo do presidente: ": chairman_name
+    validate: validate_person_full_name
     required: True
   - "E-mail do presidente: ": chairman_email
     help: ${ help_email_msg }
     datatype: email
-  - "Secretário: ": secretary_name
+  - "Nome completo do secretário: ": secretary_name
+    validate: validate_person_full_name
     required: True
   - "E-mail do secretário: ": secretary_email
     help: ${ help_email_msg }
@@ -262,6 +264,7 @@ question: |
 fields:
   - Número: shareholders.target_number
     datatype: integer
+    default: 1
     min: 1
 ---
 section: Acionistas

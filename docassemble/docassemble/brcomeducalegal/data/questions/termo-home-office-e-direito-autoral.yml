@@ -81,6 +81,7 @@ question: |
   Dados do(a) Empregado
 fields:
   - "Nome completo:": workers[i].name.text
+    validate: validate_person_full_name
     required: True
   - "CPF:": workers[i].cpf
     validate: validate_cpf
@@ -192,11 +193,11 @@ edit:
 ---
 section: Cláusulas
 progress: 75
-question: 'O regime de home office perdurará até a data:'
+question: 'O regime de home office perdurará até:'
 fields:
-  - "Data:": data_regime
+  - "Periodo:": data_regime
     required: True
-    datatype: date
+    help: 'exemplos de preenchimento: "o final do ano letivo de 2020" ou "o dia 30/11/2020"'
 ---
 code: |
   recipients = list()
