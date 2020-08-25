@@ -10,10 +10,6 @@
           <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
           </nav>
         </div>
-        <div class="col-lg-6 col-5 text-right">
-          <base-button size="md" type="warning" @click="handleNew">
-            <i class="fa fa-plus-circle"></i> Novo</base-button>
-        </div>
       </div>
     </base-header>
     <div class="container-fluid mt--6">

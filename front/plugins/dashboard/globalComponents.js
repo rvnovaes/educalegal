@@ -14,10 +14,15 @@ import Card from "~/components/argon-core/Cards/Card.vue";
 import Modal from "~/components/argon-core/Modal.vue";
 import RouteBreadcrumb from "~/components/argon-core/Breadcrumb/RouteBreadcrumb";
 import StatsCard from "~/components/argon-core/Cards/StatsCard.vue";
+import Tab from "~/components/argon-core/Tabs/Tab.vue";
+import Tabs from "~/components/argon-core/Tabs/Tabs.vue";
 import {Input, Tooltip, Popover, Loading} from "element-ui";
 import {ValidationProvider, ValidationObserver} from "vee-validate";
 import {Select, Option} from "element-ui";
+
 import Vue from "vue";
+import flatPickr from "vue-flatpickr-component";
+
 /**
  * You can register global components here and use them as a plugin in your main Vue instance
  */
@@ -39,6 +44,8 @@ Vue.component(Modal.name, Modal);
 Vue.component(StatsCard.name, StatsCard);
 Vue.component(RouteBreadcrumb.name, RouteBreadcrumb);
 Vue.component(Input.name, Input);
+Vue.component(Tab.name, Tab)
+Vue.component(Tabs.name, Tabs)
 Vue.component("validation-provider", ValidationProvider);
 Vue.component("validation-observer", ValidationObserver);
 Vue.use(Tooltip);
@@ -46,3 +53,4 @@ Vue.use(Popover);
 Vue.use(Select);
 Vue.use(Option);
 Vue.use(Loading);
+Vue.use(flatPickr)

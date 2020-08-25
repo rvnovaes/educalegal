@@ -1,46 +1,21 @@
 import moment from 'moment';
 
 export const state = () => ({
-  documents: [],
-  createdDateOrdering: null,
-  count: 0,
-  loading: true,
-  statusFilter: [],
-  schoolFilter: []
+  interviews: [],
 });
 
 export const mutations = {
-  appendDocuments(state, documents) {
-    console.log("appendDocuments")
-    state.documents = [...state.documents, ...documents];
+  appendDocuments(state, interviews) {
+    state.interviews = [...state.interviews, ...interviews];
   },
-  setDocumentCount(state, count) {
-    console.log("setDocumentCount")
-    state.count = count;
-  },
-  cleanDocuments(state) {
-    state.documents = [];
-    state.count = 0;
-  },
-  loadingFalse(state) {
-    state.loading = false;
-  },
-  loadingTrue(state) {
-    state.loading = true;
-  },
+
 };
 
 export const getters = {
   // https://vuex.vuejs.org/guide/getters.html#method-style-access
-  getDocument: (state) => (id) => {
-    return state.documents.find(document => document.id === Number(id));
+  getInterview: (state) => (id) => {
+    return state.interviews.find(interviews => interviews.id === Number(id));
   },
-  getLoadedDocumentsListCount: (state) => {
-    return state.documents.length;
-  },
-  getTotalDocumentsCount: (state) => {
-    return state.count;
-  }
 };
 
 export const actions = {
@@ -71,5 +46,4 @@ export const actions = {
     }
   },
 };
-
 

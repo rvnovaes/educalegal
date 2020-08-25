@@ -8,10 +8,6 @@
             Documentos já gerados por sua escola
           </p>
         </div>
-        <!--        <div class="col-lg-6 col-5 text-right">-->
-        <!--          <base-button size="sm" type="neutral">New</base-button>-->
-        <!--          <base-button size="sm" type="neutral">Filters</base-button>-->
-        <!--        </div>-->
       </div>
     </base-header>
     <div class="container-fluid mt--6">
@@ -20,22 +16,20 @@
           <div>
             <div class="filters col-12 d-flex justify-content-center justify-content-sm-between flex-wrap"
             >
-              <el-select
-                class="select-primary pagination-select"
-                v-model="pagination.perPage"
-                placeholder="Per page"
-              >
-                <el-option
-                  class="select-primary"
-                  v-for="item in pagination.perPageOptions"
-                  :key="item"
-                  :label="item"
-                  :value="item"
-                >
-                </el-option>
-              </el-select>
 
-              <div>
+              <base-input label="Criação"
+                          addon-left-icon="ni ni-calendar-grid-58">
+                <flat-pickr slot-scope="{focus, blur}"
+                            @on-open="focus"
+                            @on-close="blur"
+                            :config="{allowInput: true, mode: 'range'}"
+                            class="form-control datepicker"
+                            v-model="createdDateRange">
+                </flat-pickr>
+              </base-input>
+
+
+              <base-input label="Escola">
                 <el-select multiple
                            class="select-primary"
                            placeholder="Escola"
@@ -48,10 +42,10 @@
                     :key="option.label">
                   </el-option>
                 </el-select>
-              </div>
+              </base-input>
 
 
-              <div>
+              <base-input label="Status">
                 <el-select multiple
                            class="select-primary"
                            placeholder="Status"
@@ -64,27 +58,36 @@
                     :key="option.label">
                   </el-option>
                 </el-select>
-              </div>
+              </base-input>
 
-              <div>
+              <base-input label="Paginação">
+                <el-select
+                  class="select-primary pagination-select"
+                  v-model="pagination.perPage"
+                  placeholder="Per page"
+                >
+                  <el-option
+                    class="select-primary"
+                    v-for="item in pagination.perPageOptions"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
+              </base-input>
+
+              <div id="filter-buttons">
                 <base-button @click="applyFilters" type="primary">
                   <i class="fa fa-search"></i> Buscar
                 </base-button>
-                <base-button @click="cleanFilters" type="danger">
-                  <i class="fa fa-trash"></i> Limpar
+                <base-button @click="cleanFilters" type="warning">
+                  <i class="fa fa-sync"></i> Limpar
                 </base-button>
               </div>
-
-              <!--              <div>-->
-
-              <!--                <base-input v-model="searchQuery"-->
-              <!--                            prepend-icon="fas fa-search"-->
-              <!--                            placeholder="Search...">-->
-              <!--                </base-input>-->
-              <!--              </div>-->
             </div>
             <el-table v-loading="loading"
-                      :data="queriedData"
+                      :data="paginatedData"
                       row-key="id"
                       header-row-class-name="thead-light"
                       @sort-change="sortChange"
@@ -110,11 +113,11 @@
                   <base-button
                     @click.native="handleEdit($index, row)"
                     class="edit"
-                    type="warning"
+                    type="primary"
                     size="sm"
                     icon
                   >
-                    <i class="text-white ni ni-ruler-pencil"></i>
+                    <i class="text-white fa fa-edit"></i>
                   </base-button>
                   <base-button
                     @click.native="handleDelete($index, row)"
@@ -163,13 +166,26 @@ import {Table, TableColumn, Select, Option} from "element-ui";
 import {BasePagination} from "@/components/argon-core";
 import documentPaginationMixin from "~/components/tables/PaginatedTables/documentPaginationMixin";
 import Swal from "sweetalert2";
-import Fuse from "fuse.js";
+// Set the locale:
+// https://github.com/ankurk91/vue-flatpickr-component/issues/49
+import flatpickr from "flatpickr";
+import {Portuguese} from "flatpickr/dist/l10n/pt";
+
+flatpickr.localize(Portuguese);
+flatpickr.setDefaults({
+    dateFormat: "d/m/Y"
+  }
+);
+import flatPickr from "vue-flatpickr-component";
+
+import "flatpickr/dist/flatpickr.css";
 
 export default {
   mixins: [documentPaginationMixin],
   layout: "DashboardLayout",
   components: {
     BasePagination,
+    flatPickr,
     [Select.name]: Select,
     [Option.name]: Option,
     [Table.name]: Table,
@@ -181,44 +197,42 @@ export default {
       propsToSearch: ["name", "interview_name", "school_name", "status"],
       tableColumns: [
         {
+          prop: "created_date",
+          label: "Criação",
+          minWidth: 80,
+          sortable: false
+        },
+        {
           prop: "name",
           label: "Documento",
           minWidth: 140,
-          sortable: true
+          sortable: false
         },
         {
           prop: "interview_name",
           label: "Modelo",
           minWidth: 140,
-          sortable: true
+          sortable: false
         },
         {
           prop: "school_name",
           label: "Escola",
           minWidth: 140,
-          sortable: true
-        },
-        {
-          prop: "created_date",
-          label: "Criação",
-          minWidth: 80,
-          sortable: true
+          sortable: false
         },
         {
           prop: "altered_date",
           label: "Alteração",
           minWidth: 80,
-          sortable: true
+          sortable: false
         },
         {
           prop: "status",
           label: "Status",
           minWidth: 120,
-          sortable: true
+          sortable: false
         },
       ],
-      selectedStatuses: null,
-      selectedSchools: null,
       selects: {
         statuses: [
           {value: "assinado", label: "assinado"},
@@ -236,9 +250,11 @@ export default {
           {value: "rascunho - em lote", label: "rascunho - em lote"}
         ],
       },
-      // tableData: users,
       selectedRows: [],
-
+      orderByCreatedDate: "descending",
+      selectedStatuses: [],
+      selectedSchools: [],
+      createdDateRange: null,
     };
   },
   computed: {
@@ -254,11 +270,13 @@ export default {
   },
   created() {
     this.$store.dispatch("schools/fetchAllSchools");
-    this.$store.dispatch("documents/fetchPaginatedDocuments", {offset: 0});
-    // this.fuseSearch = new Fuse(this.tableData, {
-    //   keys: ["name", "school_name", "interview_name", "status"],
-    //   threshold: 0.3
-    // });
+    this.$store.dispatch("documents/fetchPaginatedDocuments", {
+      offset: 0,
+      statusFilter: [],
+      schoolFilter: [],
+      orderByCreatedDate: "descending",
+      createdDateRange: null,
+    });
   },
   methods: {
     handleLike(index, row) {
@@ -270,11 +288,11 @@ export default {
       });
     },
     handleEdit(index, row) {
-      Swal.fire({
-        title: `You want to edit ${row.name}`,
-        buttonsStyling: false,
-        confirmButtonClass: "btn btn-info btn-fill"
-      });
+      console.log(index)
+      console.log(row)
+      this.$router.push({
+        path: "/arquivo/" + row.doc_uuid
+      })
     },
     handleDelete(index, row) {
       Swal.fire({
@@ -310,9 +328,23 @@ export default {
     selectionChange(selectedRows) {
       this.selectedRows = selectedRows;
     },
+    sortChange({prop, order}) {
+      let orderByCreatedDate = "descending";
+      if (prop === "created_date") {
+        console.log(prop);
+        console.log(order);
+        if (order === "ascending") {
+          orderByCreatedDate = order;
+        }
+      }
+      this.orderByCreatedDate = orderByCreatedDate;
+      this.updatePagination("Modificada ordenacao de data");
+      this.$store.dispatch("documents/fetchPaginatedDocuments", {offset: 0, createdDateOrdering: order});
+    },
+
     // Sempre que ocorre um evento  no componente de paginacao base-pagination essa funcao e chamada
     updatePagination(args) {
-      console.log("Dispardo evento input no componente de paginacao");
+      // console.log("Disparado evento input no componente de paginacao");
       console.log("Estamos na página: " + args);
       /* demandedDocumens representa quantos docs o componente de tabela precisa conforme o ponto da navegacao. Ou seja,
       se o usuario esta na pagina 2 e escolheu exibir 50 documentos por pagina, precisamos de ter no minimo 100
@@ -320,36 +352,47 @@ export default {
       documentos uma página antes de eles serem necessários. No exemplo (usuario na pagina 2 com 50 docs/pagina) o valor
       de demandedDocuments sera (2 + 1) * 50 = 150, o que ira disparar a carga de mais documentos uma pagina antes.
       */
+      // let clearDocumentsList = false
+      // // console.log("this.selectedStatuses.length")
+      // // console.log(this.selectedStatuses.length)
+      // // console.log("this.$store.state.documents.statusFilter.length")
+      // // console.log(this.$store.state.documents.statusFilter.length)
+      // if (this.selectedStatuses.length !== this.$store.state.documents.statusFilter.length){
+      //   clearDocumentsList = true
+      // }
+      // console.log("clearDocumentsList")
+      // console.log(clearDocumentsList)
       const demandedDocuments = (this.pagination.currentPage + 1) * this.pagination.perPage;
-      console.log("Demanded:" + demandedDocuments);
+      // console.log("Demanded:" + demandedDocuments);
       const onStore = this.$store.getters["documents/getLoadedDocumentsListCount"];
-      console.log("On Store: " + onStore);
+      // console.log("On Store: " + onStore);
       if (demandedDocuments >= onStore) {
         console.log("Precisamos de mais documentos!");
         this.$store.dispatch("documents/fetchPaginatedDocuments", {
           offset: onStore,
-          status: this.selectedStatuses,
-          school: this.selectedSchools
+          statusFilter: this.selectedStatuses,
+          schoolFilter: this.selectedSchools,
+          orderByCreatedDate: this.orderByCreatedDate,
+          createdDateRange: this.createdDateRange
         });
-        // this.fuseSearch = new Fuse(this.tableData, {
-        //   keys: ["name", "school_name", "interview_name", "status"],
-        //   threshold: 0.3
-        // });
       }
     },
     applyFilters() {
       this.$store.commit("documents/cleanDocuments");
       this.$store.dispatch("documents/fetchPaginatedDocuments", {
         offset: 0,
-        status: this.selectedStatuses,
-        school: this.selectedSchools
+        statusFilter: this.selectedStatuses,
+        schoolFilter: this.selectedSchools,
+        orderByCreatedDate: this.orderByCreatedDate,
+        createdDateRange: this.createdDateRange
       });
-
     },
-
     cleanFilters() {
-      this.selectedStatuses = null;
-      this.selectedSchools = null;
+      this.selectedStatuses = [];
+      this.selectedSchools = [];
+      this.createdDateRange = null;
+      // this.$store.commit("documents/cleanStatusFilter")
+      // this.$store.commit("documents/cleanSchoolFilter")
       this.applyFilters();
     }
   },
@@ -361,8 +404,8 @@ export default {
   border-top: 0;
 }
 
-.filters {
-  margin-bottom: 15px;
+#filter-buttons {
+  margin-top: 30px;
 }
 
 .el-tag.el-tag--info.el-tag--small.el-tag--light {

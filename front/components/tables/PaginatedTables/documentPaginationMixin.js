@@ -5,15 +5,8 @@ export default {
     /***
      * Returns a page from the searched data or the whole data. Search is performed in the watch section below
      */
-    queriedData() {
+    paginatedData() {
       let result = this.tableData;
-      if (this.searchedData.length > 0) {
-        result = this.searchedData;
-      } else {
-        if (this.searchQuery) {
-          result = [];
-        }
-      }
       return result.slice(this.from, this.to);
     },
     to() {
@@ -27,12 +20,7 @@ export default {
       return this.pagination.perPage * (this.pagination.currentPage - 1);
     },
     total() {
-      return this.searchedData.length > 0
-        ? this.searchedData.length
-        : this.$store.getters["documents/getTotalDocumentsCount"]
-        // : this.tableData.length;
-      // : this.$store.state.documents.count
-      // return this.$store.state.documents.count
+      return this.$store.getters["documents/getTotalDocumentsCount"]
     }
   },
   data() {
@@ -43,50 +31,6 @@ export default {
         perPageOptions: [5, 10, 25, 50],
         total: 0
       },
-      searchQuery: "",
-      searchedData: [],
-      fuseSearch: null
     };
   },
-  methods: {
-    sortChange({prop, order}) {
-      if (prop) {
-        this.searchedData.sort((a, b) => {
-        // this.tableData.sort((a, b) => {
-          let aVal = a[prop];
-          let bVal = b[prop];
-          if (order === "ascending") {
-            return aVal > bVal ? 1 : -1;
-          }
-          return bVal - aVal ? 1 : -1;
-        });
-      } else {
-        this.searchedData.sort((a, b) => {
-        // this.tableData.sort((a, b) => {
-          return a.id - b.id;
-        });
-      }
-    }
-  },
-  // mounted() {
-  //   // Fuse search initialization.
-  //   this.fuseSearch = new Fuse(this.tableData, {
-  //     keys: ["name", "school_name", "interview_name", "status"],
-  //     threshold: 0.3
-  //   });
-  // },
-  watch: {
-    /**
-     * Searches through the table data by a given query.
-     * NOTE: If you have a lot of data, it's recommended to do the search on the Server Side and only display the results here.
-     * @param value of the query
-     */
-    searchQuery(value) {
-      let result = this.tableData;
-      // if (value !== "") {
-      //   result = this.fuseSearch.search(this.searchQuery);
-      // }
-      this.searchedData = result;
-    }
-  }
 };

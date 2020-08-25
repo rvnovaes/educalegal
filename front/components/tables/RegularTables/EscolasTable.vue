@@ -1,7 +1,11 @@
 <template>
   <div class="card">
     <div class="border-0 card-header">
-<!--      <h3 class="mb-0">Escolas</h3>-->
+      <div class="col-lg-6 col-5 text-right">
+        <base-button size="md" type="warning" @click="handleNew">
+          <i class="fa fa-plus-circle"></i> Novo
+        </base-button>
+      </div>
     </div>
 
     <el-table class="table-responsive table-flush"
@@ -21,7 +25,6 @@
             icon
           >
             <i class="text-white fa fa-edit"></i>
-<!--            <i class="text-white ni ni-ruler-pencil"></i>-->
           </base-button>
           <base-button
             @click.native="handleDelete($index, row)"
@@ -39,9 +42,10 @@
 </template>
 <script>
 import Swal from "sweetalert2";
-import { Table, TableColumn} from 'element-ui'
+import {Table, TableColumn} from "element-ui";
+
 export default {
-  name: 'escolas-table',
+  name: "escolas-table",
   components: {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
@@ -96,7 +100,7 @@ export default {
   },
 
   computed: {
-    schools () {
+    schools() {
       return this.$store.state.schools.schools;
     }
   },
@@ -145,26 +149,26 @@ export default {
       });
     },
     deleteRow(row) {
-        try {
-          console.log(row)
-          this.$store.dispatch("schools/deleteSchool", row)
-        } catch (e) {
-          Swal.fire({
-            title: `Erro ao excluir ${row.name}`,
-            text: e,
-            icon: "error",
-            customClass: {
-              confirmButton: "btn btn-info btn-fill",
-            },
-            confirmButtonText: "OK",
-            buttonsStyling: false
-          });
-        }
+      try {
+        console.log(row);
+        this.$store.dispatch("schools/deleteSchool", row);
+      } catch (e) {
+        Swal.fire({
+          title: `Erro ao excluir ${row.name}`,
+          text: e,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
+      }
       // }
     },
     selectionChange(selectedRows) {
       this.selectedRows = selectedRows;
     },
   }
-}
+};
 </script>

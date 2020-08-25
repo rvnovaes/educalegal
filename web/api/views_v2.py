@@ -1,5 +1,9 @@
 import logging
 import io
+from datetime import datetime
+from datetime import timedelta
+import pytz
+
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -28,6 +32,7 @@ from .mayan_helpers import MayanClient
 from .serializers_v2 import (
     PlanSerializer,
     DocumentSerializer,
+    DocumentDetailSerializer,
     DocumentCountSerializer,
     InterviewSerializer,
     SchoolSerializer,
@@ -128,7 +133,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
             logger.info(message)
             raise ValidationError(message)
 
-        serializer = self.serializer_class(instance)
+        serializer = DocumentDetailSerializer(instance)
         return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
@@ -145,6 +150,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
         queryset = self.queryset.filter(tenant_id=tenant_id)
         status_filter_param = request.query_params.getlist("status[]")
         school_filter_param = request.query_params.getlist("school[]")
+        order_by_created_date = request.query_params.get("orderByCreatedDate")
+        created_date_range = request.query_params.get("createdDateRange")
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
@@ -157,6 +164,28 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 for id in school_filter_param[1:]:
                     conditions |= Q(school=id)
             queryset = queryset.filter(conditions)
+        if created_date_range:
+            # O intevalo de datas vem como "01/08/2020" ou "01/08/2020 até 08/08/2020"
+            # Abaixo o retorno é splitado no até (se houver) e cada data tem os espaços em branco nos extremos removidos
+            dates_list = list(map(str.strip, created_date_range.split("até")))
+            tz = pytz.timezone("America/Sao_Paulo")
+            from_date = datetime.datetime.strptime(dates_list[0], '%d/%m/%Y')
+            from_date = tz.localize(from_date)
+            # Filtering a DateTimeFieldwith dates won’t include items on the last day, because the bounds are
+            # interpreted as " 0am on the given date”. Por isso, somamos mais um ao dia para incluir o dia de fim
+            if len(dates_list) == 1:
+                to_date = from_date + timedelta(days=1)
+                queryset = queryset.filter(created_date__range=(from_date, to_date))
+            if len(dates_list) > 1:
+                to_date = datetime.datetime.strptime(dates_list[1], '%d/%m/%Y')
+                to_date += timedelta(days=1)
+                to_date = tz.localize(to_date)
+                queryset = queryset.filter(created_date__range=(from_date, to_date))
+
+        if order_by_created_date == "ascending":
+            queryset.order_by("created_date")
+        else:
+            queryset.order_by("-created_date")
 
         page = paginator.paginate_queryset(queryset, request)
         serializer = self.serializer_class(page, many=True)

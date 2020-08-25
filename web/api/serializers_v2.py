@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from billing.models import Plan
-from document.models import Document, DocumentCount
+from document.models import Document, DocumentCount, Envelope, Signer
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Tenant, TenantGedData, ESignatureApp
@@ -45,13 +45,74 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         ref_name = "Document v2"
-        fields = ["name", "interview_name", "school_name", "created_date", "altered_date", "status"]
+        fields = ["doc_uuid", "name", "interview_name", "school_name", "created_date", "altered_date", "status"]
 
     def get_interview_name(self, obj):
         return obj.interview.name if obj.interview else ""
 
     def get_school_name(self, obj):
         return obj.school.name if obj.school else ""
+
+
+class EnvelopeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Envelope
+        ref_name = "Envelope V2"
+        fields = "__all__"
+
+
+class SignerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Signer
+        ref_name = "Signer V2"
+        fields = "__all__"
+
+class DocumentDetailSerializer(serializers.ModelSerializer):
+    interview_name = serializers.SerializerMethodField()
+    school_name = serializers.SerializerMethodField()
+    signers = serializers.SerializerMethodField()
+    envelope = EnvelopeSerializer()
+
+    class Meta:
+        model = Document
+        ref_name = "Document v2"
+        fields = "__all__"
+
+    def get_interview_name(self, obj):
+        return obj.interview.name if obj.interview else ""
+
+    def get_school_name(self, obj):
+        return obj.school.name if obj.school else ""
+
+    def get_signers(self, obj):
+        try:
+            # busca somente o último signer de cada email do documento
+            signers = Signer.objects.raw(
+                """select
+                    s1.* 
+                   from
+                    document_signer s1
+                   where
+                    s1.document_id = {document_id} and
+                    s1.created_date = (
+                        select
+                            max(created_date)
+                        from
+                            document_signer s2
+                        where
+                             s1.document_id = s2.document_id and 
+                            s1.email = s2.email 
+                ) order by s1.created_date desc;""".format(document_id=obj.id))
+        except:
+            return None
+        else:
+            signers = list(signers)
+            # signer_statuses = list()
+            signer_serialized_list = list()
+            for signer in signers:
+                # signer_statuses.append(signer.status)
+                signer_serialized_list.append(SignerSerializer(signer).data)
+            return signer_serialized_list
 
 
 class DocumentCountSerializer(serializers.ModelSerializer):
@@ -85,6 +146,7 @@ class TenantGedDataSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     tenant_name = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
         ref_name = "User v2"

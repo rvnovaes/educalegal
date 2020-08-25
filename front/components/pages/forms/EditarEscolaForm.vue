@@ -170,7 +170,7 @@
           </div>
         </div>
         <base-button type="success" native-type="submit"><i class="fa fa-check"></i>Salvar</base-button>
-        <base-button @click="back()" type="danger"><i class="fa fa-window-close"></i>Voltar</base-button>
+        <base-button @click="back()" type="warning"><i class="ni ni-bold-left"></i>Voltar</base-button>
       </form>
     </validation-observer>
   </card>
