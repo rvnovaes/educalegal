@@ -7,6 +7,10 @@ from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
+# from docassemble.base.util import (
+#     log,
+# )
+
 
 class DocumentStatus(Enum):
     RASCUNHO = "rascunho"
@@ -106,7 +110,6 @@ class EducaLegalClient:
         related_documents=None,
         document_data=None,
     ):
-
         payload = {
             "name": name,
             "status": status,
@@ -117,17 +120,28 @@ class EducaLegalClient:
             "related_documents": related_documents,
             "document_data": json.dumps(document_data),
         }
+
+        print("elc document_data", "console")
+        print(document_data, "console")
         final_url = self.api_base_url + "/v1/documents/"
         response = self.session.post(final_url, data=payload)
         return response.json()
 
-    def patch_document(self, data=None, **kwargs):
-        final_url = self.api_base_url + "/v1/documents/"
+    def patch_document(self, data, params):
+        final_url = self.api_base_url + "/v2/documents/{}".format(params['doc_uuid'])
+
         try:
-            response = self.session.patch(final_url, data=data)
+            print("passou aqui 1", "console")
+            response = self.session.patch(final_url, data=data, params=params)
         except Exception as e:
+            print("passou aqui 2", "console")
+            print("e", "console")
+            print(e, "console")
             return None, str(e)
         else:
+            print("passou aqui 3", "console")
+            print("response", "console")
+            print(response.json(), "console")
             return response.status_code, response.json()
 
     def patch_document_with_ged_data(

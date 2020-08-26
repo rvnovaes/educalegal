@@ -6,6 +6,8 @@ include:
   - element-custom-file-name.yml
 ---
 code: |
+  import json
+
   # private=False - para que o arquivo fique acessivel fora do docassemble
   # estando logado ou nao
   generated_file.pdf.set_attributes(private=False)
@@ -17,7 +19,7 @@ code: |
      "status": "criado",
      "school": school_id,
      "related_documents": None,
-     "document_data": all_variables()
+     "document_data": json.dumps(all_variables())
   }
 
   # external=True - acrescenta na url o protocolo and hostname (https://hostname)
@@ -28,13 +30,16 @@ code: |
     "pdf_filename": custom_file_name + '.pdf',
     "docx_filename": custom_file_name + '.docx',
     "tenant_id": tid,
+    "doc_uuid": doc_uuid,
   }
 
   log("params", "console")
   log(params, "console")
+  log("data", "console")
+  log(data, "console")
 
   # atualiza no educa legal dados do documento gerado
-  status_code, el_patch_document = elc.patch_document(data, params=params)
+  status_code, el_patch_document = elc.patch_document(data, params)
   log("status_code", "console")
   log(status_code, "console")
   log("el_patch_document", "console")

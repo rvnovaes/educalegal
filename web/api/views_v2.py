@@ -1,6 +1,5 @@
 import io
 import logging
-import json
 
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
@@ -203,28 +202,30 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
             # se o parametro 'trigger' = docassemble indica que o patch veio do docassemble
             # faz o download do arquivo e salva no ged
-            params = json.loads(self.request.query_params['params'])
+            params = self.request.query_params
+            logging.info('passou aqui 1')
+            logging.info(params)
             if 'trigger' in params:
                 if params['trigger'] == 'docassemble':
                     tenant = Tenant.objects.get(pk=params['tenant_id'])
                     ged_url = tenant.tenantgeddata.url
                     ged_token = tenant.tenantgeddata.token
                     mc = MayanClient(ged_url, ged_token)
+                    data = {
+                        "document_type": instance.interview.document_type.id,
+                        "label": params['pdf_filename'],
+                        "language": instance.interview.language,
+                        "description": instance.interview.description,
+                    }
+
+                    ged_params = {
+                        "pdf_url": params['pdf_url'],
+                        "pdf_filename": params['pdf_filename'],
+                        "docx_url": params['docx_url'],
+                        "docx_filename": params['docx_filename'],
+                    }
+
                     try:
-                        data = {
-                           "document_type": instance.interview.document_type.id,
-                           "label": params['pdf_filename'],
-                           "language": instance.interview.language,
-                           "description": instance.interview.description,
-                        }
-
-                        ged_params = {
-                            "pdf_url": params['pdf_url'],
-                            "pdf_filename": params['pdf_filename'],
-                            "docx_url": params['docx_url'],
-                            "docx_filename": params['docx_filename'],
-                        }
-
                         ged_status_code, ged_response, ged_id = mc.document_create(data, ged_params)
                     except Exception as e:
                         message = 'Não foi possível inserir o documento no GED. Erro: ' + str(e)

@@ -21,11 +21,6 @@
                 {% endif %}
                 <li class="list-group-item">
                     <span class="font-weight-bold">Status: </span>{{ document.status }}</li>
-                {% if user.tenant.plan.use_ged %}
-                    <li class="list-group-item">
-                        <span class="font-weight-bold">Link: </span><a href="{{ document.ged_link }}"
-                                                                       target="_blank">{{ document.ged_link }}</a></li>
-                {% endif %}
                 <li class="list-group-item">
                     <span class="font-weight-bold">Descrição: </span>{{ document.description|default:"-" }}</li>
                 <li class="list-group-item">
@@ -33,8 +28,20 @@
 
             </ul>
         </div>
+    </div>
 
-        {% if document.envelope %}
+    <br/>
+    <div class="text-center">
+        <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
+        <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
+        {% if not document.envelope %}
+            <a target="_blank" href="#"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>
+        {% endif %}
+        <a target="_blank" href="#"><button type="button" class="btn btn-info">Enviar por email</button></a>
+    </div>
+
+    {% if document.envelope %}
+        <div class="card">
             {% with envelope=document.envelope %}
                 <div class="card-header">
                     <h5>Detalhes do Envelope</h5>
@@ -62,53 +69,53 @@
                     </ul>
                 </div>
             {% endwith %}
-        {% endif %}
 
 
-        {% if signers %}
-            <div class="card-header">
-              <h5>Detalhes dos Destinatários</h5>
-            </div>
-            <br/>
-            <div class="card-deck ml-1 mr-1">
-              <div class="row">
-                {% for signer in signers %}
-                  <div class="col-sm">
-                    <div class="card mb-3 border-{{ signer.status }}">
-                      <div class="card-header header-{{ signer.status }}">
-                        <b>{{ signer.status|title }}</b>
+            {% if signers %}
+                <div class="card-header">
+                  <h5>Detalhes dos Destinatários</h5>
+                </div>
+                <br/>
+                <div class="card-deck ml-1 mr-1">
+                  <div class="row">
+                    {% for signer in signers %}
+                      <div class="col-sm">
+                        <div class="card mb-3 border-{{ signer.status }}">
+                          <div class="card-header header-{{ signer.status }}">
+                            <b>{{ signer.status|title }}</b>
+                          </div>
+                          <div class="card-body">
+                            <h5 class="card-title">{{ signer.name }}</h5>
+                            <p class="card-text">E-mail: {{ signer.email }}</p>
+                            <p class="card-text">Importação: {{ signer.created_date|date:"d/m/Y H:i:s" }}</p>
+                            <p class="card-text">Envio: {{ signer.sent_date|date:"d/m/Y H:i:s"|default:"-" }}</p>
+                            <p class="card-text">Tipo: {{ signer.type }}</p>
+                            {% if signer.pdf_filenames %}
+                              <p class="card-text">PDFs: {{ signer.pdf_filenames|linebreaks }}</p>
+                            {% endif %}
+                          </div>
+                        </div>
                       </div>
-                      <div class="card-body">
-                        <h5 class="card-title">{{ signer.name }}</h5>
-                        <p class="card-text">E-mail: {{ signer.email }}</p>
-                        <p class="card-text">Importação: {{ signer.created_date|date:"d/m/Y H:i:s" }}</p>
-                        <p class="card-text">Envio: {{ signer.sent_date|date:"d/m/Y H:i:s"|default:"-" }}</p>
-                        <p class="card-text">Tipo: {{ signer.type }}</p>
-                        {% if signer.pdf_filenames %}
-                          <p class="card-text">PDFs: {{ signer.pdf_filenames|linebreaks }}</p>
-                        {% endif %}
-                      </div>
-                    </div>
+                    {% endfor %}
                   </div>
-                {% endfor %}
-              </div>
-            </div>
-        {% endif %}
+                </div>
+            {% endif %}
 
-        <br/>
-        {% if document.documents.all %}
-            <div class="card-header">
-                <h5>Documentos Relacionados</h5>
-            </div>
             <br/>
-            <ul>
-                {% for related_document in document.documents.all %}
-                    <li><a href="{% url 'document:document-detail' pk=related_document.pk %}"
-                           target="_blank">{{ related_document.name }}</a></li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+            {% if document.documents.all %}
+                <div class="card-header">
+                    <h5>Documentos Relacionados</h5>
+                </div>
+                <br/>
+                <ul>
+                    {% for related_document in document.documents.all %}
+                        <li><a href="{% url 'document:document-detail' pk=related_document.pk %}"
+                               target="_blank">{{ related_document.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
 
     <script type="text/javascript">
         $.each({{ signer_statuses }}, function(index, signer_status) {

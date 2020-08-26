@@ -23,9 +23,15 @@ action buttons:
 code: |
   button_list = list()
   button_list.append(el_button)
+  button_list.append(el_button_v2)
 ---
 code: |
-  el_button = {'action': educalegal_url + '/v2/documents/' + doc_uuid,
+  el_button = {'action': educalegal_url + '/document/document/25581',
                 'label': 'Ver detalhes',
+                'color': 'success',
+                'icon': 'check'}
+
+  el_button_v2 = {'action': educalegal_url + '/document/document/' + doc_uuid,
+                'label': 'Ver detalhes v2',
                 'color': 'success',
                 'icon': 'check'}

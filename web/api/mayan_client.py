@@ -1,7 +1,6 @@
-import json
-from requests import Session
+import logging
+import requests
 import time
-from requests.exceptions import RequestException
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
@@ -14,7 +13,7 @@ class MayanClient:
         self.api_base_url = api_base_url
         headers = {"Authorization": "Token " + token}
         self.session = retry(
-            Session(),
+            requests.Session(),
             retries=3,
             backoff_factor=0.5,
             status_to_retry=(500, 502, 504),
@@ -22,23 +21,28 @@ class MayanClient:
         self.session.headers.update(headers)
 
     def document_create(self, data, ged_params):
-        # salva o docx no sistema de arquivos
-        save_file_from_url(ged_params['docx_url'], 'docassemble', ged_params['docx_filename'])
+        # # salva o docx no sistema de arquivos
+        # save_file_from_url(ged_params['docx_url'], 'docassemble', ged_params['docx_filename'])
 
         # salva o pdf no sistema de arquivos
         pdf_absolute_path, pdf_filename = save_file_from_url(
             ged_params['pdf_url'], 'docassemble', ged_params['pdf_filename'])
 
         # envia documento para o ged
-        file_object = open(pdf_absolute_path, mode="rb")
+        pdf_file = open(pdf_absolute_path, mode="rb")
         final_url = self.api_base_url + "/api/documents/"
         try:
+            logging.exception("passou_aqui_4")
             response = self.session.post(
-                final_url, data=data, files={"file": file_object}
+                final_url, data=data, files={"file": pdf_file}
             )
         except Exception as e:
-            return 0, str(e), 0
+            logging.exception("passou_aqui_5")
+            message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
+            logging.exception(message)
+            return 0, message, 0
         else:
+            logging.exception("passou_aqui_6")
             if 'id' in response.json():
                 return response.status_code, response.json(), response.json()['id']
             else:
@@ -71,7 +75,7 @@ class MayanClient:
                     return error_message
                 else:
                     return response.json()
-        except RequestException as e:
+        except requests.RequestException as e:
             error_message = (
                 "<h5>O documento não foi criado no GED!</h5><br>"
                 "<b>Exception:</b> {e}<br><br>"
