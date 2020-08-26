@@ -4,7 +4,7 @@ export const state = () => ({
   documents: [],
   createdDateOrdering: null,
   count: 0,
-  loading: true,
+  loading: false,
   statusFilter: [],
   schoolFilter: []
 });
@@ -23,11 +23,11 @@ export const mutations = {
     state.count = 0;
   },
   loadingFalse(state) {
-    state.loading = false;
+    state.loading = false
   },
-  loadingTrue(state) {
-    state.loading = true;
-  },
+  loadingTrue(state){
+    state.loading = true
+  }
 };
 
 export const getters = {
@@ -45,6 +45,7 @@ export const getters = {
 
 export const actions = {
   async fetchPaginatedDocuments({commit}, payload) {
+    commit("loadingTrue");
     const res = await this.$axios.get("/v2/documents/", {
       params:
         {
@@ -69,6 +70,7 @@ export const actions = {
       commit("setDocumentCount", res.data.count);
       commit("loadingFalse");
     }
+
   },
 };
 

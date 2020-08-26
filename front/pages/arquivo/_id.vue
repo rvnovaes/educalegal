@@ -1,17 +1,19 @@
 <template>
   <div>
-  <div v-if="loading">
-    <h3 class="text-sm text-black-50"> Carregando...</h3>
-  </div>
-  <div v-else>
     <base-header class="pb-6">
       <div class="row align-items-center py-4">
-        <div class="col-lg-6 col-7">
-          <h3 class="h2 text-white d-inline-block mb-0">{{ currentDocument.name }}</h3><br>
-          <h4 class="h2 text-white d-inline-block mb-0">{{ currentDocument.status | capitalize }}</h4>
-          <p class="text-sm text-white font-weight-bold mb-0">
+        <div class="col-lg-11 col-11">
+          <h3 v-if="currentDocument" class="h2 text-white d-inline-block mb-0">{{ currentDocument.name }}</h3>
+          <h3 v-else class="h2 text-white d-inline-block mb-0">Carregando...</h3><br>
+          <h4 v-if="currentDocument" class="h2 text-white d-inline-block mb-0">{{ currentDocument.status | capitalize }}</h4>
+          <p v-if="currentDocument" class="text-sm text-white font-weight-bold mb-0">
             {{ currentDocument.interview_name }}
           </p>
+        </div>
+        <div v-if="loading" class="col-1">
+          <div>
+            <HourGlassSpinner></HourGlassSpinner>
+          </div>
         </div>
       </div>
     </base-header>
@@ -19,29 +21,29 @@
       <div>
         <card body-classes="px-0 pb-1" footer-classes="pb-2">
           <div class="card-body">
-            <detalhes-documento-tab :currentDocument="currentDocument">
+            <detalhes-documento-tab v-if="currentDocument" :currentDocument="currentDocument">
             </detalhes-documento-tab>
           </div>
         </card>
       </div>
     </div>
   </div>
-  </div>
 </template>
 
 <script>
 import DetalhesDocumentoTab from "@/components/pages/tabs/DetalhesDocumentoTab.Vue";
+import HourGlassSpinner from "@/components/widgets/HourGlassSpinner";
 
 export default {
   name: "detalhes-documento",
   layout: "DashboardLayout",
   components: {
-    DetalhesDocumentoTab
+    DetalhesDocumentoTab,
+    HourGlassSpinner
   },
   data() {
     return {
       currentDocument: null,
-      doc_uuid: this.$route.params.id,
     };
   },
   computed: {
@@ -50,7 +52,7 @@ export default {
     }
   },
   created() {
-    this.fetchDocumentDetails(this.doc_uuid)
+    this.fetchDocumentDetails(this.$route.params.id,)
   },
   methods: {
     async fetchDocumentDetails(doc_uuid) {

@@ -19,6 +19,7 @@ import Tabs from "~/components/argon-core/Tabs/Tabs.vue";
 import {Input, Tooltip, Popover, Loading} from "element-ui";
 import {ValidationProvider, ValidationObserver} from "vee-validate";
 import {Select, Option} from "element-ui";
+import HourGlassSpinner from "@/components/widgets/HourGlassSpinner";
 
 import Vue from "vue";
 import flatPickr from "vue-flatpickr-component";
@@ -53,4 +54,5 @@ Vue.use(Popover);
 Vue.use(Select);
 Vue.use(Option);
 Vue.use(Loading);
-Vue.use(flatPickr)
+Vue.use(flatPickr);
+Vue.use(HourGlassSpinner);

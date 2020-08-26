@@ -29,7 +29,7 @@
 
       </tab-pane>
 
-      <tab-pane id="envelope">
+      <tab-pane id="envelope" v-if="currentDocument.envelope">
         <span slot="title">
           <i class="fa fa-envelope-open"></i> Envelope
         </span>
@@ -55,7 +55,7 @@
         </ul>
       </tab-pane>
 
-      <tab-pane id="destinatarios">
+      <tab-pane id="destinatarios" v-if="currentDocument.envelope">
          <span slot="title">
            <i class="fa fa-user"></i> Destinatários
           </span>

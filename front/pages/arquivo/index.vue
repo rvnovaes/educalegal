@@ -2,11 +2,16 @@
   <div class="content">
     <base-header class="pb-6">
       <div class="row align-items-center py-4">
-        <div class="col-lg-6 col-7">
+        <div class="col-11">
           <h6 class="h2 text-white d-inline-block mb-0">Arquivo</h6>
           <p class="text-sm text-white font-weight-bold mb-0">
             Documentos já gerados por sua escola
           </p>
+        </div>
+        <div v-if="loading" class="col-1">
+          <div>
+            <HourGlassSpinner></HourGlassSpinner>
+          </div>
         </div>
       </div>
     </base-header>
@@ -86,8 +91,8 @@
                 </base-button>
               </div>
             </div>
-            <el-table v-loading="loading"
-                      :data="paginatedData"
+
+            <el-table :data="paginatedData"
                       row-key="id"
                       header-row-class-name="thead-light"
                       @sort-change="sortChange"
@@ -101,15 +106,15 @@
               </el-table-column>
               <el-table-column min-width="80px" align="right" label="Detalhes">
                 <div slot-scope="{$index, row}" class="d-flex">
-<!--                  <base-button-->
-<!--                    @click.native="handleLike($index, row)"-->
-<!--                    class="like btn-link"-->
-<!--                    type="info"-->
-<!--                    size="sm"-->
-<!--                    icon-->
-<!--                  >-->
-<!--                    <i class="text-white ni ni-like-2"></i>-->
-<!--                  </base-button>-->
+                  <!--                  <base-button-->
+                  <!--                    @click.native="handleLike($index, row)"-->
+                  <!--                    class="like btn-link"-->
+                  <!--                    type="info"-->
+                  <!--                    size="sm"-->
+                  <!--                    icon-->
+                  <!--                  >-->
+                  <!--                    <i class="text-white ni ni-like-2"></i>-->
+                  <!--                  </base-button>-->
                   <base-button
                     @click.native="handleEdit($index, row)"
                     class="edit"
@@ -119,15 +124,15 @@
                   >
                     <i class="text-white fa fa-edit"></i>
                   </base-button>
-<!--                  <base-button-->
-<!--                    @click.native="handleDelete($index, row)"-->
-<!--                    class="remove btn-link"-->
-<!--                    type="danger"-->
-<!--                    size="sm"-->
-<!--                    icon-->
-<!--                  >-->
-<!--                    <i class="text-white ni ni-fat-remove"></i>-->
-<!--                  </base-button>-->
+                  <!--                  <base-button-->
+                  <!--                    @click.native="handleDelete($index, row)"-->
+                  <!--                    class="remove btn-link"-->
+                  <!--                    type="danger"-->
+                  <!--                    size="sm"-->
+                  <!--                    icon-->
+                  <!--                  >-->
+                  <!--                    <i class="text-white ni ni-fat-remove"></i>-->
+                  <!--                  </base-button>-->
                 </div>
               </el-table-column>
             </el-table>
@@ -141,8 +146,8 @@
                 Mostrando {{ from + 1 }} a {{ to }} de {{ total }} documentos
 
                 <span v-if="selectedRows.length">
-                  &nbsp; &nbsp; {{ selectedRows.length }} rows selected
-                </span>
+                    &nbsp; &nbsp; {{ selectedRows.length }} rows selected
+                  </span>
               </p>
 
             </div>
@@ -179,11 +184,13 @@ flatpickr.setDefaults({
 import flatPickr from "vue-flatpickr-component";
 
 import "flatpickr/dist/flatpickr.css";
+import HourGlassSpinner from "@/components/widgets/HourGlassSpinner";
 
 export default {
   mixins: [documentPaginationMixin],
   layout: "DashboardLayout",
   components: {
+    HourGlassSpinner,
     BasePagination,
     flatPickr,
     [Select.name]: Select,
@@ -199,19 +206,19 @@ export default {
         {
           prop: "created_date",
           label: "Criação",
-          minWidth: 80,
+          minWidth: 100,
           sortable: false
         },
         {
           prop: "name",
           label: "Documento",
-          minWidth: 240,
+          minWidth: 220,
           sortable: false
         },
         {
           prop: "interview_name",
           label: "Modelo",
-          minWidth: 240,
+          minWidth: 220,
           sortable: false
         },
         {
@@ -223,7 +230,7 @@ export default {
         {
           prop: "altered_date",
           label: "Alteração",
-          minWidth: 80,
+          minWidth: 100,
           sortable: false
         },
         {
@@ -266,6 +273,7 @@ export default {
     },
     loading() {
       return this.$store.state.documents.loading;
+      // return true
     }
   },
   created() {
@@ -288,11 +296,11 @@ export default {
       });
     },
     handleEdit(index, row) {
-      console.log(index)
-      console.log(row)
+      console.log(index);
+      console.log(row);
       this.$router.push({
         path: "/arquivo/" + row.doc_uuid
-      })
+      });
     },
     handleDelete(index, row) {
       Swal.fire({
@@ -377,9 +385,9 @@ export default {
         });
       }
     },
-    applyFilters() {
+    async applyFilters() {
       this.$store.commit("documents/cleanDocuments");
-      this.$store.dispatch("documents/fetchPaginatedDocuments", {
+      await this.$store.dispatch("documents/fetchPaginatedDocuments", {
         offset: 0,
         statusFilter: this.selectedStatuses,
         schoolFilter: this.selectedSchools,
@@ -391,8 +399,6 @@ export default {
       this.selectedStatuses = [];
       this.selectedSchools = [];
       this.createdDateRange = null;
-      // this.$store.commit("documents/cleanStatusFilter")
-      // this.$store.commit("documents/cleanSchoolFilter")
       this.applyFilters();
     }
   },
