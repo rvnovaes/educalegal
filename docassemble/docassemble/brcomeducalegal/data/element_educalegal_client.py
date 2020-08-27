@@ -131,15 +131,12 @@ class EducaLegalClient:
         final_url = self.api_base_url + "/v2/documents/{}".format(params['doc_uuid'])
 
         try:
-            print("passou aqui 1", "console")
             response = self.session.patch(final_url, data=data, params=params)
         except Exception as e:
-            print("passou aqui 2", "console")
             print("e", "console")
             print(e, "console")
             return None, str(e)
         else:
-            print("passou aqui 3", "console")
             print("response", "console")
             print(response.json(), "console")
             return response.status_code, response.json()
@@ -147,7 +144,7 @@ class EducaLegalClient:
     def patch_document_with_ged_data(
         self,
         doc_uuid,
-        ged_id,
+        pdf_ged_id,
         ged_link,
         ged_uuid,
         status=DocumentStatus.INSERIDO_GED.value,
@@ -155,9 +152,9 @@ class EducaLegalClient:
 
         payload = {
             "doc_uuid": doc_uuid,
-            "ged_id": ged_id,
-            "ged_link": ged_link,
-            "ged_uuid": ged_uuid,
+            "pdf_ged_id": pdf_ged_id,
+            "pdf_ged_link": ged_link,
+            "pdf_ged_uuid": ged_uuid,
             "status": status,
         }
         final_url = self.api_base_url + "/v1/documents/"

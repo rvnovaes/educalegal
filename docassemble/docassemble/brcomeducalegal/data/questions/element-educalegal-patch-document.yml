@@ -9,41 +9,31 @@ code: |
   import json
 
   # private=False - para que o arquivo fique acessivel fora do docassemble
-  # estando logado ou nao
   generated_file.pdf.set_attributes(private=False)
   generated_file.docx.set_attributes(private=False)
 
   data = {
-     "name": custom_file_name + '.pdf',
      "description": interview_description,
      "status": "criado",
      "school": school_id,
+     "document_type": interview_document_type,
      "related_documents": None,
      "document_data": json.dumps(all_variables())
   }
 
   # external=True - acrescenta na url o protocolo and hostname (https://hostname)
   params = {
-    "trigger": "docassemble",
-    "pdf_url": generated_file.pdf.url_for(external=True),
-    "docx_url": generated_file.docx.url_for(external=True),
-    "pdf_filename": custom_file_name + '.pdf',
-    "docx_filename": custom_file_name + '.docx',
-    "tenant_id": tid,
-    "doc_uuid": doc_uuid,
+      "trigger": "docassemble",
+      "pdf_url": generated_file.pdf.url_for(external=True),
+      "pdf_filename": custom_file_name + '.pdf',
+      "docx_url": generated_file.docx.url_for(external=True),
+      "docx_filename": custom_file_name + '.docx',
+      "tenant_id": tid,
+      "doc_uuid": doc_uuid,
   }
-
-  log("params", "console")
-  log(params, "console")
-  log("data", "console")
-  log(data, "console")
 
   # atualiza no educa legal dados do documento gerado
   status_code, el_patch_document = elc.patch_document(data, params)
-  log("status_code", "console")
-  log(status_code, "console")
-  log("el_patch_document", "console")
-  log(el_patch_document, "console")
   if status_code == 200:
     log("Atualizado o documento")
   else:

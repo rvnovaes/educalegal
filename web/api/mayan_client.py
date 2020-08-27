@@ -5,8 +5,6 @@ import time
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
-from util.util import save_file_from_url
-
 
 class MayanClient:
     def __init__(self, api_base_url, token):
@@ -20,34 +18,23 @@ class MayanClient:
         )
         self.session.headers.update(headers)
 
-    def document_create(self, data, ged_params):
-        # # salva o docx no sistema de arquivos
-        # save_file_from_url(ged_params['docx_url'], 'docassemble', ged_params['docx_filename'])
-
-        # salva o pdf no sistema de arquivos
-        pdf_absolute_path, pdf_filename = save_file_from_url(
-            ged_params['pdf_url'], 'docassemble', ged_params['pdf_filename'])
-
+    def document_create(self, data, absolute_path):
         # envia documento para o ged
-        pdf_file = open(pdf_absolute_path, mode="rb")
+        file = open(absolute_path, mode="rb")
         final_url = self.api_base_url + "/api/documents/"
         try:
-            logging.exception("passou_aqui_4")
             response = self.session.post(
-                final_url, data=data, files={"file": pdf_file}
+                final_url, data=data, files={"file": file}
             )
         except Exception as e:
-            logging.exception("passou_aqui_5")
             message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
             logging.exception(message)
             return 0, message, 0
         else:
-            logging.exception("passou_aqui_6")
             if 'id' in response.json():
                 return response.status_code, response.json(), response.json()['id']
             else:
                 return response.status_code, response.json(), 0
-
 
     # Este método foi escrito deste modo para retornar uma mensagem num formato que o Docassemble pode interpretar
     # Não deve ser usado com chamados puros de API, apenas no contexto do Docassemble

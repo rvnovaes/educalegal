@@ -23,15 +23,12 @@ def save_file_from_url(url, path, filename):
 
     absolute_path = os.path.join(fullpath, filename)
 
-    logging.info("url_absolute_path")
-    logging.info(url)
-    logging.info(absolute_path)
-    # baixa o pdf no diretorio criado
+    # baixa o arquivo no diretorio criado
     try:
         urllib.request.urlretrieve(url, absolute_path)
     except Exception as e:
         message = 'Não foi possível salvar o arquivo no sistema de arquivos. Erro: ' + str(e)
         logging.exception(message)
-        return message, ''
+        return message
 
-    return absolute_path, filename
+    return absolute_path

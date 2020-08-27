@@ -89,16 +89,24 @@ class Document(TenantAwareModel):
         max_length=256, blank=True, default="", verbose_name="N° do Envelope"
     )
     status = models.CharField(max_length=256, default="", verbose_name="Status")
-    ged_id = models.CharField(
-        max_length=128, blank=True, default="", verbose_name="ID do Documento no GED"
+    pdf_ged_id = models.CharField(
+        max_length=128, blank=True, default="", verbose_name="ID do PDF do documento no GED"
     )
-    ged_link = models.CharField(max_length=256, blank=True, default="", verbose_name="Link")
-    ged_uuid = models.CharField(
+    pdf_ged_link = models.CharField(max_length=256, blank=True, default="", verbose_name="Link do PDF")
+    pdf_ged_uuid = models.CharField(
         max_length=256,
         blank=True,
         default="",
-        help_text="UUID do documento. UUID = Universally Unique ID.",
-        verbose_name="UUID",
+        help_text="UUID do documento em PDF. UUID = Universally Unique ID.",
+        verbose_name="UUID do PDF",
+    )
+    docx_ged_id = models.CharField(max_length=128, blank=True, verbose_name="ID do Docx do documento no GED")
+    docx_ged_link = models.CharField(max_length=255, blank=True, verbose_name="Link do Docx")
+    docx_ged_uuid = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="UUID do documento em Docx. UUID = Universally Unique ID.",
+        verbose_name="UUID do Docx",
     )
     description = models.TextField(default="", blank=True, verbose_name="Descrição")
     interview = models.ForeignKey(
