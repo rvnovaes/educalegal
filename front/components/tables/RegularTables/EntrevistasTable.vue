@@ -3,7 +3,6 @@
     <div class="border-0 card-header">
       <div class="col-lg-12 col-5 text-right">
           <base-input v-model="searchQuery"
-                      label="Pesquisar"
                       prepend-icon="fas fa-search"
                       placeholder="Pesquise por qualquer termo...">
           </base-input>

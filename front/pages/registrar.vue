@@ -123,16 +123,12 @@ export default {
   methods: {
     async onSubmit() {
       const tokenRes = await this.$axios.post("v2/token/", {
-        username: "rvnovaes@gmail.com",
-        password: "ismenia@568"
+        username: "token.fetcher@educalegal.com.br",
+        password: "Silex@568"
       });
-      console.log(tokenRes);
-
       const config = {
         headers: {Authorization: "Bearer " + tokenRes.data.access}
       };
-
-
       const res = await this.$axios.post("/v2/tenants/", {
         full_name: this.model.fullName,
         tenant_name: this.model.tenantName,
@@ -140,7 +136,6 @@ export default {
         email: this.model.email,
         password: this.model.password,
       }, config);
-      console.log(res);
       if (res.status === 200) {
         await Swal.fire({
           title: `Não foi possível criar sua conta...`,
