@@ -1,9 +1,12 @@
 <template>
-  <base-nav
-    container-classes="container-fluid"
-    class="navbar-top border-bottom navbar-expand"
-    :class="{'bg-primary navbar-dark': type === 'default'}"
-  >
+    <base-nav
+      container-classes="container-fluid"
+      class="navbar-top border-bottom navbar-expand"
+      :class="{'bg-primary navbar-dark': type === 'default'}"
+      :type="navBarType">
+      <div class="text-white font-weight-bold">
+      <slot name="brand">{{ tenant }} <div v-if="navBarType === 'danger'">SUPER USUÁRIO</div></slot>
+      </div>
     <ul class="navbar-nav align-items-center ml-auto ml-md-10">
       <base-dropdown menu-on-right
                      class="nav-item"
@@ -13,7 +16,7 @@
         <a href="#" class="nav-link pr-0" @click.prevent slot="title-container">
                     <div class="media align-items-center">
           <div class="media-body ml-2 d-none d-lg-block">
-            <span class="mb-0 text-sm  font-weight-bold">{{ fullName }} | {{ tenant }}</span>
+            <span class="mb-0 text-sm  font-weight-bold">{{ fullName }}</span>
           </div>
           </div>
         </a>
@@ -80,9 +83,16 @@ export default {
     fullName: function () {
       return this.$auth.user.first_name + " " + this.$auth.user.last_name;
     },
-
     tenant: function () {
       return this.$auth.user.tenant_name;
+    },
+    navBarType: function () {
+      if (this.$auth.user.is_superuser){
+        return "danger"
+      }
+      else {
+        return "primary"
+      }
     }
 
   },
@@ -114,7 +124,7 @@ export default {
       this.$auth.logout();
       // Certifique-se que sai da aplicacao. TODO: Pq o redirect do nuxt auth não funciona?
       this.$router.push({path: "/"});
-    }
+    },
   }
 };
 </script>
