@@ -124,7 +124,7 @@ module.exports = {
       local: {
         endpoints: {
           login: {url: "/v2/token/", method: "post", propertyName: "access", altProperty: "refresh"},
-          user: {url: "/v2/user/", method: "get", propertyName: false},
+          user: {url: "/v2/users/", method: "get", propertyName: false},
           logout: false,
         }
       }
@@ -138,7 +138,7 @@ module.exports = {
   build: {
     transpile: [
       "@nuxtjs/auth",
-      "vee-validate/dist/rules" // <-- TODO Para que serve isso?
+      "vee-validate/dist/rules"
     ],
     /*
     ** You can extend webpack config here

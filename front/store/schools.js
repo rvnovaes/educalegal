@@ -66,20 +66,20 @@ export const getters = {
 
 export const actions = {
   async fetchAllSchools({commit}) {
-    const res = await this.$axios.get("/v2/tenant/schools");
+    const res = await this.$axios.get("/v2/schools");
     if (res.status === 200) {
       commit("setSchools", res.data.results);
     }
   },
   async deleteSchool({commit}, school) {
-    const res = await this.$axios.delete(`/v2/tenant/schools/${school.id}`);
+    const res = await this.$axios.delete(`/v2/schools/${school.id}`);
     if (res.status === 204) {
       console.log(res);
       commit("deleteSchool", school);
     }
   },
   async createSchool({commit}, school) {
-    const res = await this.$axios.post(`/v2/tenant/schools/`, school);
+    const res = await this.$axios.post(`/v2/schools/`, school);
     if (res.status === 200) {
       console.log(res);
       commit("addSchool", school);
