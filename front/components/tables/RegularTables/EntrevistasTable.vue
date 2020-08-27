@@ -2,15 +2,18 @@
   <div class="card">
     <div class="border-0 card-header">
       <div class="col-lg-12 col-5 text-right">
-        <base-button size="md" type="success" @click="handleNew">
-          <i class="fa fa-plus-circle"></i> Nova Escola
-        </base-button>
+          <base-input v-model="searchQuery"
+                      label="Pesquisar"
+                      prepend-icon="fas fa-search"
+                      placeholder="Pesquise por qualquer termo...">
+          </base-input>
+
       </div>
     </div>
 
     <el-table class="table-responsive table-flush"
               header-row-class-name="thead-light"
-              :data="schools">
+              :data="queriedData">
       <el-table-column
         v-for="column in tableColumns"
         :key="column.label"
@@ -20,21 +23,21 @@
           <base-button
             @click.native="handleEdit($index, row)"
             class="edit"
-            type="primary"
+            type="success"
             size="sm"
             icon
           >
-            <i class="text-white fa fa-edit"></i>
+            <i class="text-white fa fa-plus-circle"></i> Novo Documento
           </base-button>
-          <base-button
-            @click.native="handleDelete($index, row)"
-            class="remove btn-link"
-            type="danger"
-            size="sm"
-            icon
-          >
-            <i class="text-white fa fa-trash"></i>
-          </base-button>
+<!--          <base-button-->
+<!--            @click.native="handleDelete($index, row)"-->
+<!--            class="remove btn-link"-->
+<!--            type="danger"-->
+<!--            size="sm"-->
+<!--            icon-->
+<!--          >-->
+<!--            <i class="text-white fa fa-trash"></i>-->
+<!--          </base-button>-->
         </div>
       </el-table-column>
     </el-table>
@@ -43,69 +46,60 @@
 <script>
 import Swal from "sweetalert2";
 import {Table, TableColumn} from "element-ui";
+import interviewSearchMixin from "@/components/tables/PaginatedTables/interviewSearchMixin";
+import Fuse from "fuse.js";
 
 export default {
-  name: "escolas-table",
+  name: "entrevistas-table",
+  mixins: [interviewSearchMixin],
   components: {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
   },
   data() {
     return {
+      propsToSearch: ['name', 'description'],
       tableColumns: [
         {
           prop: "name",
           label: "Nome",
-          minWidth: 140,
-          sortable: true
+          minWidth: 240,
+          sortable: false
         },
         {
-          prop: "phone",
-          label: "Telefone",
+          prop: "description",
+          label: "Descrição",
+          minWidth: 220,
+          sortable: false
+        },
+        {
+          prop: "version",
+          label: "Versão",
+          minWidth: 80,
+          sortable: false
+        },
+        {
+          prop: "date_available",
+          label: "Disponibilização",
           minWidth: 100,
-          sortable: true
-        },
-        {
-          prop: "email",
-          label: "E-mail",
-          minWidth: 220,
-          sortable: true
-        },
-        {
-          prop: "site",
-          label: "Site",
-          minWidth: 220,
-          sortable: true
-        },
-        {
-          prop: "city",
-          label: "Cidade",
-          minWidth: 120,
-          sortable: true
-        },
-        {
-          prop: "state",
-          label: "UF",
-          minWidth: 60,
-          sortable: true
-        },
+          sortable: false
+        }
       ],
-
-      currentPage: 1
     };
   },
 
   created() {
-    // Como as escolas sao carregadas no VUEX a partir do painel, so e necessario fazer o fetch se a lista de escolas
+    // Como as entrevistas sao carregadas no VUEX a partir do painel, so e necessario fazer o fetch se a lista de escolas
     // estiver vazia, por exemplo, se for feito um refresh da pagina
-    if (this.schools.length === 0) {
-      this.$store.dispatch("schools/fetchAllSchools");
+    if (this.tableData.length === 0) {
+      this.$store.dispatch("interviews/fetchAllInterviews");
     }
   },
+
   computed: {
-    schools() {
-      return this.$store.state.schools.schools;
-    },
+    tableData() {
+      return this.$store.state.interviews.interviews;
+    }
   },
   methods: {
     handleNew() {

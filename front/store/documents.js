@@ -4,30 +4,27 @@ export const state = () => ({
   documents: [],
   createdDateOrdering: null,
   count: 0,
-  loading: false,
+  loading: null,
   statusFilter: [],
   schoolFilter: []
 });
 
 export const mutations = {
   appendDocuments(state, documents) {
-    console.log("appendDocuments")
+    // console.log("appendDocuments")
     state.documents = [...state.documents, ...documents];
   },
   setDocumentCount(state, count) {
-    console.log("setDocumentCount")
+    // console.log("setDocumentCount")
     state.count = count;
   },
   cleanDocuments(state) {
     state.documents = [];
     state.count = 0;
   },
-  loadingFalse(state) {
-    state.loading = false
+  toggleLoading(state, value) {
+    state.loading = value
   },
-  loadingTrue(state){
-    state.loading = true
-  }
 };
 
 export const getters = {
@@ -45,7 +42,7 @@ export const getters = {
 
 export const actions = {
   async fetchPaginatedDocuments({commit}, payload) {
-    commit("loadingTrue");
+    commit("toggleLoading", true);
     const res = await this.$axios.get("/v2/documents/", {
       params:
         {
@@ -53,6 +50,7 @@ export const actions = {
           offset: payload.offset,
           status: payload.statusFilter,
           school: payload.schoolFilter,
+          interview: payload.interviewFilter,
           orderByCreatedDate: payload.orderByCreatedDate,
           createdDateRange: payload.createdDateRange
         }
@@ -68,7 +66,7 @@ export const actions = {
     if (res.status === 200) {
       commit("appendDocuments", documents);
       commit("setDocumentCount", res.data.count);
-      commit("loadingFalse");
+      commit("toggleLoading", false);
     }
 
   },

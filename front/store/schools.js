@@ -85,12 +85,4 @@ export const actions = {
       commit("addSchool", school);
     }
   }
-
-  // fetchSchool({commit}, id) {
-  //   return this.$axios.get(`http://localhost:8001/v2/tenant/schools/${id}`).then(res => {
-  //     if (res.status === 200) {
-  //       commit('setSchool', res.data)
-  //     }
-  //   })
-  // },
 };

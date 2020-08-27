@@ -15,6 +15,7 @@ from .views_v2 import (
     DocumentCountViewSet,
     TenantSchoolViewSet,
     TenantSchoolUnitViewSet,
+    TenantInterviewViewSet,
     TenantPlanViewSet,
     UserView
 )
@@ -49,7 +50,7 @@ urlpatterns = [
     path("tenant/schools/<int:spk>/school_units", TenantSchoolUnitViewSet.as_view({"post": "create", "get": "list"})),
     path("tenant/schools/<int:spk>/school_units/<int:pk>", TenantSchoolUnitViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
 
-    # path("tenant/interviews/", TenantInterviewViewSet.as_view({"post": "create", "get": "list"})),
+    path("tenant/interviews/", TenantInterviewViewSet.as_view({"get": "list"})),
     # path("tenant/interviews/<int:pk>", TenantInterviewViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     path("tenant/plan/<int:pk>", TenantPlanViewSet.as_view({"get": "retrieve"})),
     # path("tenant/ged_data/", TenantGedDataViewSet.as_view({"post": "create", "get": "list"})),

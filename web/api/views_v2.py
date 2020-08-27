@@ -20,7 +20,7 @@ from rest_framework.exceptions import (
     APIException,
 )
 from rest_framework import status
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.pagination import LimitOffsetPagination
 from validator_collection import checkers
 
 from document.models import *
@@ -150,6 +150,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         queryset = self.queryset.filter(tenant_id=tenant_id)
         status_filter_param = request.query_params.getlist("status[]")
         school_filter_param = request.query_params.getlist("school[]")
+        interview_filter_param = request.query_params.getlist("interview[]")
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
         if status_filter_param:
@@ -163,6 +164,12 @@ class DocumentViewSet(viewsets.ModelViewSet):
             if len(school_filter_param) > 1:
                 for id in school_filter_param[1:]:
                     conditions |= Q(school=id)
+            queryset = queryset.filter(conditions)
+        if interview_filter_param:
+            conditions = Q(interview=interview_filter_param[0])
+            if len(interview_filter_param) > 1:
+                for id in interview_filter_param[1:]:
+                    conditions |= Q(interview=id)
             queryset = queryset.filter(conditions)
         if created_date_range:
             # O intevalo de datas vem como "01/08/2020" ou "01/08/2020 até 08/08/2020"
@@ -501,10 +508,17 @@ class TenantSchoolUnitViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class TenantInterviewViewSet(TenantAwareAPIMixin, viewsets.ModelViewSet):
+class TenantInterviewViewSet(viewsets.ModelViewSet):
 
-    queryset = Interview.objects.all()
+    tenant = Tenant.objects.all()
     serializer_class = InterviewSerializer
+
+    def get_queryset(self):
+        tenant = self.request.user.tenant
+        queryset = tenant.interview_set.all()
+        queryset = queryset.order_by("name")
+        return queryset
+
 
 
 class TenantPlanViewSet(viewsets.ModelViewSet):

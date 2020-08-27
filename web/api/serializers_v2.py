@@ -19,7 +19,20 @@ class InterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
         ref_name = "Interview v2"
-        fields = "__all__"
+        fields = ["id",
+                  "name",
+                  "version",
+                  "date_available",
+                  "description",
+                  "language",
+                  "custom_file_name",
+                  "base_url",
+                  "is_generic",
+                  "is_freemium",
+                  "use_bulk_interview",
+                  "yaml_name",
+                  "document_type",
+                  "interview_server_config"]
 
 
 class PlanSerializer(serializers.ModelSerializer):
@@ -66,6 +79,7 @@ class SignerSerializer(serializers.ModelSerializer):
         model = Signer
         ref_name = "Signer V2"
         fields = "__all__"
+
 
 class DocumentDetailSerializer(serializers.ModelSerializer):
     interview_name = serializers.SerializerMethodField()

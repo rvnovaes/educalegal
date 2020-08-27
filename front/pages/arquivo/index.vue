@@ -19,79 +19,110 @@
       <div>
         <card class="no-border-card" body-classes="px-0 pb-1" footer-classes="pb-2">
           <div>
-            <div class="filters col-12 d-flex justify-content-center justify-content-sm-between flex-wrap"
+            <div class="col-12 d-flex  justify-content-sm-between flex-wrap"
             >
 
-              <base-input label="Criação"
-                          addon-left-icon="ni ni-calendar-grid-58">
-                <flat-pickr slot-scope="{focus, blur}"
-                            @on-open="focus"
-                            @on-close="blur"
-                            :config="{allowInput: true, mode: 'range'}"
-                            class="form-control datepicker"
-                            v-model="createdDateRange">
-                </flat-pickr>
-              </base-input>
+              <div class="col2">
 
-
-              <base-input label="Escola">
-                <el-select multiple
-                           class="select-primary"
-                           placeholder="Escola"
-                           v-model="selectedSchools">
-                  <el-option
-                    class="select-primary"
-                    v-for="option in schools"
-                    :value="option.value"
-                    :label="option.label"
-                    :key="option.label">
-                  </el-option>
-                </el-select>
-              </base-input>
-
-
-              <base-input label="Status">
-                <el-select multiple
-                           class="select-primary"
-                           placeholder="Status"
-                           v-model="selectedStatuses">
-                  <el-option
-                    class="select-primary"
-                    v-for="option in selects.statuses"
-                    :value="option.value"
-                    :label="option.label"
-                    :key="option.label">
-                  </el-option>
-                </el-select>
-              </base-input>
-
-              <base-input label="Paginação">
-                <el-select
-                  class="select-primary pagination-select"
-                  v-model="pagination.perPage"
-                  placeholder="Per page"
-                >
-                  <el-option
-                    class="select-primary"
-                    v-for="item in pagination.perPageOptions"
-                    :key="item"
-                    :label="item"
-                    :value="item"
-                  >
-                  </el-option>
-                </el-select>
-              </base-input>
-
-              <div id="filter-buttons">
-                <base-button @click="applyFilters" type="primary">
-                  <i class="fa fa-search"></i> Buscar
-                </base-button>
-                <base-button @click="cleanFilters" type="warning">
-                  <i class="fa fa-sync"></i> Limpar
-                </base-button>
+                <base-input label="Data de criação"
+                            addon-left-icon="ni ni-calendar-grid-58">
+                  <flat-pickr slot-scope="{focus, blur}"
+                              @on-open="focus"
+                              @on-close="blur"
+                              :config="{allowInput: true, mode: 'range'}"
+                              class="form-control datepicker"
+                              v-model="createdDateRange">
+                  </flat-pickr>
+                </base-input>
               </div>
-            </div>
+              <div class="col-4">
+                <base-input label="Modelo de Documento">
+                  <el-select multiple
+                             class="select-primary"
+                             placeholder="Modelo"
+                             v-model="selectedInterviews">
+                    <el-option
+                      class="select-primary"
+                      v-for="option in interviews"
+                      :value="option.value"
+                      :label="option.label"
+                      :key="option.label">
+                    </el-option>
+                  </el-select>
+                </base-input>
+              </div>
 
+              <div class="col-2">
+                <base-input label="Escola">
+                  <el-select multiple
+                             class="select-primary"
+                             placeholder="Escola"
+                             v-model="selectedSchools">
+                    <el-option
+                      class="select-primary"
+                      v-for="option in schools"
+                      :value="option.value"
+                      :label="option.label"
+                      :key="option.label">
+                    </el-option>
+                  </el-select>
+                </base-input>
+
+              </div>
+
+              <div class="col-2">
+                <base-input label="Status">
+                  <el-select multiple
+                             class="select-primary"
+                             placeholder="Status"
+                             v-model="selectedStatuses">
+                    <el-option
+                      class="select-primary"
+                      v-for="option in selects.statuses"
+                      :value="option.value"
+                      :label="option.label"
+                      :key="option.label">
+                    </el-option>
+                  </el-select>
+                </base-input>
+              </div>
+
+              <div class="col-2">
+                <base-input label="Paginação">
+                  <el-select
+                    class="select-primary pagination-select"
+                    v-model="pagination.perPage"
+                    placeholder="Per page"
+                  >
+                    <el-option
+                      class="select-primary"
+                      v-for="item in pagination.perPageOptions"
+                      :key="item"
+                      :label="item"
+                      :value="item"
+                    >
+                    </el-option>
+                  </el-select>
+                </base-input>
+              </div>
+
+
+              </div>
+
+            <div class="col-12 d-flex justify-content-end  flex-wrap filter-buttons "
+            >
+
+                <div id="filter-buttons">
+                  <base-button @click="applyFilters" type="primary">
+                    <i class="fa fa-search"></i> Buscar
+                  </base-button>
+                  <base-button @click="cleanFilters" type="warning">
+                    <i class="fa fa-sync"></i> Limpar
+                  </base-button>
+                </div>
+
+
+            </div>
             <el-table :data="paginatedData"
                       row-key="id"
                       header-row-class-name="thead-light"
@@ -218,7 +249,7 @@ export default {
         {
           prop: "interview_name",
           label: "Modelo",
-          minWidth: 220,
+          minWidth: 240,
           sortable: false
         },
         {
@@ -228,15 +259,15 @@ export default {
           sortable: false
         },
         {
-          prop: "altered_date",
-          label: "Alteração",
-          minWidth: 100,
-          sortable: false
-        },
-        {
           prop: "status",
           label: "Status",
           minWidth: 120,
+          sortable: false
+        },
+        {
+          prop: "altered_date",
+          label: "Alteração",
+          minWidth: 100,
           sortable: false
         },
       ],
@@ -259,9 +290,10 @@ export default {
       },
       selectedRows: [],
       orderByCreatedDate: "descending",
-      selectedStatuses: [],
-      selectedSchools: [],
       createdDateRange: null,
+      selectedStatuses: [],
+      selectedInterviews: [],
+      selectedSchools: [],
     };
   },
   computed: {
@@ -271,20 +303,36 @@ export default {
     schools() {
       return this.$store.state.schools.schools.map(s => ({value: s.id, label: s.name}));
     },
+    interviews() {
+      return this.$store.state.interviews.interviews.map(interview => ({value: interview.id, label: interview.name}));
+    },
     loading() {
       return this.$store.state.documents.loading;
       // return true
     }
   },
   created() {
-    this.$store.dispatch("schools/fetchAllSchools");
-    this.$store.dispatch("documents/fetchPaginatedDocuments", {
-      offset: 0,
-      statusFilter: [],
-      schoolFilter: [],
-      orderByCreatedDate: "descending",
-      createdDateRange: null,
-    });
+    // Como as escolas sao carregadas no VUEX a partir do painel, so e necessario fazer o fetch se a lista de escolas
+    // estiver vazia, por exemplo, se for feito um refresh da pagina. Esse componete precisa das escolas e das entrevistas
+    // para os filtros respectivos. Os primeiros 50 documentos tambem ja sao carregados no painel e aqui apenas em caso
+    // de refresh
+    if (this.schools.length === 0) {
+      this.$store.dispatch("schools/fetchAllSchools");
+    }
+    if (this.interviews.length === 0) {
+      this.$store.dispatch("interviews/fetchAllInterviews");
+    }
+    if (this.tableData.length === 0) {
+      this.$store.dispatch("documents/fetchPaginatedDocuments", {
+        offset: 0,
+        statusFilter: [],
+        schoolFilter: [],
+        interviewFilter: [],
+        orderByCreatedDate: "descending",
+        createdDateRange: null,
+      });
+    }
+    ;
   },
   methods: {
     handleLike(index, row) {
@@ -380,6 +428,7 @@ export default {
           offset: onStore,
           statusFilter: this.selectedStatuses,
           schoolFilter: this.selectedSchools,
+          interviewFilter: this.selectedInterviews,
           orderByCreatedDate: this.orderByCreatedDate,
           createdDateRange: this.createdDateRange
         });
@@ -391,11 +440,14 @@ export default {
         offset: 0,
         statusFilter: this.selectedStatuses,
         schoolFilter: this.selectedSchools,
+        interviewFilter: this.selectedInterviews,
         orderByCreatedDate: this.orderByCreatedDate,
         createdDateRange: this.createdDateRange
       });
     },
     cleanFilters() {
+      this.createdDateRange = null;
+      this.selectedInterviews = [];
       this.selectedStatuses = [];
       this.selectedSchools = [];
       this.createdDateRange = null;
@@ -411,7 +463,8 @@ export default {
 }
 
 #filter-buttons {
-  margin-top: 30px;
+  margin-bottom: 30px;
+  margin-right: 15px;
 }
 
 .el-tag.el-tag--info.el-tag--small.el-tag--light {

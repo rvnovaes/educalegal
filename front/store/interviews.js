@@ -1,14 +1,15 @@
-import moment from 'moment';
-
 export const state = () => ({
   interviews: [],
+  loading: null,
 });
 
 export const mutations = {
-  appendDocuments(state, interviews) {
-    state.interviews = [...state.interviews, ...interviews];
+  setInterviews(state, interviews) {
+    state.interviews = interviews;
   },
-
+  toggleLoading(state, value) {
+    state.loading = value
+  },
 };
 
 export const getters = {
@@ -19,30 +20,13 @@ export const getters = {
 };
 
 export const actions = {
-  async fetchPaginatedDocuments({commit}, payload) {
-    const res = await this.$axios.get("/v2/documents/", {
-      params:
-        {
-          limit: 50,
-          offset: payload.offset,
-          status: payload.statusFilter,
-          school: payload.schoolFilter,
-          orderByCreatedDate: payload.orderByCreatedDate,
-          createdDateRange: payload.createdDateRange
-        }
-    });
-    // console.log("Depois da requisicao")
-    // console.log(res.data.results)
-    let documents = res.data.results
-    documents.forEach(function(doc, index) {
-      this[index].created_date = moment(doc.created_date).format('DD/MM/YYYY')
-      this[index].altered_date = moment(doc.altered_date).format('DD/MM/YYYY')
-    }, documents); // use arr as this
-    // console.log(documents)
+  async fetchAllInterviews({commit}) {
+    commit("toggleLoading", true);
+    const res = await this.$axios.get("/v2/tenant/interviews/");
+    let interviews = res.data.results
     if (res.status === 200) {
-      commit("appendDocuments", documents);
-      commit("setDocumentCount", res.data.count);
-      commit("loadingFalse");
+      commit("setInterviews", interviews);
+      commit("toggleLoading", false);
     }
   },
 };

@@ -19,13 +19,13 @@
           }">
         </sidebar-item>
 
-        <sidebar-item
-          :link="{
-            name: 'Geração em Lote',
-            icon: 'ni ni-ungroup text-orange',
-            path: '/lote'
-          }">
-        </sidebar-item>
+<!--        <sidebar-item-->
+<!--          :link="{-->
+<!--            name: 'Geração em Lote',-->
+<!--            icon: 'ni ni-ungroup text-orange',-->
+<!--            path: '/lote'-->
+<!--          }">-->
+<!--        </sidebar-item>-->
 
         <sidebar-item
           :link="{
@@ -43,13 +43,13 @@
           }">
         </sidebar-item>
 
-        <sidebar-item
-          :link="{
-            name: 'Atendimento',
-            icon: 'fa fa-user-tie text-red',
-            path: '/atendimento'
-          }">
-        </sidebar-item>
+<!--        <sidebar-item-->
+<!--          :link="{-->
+<!--            name: 'Atendimento',-->
+<!--            icon: 'fa fa-user-tie text-red',-->
+<!--            path: '/atendimento'-->
+<!--          }">-->
+<!--        </sidebar-item>-->
       </template>
 
       <template slot="links-after">
@@ -58,18 +58,19 @@
 
         <ul class="navbar-nav mb-md-3">
           <li class="nav-item">
-            <a class="nav-link" href="https://demos.creative-tim.com/nuxt-argon-dashboard-pro/documentation"
+            <a class="nav-link" href="https://atendimento.atlassian.net/servicedesk/customer/portal/2"
                target="_blank" rel="noopener">
-              <i class="ni ni-bulb-61"></i>
-              <span class="nav-link-text">Base de Conhecimento</span>
+<!--              <i class="ni ni-bulb-61"></i>-->
+              <i class="fa fa-user-tie text-red"></i>
+              <span class="nav-link-text">Atendimento Jurídico</span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link"
                href="https://www.educalegal.com.br"
                target="_blank" rel="noopener">
-              <i class="ni ni-chat-round"></i>
-              <span class="nav-link-text">Educa Legal</span>
+              <i class="ni ni-chat-round text-warning"></i>
+              <span class="nav-link-text">Site Educa Legal</span>
             </a>
           </li>
         </ul>
