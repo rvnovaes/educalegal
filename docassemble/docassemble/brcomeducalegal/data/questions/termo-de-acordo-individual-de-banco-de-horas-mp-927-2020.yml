@@ -9,13 +9,13 @@ include:
   - element-signature.yml
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
-  - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
   - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
+  - .element_docusign_client
 ---
 sections:
   - Empregado
@@ -42,9 +42,7 @@ code: |
     if plan_use_esignature:
       valid_workers_table
     generated_file
-    el_document_patched_with_docassemble_data
-    if plan_use_ged:
-      el_document_patched_with_ged_data
+    el_patch_document
     document_ready_screen
   all_done
 ---

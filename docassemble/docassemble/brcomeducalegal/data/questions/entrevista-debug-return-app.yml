@@ -7,7 +7,7 @@ include:
   - element-roadmap.yml
   - element-data-list.yml
   - element-generate-file.yml
-  - element-document-ready-app.yml
+  - element-document-ready.yml
 ---
 sections:
   - Escola
@@ -30,7 +30,7 @@ code: |
     nomeAluno
     generated_file
     el_patch_document
-    document_ready_screen_app
+    document_ready_screen
 ---
 progress: 10
 section: Aluno(a)

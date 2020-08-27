@@ -1,15 +1,10 @@
-import json
-
-# from docassemble.base.util import log
 from enum import Enum
 from requests import Session
 
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
-# from docassemble.base.util import (
-#     log,
-# )
+# from docassemble.base.util import log
 
 
 class DocumentStatus(Enum):
@@ -99,34 +94,6 @@ class EducaLegalClient:
             school_units_dict[school["name"]] = school["school_units"]
         return school_names_list, school_units_dict, school_data_dict
 
-    def create_document(
-        self,
-        name,
-        status,
-        description,
-        tenant,
-        interview,
-        school=None,
-        related_documents=None,
-        document_data=None,
-    ):
-        payload = {
-            "name": name,
-            "status": status,
-            "description": description,
-            "tenant": tenant,
-            "school": school,
-            "interview": interview,
-            "related_documents": related_documents,
-            "document_data": json.dumps(document_data),
-        }
-
-        print("elc document_data", "console")
-        print(document_data, "console")
-        final_url = self.api_base_url + "/v1/documents/"
-        response = self.session.post(final_url, data=payload)
-        return response.json()
-
     def patch_document(self, data, params):
         final_url = self.api_base_url + "/v2/documents/{}".format(params['doc_uuid'])
 
@@ -140,26 +107,6 @@ class EducaLegalClient:
             print("response", "console")
             print(response.json(), "console")
             return response.status_code, response.json()
-
-    def patch_document_with_ged_data(
-        self,
-        doc_uuid,
-        pdf_ged_id,
-        ged_link,
-        ged_uuid,
-        status=DocumentStatus.INSERIDO_GED.value,
-    ):
-
-        payload = {
-            "doc_uuid": doc_uuid,
-            "pdf_ged_id": pdf_ged_id,
-            "pdf_ged_link": ged_link,
-            "pdf_ged_uuid": ged_uuid,
-            "status": status,
-        }
-        final_url = self.api_base_url + "/v1/documents/"
-        response = self.session.patch(final_url, data=payload)
-        return response.json()
 
     def patch_document_with_email_data(
         self,

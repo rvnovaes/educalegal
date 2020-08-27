@@ -123,6 +123,7 @@ class Document(TenantAwareModel):
         related_name="documents",
     )
     document_data = JSONField(null=True, verbose_name="Dados do Documento")
+    recipients = JSONField(blank=True, default="", verbose_name="Destinatários do e-mail/assinatura eletrônica")
 
     bulk_generation = models.ForeignKey(
         BulkDocumentGeneration, null=True, on_delete=models.CASCADE, verbose_name="Criação em Lote"

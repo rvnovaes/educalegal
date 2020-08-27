@@ -5,14 +5,14 @@ import pandas as pd
 from mongoengine.errors import ValidationError
 from celery import chain
 
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.messages import get_messages
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableView
-from django.contrib import messages
-from django.contrib.messages import get_messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse
 from django.utils.safestring import mark_safe
 from django.views import View
@@ -656,3 +656,48 @@ def query_documents_by_args(pk=None, **kwargs):
         'draw': draw,
     }
     return data
+
+
+@login_required
+def send_email(request, **kwargs):
+    try:
+        document = Document.objects.get(doc_uuid=kwargs['doc_uuid'])
+    except Document.DoesNotExist:
+        message = 'Não foi encontrado o documento com o uuid = {}'.format(kwargs['doc_uuid'])
+        messages.error(request, message)
+        logger.error(message)
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        messages.error(request, message)
+        logger.error(message)
+
+    # document
+    # to_emails = recipients
+    # subject = email_subject
+    # html_content = email_html_content
+    # category = email_category
+    # file_path = generated_file.pdf.path()
+    # file_name = custom_file_name + '.pdf'
+    # if el_log_to_console:
+    #     log("Enviando e-mail para {to_emails}".format(to_emails=to_emails), "console")
+    # log("Enviando e-mail para {to_emails}".format(to_emails=to_emails))
+    # response_status_code, response_message = send_email_sendgrid(to_emails, subject, html_content, category, file_path,
+    #                                                              file_name)
+    # if el_log_to_console:
+    #     log("Sendgrid response status code: " + str(response_status_code), "console")
+    #     log("Sendgrid response message: " + response_message, "console")
+    # log("Sendgrid response status code: " + str(response_status_code))
+    # log("Sendgrid response message: " + response_message)
+    # if response_status_code == 202:
+    #     cd_send_email = True
+    #     cd_status = 'enviado por e-mail'
+    #     el_document_patched_with_email_data = elc.patch_document_with_email_data(doc_uuid, cd_send_email, cd_status)
+    #     email_success
+    # else:
+    #     if el_log_to_console:
+    #         log(str(response_status_code) + " " + response_message, "console")
+    #     log(str(response_status_code) + " " + response_message)
+    #     email_failure
+    #
+    #
+    # return HttpResponse(json.dumps(payload), content_type="application/json")

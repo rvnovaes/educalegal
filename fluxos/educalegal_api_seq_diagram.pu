@@ -52,7 +52,7 @@ deactivate Docassemble
 User -> Docassemble: Fills up the interview
 activate Docassemble
 
-Docassemble -> EducaLegal: POST elc.patch_document_with_docassemble_data(doc_uuid, name, status, description, tenant, school, interview, related_documents, document_data)
+Docassemble -> EducaLegal: POST elc.patch_document(data, params)
 activate EducaLegal
 
 
