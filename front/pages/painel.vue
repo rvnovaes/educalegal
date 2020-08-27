@@ -90,7 +90,6 @@
     },
     created() {
       this.$store.dispatch("interviews/fetchAllInterviews");
-      this.$store.dispatch("schools/fetchAllSchools");
       this.$store.dispatch("documents/fetchPaginatedDocuments", {
         offset: 0,
         statusFilter: [],

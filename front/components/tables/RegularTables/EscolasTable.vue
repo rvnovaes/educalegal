@@ -96,11 +96,7 @@ export default {
   },
 
   created() {
-    // Como as escolas sao carregadas no VUEX a partir do painel, so e necessario fazer o fetch se a lista de escolas
-    // estiver vazia, por exemplo, se for feito um refresh da pagina
-    if (this.schools.length === 0) {
       this.$store.dispatch("schools/fetchAllSchools");
-    }
   },
   computed: {
     schools() {
