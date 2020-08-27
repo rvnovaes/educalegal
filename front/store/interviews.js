@@ -22,7 +22,7 @@ export const getters = {
 export const actions = {
   async fetchAllInterviews({commit}) {
     commit("toggleLoading", true);
-    const res = await this.$axios.get("/v2/tenant/interviews/");
+    const res = await this.$axios.get("/v2/interviews/");
     let interviews = res.data.results
     if (res.status === 200) {
       commit("setInterviews", interviews);

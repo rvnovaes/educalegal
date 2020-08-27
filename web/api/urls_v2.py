@@ -13,10 +13,9 @@ from .views_v2 import (
     DocumentViewSet,
     DocumentDownloadViewSet,
     DocumentCountViewSet,
-    TenantSchoolViewSet,
-    TenantSchoolUnitViewSet,
-    TenantInterviewViewSet,
-    TenantPlanViewSet,
+    SchoolViewSet,
+    SchoolUnitViewSet,
+
     UserView
 )
 
@@ -36,7 +35,7 @@ urlpatterns = [
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
     path("plans/", PlanViewSet.as_view({"get": "list"})),
     path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
-    path("tenants/", TenantViewSet.as_view({"get": "list"})),
+    path("tenants/", TenantViewSet.as_view({"get": "list", "post": "create"})),
     path("tenants/<int:pk>", TenantViewSet.as_view({"get": "retrieve"})),
     # Documents Views
     path("documents/", DocumentViewSet.as_view({"post": "create", "get": "list"})),
@@ -44,20 +43,19 @@ urlpatterns = [
     path("documents/<str:identifier>/download", DocumentDownloadViewSet.as_view({"get": "retrieve", "delete": "destroy"})),
     path("documents/count", DocumentCountViewSet.as_view({"get": "list"})),
     # Front end views
-    path("tenant/schools/", TenantSchoolViewSet.as_view({"post": "create", "get": "list"})),
-    path("tenant/schools/<int:pk>", TenantSchoolViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+    path("schools/", SchoolViewSet.as_view({"post": "create", "get": "list"})),
+    path("schools/<int:pk>", SchoolViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
 
-    path("tenant/schools/<int:spk>/school_units", TenantSchoolUnitViewSet.as_view({"post": "create", "get": "list"})),
-    path("tenant/schools/<int:spk>/school_units/<int:pk>", TenantSchoolUnitViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+    path("schools/<int:spk>/school_units", SchoolUnitViewSet.as_view({"post": "create", "get": "list"})),
+    path("schools/<int:spk>/school_units/<int:pk>", SchoolUnitViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
 
-    path("tenant/interviews/", TenantInterviewViewSet.as_view({"get": "list"})),
     # path("tenant/interviews/<int:pk>", TenantInterviewViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
-    path("tenant/plan/<int:pk>", TenantPlanViewSet.as_view({"get": "retrieve"})),
+    # path("tenants/plan/<int:pk>", TenantPlanViewSet.as_view({"get": "retrieve"})),
     # path("tenant/ged_data/", TenantGedDataViewSet.as_view({"post": "create", "get": "list"})),
     # path("tenant/ged_data/<int:pk>", TenantGedDataViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     # Other
     path("clicksign/webhook", webhook_listener),
-    path("user/", UserView.as_view(), name="users"),
+    path("users/", UserView.as_view(), name="users"),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
 

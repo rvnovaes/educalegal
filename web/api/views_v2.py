@@ -4,14 +4,14 @@ from datetime import datetime
 from datetime import timedelta
 import pytz
 
-
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework import viewsets
 from rest_framework.exceptions import (
     ValidationError,
@@ -21,12 +21,14 @@ from rest_framework.exceptions import (
 )
 from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.decorators import api_view, renderer_classes
 from validator_collection import checkers
 
 from document.models import *
 from interview.models import *
 from school.models import *
 from tenant.models import *
+from users.models import CustomUser
 from .mayan_helpers import MayanClient
 
 from .serializers_v2 import (
@@ -46,58 +48,108 @@ logger = logging.getLogger(__name__)
 UUID = "([a-z]|[0-9]){8}-([a-z]|[0-9]){4}-([a-z]|[0-9]){4}-([a-z]|[0-9]){4}-([a-z]|[0-9]){12}"
 
 
-class TenantAwareAPIMixin:
-    """
-    Todas os ViewSets que restringem seu retorno às entidades pertencentes a um tenant apenas devem ser compostos
-    por este mixin. Ele filtra o queryset a partir do Tenant do Usuário que faz a requisição. O usuário da requisição
-    é o dono to token nela usado.
-    """
-
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            # queryset just for schema generation metadata
-            # https://github.com/axnsan12/drf-yasg/issues/333
-            return Tenant.objects.none()
-        tenant = self.request.user.tenant
-        return self.queryset.filter(tenant=tenant)
-
-
-# Administrative Views - Not filtered by Tenant - Requires Administrative Rigths (is_staff = True )#####################
-
 class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Retorna a lista de todas as entrevistas ou os detalhes de uma entrevista.
 
-    Disponível apenas para administradores.
     """
-
-    queryset = Interview.objects.all()
     serializer_class = InterviewSerializer
-    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_superuser:
+            tenant = self.request.user.tenant
+            queryset = tenant.interview_set.all()
+        else:
+            queryset = Interview.objects.all()
+        queryset = queryset.order_by("name")
+        return queryset
 
 
 class PlanViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Retorna dados dos planos disponíveis para contratação.
 
-    Disponível apenas para administradores.
     """
-
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
-    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_superuser:
+            tenant = self.request.user.tenant
+            queryset = self.queryset.filter(pk=tenant.plan_id)
+            return queryset
+        else:
+            return self.queryset
 
 
-class TenantViewSet(viewsets.ReadOnlyModelViewSet):
+
+
+class TenantViewSet(viewsets.ModelViewSet):
     """
-    Retorna a listagem de clientes (tenants) ou o cliente específico.
-
-    Disponível apenas para administradores.
+    # Retorna a listagem de clientes (tenants) ou o cliente específico.
+    #
     """
-
     queryset = Tenant.objects.all()
     serializer_class = TenantSerializer
-    permission_classes = [IsAdminUser]
+
+    def create(self, request, *args, **kwargs):
+        full_name = request.data.get("full_name").strip()
+        tenant_name = request.data.get("tenant_name").strip()
+        phone = request.data.get("phone").strip()
+        email = request.data.get("email").strip()
+        password = request.data.get("password")
+
+        tenant = Tenant.objects.filter(name=tenant_name)
+        if tenant:
+            logger.info("Houve tentativa de criação de um tenant repetido pela auto-inscrição: " + tenant[0].name)
+            return Response(
+                "Já existe uma escola com esse nome. Favor escolher um nome diferente ou pedir à sua escola que o cadastre como usuário.",
+                status=status.HTTP_200_OK)
+        user = CustomUser.objects.filter(email=email)
+        if user:
+            logger.info("Houve tentativa de criação de um usuário repetido pela auto-inscrição: " + user[0].email)
+            return Response(
+                "Já existe uma usuário cadastrado com esse e-mail. Favor verificar se sua escola já está cadastrada no sistema ou usar outro e-mail.",
+                status=status.HTTP_200_OK)
+        logger.info("Novo tenant sendo criado:" + tenant_name)
+
+        essential_plan = Plan.objects.get(pk=1)
+
+        tenant = Tenant.objects.create(
+            name=tenant_name,
+            subdomain_prefix=None,
+            eua_agreement=True,
+            plan=essential_plan,
+            auto_enrolled=True,
+            esignature_app=None,
+            phone=phone,
+        )
+        tenant.save()
+        # Selects every freemium interview and adds to newly created tenant
+        freemium_interviews = Interview.objects.filter(is_freemium=True)
+        # https://docs.djangoproject.com/en/3.0/ref/models/relations/#django.db.models.fields.related.RelatedManager.add
+        # add não aceita uma lista, mas um número arbitrário de objetos. Para expandir uma lista em vários objetos,
+        # usamos *freemium_interviews antes da lista
+        tenant.interview_set.add(*freemium_interviews)
+        # splits the e-mail and uses the name part as username
+        unsername = email.split('@')[0]
+        # Splits the full name field into first and "rest of the name" for the user
+        first_name = full_name.split()[0]
+        last_name = ""
+        for name in full_name.split()[1:]:
+            last_name += " " + name
+        last_name = last_name
+        # Creates the user
+        user = CustomUser.objects.create_user(username=unsername,
+                                              first_name=first_name,
+                                              last_name=last_name,
+                                              email=email,
+                                              password=password,
+                                              tenant=tenant)
+        user.save()
+        return Response(status=status.HTTP_201_CREATED)
 
 
 # Document Views #######################################################################################################
@@ -330,7 +382,6 @@ def validate_tenant_plan_ged(tenant):
 
 
 class DocumentDownloadViewSet(viewsets.ModelViewSet):
-
     queryset = Document.objects.all()
     # Este parametro é obrigatório em um ModelViewSet, embora não seja usado no presente exemplo
     serializer_class = DocumentSerializer
@@ -480,16 +531,21 @@ class DocumentCountViewSet(viewsets.ReadOnlyModelViewSet):
         return self.queryset.get(pk=tenant.id)
 
 
-# Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
-# and are composed by TenantAwareAPIMixin, which filters the queryset by tenant
-
-class TenantSchoolViewSet(TenantAwareAPIMixin, viewsets.ModelViewSet):
-
+class SchoolViewSet(viewsets.ModelViewSet):
     queryset = School.objects.all()
     serializer_class = SchoolSerializer
 
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_superuser:
+            tenant = self.request.user.tenant
+            queryset = self.queryset.filter(tenant=tenant)
+            return queryset
+        else:
+            return self.queryset
 
-class TenantSchoolUnitViewSet(viewsets.ModelViewSet):
+
+class SchoolUnitViewSet(viewsets.ModelViewSet):
     """
     Permite criar, alterar, listar e apagar as unidades das escolas.
     Só permite excluir escola vinculada ao tenant referente ao token informado.
@@ -508,31 +564,8 @@ class TenantSchoolUnitViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class TenantInterviewViewSet(viewsets.ModelViewSet):
-
-    tenant = Tenant.objects.all()
-    serializer_class = InterviewSerializer
-
-    def get_queryset(self):
-        tenant = self.request.user.tenant
-        queryset = tenant.interview_set.all()
-        queryset = queryset.order_by("name")
-        return queryset
-
-
-
-class TenantPlanViewSet(viewsets.ModelViewSet):
-
-    queryset = Plan.objects.all()
-    serializer_class = PlanSerializer
-
-    def get_queryset(self):
-        tenant = self.request.user.tenant
-        return self.queryset.get(pk=tenant.plan.id)
-
 #################################### OTHERS ############################################################################
 
-# Aparentemente essa view e necessaria para voltar os dados de usuario para o front
 class UserView(APIView):
     def get(self, request):
         """
@@ -541,4 +574,3 @@ class UserView(APIView):
         user = request.user
         user_data = UserSerializer(user)
         return Response(user_data.data)
-
