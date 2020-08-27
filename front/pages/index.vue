@@ -12,31 +12,13 @@
           </div>
         </div>
       </div>
-<!--      <div class="separator separator-bottom separator-skew zindex-100">-->
-<!--        <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1"-->
-<!--             xmlns="http://www.w3.org/2000/svg">-->
-<!--          <polygon class="fill-primary" points="2560 0 2560 100 0 100"></polygon>-->
-<!--        </svg>-->
-<!--      </div>-->
     </div>
     <!-- Page content -->
     <div class="container mt--8 pb-5">
       <div class="row justify-content-center">
         <div class="col-lg-5 col-md-7">
           <div class="card bg-secondary border-0 mb-0">
-<!--            <div class="card-header bg-transparent pb-5">-->
-<!--              <div class="text-muted text-center mt-2 mb-3"><small>Sign in with</small></div>-->
-<!--              <div class="btn-wrapper text-center">-->
-<!--                <a href="#" class="btn btn-neutral btn-icon">-->
-<!--                  <span class="btn-inner&#45;&#45;icon"><img src="~/static/img/icons/common/github.svg"></span>-->
-<!--                  <span class="btn-inner&#45;&#45;text">Github</span>-->
-<!--                </a>-->
-<!--                <a href="#" class="btn btn-neutral btn-icon">-->
-<!--                  <span class="btn-inner&#45;&#45;icon"><img src="~/static/img/icons/common/google.svg"></span>-->
-<!--                  <span class="btn-inner&#45;&#45;text">Google</span>-->
-<!--                </a>-->
-<!--              </div>-->
-<!--            </div>-->
+
             <div class="card-body px-lg-5 py-lg-5">
               <div class="text-center text-muted mb-4">
                 <small>Digite seu e-mail e sua senha</small>
@@ -72,10 +54,10 @@
           </div>
           <div class="row mt-3">
             <div class="col-6">
-              <router-link to="/dashboard" class="text-light"><small>Esqueceu a senha?</small></router-link>
+              <n-link to="/recuperar" class="text-light"><small>Esqueceu a senha?</small></n-link>
             </div>
             <div class="col-6 text-right">
-              <router-link to="/register" class="text-light"><small>Cria nova conta</small></router-link>
+              <n-link to="/registrar" class="text-light"><small>Cria nova conta</small></n-link>
             </div>
           </div>
         </div>
