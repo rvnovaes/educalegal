@@ -52,7 +52,7 @@ code: |
       status_code, reason, data_sent = csc.add_signer(recipients_sign)
 
       # adiciona signer key no educa legal
-      data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, tid)
+      data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, tid, tenant_data["esignature_app"]["id"])
 
       # adiciona os signatarios ao documento e envia por email para o primeiro signatario
       # o envelope_id eh a key do documento no clicksign
