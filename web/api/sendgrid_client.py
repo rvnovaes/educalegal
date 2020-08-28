@@ -4,10 +4,20 @@ import os
 import base64
 
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Category, Attachment, FileContent, FileType, FileName, Disposition, To, From, Bcc
+from sendgrid.helpers.mail import (
+    Mail,
+    Category,
+    Attachment,
+    FileContent,
+    FileType,
+    FileName,
+    Disposition,
+    To,
+    From,
+    Bcc)
 
 
-def send_email_sendgrid(to_emails, subject, html_content, category, file_path, file_name):
+def send_email(to_emails, subject, html_content, category, file_path, file_name):
     message = Mail(
         subject=subject,
         html_content=html_content)
@@ -58,6 +68,5 @@ if __name__ == "__main__":
                   {"email": "rvnovaes@gmail.com", "name": "Roberto"},
                   {"email": "roberto.novaes@educalegal.com.br", "name": "Roberto EducaLegal"}]
 
-
-    print(send_email_sendgrid(recipients, "TESTE", "<h1>Hello World",
+    print(send_email(recipients, "TESTE", "<h1>Hello World",
                         "Desenvolvimento", "lorem-ipsum.pdf", "lorem-ipsum.pdf"))

@@ -100,6 +100,7 @@ class Document(TenantAwareModel):
         help_text="UUID do documento em PDF. UUID = Universally Unique ID.",
         verbose_name="UUID do PDF",
     )
+    pdf_absolute_path = models.CharField(max_length=255, blank=True, verbose_name="Caminho absoluto PDF")
     docx_ged_id = models.CharField(max_length=128, blank=True, verbose_name="ID do Docx do documento no GED")
     docx_ged_link = models.CharField(max_length=255, blank=True, verbose_name="Link do Docx")
     docx_ged_uuid = models.CharField(
@@ -108,6 +109,7 @@ class Document(TenantAwareModel):
         help_text="UUID do documento em Docx. UUID = Universally Unique ID.",
         verbose_name="UUID do Docx",
     )
+    docx_absolute_path = models.CharField(max_length=255, blank=True, verbose_name="Caminho absoluto Docx")
     description = models.TextField(default="", blank=True, verbose_name="Descrição")
     interview = models.ForeignKey(
         Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"

@@ -46,6 +46,16 @@ class Migration(migrations.Migration):
             name='recipients',
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default='', verbose_name='Destinatários do e-mail/assinatura eletrônica'),
         ),
+        migrations.AddField(
+            model_name='document',
+            name='docx_absolute_path',
+            field=models.CharField(blank=True, max_length=255, verbose_name='Caminho absoluto Docx'),
+        ),
+        migrations.AddField(
+            model_name='document',
+            name='pdf_absolute_path',
+            field=models.CharField(blank=True, max_length=255, verbose_name='Caminho absoluto PDF'),
+        ),
         migrations.RenameField(
             model_name='document',
             old_name='ged_id',

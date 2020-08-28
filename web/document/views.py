@@ -17,11 +17,12 @@ from django.shortcuts import render, HttpResponse
 from django.utils.safestring import mark_safe
 from django.views import View
 
+from api.sendgrid_client import send_email as sendgrid_send_email
+from interview.models import Interview, InterviewServerConfig
+from interview.util import build_interview_full_name
 from tenant.models import Tenant
 from tenant.mixins import TenantAwareViewMixin
 from school.models import SchoolUnit
-from interview.models import Interview, InterviewServerConfig
-from interview.util import build_interview_full_name
 from util.mongo_util import (
     create_dynamic_document_class,
     mongo_to_hierarchical_dict,
@@ -55,8 +56,13 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
     context_object_name = "document"
 
     def get_context_data(self, **kwargs):
+        if self.kwargs["uuid"]:
+            lookup_field = 'doc_uuid'
+            document = Document.objects.get(pk=self.kwargs["uuid"])
+        else:
+            document = Document.objects.get(pk=self.kwargs["pk"])
+
         context = super().get_context_data(**kwargs)
-        document = Document.objects.get(pk=self.kwargs["pk"])
 
         try:
             # busca somente o último signer de cada email do documento
@@ -573,7 +579,6 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         return HttpResponse(json.dumps(payload), content_type="application/json")
 
 
-
 @login_required
 def bulk_generation_progress(request, bulk_document_generation_id):
     document_task_view = DocumentTaskView.objects.filter(bulk_generation_id=bulk_document_generation_id)
@@ -671,33 +676,40 @@ def send_email(request, **kwargs):
         messages.error(request, message)
         logger.error(message)
 
-    # document
-    # to_emails = recipients
-    # subject = email_subject
-    # html_content = email_html_content
-    # category = email_category
-    # file_path = generated_file.pdf.path()
-    # file_name = custom_file_name + '.pdf'
-    # if el_log_to_console:
-    #     log("Enviando e-mail para {to_emails}".format(to_emails=to_emails), "console")
-    # log("Enviando e-mail para {to_emails}".format(to_emails=to_emails))
-    # response_status_code, response_message = send_email_sendgrid(to_emails, subject, html_content, category, file_path,
-    #                                                              file_name)
-    # if el_log_to_console:
-    #     log("Sendgrid response status code: " + str(response_status_code), "console")
-    #     log("Sendgrid response message: " + response_message, "console")
-    # log("Sendgrid response status code: " + str(response_status_code))
-    # log("Sendgrid response message: " + response_message)
-    # if response_status_code == 202:
-    #     cd_send_email = True
-    #     cd_status = 'enviado por e-mail'
-    #     el_document_patched_with_email_data = elc.patch_document_with_email_data(doc_uuid, cd_send_email, cd_status)
-    #     email_success
-    # else:
-    #     if el_log_to_console:
-    #         log(str(response_status_code) + " " + response_message, "console")
-    #     log(str(response_status_code) + " " + response_message)
-    #     email_failure
-    #
-    #
-    # return HttpResponse(json.dumps(payload), content_type="application/json")
+    if document.recipients:
+        to_emails = document.recipients
+        school_name = document.school.name if document.school.name else document.school.legal_name
+        interview_name = document.interview.name if document.interview.name else ''
+        subject = "IMPORTANTE: " + school_name + " | " + interview_name
+        category = document.name
+        if category.endswith('.pdf'):
+            category = category[:-4]
+        html_content = "<h3>" + document.interview.name + "</h3><p>Leia com atenção o documento em anexo.</p>"
+        file_path = document.pdf_absolute_path
+        file_name = document.name
+
+        try:
+            status_code, response_json = sendgrid_send_email(
+                to_emails, subject, html_content, category, file_path, file_name)
+        except Exception as e:
+            message = 'Não foi possível enviar o e-mail.'
+            error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
+            logger.error(error_message)
+            messages.debug(request, message)
+        else:
+            if status_code == 202:
+                document.send_email = True
+                document.status = 'enviado por e-mail'
+                document.save(update_fields=['send_email', 'status'])
+
+                message = 'O e-mail foi enviado com sucesso.'
+                messages.success(request, message)
+            else:
+                message = 'Não foi possível enviar o e-mail.'
+                error_message = message + "{} - {}".format(status_code, response_json)
+                logger.error(error_message)
+                messages.error(request, message)
+
+        return render(request, "document/document_detail.html")
+
+# {% include "snippets/messages.html" %}

@@ -22,7 +22,7 @@ code: |
   button_list.append(el_button)
 ---
 code: |
-  el_button = {'action': educalegal_url + '/document/document/25581',
+  el_button = {'action': educalegal_url + '/document/document/' + doc_uuid,
                 'label': 'Ver detalhes',
                 'color': 'success',
                 'icon': 'check'}

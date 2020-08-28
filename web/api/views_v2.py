@@ -238,6 +238,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
                                 instance.pdf_ged_id = ged_document_data['id']
                                 instance.pdf_ged_link = ged_document_data['latest_version']['download_url']
                                 instance.pdf_ged_uuid = ged_document_data['uuid']
+                                instance.pdf_absolute_path = absolute_path
                                 instance.status = DocumentStatus.INSERIDO_GED.value
 
                                 # salva dados do ged do documento no educa legal
@@ -269,6 +270,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
                                 instance.docx_ged_id = ged_document_data['id']
                                 instance.docx_ged_link = ged_document_data['latest_version']['download_url']
                                 instance.docx_ged_uuid = ged_document_data['uuid']
+                                instance.docx_absolute_path = absolute_path
                                 instance.status = DocumentStatus.INSERIDO_GED.value
 
                                 # salva dados do ged do documento no educa legal
