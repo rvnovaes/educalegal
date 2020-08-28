@@ -12,6 +12,7 @@ __all__ = ["ClickSignClient"]
 
 
 el_environment = get_config('el environment')
+# el_environment = 'production'
 # el_environment = 'development'
 
 if el_environment == "production":
@@ -86,8 +87,12 @@ class ClickSignClient:
                 log('Erro ao fazer o upload do documento. Erro: {e}'.format(e=e), "console")
             return document, e, 0, ''
         else:
-            # data_sent, data_received, status_code
-            return document, response.json(), response.status_code, response.json()['document']['key']
+            if response.status_code == 201:
+                # data_sent, data_received, status_code
+                return document, response.json(), response.status_code, response.json()['document']['key']
+            else:
+                # data_sent, data_received, status_code
+                return document, response.json(), response.status_code, response.json()
 
     def add_signer(self, recipients):
         """

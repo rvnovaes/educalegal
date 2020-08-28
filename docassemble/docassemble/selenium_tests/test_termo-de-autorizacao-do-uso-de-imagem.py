@@ -138,7 +138,7 @@ class TestTermodeautorizacaodousodeimagem(WebTest):
         )
         self.driver.find_element(
             By.XPATH, "//form[@id='daform']/div[2]/div/input"
-        ).send_keys("Francisco")
+        ).send_keys("Francisco Chico")
         for k in CPF:
             self.driver.find_element(
                 By.XPATH, "//form[@id='daform']/div[3]/div/input"
@@ -155,7 +155,7 @@ class TestTermodeautorizacaodousodeimagem(WebTest):
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element(
-                (By.XPATH, "//h1"), "Endereço do(a) Francisco"
+                (By.XPATH, "//h1"), "Endereço do(a) Francisco Chico"
             )
         )
         self.driver.find_element(

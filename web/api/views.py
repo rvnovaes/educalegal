@@ -153,4 +153,7 @@ class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
         # ESignatureAppSignerKey
         # como cada cliente tem uma conta da clicksig, deve ser verificado o tenant tbm
 
-        return ESignatureAppSignerKey.objects.filter(tenant=self.request.user.tenant.id, email=self.kwargs['email'])
+        return ESignatureAppSignerKey.objects.filter(
+            tenant=self.request.user.tenant.id,
+            esignature_app=self.request.user.tenant.esignature_app,
+            email=self.kwargs['email'])

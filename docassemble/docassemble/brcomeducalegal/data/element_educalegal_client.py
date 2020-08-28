@@ -250,13 +250,14 @@ class EducaLegalClient:
         except NameError:
             return recipients, recipients_sign, 200
 
-    def post_signer_key(self, recipients, tenant_id):
+    def post_signer_key(self, recipients, tenant_id, e_signature_app):
         for recipient in recipients:
             if recipient['new_signer'] and recipient['status_code'] == 201:
                 payload = {
                     "email": recipient['email'],
                     "key": recipient['key'],
                     "tenant": tenant_id,
+                    "esignature_app": e_signature_app,
                 }
                 final_url = self.api_base_url + "/v1/esignature-app-signer-keys/"
 
