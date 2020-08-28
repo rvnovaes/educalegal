@@ -2,6 +2,7 @@
 # https://github.com/sendgrid/sendgrid-python
 import os
 import base64
+import logging
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
@@ -15,6 +16,8 @@ from sendgrid.helpers.mail import (
     To,
     From,
     Bcc)
+
+logger = logging.getLogger(__name__)
 
 
 def send_email(to_emails, subject, html_content, category, file_path, file_name, file):
@@ -65,8 +68,7 @@ def send_email(to_emails, subject, html_content, category, file_path, file_name,
         else:
             return response.status_code, response.body
     except Exception as e:
-        exception_status_code = 1
-        return exception_status_code, str(e)
+        return 0, str(e)
 
 
 if __name__ == "__main__":

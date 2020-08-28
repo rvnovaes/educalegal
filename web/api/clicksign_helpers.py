@@ -54,13 +54,25 @@ recipient_types = {
 
 logger = logging.getLogger(__name__)
 
-# if os.environ['EL_ENV'] == 'production':
+# if os.environ.get('EL_ENV') == 'production':
 #     secret_key = 'gerar no ambiente de producao'
 # else:
 #     secret_key = '6c49e1a0f98862bd735efec7548148b4'
 
 # DEVELOPMENT - VER COMO PEGO O EL_ENV DO CONTAINER
 secret_key = '6c49e1a0f98862bd735efec7548148b4'
+
+
+# HMAC DOCUSIGN (TESTAR NO CLICKSIGN)
+def ComputeHash(secret, payload):
+    import base64
+    hashBytes = hmac.new(secret, msg=payload, digestmod=hashlib.sha256).digest()
+    base64Hash = base64.b64encode(hashBytes)
+    return base64Hash
+
+
+def HashIsValid(secret, payload, verify):
+    return verify == ComputeHash(secret, payload)
 
 
 def verify_hmac(headers, request_body):

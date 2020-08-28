@@ -1,3 +1,4 @@
+import copy
 import io
 import logging
 import json
@@ -20,10 +21,12 @@ from django.utils.safestring import mark_safe
 from django.views import View
 from rest_framework import generics
 
+from api.clicksign_client import ClickSignClient
+from api.docusign_client import DocuSignClient, make_document_base64
 from api.sendgrid_client import send_email as sendgrid_send_email
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
-from tenant.models import Tenant
+from tenant.models import Tenant, ESignatureAppProvider, ESignatureAppSignerKey
 from tenant.mixins import TenantAwareViewMixin
 from school.models import SchoolUnit
 from util.mongo_util import (
@@ -742,3 +745,144 @@ def send_email(request, doc_uuid):
                     messages.error(request, message)
 
     return redirect("document:document-detail", doc_uuid)
+
+@login_required
+def send_to_esignature(request, doc_uuid):
+    try:
+        document = Document.objects.get(doc_uuid=doc_uuid)
+    except Document.DoesNotExist:
+        message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
+        messages.error(request, message)
+        logger.error(message)
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+    else:
+        if document.recipients:
+            esignature_app = document.tenant.esignature_app
+
+            documents = [
+                {
+                    'name': document.name,
+                    'fileExtension': 'pdf',
+                    'documentBase64': make_document_base64(document.pdf_absolute_path)
+                }
+            ]
+
+            if esignature_app.provider == ESignatureAppProvider.DOCUSIGN.value:
+                dsc = DocuSignClient(document.tenant.id, esignature_app.impersonated_user_guid, esignature_app.test_mode,
+                                     esignature_app.private_key)
+
+                try:
+                    status_code, response_json  = dsc.send_to_docusign(
+                        document.recipients, documents, send_immediately=True, email_subject="Documento para sua assinatura")
+                except Exception as e:
+                    message = str(type(e).__name__) + " : " + str(e)
+                    logger.error(message)
+                    return 0, message
+                else:
+                    if status_code == 201:
+                        document.submit_to_esignature = True
+                        document.status = DocumentStatus.ENVIADO_ASS_ELET.value
+                        document.envelope_number = response_json['envelopeId']
+                        document.save(update_fields=['submit_to_esignature', 'status', 'envelope_number'])
+                    return status_code, response_json
+
+            elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.value:
+                csc = ClickSignClient(esignature_app.private_key, esignature_app.test_mode)
+
+                # faz o upload do documento no clicksign
+                status_code, response_json, envelope_number = csc.upload_document(documents[0])
+
+                if status_code == 201:
+                    # atualiza dados do envelope no documento do EL
+                    document.status = DocumentStatus.ENVIADO_ASS_ELET.value
+                    document.envelope_number = envelope_number
+                    document.task_submit_to_esignature = True
+
+                    # verifica se o signer ja foi enviado para a clicksign
+                    document.recipients = get_signer_key_by_email(document.recipients)
+
+                    recipients_sign = copy.deepcopy(document.recipients)
+
+                    # cria os destinatarios
+                    status_code, reason = csc.add_signer(recipients_sign)
+
+                    # adiciona signer key no educa legal
+                    data_received, status_code = elc.post_signer_key(recipients_sign, tid)
+
+                    # adiciona os signatarios ao documento e envia por email para o primeiro signatario
+                    # o envelope_id eh a key do documento no clicksign
+                    data_received, status_code = csc.send_to_signers(envelope_id, recipients_sign)
+
+                    if status_code == 202:
+                        e_signature_response_status_code = 201
+                    else:
+                        e_signature_response_status_code = 0
+                        log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(
+                            status_code=status_code, reason=data_received))
+                        log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(
+                            status_code=status_code, reason=data_received), "console")
+
+            if e_signature_response_status_code == 201:
+                signature_success
+            else:
+                signature_fail
+
+    return redirect("document:document-detail", doc_uuid)
+
+
+def get_signer_key_by_email(recipients):
+    for recipient in recipients:
+        try:
+            e_signature_app_signer_key = ESignatureAppSignerKey.objects.get(
+                tenant=recipient.tenant_id, email=recipient.email)
+        except ESignatureAppSignerKey.DoesNotExist:
+            recipient['key'] = ''
+            recipient['new_signer'] = True
+            recipient['status_code'] = 404
+        except Exception as e:
+            message = 'Erro ao obter a chave do signatário. ' + str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return 0, message
+        else:
+            recipient['key'] = e_signature_app_signer_key.key
+            recipient['new_signer'] = False
+            recipient['status_code'] = 200
+
+    return recipients
+
+
+def post_signer_key(recipients):
+    for recipient in recipients:
+        if recipient['new_signer'] and recipient['status_code'] == 201:
+            e_signature_app_signer_key = ESignatureAppSignerKey(
+                email=envelope_number,
+                key=envelope_status,
+                envelope_created_date=data['document']['uploaded_at'],
+                sent_date=data['document']['uploaded_at'],
+                status_update_date=data['document']['updated_at'],
+                signing_provider=ESignatureAppProvider.CLICKSIGN.value,
+                tenant=tenant,
+            )
+            envelope.save()
+
+            payload = {
+                "email": recipient['email'],
+                "key": recipient['key'],
+                "tenant": tenant_id,
+            }
+            final_url = self.api_base_url + "/v1/esignature-app-signer-keys/"
+
+            try:
+                response = self.session.post(final_url, data=payload)
+            except Exception as e:
+                print("Erro ao gravar a chave do signatário.", "console")
+                print(e, "console")
+                return recipients, e, 0
+    try:
+        # data_sent, data_received, status_code
+        return recipients, response.json(), response.status_code
+    except NameError:
+        # data_sent, data_received, status_code
+        return recipients, 'Todos os destinatários já existiam.', 200

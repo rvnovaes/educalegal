@@ -215,11 +215,3 @@ code: |
   recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
-
-  documents = [
-      {
-          'name': document_name,
-          'fileExtension': 'pdf',
-          'documentBase64': make_document_base64(generated_file.pdf.path())
-      }
-  ]
