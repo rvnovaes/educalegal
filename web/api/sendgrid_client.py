@@ -17,7 +17,7 @@ from sendgrid.helpers.mail import (
     Bcc)
 
 
-def send_email(to_emails, subject, html_content, category, file_path, file_name):
+def send_email(to_emails, subject, html_content, category, file_path, file_name, file):
     message = Mail(
         subject=subject,
         html_content=html_content)
@@ -40,6 +40,12 @@ def send_email(to_emails, subject, html_content, category, file_path, file_name)
         with open(file_path, 'rb') as f:
             data = f.read()
             f.close()
+    else:
+        f = file
+        data = f.read()
+        f.close()
+
+    if data:
         encoded = base64.b64encode(data).decode()
         attachment = Attachment()
         attachment.file_content = FileContent(encoded)
@@ -55,9 +61,9 @@ def send_email(to_emails, subject, html_content, category, file_path, file_name)
         # sg = SendGridAPIClient('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')
         response = sg.send(message)
         if response.status_code == 202:
-            return response.status_code, response.json()
+            return response.status_code, 'Email enviado com sucesso'
         else:
-            return response.status_code, response.json()
+            return response.status_code, response.body
     except Exception as e:
         exception_status_code = 1
         return exception_status_code, str(e)
@@ -69,4 +75,4 @@ if __name__ == "__main__":
                   {"email": "roberto.novaes@educalegal.com.br", "name": "Roberto EducaLegal"}]
 
     print(send_email(recipients, "TESTE", "<h1>Hello World",
-                        "Desenvolvimento", "lorem-ipsum.pdf", "lorem-ipsum.pdf"))
+                        "Desenvolvimento", "lorem-ipsum.pdf", "lorem-ipsum.pdf", None))

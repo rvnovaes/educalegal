@@ -1,7 +1,8 @@
 import logging
 import os
-from pathlib import Path
 import urllib.request
+
+from pathlib import Path
 
 from django.conf import settings
 
@@ -9,7 +10,7 @@ from django.conf import settings
 def save_file_from_url(url, path, filename):
     """
     Faz o download e salva o arquivo no caminho especificado, dentro do diretorio base em web/media
-    :param url: url da qual será feita o download
+    :param url: url da qual será feito o download
     :param path: caminho onde será salvo o arquivo. É concatenado com o diretório base.
         Ex.: path = docassemble, será salvo em /opt/educalegal/web/media/docassemble
     :param filename: nome do arquivo a ser salvo

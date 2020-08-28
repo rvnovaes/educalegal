@@ -1,6 +1,8 @@
+import io
 import logging
 import json
 import pandas as pd
+import requests
 
 from mongoengine.errors import ValidationError
 from celery import chain
@@ -704,15 +706,24 @@ def send_email(request, doc_uuid):
             if category.endswith('.pdf'):
                 category = category[:-4]
             html_content = "<h3>" + document.interview.name + "</h3><p>Leia com atenção o documento em anexo.</p>"
-            file_path = document.pdf_absolute_path
             file_name = document.name
+
+            file = None
+            if document.pdf_absolute_path:
+                file_path = document.pdf_absolute_path
+            else:
+                file_path = ''
+                if document.tenant.plan.use_ged and document.pdf_ged_link:
+                    response = requests.get(document.pdf_ged_link)
+                    file = io.BytesIO(response.content)
 
             try:
                 status_code, response_json = sendgrid_send_email(
-                    to_emails, subject, html_content, category, file_path, file_name)
+                    to_emails, subject, html_content, category, file_path, file_name, file)
             except Exception as e:
                 message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
                 error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
+                logger.debug(error_message)
                 logger.error(error_message)
                 messages.error(request, message)
             else:
@@ -726,6 +737,7 @@ def send_email(request, doc_uuid):
                 else:
                     message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
                     error_message = message + "{} - {}".format(status_code, response_json)
+                    logger.debug(error_message)
                     logger.error(error_message)
                     messages.error(request, message)
 
