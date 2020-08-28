@@ -13,7 +13,7 @@ from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableView
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, get_object_or_404
 from django.utils.safestring import mark_safe
 from django.views import View
 
@@ -51,13 +51,30 @@ DOCUMENT_COLUMNS = (
 )
 
 
-class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
+class MultipleFieldLookupMixin:
+    """
+    Apply this mixin to any view or viewset to get multiple field filtering
+    based on a `lookup_fields` attribute, instead of the default single field filtering.
+    """
+    def get_object(self):
+        queryset = self.get_queryset()             # Get the base queryset
+        queryset = self.filter_queryset(queryset)  # Apply any filter backends
+        filter = {}
+        for field in self.lookup_fields:
+            if self.kwargs[field]: # Ignore empty fields.
+                filter[field] = self.kwargs[field]
+        obj = get_object_or_404(queryset, **filter)  # Lookup the object
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+
+class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, MultipleFieldLookupMixin, DetailView):
     model = Document
     context_object_name = "document"
+    lookup_fields = ['pk', 'doc_uuid']
 
     def get_context_data(self, **kwargs):
         if self.kwargs["uuid"]:
-            lookup_field = 'doc_uuid'
             document = Document.objects.get(pk=self.kwargs["uuid"])
         else:
             document = Document.objects.get(pk=self.kwargs["pk"])
@@ -676,8 +693,8 @@ def send_email(request, **kwargs):
         messages.error(request, message)
         logger.error(message)
 
-    if document.recipients:
-        to_emails = document.recipients
+    if document.recipients(default=dict):
+        to_emails = document.recipients(default=dict)
         school_name = document.school.name if document.school.name else document.school.legal_name
         interview_name = document.interview.name if document.interview.name else ''
         subject = "IMPORTANTE: " + school_name + " | " + interview_name
