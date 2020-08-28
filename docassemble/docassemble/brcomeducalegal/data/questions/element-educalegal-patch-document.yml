@@ -14,6 +14,7 @@ code: |
 
   # dados do documento que serao salvos no educa legal
   data = {
+     "name": custom_file_name + '.pdf',
      "description": interview_description,
      "status": "criado",
      "school": school_id,

@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='document',
             name='recipients',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default='', verbose_name='Destinatários do e-mail/assinatura eletrônica'),
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, verbose_name='Destinatários do e-mail/assinatura eletrônica'),
         ),
         migrations.AddField(
             model_name='document',

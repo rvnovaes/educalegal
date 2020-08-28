@@ -35,11 +35,14 @@
         <a target="_blank" href="{{ document.pdf_ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
         <a target="_blank" href="{{ document.docx_ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
         {% if not document.envelope %}
-            <a target="_blank" href="#"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>
+            <a href="#"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>
         {% endif %}
-        <a target="_blank" href="{% url 'document:send_email' %}"><button type="button" class="btn btn-info">Enviar por email</button></a>
+        <a href="{% url 'document:send-email' document.doc_uuid %}"><button type="button" class="btn btn-info">Enviar por email</button></a>
     </div>
 
+    <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
+    {% include "snippets/messages.html" %}
+    <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% if document.envelope %}
         <div class="card">
             {% with envelope=document.envelope %}

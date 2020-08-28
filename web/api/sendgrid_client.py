@@ -36,28 +36,28 @@ def send_email(to_emails, subject, html_content, category, file_path, file_name)
         to_emails_deduplication.append(current_email)
     message.to = to_emails_names
     message.category = Category(category)
-    file_path = file_path
-    with open(file_path, 'rb') as f:
-        data = f.read()
-        f.close()
-    encoded = base64.b64encode(data).decode()
-    attachment = Attachment()
-    attachment.file_content = FileContent(encoded)
-    attachment.file_type = FileType('application/pdf')
-    attachment.file_name = FileName(file_name)
-    attachment.disposition = Disposition('attachment')
-    message.attachment = attachment
+    if file_path:
+        with open(file_path, 'rb') as f:
+            data = f.read()
+            f.close()
+        encoded = base64.b64encode(data).decode()
+        attachment = Attachment()
+        attachment.file_content = FileContent(encoded)
+        attachment.file_type = FileType('application/pdf')
+        attachment.file_name = FileName(file_name)
+        attachment.disposition = Disposition('attachment')
+        message.attachment = attachment
 
     try:
+        # SENDGRID_API_KEY - variave de ambiente criada no container do EL
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        # para debugar pela venv use a chave abaixo
         # sg = SendGridAPIClient('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')
         response = sg.send(message)
         if response.status_code == 202:
-            success_message = "E-mail enviado com sucesso!"
-            return response.status_code, success_message
+            return response.status_code, response.json()
         else:
-            error_message = "Hove falha no envio do e-mail..."
-            return response.status_code, error_message
+            return response.status_code, response.json()
     except Exception as e:
         exception_status_code = 1
         return exception_status_code, str(e)

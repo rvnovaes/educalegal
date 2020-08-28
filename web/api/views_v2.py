@@ -242,7 +242,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
                                 instance.status = DocumentStatus.INSERIDO_GED.value
 
                                 # salva dados do ged do documento no educa legal
-                                instance.save(update_fields=['pdf_ged_id', 'pdf_ged_link', 'pdf_ged_uuid', 'status'])
+                                instance.save(update_fields=['pdf_ged_id', 'pdf_ged_link', 'pdf_ged_uuid',
+                                                             'pdf_absolute_path', 'status'])
 
                     # salva o docx no sistema de arquivos
                     data['name'] = params['docx_filename']
@@ -274,7 +275,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
                                 instance.status = DocumentStatus.INSERIDO_GED.value
 
                                 # salva dados do ged do documento no educa legal
-                                instance.save(update_fields=['docx_ged_id', 'docx_ged_link', 'docx_ged_uuid', 'status'])
+                                instance.save(update_fields=['docx_ged_id', 'docx_ged_link', 'docx_ged_uuid',
+                                                             'docx_absolute_path', 'status'])
 
             return Response(serializer.data)
 

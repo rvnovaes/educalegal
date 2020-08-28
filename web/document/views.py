@@ -13,9 +13,10 @@ from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableView
-from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.shortcuts import render, HttpResponse, redirect
 from django.utils.safestring import mark_safe
 from django.views import View
+from rest_framework import generics
 
 from api.sendgrid_client import send_email as sendgrid_send_email
 from interview.models import Interview, InterviewServerConfig
@@ -51,31 +52,32 @@ DOCUMENT_COLUMNS = (
 )
 
 
-class MultipleFieldLookupMixin:
-    """
-    Apply this mixin to any view or viewset to get multiple field filtering
-    based on a `lookup_fields` attribute, instead of the default single field filtering.
-    """
+class MultipleFieldLookupMixin(generics.GenericAPIView):
+    def __init__(self):
+        if not hasattr(self, 'lookup_fields'):
+            raise AssertionError("Expected view {} to have `.lookup_fields` attribute".format(self.__class__.__name__))
+
     def get_object(self):
-        queryset = self.get_queryset()             # Get the base queryset
-        queryset = self.filter_queryset(queryset)  # Apply any filter backends
-        filter = {}
         for field in self.lookup_fields:
-            if self.kwargs[field]: # Ignore empty fields.
-                filter[field] = self.kwargs[field]
-        obj = get_object_or_404(queryset, **filter)  # Lookup the object
-        self.check_object_permissions(self.request, obj)
-        return obj
+            if field in self.kwargs:
+                self.lookup_field = field
+                break
+        else:
+            raise AssertionError(
+                'Expected view %s to be called with one of the lookup_fields: %s' %
+                (self.__class__.__name__, self.lookup_fields))
+
+        return super().get_object()
 
 
 class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, MultipleFieldLookupMixin, DetailView):
     model = Document
     context_object_name = "document"
-    lookup_fields = ['pk', 'doc_uuid']
+    lookup_fields = ('pk', 'doc_uuid')
 
     def get_context_data(self, **kwargs):
-        if self.kwargs["uuid"]:
-            document = Document.objects.get(pk=self.kwargs["uuid"])
+        if 'doc_uuid' in self.kwargs:
+            document = Document.objects.get(doc_uuid=self.kwargs["doc_uuid"])
         else:
             document = Document.objects.get(pk=self.kwargs["pk"])
 
@@ -681,52 +683,50 @@ def query_documents_by_args(pk=None, **kwargs):
 
 
 @login_required
-def send_email(request, **kwargs):
+def send_email(request, doc_uuid):
     try:
-        document = Document.objects.get(doc_uuid=kwargs['doc_uuid'])
+        document = Document.objects.get(doc_uuid=doc_uuid)
     except Document.DoesNotExist:
-        message = 'Não foi encontrado o documento com o uuid = {}'.format(kwargs['doc_uuid'])
+        message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
         messages.error(request, message)
         logger.error(message)
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
         messages.error(request, message)
         logger.error(message)
+    else:
+        if document.recipients:
+            to_emails = document.recipients
+            school_name = document.school.name if document.school.name else document.school.legal_name
+            interview_name = document.interview.name if document.interview.name else ''
+            subject = "IMPORTANTE: " + school_name + " | " + interview_name
+            category = document.name
+            if category.endswith('.pdf'):
+                category = category[:-4]
+            html_content = "<h3>" + document.interview.name + "</h3><p>Leia com atenção o documento em anexo.</p>"
+            file_path = document.pdf_absolute_path
+            file_name = document.name
 
-    if document.recipients(default=dict):
-        to_emails = document.recipients(default=dict)
-        school_name = document.school.name if document.school.name else document.school.legal_name
-        interview_name = document.interview.name if document.interview.name else ''
-        subject = "IMPORTANTE: " + school_name + " | " + interview_name
-        category = document.name
-        if category.endswith('.pdf'):
-            category = category[:-4]
-        html_content = "<h3>" + document.interview.name + "</h3><p>Leia com atenção o documento em anexo.</p>"
-        file_path = document.pdf_absolute_path
-        file_name = document.name
-
-        try:
-            status_code, response_json = sendgrid_send_email(
-                to_emails, subject, html_content, category, file_path, file_name)
-        except Exception as e:
-            message = 'Não foi possível enviar o e-mail.'
-            error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
-            logger.error(error_message)
-            messages.debug(request, message)
-        else:
-            if status_code == 202:
-                document.send_email = True
-                document.status = 'enviado por e-mail'
-                document.save(update_fields=['send_email', 'status'])
-
-                message = 'O e-mail foi enviado com sucesso.'
-                messages.success(request, message)
-            else:
-                message = 'Não foi possível enviar o e-mail.'
-                error_message = message + "{} - {}".format(status_code, response_json)
+            try:
+                status_code, response_json = sendgrid_send_email(
+                    to_emails, subject, html_content, category, file_path, file_name)
+            except Exception as e:
+                message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
+                error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
                 logger.error(error_message)
                 messages.error(request, message)
+            else:
+                if status_code == 202:
+                    document.send_email = True
+                    document.status = 'enviado por e-mail'
+                    document.save(update_fields=['send_email', 'status'])
 
-        return render(request, "document/document_detail.html")
+                    message = 'O e-mail foi enviado com sucesso.'
+                    messages.success(request, message)
+                else:
+                    message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
+                    error_message = message + "{} - {}".format(status_code, response_json)
+                    logger.error(error_message)
+                    messages.error(request, message)
 
-# {% include "snippets/messages.html" %}
+    return redirect("document:document-detail", doc_uuid)
