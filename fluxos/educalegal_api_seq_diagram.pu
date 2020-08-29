@@ -12,7 +12,7 @@ activate Docassemble
 note right
 element-tenant-school-interview.yml +
 element-tenant-school-interview-error-screens.yml +
-element_educalegal_client.py
+module_educalegal_client.py
 end note
 
 Docassemble -> EducaLegal: GET tenants_school_names_school_data(tid)
@@ -58,7 +58,7 @@ activate EducaLegal
 
 note right
 element-educalegal-patch-document.yml +
-element_educalegal_client.py
+module_educalegal_client.py
 end note
 
 EducaLegal -> Docassemble: returns Educa Legal document data
@@ -71,7 +71,7 @@ note right
 Only if tenant_use_ged == True
 element-ged.yml + 
 element_mayan_client.py +
-element_educalegal_client.py
+module_educalegal_client.py
 end note
 
 Mayan -> Docassemble: response(many fields, specially document id)
@@ -87,13 +87,13 @@ Docassemble -> Docusign: POST send_to_docusign((recipients, documents, send_imme
 activate Docusign
 
 note left
-element-esignature.yml
+                element-esignature.yml
 element_docusign.py
 end note
 
 
 Docusign -> Docassemble: envelope_data
-Docassemble -> EducaLegal: PATCH patch_document_with_esignature_data(doc_uuid, status, envelope_number, submit_to_esignature)
+Docassemble -> EducaLegal: PATCH patch_document(data, params)
 deactivate Docassemble
 activate EducaLegal
 

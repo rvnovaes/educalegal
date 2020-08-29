@@ -15,7 +15,7 @@ include:
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
-  - .element_docusign_client
+  - .module_docusign_client
 ---
 sections:
   - Empregado

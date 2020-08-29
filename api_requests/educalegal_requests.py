@@ -1,8 +1,8 @@
 import sys
 
 sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
-from element_educalegal_client import EducaLegalClient
-from module_clicksign_client import ClickSignClient
+from module_educalegal_client import EducaLegalClient
+from api.clicksign_client import ClickSignClient
 
 ###### PRODUCTION ######
 # token_csc = "4806d373-89b8-4dcc-aa04-87dc8f1a31ea"
@@ -85,16 +85,10 @@ def send_to_clicksign():
     # faz o upload do documento no clicksign
     data_sent, data_received, status_code, envelope_id = csc.upload_document(document)
 
-    # verifica se o signer ja foi enviado para a clicksign
-    data_sent, data_received, status_code = elc.get_signer_key_by_email(recipients)
-
     recipients_sign = data_received.copy()
 
     # cria os destinatarios
     data_sent, data_received, status_code = csc.add_signer(recipients_sign)
-
-    # adiciona signer key no educa legal
-    data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, 1, 3)
 
     data_sent, data_received, status_code = csc.send_to_signers(envelope_id, recipients_sign)
     print(data_received, status_code)
@@ -184,7 +178,7 @@ if __name__ == "__main__":
     # ged_link = "ged_link"
     # ged_uuid = "010101010101"
     #
-    # response = elc.patch_document_with_email_data(
+    # response = elc.patch_document(PARAMETROS DEVEM SER PASSADOS COMO DICT (data, params)
     #     el_document_created_doc_uuid, send_email=True, status="enviado por e-mail"
     # )
     # print(response)
@@ -200,55 +194,14 @@ if __name__ == "__main__":
     # ged_id = 1
     # new_status = "modificado"
     # new_envelope_number = '3fc59949-23ab-4301-b4ce-1176f1246954'
-    # response = elc.patch_document_with_esignature_data(
+    # response = elc.patch_document(PARAMETROS DEVEM SER PASSADOS COMO DICT (data, params)
     #     el_document_created_doc_uuid, new_status, new_envelope_number, submit_to_esignature=False
     # )
     # print(response)
-
-    # =========== elc.post_envelope ============= #
-    # tid = 1
-    # data_received = {
-    #   "envelopeId": "aaa",
-    #   "status": "sent",
-    #   "statusDateTime": "2020-07-30T16:49:23.7938569Z",
-    #   "uri": "/envelopes/b08b6022-fbb9-4e47-955f-eda4ac3f13a0"
-    # }
-    # esignature_provider = 'Docusign'
     #
-    # response, status_code = elc.post_envelope(tid, esignature_provider, data_received)
-    #
-    # print(status_code)
-    #
-    # print(response)
-    # =========== elc.post_envelope ============= #
-
-
-    # =========== elc.post_signers ============= #
-    # el_recipients = [
-    #     {'name': 'Ut est sed sed ipsa', 'email': 'dogoka@mailinator.com', 'group': 'signers', 'status': 'gerado',
-    #      'sent_date': '', 'tenant': '1', 'envelope_log': 27,
-    #      'pdf_filenames': '20200717-112740-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.pdf'},
-    #     {'name': 'Development Sociedade de Ensino Colégio Bacana Ltda.', 'email': 'silex@silexsistemas.com.br',
-    #      'group': 'signers', 'status': 'gerado', 'sent_date': '', 'tenant': '1', 'envelope_log': 27,
-    #      'pdf_filenames': '20200717-112740-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.pdf'}
-    # ]
-    #
-    # documents = {'name': 'documento.pdf'}
-    # tid = 1
-    # envelope_log_response = dict()
-    # envelope_log_response['id'] = 27
-    #
-    # el_post_signers_log, status_code = elc.post_signers_log(el_recipients, documents, tid, envelope_log_response['id'])
-    #
-    # print(status_code)
-    #
-    # print(el_post_signers_log)
-    # =========== elc.post_signers ============= #
-
-
     # =========== envio do documento para assinatura clicksign ============= #
     # send_to_clicksign()
-    # =========== elc.get_signer_key_by_email ============= #
+    # =========== envio do documento para assinatura clicksign ============= #
 
     # =========== patch_document() ============= #
     patch_document()

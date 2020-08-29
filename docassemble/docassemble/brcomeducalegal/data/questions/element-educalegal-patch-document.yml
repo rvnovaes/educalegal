@@ -1,6 +1,6 @@
 ---
 modules:
-  - .element_educalegal_client
+  - .module_educalegal_client
 ---
 include:
   - element-custom-file-name.yml

@@ -15,7 +15,7 @@ from document.models import Document, Envelope, Signer, DocumentStatus
 from interview.models import Interview
 from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
 
-from .mayan_helpers import MayanClient
+from .mayan_client import MayanClient
 
 
 logger = logging.getLogger(__name__)
