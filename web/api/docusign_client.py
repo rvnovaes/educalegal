@@ -1,7 +1,6 @@
 # DocuSign Integration for Docassemble
 import base64
 import logging
-import os
 import json
 import jwt
 import re

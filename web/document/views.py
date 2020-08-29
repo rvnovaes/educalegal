@@ -772,8 +772,8 @@ def send_to_esignature(request, doc_uuid):
             ]
 
             if esignature_app.provider == ESignatureAppProvider.DOCUSIGN.name:
-                dsc = DocuSignClient(document.tenant.id, esignature_app.impersonated_user_guid, esignature_app.test_mode,
-                                     esignature_app.private_key)
+                dsc = DocuSignClient(esignature_app.client_id, esignature_app.impersonated_user_guid,
+                                     esignature_app.test_mode, esignature_app.private_key)
 
                 try:
                     status_code, response_json = dsc.send_to_docusign(
