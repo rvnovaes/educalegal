@@ -117,7 +117,6 @@ class ClickSignClient:
                     logger.error(message)
                     return 0, message
                 else:
-    # testar quando signer ja existe
                     if response.status_code == 201:
                         recipient['key'] = response.json()['signer']['key']
                         recipient['response_json'] = response.json()
@@ -126,8 +125,10 @@ class ClickSignClient:
                         message = 'Erro ao adicionar o signatário. Erro: {status_code} - {response}'.format(
                             status_code=response.status_code, response=response.json())
                         logger.error(message)
-
-        return response.status_code, response.json()
+        try:
+            return response.status_code, response.json()
+        except NameError:
+            return 201, 'Destinatários já existem.'
 
     def add_signer_to_document(self, document_uuid, signers):
         """

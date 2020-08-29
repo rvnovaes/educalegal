@@ -7,7 +7,8 @@ from .views import (
     ValidateCSVFile,
     generate_bulk_documents,
     bulk_generation_progress,
-    send_email
+    send_email,
+    send_to_esignature
 )
 
 app_name = "document"
@@ -29,4 +30,5 @@ urlpatterns = [
     path("bulk_document_generation/generate/progress/<int:bulk_document_generation_id>", bulk_generation_progress,
          name="bulk-document-generation-progress"),
     path("send_email/<str:doc_uuid>", send_email, name="send-email"),
+    path("send_to_esignature/<str:doc_uuid>", send_to_esignature, name="send-to-esignature"),
 ]

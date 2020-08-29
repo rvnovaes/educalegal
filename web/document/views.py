@@ -1,4 +1,3 @@
-import copy
 import io
 import logging
 import json
@@ -12,6 +11,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
+from django.db import IntegrityError
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -525,7 +525,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
             )
 
             # Se for enviar por e-mail nao enviar para Docusign
-            if interview_variables["submit_to_esignature"] == True:
+            if interview_variables["submit_to_esignature"]:
                 interview_variables["el_send_email"] = False
 
             if interview_variables["submit_to_esignature"]:
@@ -732,7 +732,7 @@ def send_email(request, doc_uuid):
             else:
                 if status_code == 202:
                     document.send_email = True
-                    document.status = 'enviado por e-mail'
+                    document.status = DocumentStatus.ENVIADO_EMAIL.value
                     document.save(update_fields=['send_email', 'status'])
 
                     message = 'O e-mail foi enviado com sucesso.'
@@ -745,6 +745,7 @@ def send_email(request, doc_uuid):
                     messages.error(request, message)
 
     return redirect("document:document-detail", doc_uuid)
+
 
 @login_required
 def send_to_esignature(request, doc_uuid):
@@ -760,6 +761,7 @@ def send_to_esignature(request, doc_uuid):
     else:
         if document.recipients:
             esignature_app = document.tenant.esignature_app
+            message = 'Não foi possível enviar para a assinatura eletrônica. Entre em contato com o suporte.'
 
             documents = [
                 {
@@ -769,74 +771,76 @@ def send_to_esignature(request, doc_uuid):
                 }
             ]
 
-            if esignature_app.provider == ESignatureAppProvider.DOCUSIGN.value:
+            if esignature_app.provider == ESignatureAppProvider.DOCUSIGN.name:
                 dsc = DocuSignClient(document.tenant.id, esignature_app.impersonated_user_guid, esignature_app.test_mode,
                                      esignature_app.private_key)
 
                 try:
-                    status_code, response_json  = dsc.send_to_docusign(
+                    status_code, response_json = dsc.send_to_docusign(
                         document.recipients, documents, send_immediately=True, email_subject="Documento para sua assinatura")
                 except Exception as e:
-                    message = str(type(e).__name__) + " : " + str(e)
-                    logger.error(message)
-                    return 0, message
+                    logger.error(str(type(e).__name__) + " : " + str(e))
+                    messages.error(request, message)
                 else:
                     if status_code == 201:
                         document.submit_to_esignature = True
                         document.status = DocumentStatus.ENVIADO_ASS_ELET.value
                         document.envelope_number = response_json['envelopeId']
                         document.save(update_fields=['submit_to_esignature', 'status', 'envelope_number'])
-                    return status_code, response_json
+                        messages.success(request, 'Documento enviado para a assinatura eletrônica com sucesso.')
 
-            elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.value:
+            elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.name:
                 csc = ClickSignClient(esignature_app.private_key, esignature_app.test_mode)
 
                 # faz o upload do documento no clicksign
                 status_code, response_json, envelope_number = csc.upload_document(documents[0])
 
                 if status_code == 201:
-                    # atualiza dados do envelope no documento do EL
-                    document.status = DocumentStatus.ENVIADO_ASS_ELET.value
-                    document.envelope_number = envelope_number
-                    document.task_submit_to_esignature = True
-
                     # verifica se o signer ja foi enviado para a clicksign
-                    document.recipients = get_signer_key_by_email(document.recipients)
-
-                    recipients_sign = copy.deepcopy(document.recipients)
+                    success, recipients_sign = get_signer_key_by_email(document.recipients, document.tenant)
+                    if not success:
+                        messages.error(request, message)
+                        return redirect("document:document-detail", doc_uuid)
 
                     # cria os destinatarios
                     status_code, reason = csc.add_signer(recipients_sign)
+                    if status_code != 201:
+                        messages.error(request, message)
+                        return redirect("document:document-detail", doc_uuid)
 
                     # adiciona signer key no educa legal
-                    data_received, status_code = elc.post_signer_key(recipients_sign, tid)
+                    if not post_signer_key(recipients_sign, esignature_app, document.tenant):
+                        messages.error(request, message)
+                        return redirect("document:document-detail", doc_uuid)
 
                     # adiciona os signatarios ao documento e envia por email para o primeiro signatario
                     # o envelope_id eh a key do documento no clicksign
-                    data_received, status_code = csc.send_to_signers(envelope_id, recipients_sign)
+                    status_code, response_json = csc.send_to_signers(envelope_number, recipients_sign)
 
                     if status_code == 202:
-                        e_signature_response_status_code = 201
-                    else:
-                        e_signature_response_status_code = 0
-                        log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(
-                            status_code=status_code, reason=data_received))
-                        log("Erro ao enviar documento para assinatura. Erro: {status_code} - {reason}".format(
-                            status_code=status_code, reason=data_received), "console")
+                        # atualiza dados do envelope no documento do EL
+                        document.status = DocumentStatus.ENVIADO_ASS_ELET.value
+                        document.envelope_number = envelope_number
+                        document.submit_to_esignature = True
+                        document.save(update_fields=['status', 'envelope_number', 'submit_to_esignature'])
 
-            if e_signature_response_status_code == 201:
-                signature_success
-            else:
-                signature_fail
+                        messages.success(request, 'Documento enviado para a assinatura eletrônica com sucesso.')
 
     return redirect("document:document-detail", doc_uuid)
 
 
-def get_signer_key_by_email(recipients):
+def get_signer_key_by_email(recipients, tenant):
+    # separa somente os destinatarios que assinam o documento
+    recipients_sign = list()
     for recipient in recipients:
+        if recipient['group'] == 'signers':
+            recipient['group'] = 'sign'
+            recipients_sign.append(recipient)
+
+    for recipient in recipients_sign:
         try:
             e_signature_app_signer_key = ESignatureAppSignerKey.objects.get(
-                tenant=recipient.tenant_id, email=recipient.email)
+                tenant=tenant, email=recipient['email'])
         except ESignatureAppSignerKey.DoesNotExist:
             recipient['key'] = ''
             recipient['new_signer'] = True
@@ -844,45 +848,32 @@ def get_signer_key_by_email(recipients):
         except Exception as e:
             message = 'Erro ao obter a chave do signatário. ' + str(type(e).__name__) + " : " + str(e)
             logger.error(message)
-            return 0, message
+            return False, None
         else:
             recipient['key'] = e_signature_app_signer_key.key
             recipient['new_signer'] = False
             recipient['status_code'] = 200
 
-    return recipients
+    return True, recipients_sign
 
 
-def post_signer_key(recipients):
+def post_signer_key(recipients, esignature_app, tenant):
     for recipient in recipients:
         if recipient['new_signer'] and recipient['status_code'] == 201:
             e_signature_app_signer_key = ESignatureAppSignerKey(
-                email=envelope_number,
-                key=envelope_status,
-                envelope_created_date=data['document']['uploaded_at'],
-                sent_date=data['document']['uploaded_at'],
-                status_update_date=data['document']['updated_at'],
-                signing_provider=ESignatureAppProvider.CLICKSIGN.value,
+                email=recipient['email'],
+                key=recipient['key'],
+                esignature_app=esignature_app,
                 tenant=tenant,
             )
-            envelope.save()
-
-            payload = {
-                "email": recipient['email'],
-                "key": recipient['key'],
-                "tenant": tenant_id,
-            }
-            final_url = self.api_base_url + "/v1/esignature-app-signer-keys/"
-
             try:
-                response = self.session.post(final_url, data=payload)
+                e_signature_app_signer_key.save()
+# testar IntegrityError - iasmini
+            except IntegrityError:
+                pass
             except Exception as e:
-                print("Erro ao gravar a chave do signatário.", "console")
-                print(e, "console")
-                return recipients, e, 0
-    try:
-        # data_sent, data_received, status_code
-        return recipients, response.json(), response.status_code
-    except NameError:
-        # data_sent, data_received, status_code
-        return recipients, 'Todos os destinatários já existiam.', 200
+                message = str(type(e).__name__) + " : " + str(e)
+                logger.error(message)
+                return False
+
+    return True

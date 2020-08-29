@@ -111,7 +111,6 @@ class DocuSignClient:
             base_url + "?response_type=code&scope=signature%20impersonation&client_id="
         )
         url += self.client_id
-        url += "&redirect_uri="
 
         return url
 
@@ -184,6 +183,7 @@ class DocuSignClient:
         """Creates an envelope and prepares it to be sent to a number of recipients."""
         # Check received recipients are okay whilst rotating the format to fix Docusign API
         rotated_recipients = {}
+        message = ''
         for index, recipient in enumerate(recipients):
             if "name" not in recipient.keys():
                 message = "Falta a chave 'name' nos destinatários."
