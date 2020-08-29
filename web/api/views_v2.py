@@ -209,7 +209,12 @@ class DocumentViewSet(viewsets.ModelViewSet):
                     tenant = Tenant.objects.get(pk=params['tenant_id'])
                     ged_url = tenant.tenantgeddata.url
                     ged_token = tenant.tenantgeddata.token
-                    mc = MayanClient(ged_url, ged_token)
+
+                    has_ged = True
+                    # se o cliente nao tem ged, nao envia para o ged
+                    if not (ged_url or ged_token):
+                        has_ged = False
+
                     data = request.data.copy()
 
                     # salva o pdf no sistema de arquivos
@@ -217,66 +222,70 @@ class DocumentViewSet(viewsets.ModelViewSet):
                     path = 'docassemble/' + params['pdf_filename'][:15]
                     absolute_path = save_file_from_url(params['pdf_url'], path, params['pdf_filename'])
 
-                    # salva o pdf no ged
-                    try:
-                        ged_status_code, ged_response, ged_id = mc.document_create(data, absolute_path)
-                    except Exception as e:
-                        message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(e)
-                        logging.exception(message)
-                    else:
-                        if ged_status_code != 201:
-                            message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(ged_status_code) + ' - ' + \
-                                      ged_response
+                    if has_ged:
+                        mc = MayanClient(ged_url, ged_token)
+
+                        # salva o pdf no ged
+                        try:
+                            ged_status_code, ged_response, ged_id = mc.document_create(data, absolute_path)
+                        except Exception as e:
+                            message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(e)
                             logging.exception(message)
                         else:
-                            try:
-                                ged_document_data = mc.document_read(ged_id)
-                            except Exception as e:
-                                message = 'Não foi possível localizar o pdf no GED. Erro: ' + str(e)
+                            if ged_status_code != 201:
+                                message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(ged_status_code) + ' - ' + \
+                                          ged_response
                                 logging.exception(message)
                             else:
-                                instance.pdf_ged_id = ged_document_data['id']
-                                instance.pdf_ged_link = ged_document_data['latest_version']['download_url']
-                                instance.pdf_ged_uuid = ged_document_data['uuid']
-                                instance.pdf_absolute_path = absolute_path
-                                instance.status = DocumentStatus.INSERIDO_GED.value
+                                try:
+                                    ged_document_data = mc.document_read(ged_id)
+                                except Exception as e:
+                                    message = 'Não foi possível localizar o pdf no GED. Erro: ' + str(e)
+                                    logging.exception(message)
+                                else:
+                                    instance.pdf_ged_id = ged_document_data['id']
+                                    instance.pdf_ged_link = ged_document_data['latest_version']['download_url']
+                                    instance.pdf_ged_uuid = ged_document_data['uuid']
+                                    instance.pdf_absolute_path = absolute_path
+                                    instance.status = DocumentStatus.INSERIDO_GED.value
 
-                                # salva dados do ged do documento no educa legal
-                                instance.save(update_fields=['pdf_ged_id', 'pdf_ged_link', 'pdf_ged_uuid',
-                                                             'pdf_absolute_path', 'status'])
+                                    # salva dados do ged do documento no educa legal
+                                    instance.save(update_fields=['pdf_ged_id', 'pdf_ged_link', 'pdf_ged_uuid',
+                                                                 'pdf_absolute_path', 'status'])
 
                     # salva o docx no sistema de arquivos
                     data['name'] = params['docx_filename']
                     path = 'docassemble/' + params['docx_filename'][:15]
                     absolute_path = save_file_from_url(params['docx_url'], path, params['docx_filename'])
 
-                    # salva o docx no ged
-                    try:
-                        ged_status_code, ged_response, ged_id = mc.document_create(data, absolute_path)
-                    except Exception as e:
-                        message = 'Não foi possível inserir o docx no GED. Erro: ' + str(e)
-                        logging.exception(message)
-                    else:
-                        if ged_status_code != 201:
-                            message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(ged_status_code) + ' - ' + \
-                                      ged_response
+                    if has_ged:
+                        # salva o docx no ged
+                        try:
+                            ged_status_code, ged_response, ged_id = mc.document_create(data, absolute_path)
+                        except Exception as e:
+                            message = 'Não foi possível inserir o docx no GED. Erro: ' + str(e)
                             logging.exception(message)
                         else:
-                            try:
-                                ged_document_data = mc.document_read(ged_id)
-                            except Exception as e:
-                                message = 'Não foi possível localizar o docx no GED. Erro: ' + str(e)
+                            if ged_status_code != 201:
+                                message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(ged_status_code) + ' - ' + \
+                                          ged_response
                                 logging.exception(message)
                             else:
-                                instance.docx_ged_id = ged_document_data['id']
-                                instance.docx_ged_link = ged_document_data['latest_version']['download_url']
-                                instance.docx_ged_uuid = ged_document_data['uuid']
-                                instance.docx_absolute_path = absolute_path
-                                instance.status = DocumentStatus.INSERIDO_GED.value
+                                try:
+                                    ged_document_data = mc.document_read(ged_id)
+                                except Exception as e:
+                                    message = 'Não foi possível localizar o docx no GED. Erro: ' + str(e)
+                                    logging.exception(message)
+                                else:
+                                    instance.docx_ged_id = ged_document_data['id']
+                                    instance.docx_ged_link = ged_document_data['latest_version']['download_url']
+                                    instance.docx_ged_uuid = ged_document_data['uuid']
+                                    instance.docx_absolute_path = absolute_path
+                                    instance.status = DocumentStatus.INSERIDO_GED.value
 
-                                # salva dados do ged do documento no educa legal
-                                instance.save(update_fields=['docx_ged_id', 'docx_ged_link', 'docx_ged_uuid',
-                                                             'docx_absolute_path', 'status'])
+                                    # salva dados do ged do documento no educa legal
+                                    instance.save(update_fields=['docx_ged_id', 'docx_ged_link', 'docx_ged_uuid',
+                                                                 'docx_absolute_path', 'status'])
 
             return Response(serializer.data)
 

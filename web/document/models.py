@@ -222,15 +222,15 @@ class DocumentTaskView(TenantAwareModel):
         max_length=256, default="", verbose_name="Id do Envelope"
     )
     document_status = models.CharField(max_length=256, default="", verbose_name="Status do Documento")
-    ged_id = models.CharField(
-        max_length=128, default="", verbose_name="ID do Documento no GED"
+    pdf_ged_id = models.CharField(
+        max_length=128, default="", verbose_name="ID do PDF do documento no GED"
     )
-    ged_link = models.CharField(max_length=256, default="", verbose_name="Link")
-    ged_uuid = models.CharField(
+    pdf_ged_link = models.CharField(max_length=256, default="", verbose_name="Link do PDF")
+    pdf_ged_uuid = models.CharField(
         max_length=256,
         default="",
         help_text="UUID do documento. UUID = Universally Unique ID.",
-        verbose_name="UUID",
+        verbose_name="UUID do PDF",
     )
     description = models.TextField(default="", verbose_name="Descrição")
     interview = models.ForeignKey(

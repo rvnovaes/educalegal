@@ -6,7 +6,7 @@ from .models import Document, BulkDocumentGeneration, DocumentTaskView
 
 class DocumentTable(tables.Table):
     interview = tables.LinkColumn("document:document-detail", args=[A("pk")])
-    ged_link = tables.TemplateColumn(
+    pdf_ged_link = tables.TemplateColumn(
         template_name="document/download_button.html", verbose_name="Baixar"
     )
     created_date = tables.DateTimeColumn(format="d/m/Y H:i:s")
@@ -16,7 +16,7 @@ class DocumentTable(tables.Table):
         if not request.user.tenant.plan.use_esignature:
             self.columns.hide('signing_provider')
         if not request.user.tenant.plan.use_ged:
-            self.columns.hide('ged_link')
+            self.columns.hide('pdf_ged_link')
         if not (request.user.tenant.plan.use_ged or request.user.tenant.plan.use_esignature):
             self.columns.hide('altered_date')
 
@@ -33,7 +33,7 @@ class DocumentTable(tables.Table):
             "submit_to_esignature",
             "send_email",
             "status",
-            "ged_link",
+            "pdf_ged_link",
         )
 
 
@@ -64,7 +64,7 @@ class DocumentTaskViewTable(tables.Table):
     task_status = tables.TemplateColumn(
         template_name="document/task_status.html", verbose_name="Status de Tarefa"
     )
-    ged_link = tables.TemplateColumn(
+    pdf_ged_link = tables.TemplateColumn(
         template_name="document/download_button.html", verbose_name="Baixar"
     )
 

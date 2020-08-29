@@ -868,7 +868,6 @@ def post_signer_key(recipients, esignature_app, tenant):
             )
             try:
                 e_signature_app_signer_key.save()
-# testar IntegrityError - iasmini
             except IntegrityError:
                 pass
             except Exception as e:

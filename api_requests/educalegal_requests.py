@@ -183,7 +183,7 @@ if __name__ == "__main__":
     # )
     # print(response)
     #
-    # response = elc.patch_document_with_ged_data(
+    # response = elc.patch_document(PARAMETROS DEVEM SER PASSADOS COMO DICT (data, params)
     #     el_document_created_doc_uuid, ged_id, ged_link, ged_uuid, status="inserido no GED",
     # )
     #
