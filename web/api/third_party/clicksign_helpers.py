@@ -54,26 +54,13 @@ recipient_types = {
 
 logger = logging.getLogger(__name__)
 
-if settings.EL_ENV == 'production':
-    secret_key = '49bc7fbfbe3e41188c0cd5ce679eff56'
-else:
-    secret_key = '6c49e1a0f98862bd735efec7548148b4'
 
+def verify_hmac(headers, request_body, test_mode):
+    if test_mode:
+        secret_key = '3d46fb2ab42bb79822d7294923bc071b'
+    else:
+        secret_key = '49bc7fbfbe3e41188c0cd5ce679eff56'
 
-# HMAC DOCUSIGN (TESTAR NO CLICKSIGN)
-def ComputeHash(secret, payload):
-    import base64
-    hashBytes = hmac.new(secret, msg=payload, digestmod=hashlib.sha256).digest()
-    base64Hash = base64.b64encode(hashBytes)
-    return base64Hash
-
-
-def HashIsValid(secret, payload, verify):
-    return verify == ComputeHash(secret, payload)
-
-
-def verify_hmac(headers, request_body):
-    # Note: HTTP headers are case insensitive
     try:
         received_mac = headers.get('Content-Hmac')
         logging.info('received_mac')
@@ -119,14 +106,6 @@ def webhook_listener(request):
         # converte json para dict
         data = json.loads(request.body)
 
-        # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
-        # HMAC é uma forma de verificar a integridade das informações transmitidas em um meio não confiável, i.e. a
-        # Internet, através de uma chave secreta compartilhada entre as partes para validar as informações transmitidas.
-        # logging.info('hmac 3')
-        # if not verify_hmac(request.headers, request.body):
-        #     return HttpResponse('HMACs não correspondem.')
-        # logging.info('hmac 4')
-
         # localiza o documento pelo uuid
         envelope_number = data['document']['key']
         try:
@@ -144,6 +123,14 @@ def webhook_listener(request):
             logging.info(message)
             return HttpResponse(message)
         else:
+            # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
+            # HMAC é uma forma de verificar a integridade das informações transmitidas em um meio não confiável, i.e. a
+            # Internet, através de uma chave secreta compartilhada entre as partes para validar as informações transmitidas.
+            # logging.info('hmac 3')
+            # if not verify_hmac(request.headers, request.body, document.tenant.esignature_app.test_mode):
+            #     return HttpResponse('HMACs não correspondem.')
+            # logging.info('hmac 4')
+
             envelope_status = str(data['document']['status']).lower()
             if envelope_status in envelope_statuses.keys():
                 document_status = envelope_statuses[envelope_status]['el']

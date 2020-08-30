@@ -231,7 +231,7 @@ def send_to_signers():
 
 
 if __name__ == '__main__':
-    # upload_document()
+    upload_document()
 
     # print(upload_document())
     # print(add_signer())
@@ -239,4 +239,4 @@ if __name__ == '__main__':
     # print(send_email())
 
     # send_to_signers()
-    csc.get_document(document_uuid)
+    # csc.get_document(document_uuid)

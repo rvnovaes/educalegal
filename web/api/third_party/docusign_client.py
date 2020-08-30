@@ -3,7 +3,6 @@ import base64
 import logging
 import json
 import jwt
-import os
 import re
 import requests
 import time
@@ -11,45 +10,6 @@ import time
 __all__ = ["DocuSignClient", "make_document_base64"]
 
 logger = logging.getLogger(__name__)
-
-# el_environment = os.environ.get('EL_ENV')
-el_environment = 'development'
-
-if el_environment == "production":
-    webhook_url = "https://app.educalegal.com.br/v1/docusign/webhook"
-else:
-    webhook_url = "https://test.educalegal.com.br/v1/docusign/webhook"
-
-event_notification = {
-    "url": webhook_url,
-    "loggingEnabled": "true",  # The api wants strings for true/false
-    "requireAcknowledgment": "true",
-    "useSoapInterface": "false",
-    "includeCertificateWithSoap": "false",
-    "signMessageWithX509Cert": "false",
-    "includeDocuments": "true",
-    "includeEnvelopeVoidReason": "true",
-    "includeTimeZone": "true",
-    "includeSenderAccountAsCustomField": "true",
-    "includeDocumentFields": "true",
-    "includeCertificateOfCompletion": "true",
-    "envelopeEvents": [  # for this recipe, we're requesting notifications
-        # for all envelope and recipient events
-        {"envelopeEventStatusCode": "sent"},
-        {"envelopeEventStatusCode": "delivered"},
-        {"envelopeEventStatusCode": "completed"},
-        {"envelopeEventStatusCode": "declined"},
-        {"envelopeEventStatusCode": "voided"},
-    ],
-    "recipientEvents": [
-        {"recipientEventStatusCode": "Sent"},
-        {"recipientEventStatusCode": "Delivered"},
-        {"recipientEventStatusCode": "Completed"},
-        {"recipientEventStatusCode": "Declined"},
-        {"recipientEventStatusCode": "AuthenticationFailed"},
-        {"recipientEventStatusCode": "AutoResponded"},
-    ],
-}
 
 RECIPIENT_TYPES = {
     "agents": {},
@@ -101,6 +61,42 @@ class DocuSignClient:
         self.impersonated_user_guid = impersonated_user_guide
         self.test_mode = test_mode
         self.private_key = private_key
+
+        if self.test_mode:
+            webhook_url = "https://test.educalegal.com.br/v1/docusign/webhook"
+        else:
+            webhook_url = "https://app.educalegal.com.br/v1/docusign/webhook"
+
+        self.event_notification = {
+            "url": webhook_url,
+            "loggingEnabled": "true",  # The api wants strings for true/false
+            "requireAcknowledgment": "true",
+            "useSoapInterface": "false",
+            "includeCertificateWithSoap": "false",
+            "signMessageWithX509Cert": "false",
+            "includeDocuments": "true",
+            "includeEnvelopeVoidReason": "true",
+            "includeTimeZone": "true",
+            "includeSenderAccountAsCustomField": "true",
+            "includeDocumentFields": "true",
+            "includeCertificateOfCompletion": "true",
+            "envelopeEvents": [  # for this recipe, we're requesting notifications
+                # for all envelope and recipient events
+                {"envelopeEventStatusCode": "sent"},
+                {"envelopeEventStatusCode": "delivered"},
+                {"envelopeEventStatusCode": "completed"},
+                {"envelopeEventStatusCode": "declined"},
+                {"envelopeEventStatusCode": "voided"},
+            ],
+            "recipientEvents": [
+                {"recipientEventStatusCode": "Sent"},
+                {"recipientEventStatusCode": "Delivered"},
+                {"recipientEventStatusCode": "Completed"},
+                {"recipientEventStatusCode": "Declined"},
+                {"recipientEventStatusCode": "AuthenticationFailed"},
+                {"recipientEventStatusCode": "AutoResponded"},
+            ],
+        }
 
     def authorization_link(self):
         if self.test_mode:
@@ -274,7 +270,7 @@ class DocuSignClient:
             "recipients": rotated_recipients,
             "documents": documents,
             "envelopecustomFields": rotated_fields,
-            "eventNotification": event_notification,
+            "eventNotification": self.event_notification,
         }
 
         for key in kwargs:
