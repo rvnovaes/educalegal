@@ -21,15 +21,8 @@ id: logic
 mandatory: True
 code: |
   if valid_data:
-    menu_items
-    if len(school_names_list) > 1:
-      selected_school
-    else:
-      selected_school = school_names_list[0]
-    school
     nomeAluno
     generated_file
-    el_patch_document
     document_ready_screen
 ---
 progress: 10

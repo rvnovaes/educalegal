@@ -110,6 +110,8 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, MultipleField
             pass
         else:
             context['signers'] = list(signers)
+            context['docx_file'] = document.get_docx_file
+            context['related_documents'] = document.get_related_documents
             signer_statuses = list()
             for signer in signers:
                 signer_statuses.append(signer.status)
@@ -712,12 +714,12 @@ def send_email(request, doc_uuid):
             file_name = document.name
 
             file = None
-            if document.pdf_absolute_path:
-                file_path = document.pdf_absolute_path
+            if document.absolute_path:
+                file_path = document.absolute_path
             else:
                 file_path = ''
-                if document.tenant.plan.use_ged and document.pdf_ged_link:
-                    response = requests.get(document.pdf_ged_link)
+                if document.tenant.plan.use_ged and document.ged_link:
+                    response = requests.get(document.ged_link)
                     file = io.BytesIO(response.content)
 
             try:
@@ -767,7 +769,7 @@ def send_to_esignature(request, doc_uuid):
                 {
                     'name': document.name,
                     'fileExtension': 'pdf',
-                    'documentBase64': make_document_base64(document.pdf_absolute_path)
+                    'documentBase64': make_document_base64(document.absolute_path)
                 }
             ]
 

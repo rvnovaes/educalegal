@@ -13,59 +13,29 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='document',
-            name='docx_ged_id',
-            field=models.CharField(blank=True, max_length=128, verbose_name='ID do Docx do documento no GED'),
-        ),
-        migrations.AddField(
-            model_name='document',
-            name='docx_ged_link',
-            field=models.CharField(blank=True, max_length=255, verbose_name='Link do Docx'),
-        ),
-        migrations.AddField(
-            model_name='document',
-            name='docx_ged_uuid',
-            field=models.CharField(blank=True, help_text='UUID do documento em Docx. UUID = Universally Unique ID.', max_length=255, verbose_name='UUID do Docx'),
-        ),
-        migrations.AlterField(
-            model_name='document',
-            name='ged_id',
-            field=models.CharField(blank=True, default='', max_length=128, verbose_name='ID do PDF do documento no GED'),
-        ),
-        migrations.AlterField(
-            model_name='document',
-            name='ged_link',
-            field=models.CharField(blank=True, default='', max_length=256, verbose_name='Link do PDF'),
-        ),
-        migrations.AlterField(
-            model_name='document',
-            name='ged_uuid',
-            field=models.CharField(blank=True, default='', help_text='UUID do documento em PDF. UUID = Universally Unique ID.', max_length=256, verbose_name='UUID do PDF'),
-        ),
-        migrations.AddField(
-            model_name='document',
             name='recipients',
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, verbose_name='Destinatários do e-mail/assinatura eletrônica'),
         ),
-        migrations.AddField(
+        migrations.RemoveField(
             model_name='document',
-            name='docx_absolute_path',
-            field=models.CharField(blank=True, max_length=255, verbose_name='Caminho absoluto Docx'),
+            name='related_documents',
         ),
         migrations.AddField(
             model_name='document',
-            name='pdf_absolute_path',
-            field=models.CharField(blank=True, max_length=255, verbose_name='Caminho absoluto PDF'),
+            name='file_kind',
+            field=models.CharField(choices=[('PDF', 'pdf'), ('DOCX', 'docx'), ('PDF_SIGNED', 'pdf_signed'),
+                                            ('PDF_CERTIFIED', 'pdf_certified')], default='pdf', max_length=255,
+                                   verbose_name='Tipo de arquivo'),
         ),
-        migrations.RenameField(
+        migrations.AddField(
             model_name='document',
-            old_name='ged_id',
-            new_name='pdf_ged_id'),
-        migrations.RenameField(
+            name='parent',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='related_document', to='document.Document'),
+        ),
+        migrations.AddField(
             model_name='document',
-            old_name='ged_link',
-            new_name='pdf_ged_link'),
-        migrations.RenameField(
-            model_name='document',
-            old_name='ged_uuid',
-            new_name='pdf_ged_uuid'),
+            name='absolute_path',
+            field=models.CharField(blank=True, max_length=255, verbose_name='Caminho absoluto'),
+        ),
     ]

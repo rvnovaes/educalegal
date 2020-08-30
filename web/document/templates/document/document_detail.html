@@ -30,15 +30,20 @@
         </div>
     </div>
 
-    <br/>
-    <div class="text-center">
-        <a target="_blank" href="{{ document.pdf_ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
-        <a target="_blank" href="{{ document.docx_ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
-        {% if not document.envelope %}
-            <a href="{% url 'document:send-to-esignature' document.doc_uuid %}"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>
-        {% endif %}
-        <a href="{% url 'document:send-email' document.doc_uuid %}"><button type="button" class="btn btn-info">Enviar por email</button></a>
-    </div>
+    {% if not document.parent %}
+        <br/>
+        <div class="text-center">
+            <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
+            {% if docx_file.ged_link %}
+                <a target="_blank" href="{{ docx_file.ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
+            {% endif %}
+            {% if not document.envelope %}
+                <a href="{% url 'document:send-to-esignature' document.doc_uuid %}"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>
+            {% endif %}
+            <a href="{% url 'document:send-email' document.doc_uuid %}"><button type="button" class="btn btn-info">Enviar por email</button></a>
+        </div>
+        <br/>
+    {% endif %}
 
     <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% include "snippets/messages.html" %}
@@ -73,7 +78,6 @@
                 </div>
             {% endwith %}
 
-
             {% if signers %}
                 <div class="card-header">
                   <h5>Detalhes dos Destinatários</h5>
@@ -103,21 +107,20 @@
                   </div>
                 </div>
             {% endif %}
-
-            <br/>
-            {% if document.documents.all %}
-                <div class="card-header">
-                    <h5>Documentos Relacionados</h5>
-                </div>
-                <br/>
-                <ul>
-                    {% for related_document in document.documents.all %}
-                        <li><a href="{% url 'document:document-detail' pk=related_document.pk %}"
-                               target="_blank">{{ related_document.name }}</a></li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
         </div>
+    {% endif %}
+
+    {% if related_documents %}
+        <div class="card-header">
+            <h5>Documentos Relacionados</h5>
+        </div>
+        <br/>
+        <ul>
+            {% for related_document in related_documents %}
+                <li><a href="{% url 'document:document-detail' pk=related_document.pk %}"
+                       target="_blank">{{ related_document.name }}</a></li>
+            {% endfor %}
+        </ul>
     {% endif %}
 
     <script type="text/javascript">

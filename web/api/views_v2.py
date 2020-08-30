@@ -1,8 +1,8 @@
 import io
 import logging
+import uuid
 
-from django.shortcuts import get_object_or_404
-from django.http import FileResponse
+from copy import deepcopy
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
@@ -15,13 +15,16 @@ from rest_framework.exceptions import (
 from rest_framework import status
 from validator_collection import checkers
 
-from document.models import Document, DocumentStatus
+from django.shortcuts import get_object_or_404
+from django.http import FileResponse
+
+from api.third_party.mayan_client import MayanClient
+from document.models import Document, DocumentStatus, DocumentFileKind
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
 from util.util import save_file_from_url
 
-from api.third_party.mayan_client import MayanClient
 from .serializers_v2 import (
     PlanSerializer,
     DocumentSerializer,
@@ -255,15 +258,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
                                 message = 'Não foi possível localizar o pdf no GED. Erro: ' + str(e)
                                 logging.exception(message)
                             else:
-                                document.pdf_ged_id = ged_document_data['id']
-                                document.pdf_ged_link = ged_document_data['latest_version']['download_url']
-                                document.pdf_ged_uuid = ged_document_data['uuid']
-                                document.pdf_absolute_path = absolute_path
+                                document.ged_id = ged_document_data['id']
+                                document.ged_link = ged_document_data['latest_version']['download_url']
+                                document.ged_uuid = ged_document_data['uuid']
+                                document.absolute_path = absolute_path
                                 document.status = DocumentStatus.INSERIDO_GED.value
-
+                                document.file_kind = DocumentFileKind.PDF.value
                                 # salva dados do ged do documento no educa legal
-                                document.save(update_fields=['pdf_ged_id', 'pdf_ged_link', 'pdf_ged_uuid',
-                                                             'pdf_absolute_path', 'status'])
+                                document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'absolute_path',
+                                                             'status', 'file_kind'])
 
                 # salva o docx no sistema de arquivos
                 data['name'] = params['docx_filename']
@@ -290,15 +293,20 @@ class DocumentViewSet(viewsets.ModelViewSet):
                                 message = 'Não foi possível localizar o docx no GED. Erro: ' + str(e)
                                 logging.exception(message)
                             else:
-                                document.docx_ged_id = ged_document_data['id']
-                                document.docx_ged_link = ged_document_data['latest_version']['download_url']
-                                document.docx_ged_uuid = ged_document_data['uuid']
-                                document.docx_absolute_path = absolute_path
-                                document.status = DocumentStatus.INSERIDO_GED.value
+                                related_document = deepcopy(document)
+                                # cria documento do word relacionado ao documento pdf principal
+                                related_document.id = None
+                                related_document.doc_uuid = uuid.uuid4()
+                                related_document.ged_id = ged_document_data['id']
+                                related_document.ged_link = ged_document_data['latest_version']['download_url']
+                                related_document.ged_uuid = ged_document_data['uuid']
+                                related_document.absolute_path = absolute_path
+                                related_document.status = DocumentStatus.INSERIDO_GED.value
+                                related_document.file_kind = DocumentFileKind.DOCX.value
+                                related_document.parent = document
 
                                 # salva dados do ged do documento no educa legal
-                                document.save(update_fields=['docx_ged_id', 'docx_ged_link', 'docx_ged_uuid',
-                                                             'docx_absolute_path', 'status'])
+                                related_document.save()
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -417,14 +425,14 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
         ged_url, tenant_ged_token = validate_tenant_plan_ged(tenant)
 
         mc = MayanClient(ged_url, tenant_ged_token)
-        response = mc.document_simple_read(document.pdf_ged_id)
+        response = mc.document_simple_read(document.ged_id)
 
         if response.status_code == 404:
             message = "O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal. Verifique a lixeira no GED."
             logger.info(message)
             raise NotFound(message)
 
-        response = mc.document_download(document.pdf_ged_id)
+        response = mc.document_download(document.ged_id)
         f = io.BytesIO(response.content)
 
         return FileResponse(f, as_attachment=True, filename=document.name)
@@ -482,7 +490,7 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
         mc = MayanClient(ged_url, tenant_ged_token)
 
         try:
-            response = mc.document_delete(document.pdf_ged_id)
+            response = mc.document_delete(document.ged_id)
         except Exception as e:
             message = "Houve algum erro de comunicação ou de processamento com o GED: {e}".format(
                 e=e
