@@ -78,7 +78,7 @@ deactivate GED
 EducaLegal -> EducaLegal: atualiza dados do GED no Educa Legal
 User -> EducaLegal: Clicks Button to ESignature
 
-EducaLegal -> ESignature: POST send_to_ESignature((recipients, documents, send_immediately, email_subject)
+EducaLegal -> ESignature: POST send_to_ESignature((recipients, documents, email_subject)
 activate ESignature
 
 ESignature -> EducaLegal: envelope_data

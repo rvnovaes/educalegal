@@ -54,13 +54,10 @@ recipient_types = {
 
 logger = logging.getLogger(__name__)
 
-# if os.environ.get('EL_ENV') == 'production':
-#     secret_key = 'gerar no ambiente de producao'
-# else:
-#     secret_key = '6c49e1a0f98862bd735efec7548148b4'
-
-# DEVELOPMENT - VER COMO PEGO O EL_ENV DO CONTAINER
-secret_key = '6c49e1a0f98862bd735efec7548148b4'
+if settings.EL_ENV == 'production':
+    secret_key = '49bc7fbfbe3e41188c0cd5ce679eff56'
+else:
+    secret_key = '6c49e1a0f98862bd735efec7548148b4'
 
 
 # HMAC DOCUSIGN (TESTAR NO CLICKSIGN)

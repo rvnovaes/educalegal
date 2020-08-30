@@ -1,19 +1,17 @@
 import logging
-import os
 
 from requests import Session
-
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
+
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 __all__ = ["ClickSignClient"]
 
-el_environment = os.environ.get('EL_ENV')
-# el_environment = 'development'
-
-if el_environment == "production":
+settings.configure()
+if settings.EL_ENV == 'production':
     webhook_url = "https://app.educalegal.com.br/v1/clicksign/webhook"
 else:
     webhook_url = "https://test.educalegal.com.br/v1/clicksign/webhook"

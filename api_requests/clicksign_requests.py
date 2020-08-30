@@ -1,4 +1,4 @@
-from api.clicksign_client import ClickSignClient
+from api.third_party.clicksign_client import ClickSignClient
 
 ###### LOCALHOST ######
 token = "dc0251e3-bb8e-4813-84c0-1158ba0bdbcf"
@@ -238,5 +238,5 @@ if __name__ == '__main__':
     # print(add_signer_to_document())
     # print(send_email())
 
-    send_to_signers()
-
+    # send_to_signers()
+    csc.get_document(document_uuid)

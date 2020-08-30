@@ -21,7 +21,7 @@ from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
 from util.util import save_file_from_url
 
-from .mayan_client import MayanClient
+from api.third_party.mayan_client import MayanClient
 from .serializers_v2 import (
     PlanSerializer,
     DocumentSerializer,

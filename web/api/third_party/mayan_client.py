@@ -110,4 +110,3 @@ class MayanClient:
             elif response.status_code == 204:
                 print('ID removido da lixeira: {id}'.format(id=document_id))
         return response
-

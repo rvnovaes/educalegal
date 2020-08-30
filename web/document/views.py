@@ -21,9 +21,9 @@ from django.utils.safestring import mark_safe
 from django.views import View
 from rest_framework import generics
 
-from api.clicksign_client import ClickSignClient
-from api.docusign_client import DocuSignClient, make_document_base64
-from api.sendgrid_client import send_email as sendgrid_send_email
+from api.third_party.clicksign_client import ClickSignClient
+from api.third_party.docusign_client import DocuSignClient, make_document_base64
+from api.third_party.sendgrid_client import send_email as sendgrid_send_email
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
 from tenant.models import Tenant, ESignatureAppProvider, ESignatureAppSignerKey
@@ -777,7 +777,7 @@ def send_to_esignature(request, doc_uuid):
 
                 try:
                     status_code, response_json = dsc.send_to_docusign(
-                        document.recipients, documents, send_immediately=True, email_subject="Documento para sua assinatura")
+                        document.recipients, documents, email_subject="Documento para sua assinatura")
                 except Exception as e:
                     logger.error(str(type(e).__name__) + " : " + str(e))
                     messages.error(request, message)

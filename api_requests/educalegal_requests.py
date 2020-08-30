@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
 from module_educalegal_client import EducaLegalClient
-from api.clicksign_client import ClickSignClient
+from api.third_party.clicksign_client import ClickSignClient
 
 ###### PRODUCTION ######
 # token_csc = "4806d373-89b8-4dcc-aa04-87dc8f1a31ea"
