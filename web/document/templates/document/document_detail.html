@@ -30,9 +30,9 @@
         </div>
     </div>
 
-    {% if not document.parent %}
-        <br/>
-        <div class="text-center">
+    <br/>
+    <div class="text-center">
+        {% if not document.parent %}
             <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
             {% if docx_file.ged_link %}
                 <a target="_blank" href="{{ docx_file.ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
@@ -41,9 +41,11 @@
                 <a href="{% url 'document:send-to-esignature' document.doc_uuid %}"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>
             {% endif %}
             <a href="{% url 'document:send-email' document.doc_uuid %}"><button type="button" class="btn btn-info">Enviar por email</button></a>
-        </div>
-        <br/>
-    {% endif %}
+        {% else %}
+            <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-primary">Download</button></a>
+        {% endif %}
+    </div>
+    <br/>
 
     <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% include "snippets/messages.html" %}

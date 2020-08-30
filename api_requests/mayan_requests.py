@@ -26,8 +26,13 @@ tenant_ged_token = '47f210da48587cb14357e4352d31e0a9c3ae63c0'
 if __name__ == '__main__':
     mc = MayanClient(base_url, tenant_ged_token)
     # filename = 'lorem-ipsum.pdf'
-    # label = 'lorem_ipsum_teste'
-    # response = mc.document_create(filename, 1, label, 'por', 'Apenas um teste...').json()
+    # data = {
+    #     "description": 'Apenas um teste...',
+    #     "document_type": 1,
+    #     "label": 'lorem_ipsum_teste',
+    #     "language": 'por',
+    # }
+    # response = mc.document_create(data, filename).json()
     # print(response)
     # document_id = 1958
     # response = mc.document_read(document_id)

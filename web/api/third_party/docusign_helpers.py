@@ -208,22 +208,22 @@ def docusign_webhook_listener(request):
                 if tenant.plan.use_ged:
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
-                    document_type_pk = interview.document_type.pk
-                    document_language = interview.language
 
                     # Post documents to GED if envelope_status is completed
                     tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
                     mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
+                    document_description = interview.description if interview.description else ''
+
+                    data = {
+                        "description": document_description,
+                        "document_type": interview.document_type.pk,
+                        "label": interview.name,
+                        "language": interview.language,
+                    }
 
                     pdf_filenames = list()
                     for pdf in envelope_data["pdf_documents"]:
-                        response = mc.document_create(
-                            pdf["full_filename"],
-                            document_type_pk,
-                            pdf["filename"],
-                            document_language,
-                            pdf["description"],
-                        )
+                        response = mc.document_create(data, pdf["full_filename"])
                         logger.debug("Posting document to GED: " + pdf["filename"])
                         logger.debug(response.text)
 

@@ -157,15 +157,16 @@ def webhook_listener(request):
                     tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
                     mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
 
+                    data = {
+                        "description": document_description,
+                        "document_type": interview.document_type.pk,
+                        "label": interview.name,
+                        "language": interview.language,
+                    }
+
                     try:
                         # salva documento no ged
-                        response = mc.document_create(
-                            fullpath,
-                            document_type_pk,
-                            filename,
-                            document_language,
-                            document_description,
-                        )
+                        response = mc.document_create(data, fullpath)
                         logging.debug("Posting document to GED: " + filename)
                         logging.debug(response.text)
                     except Exception as e:
