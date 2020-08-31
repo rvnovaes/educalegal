@@ -111,7 +111,7 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, MultipleField
             pass
         else:
             context['signers'] = list(signers)
-            context['docx_file'] = document.get_docx_file
+            context['docx_file'] = document.get_docx_file()
             context['related_documents'] = document.get_related_documents
             signer_statuses = list()
             for signer in signers:
@@ -657,7 +657,7 @@ def query_documents_by_args(pk=None, **kwargs):
     else:
         order_column = order_column[1]
 
-    queryset = Document.objects.filter(tenant=pk)
+    queryset = Document.objects.filter(tenant=pk, parent=None)
     total = queryset.count()
 
     if search_value:
@@ -894,7 +894,6 @@ def save_document_data(document, has_ged, ged_data, absolute_path, parent=None):
         # cria documento do word relacionado ao documento pdf principal
         document.id = None
         document.doc_uuid = uuid.uuid4()
-        document.file_kind = DocumentFileKind.DOCX.value
         document.parent = parent
         document.document_data = None
 

@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.conf import settings
 
-from document.models import Document, Envelope, Signer, DocumentStatus
+from document.models import Document, Envelope, Signer, DocumentStatus, DocumentFileKind
 from document.views import save_document_data
 from interview.models import Interview
 from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
@@ -127,9 +127,11 @@ def docusign_pdf_files_saver(data, envelope_dir):
     # Loop through the DocumentPDFs element, storing each document.
     for pdf in xml["DocumentPDFs"]["DocumentPDF"]:
         if pdf["DocumentType"] == "CONTENT":
+            pdf["file_kind"] = DocumentFileKind.PDF_SIGNED.value
             filename = main_filename_no_extension + "_assinado.pdf"
             description = main_filename_no_extension + ".pdf completo."
         elif pdf["DocumentType"] == "SUMMARY":
+            pdf["file_kind"] = DocumentFileKind.PDF_CERTIFIED.value
             filename = main_filename_no_extension + "_certificado.pdf"
             description = (
                 main_filename_no_extension + ".pdf certificado de assinaturas."
@@ -234,7 +236,7 @@ def docusign_webhook_listener(request):
 
                             logging.info('passou_aqui_3-1-status_code')
                             logging.info(status_code)
-                            logging.info('passou_aqui_3-1')
+                            logging.info('passou_aqui_3-1-ged_data')
                             logging.info(ged_data)
                         except Exception as e:
                             logging.info('passou_aqui_4')
@@ -252,6 +254,7 @@ def docusign_webhook_listener(request):
                                 logging.info('passou_aqui_6')
                                 # salva o documento baixado no EL como documento relacionado
                                 related_document = deepcopy(document)
+                                related_document.file_kind = pdf["file_kind"]
                                 save_document_data(related_document, has_ged, ged_data, pdf["full_filename"], document)
                             else:
                                 logging.info('passou_aqui_7')
@@ -267,6 +270,7 @@ def docusign_webhook_listener(request):
                         logging.info('passou_aqui_8')
                         # salva o documento baixado no EL como documento relacionado
                         related_document = deepcopy(document)
+                        related_document.file_kind = pdf["file_kind"]
                         save_document_data(related_document, has_ged, None, pdf["full_filename"], document)
             except Exception as e:
                 logging.info('passou_aqui_9')

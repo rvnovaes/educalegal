@@ -18,7 +18,7 @@ from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 
 from api.third_party.mayan_client import MayanClient
-from document.models import Document
+from document.models import Document, DocumentFileKind
 from document.views import save_document_data
 from interview.models import Interview
 from school.models import School, SchoolUnit
@@ -216,6 +216,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
                     data['name'] = params['pdf_filename']
                     path = 'docassemble/' + params['pdf_filename'][:15]
                     absolute_path = save_file_from_url(params['pdf_url'], path, params['pdf_filename'])
+                    instance.file_kind = DocumentFileKind.PDF.value
 
                     if has_ged:
                         try:
@@ -241,6 +242,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
                     # salva o docx como documento relacionado
                     related_document = deepcopy(instance)
                     related_document.name = params['docx_filename']
+                    related_document.file_kind = DocumentFileKind.DOCX.value
 
                     if has_ged:
                         try:

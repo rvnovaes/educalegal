@@ -13,7 +13,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
-from document.models import Document, Envelope, Signer, DocumentStatus
+from document.models import Document, Envelope, Signer, DocumentStatus, DocumentFileKind
 from document.views import save_document_data
 from interview.models import Interview
 from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
@@ -187,6 +187,7 @@ def webhook_listener(request):
                             logging.info('passou_aqui_6')
                             # salva o documento baixado no EL como documento relacionado
                             related_document = deepcopy(document)
+                            related_document.file_kind = DocumentFileKind.PDF_SIGNED.value
                             save_document_data(related_document, has_ged, ged_data, fullpath, document)
                         else:
                             logging.info('passou_aqui_7')
@@ -198,6 +199,7 @@ def webhook_listener(request):
                     logging.info('passou_aqui_8')
                     # salva o documento baixado no EL como documento relacionado
                     related_document = deepcopy(document)
+                    related_document.file_kind = DocumentFileKind.PDF_SIGNED.value
                     save_document_data(related_document, has_ged, None, fullpath, document)
 
             # atualiza o status do documento

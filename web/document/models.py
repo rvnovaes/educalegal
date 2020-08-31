@@ -176,13 +176,7 @@ class Document(TenantAwareModel):
 
     def get_docx_file(self):
         if self.related_document.exists():
-            try:
-                related_document = Document.objects.get(parent=self, file_kind=DocumentFileKind.DOCX.value)
-            except Document.DoesNotExist:
-                return None
-
-            return related_document
-        return None
+            return Document.objects.filter(parent=self, file_kind=DocumentFileKind.DOCX.value).last()
 
     def get_related_documents(self):
         if self.related_document.exists():
