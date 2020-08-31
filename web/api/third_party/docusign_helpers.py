@@ -127,11 +127,11 @@ def docusign_pdf_files_saver(data, envelope_dir):
     # Loop through the DocumentPDFs element, storing each document.
     for pdf in xml["DocumentPDFs"]["DocumentPDF"]:
         if pdf["DocumentType"] == "CONTENT":
-            pdf["file_kind"] = DocumentFileKind.PDF_SIGNED.value
+            file_kind = DocumentFileKind.PDF_SIGNED.value
             filename = main_filename_no_extension + "_assinado.pdf"
             description = main_filename_no_extension + ".pdf completo."
         elif pdf["DocumentType"] == "SUMMARY":
-            pdf["file_kind"] = DocumentFileKind.PDF_CERTIFIED.value
+            file_kind = DocumentFileKind.PDF_CERTIFIED.value
             filename = main_filename_no_extension + "_certificado.pdf"
             description = (
                 main_filename_no_extension + ".pdf certificado de assinaturas."
@@ -142,6 +142,7 @@ def docusign_pdf_files_saver(data, envelope_dir):
 
         full_filename = os.path.join(envelope_dir, filename)
         pdf_file_data = dict()
+        pdf_file_data["file_kind"] = file_kind
         pdf_file_data["filename"] = filename
         pdf_file_data["description"] = description
         pdf_file_data["full_filename"] = full_filename
@@ -232,6 +233,8 @@ def docusign_webhook_listener(request):
                     for pdf in envelope_data["pdf_documents"]:
                         try:
                             logging.info('passou_aqui_3')
+                            post_data["filename"] = pdf['filename']
+                            post_data["full_filename"] = pdf['full_filename']
                             status_code, ged_data, ged_id = mc.document_create(post_data, pdf["full_filename"])
 
                             logging.info('passou_aqui_3-1-status_code')
