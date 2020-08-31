@@ -1,6 +1,5 @@
 import io
 import logging
-import uuid
 
 from copy import deepcopy
 from rest_framework.response import Response
@@ -19,7 +18,8 @@ from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 
 from api.third_party.mayan_client import MayanClient
-from document.models import Document, DocumentStatus, DocumentFileKind
+from document.models import Document
+from document.views import save_document_data
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
@@ -208,6 +208,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
             params = self.request.query_params
             if 'trigger' in params:
                 if params['trigger'] == 'docassemble':
+                    has_ged = instance.tenant.has_ged()
+
                     data = self.request.data.copy()
 
                     # salva o pdf no sistema de arquivos
@@ -215,22 +217,46 @@ class DocumentViewSet(viewsets.ModelViewSet):
                     path = 'docassemble/' + params['pdf_filename'][:15]
                     absolute_path = save_file_from_url(params['pdf_url'], path, params['pdf_filename'])
 
-                    status_code, ged_data, ged_id = save_in_ged(data, absolute_path, instance.tenant)
-
-                    if status_code == 200:
-                        save_ged_data(instance, ged_data)
+                    if has_ged:
+                        try:
+                            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, instance.tenant)
+                        except Exception as e:
+                            message = str(e)
+                            logging.exception(message)
+                        else:
+                            if status_code == 201:
+                                save_document_data(instance, has_ged, ged_data, absolute_path, None)
+                            else:
+                                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                                    str(status_code), ged_data)
+                                logging.error(message)
+                    else:
+                        save_document_data(instance, has_ged, None, absolute_path, None)
 
                     # salva o docx no sistema de arquivos
                     data['name'] = params['docx_filename']
                     path = 'docassemble/' + params['docx_filename'][:15]
                     absolute_path = save_file_from_url(params['docx_url'], path, params['docx_filename'])
 
-                    save_in_ged(data, absolute_path, instance.tenant)
-
+                    # salva o docx como documento relacionado
                     related_document = deepcopy(instance)
+                    related_document.name = params['docx_filename']
 
-                    if status_code == 200:
-                        save_ged_data(related_document, ged_data, True)
+                    if has_ged:
+                        try:
+                            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, instance.tenant)
+                        except Exception as e:
+                            message = str(e)
+                            logging.exception(message)
+                        else:
+                            if status_code == 201:
+                                save_document_data(related_document, has_ged, ged_data, absolute_path, instance)
+                            else:
+                                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                                    str(status_code), ged_data)
+                                logging.error(message)
+                    else:
+                        save_document_data(related_document, has_ged, None, absolute_path, instance)
 
             return Response(serializer.data)
 
@@ -296,137 +322,36 @@ def validate_tenant_plan_ged(tenant):
 
         return ged_url, tenant_ged_token
 
-def save_in_file_system(self, params):
-    """Faz o download do arquivo e salva no sistema de arquivos"""
-
-    # # se o cliente nao tem ged, nao envia para o ged
-    # if has_ged:
-    #     # salva o docx no ged
-    #     try:
-    #         ged_status_code, ged_response, ged_id = mc.document_create(data, absolute_path)
-    #     except Exception as e:
-    #         message = 'Não foi possível inserir o docx no GED. Erro: ' + str(e)
-    #         logging.exception(message)
-    #     else:
-    #         if ged_status_code != 201:
-    #             message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(ged_status_code) + ' - ' + \
-    #                       ged_response
-    #             logging.exception(message)
-    #         else:
-    #             try:
-    #                 ged_document_data = mc.document_read(ged_id)
-    #             except Exception as e:
-    #                 message = 'Não foi possível localizar o docx no GED. Erro: ' + str(e)
-    #                 logging.exception(message)
-    #             else:
-    #                 related_document = deepcopy(document)
-    #                 # cria documento do word relacionado ao documento pdf principal
-    #                 related_document.id = None
-    #                 related_document.doc_uuid = uuid.uuid4()
-    #                 related_document.ged_id = ged_document_data['id']
-    #                 related_document.ged_link = ged_document_data['latest_version']['download_url']
-    #                 related_document.ged_uuid = ged_document_data['uuid']
-    #                 related_document.absolute_path = absolute_path
-    #                 related_document.status = DocumentStatus.INSERIDO_GED.value
-    #                 related_document.file_kind = DocumentFileKind.DOCX.value
-    #                 related_document.parent = document
-    #
-    #                 # salva dados do ged do documento no educa legal
-    #                 related_document.save()
-
-    # return absolute_path
-
 
 def save_in_ged(data, absolute_path, tenant):
     """Salva o arquivo no GED"""
 
-    # verifica se cliente esta num plano com ged
-    if not tenant.plan.use_ged:
-        has_ged = False
-    else:
-        if tenant.tenantgeddata:
-            ged_url = tenant.tenantgeddata.url
-            ged_token = tenant.tenantgeddata.token
-
-            # verifica se o ged esta configurado
-            has_ged = ged_url != '' and ged_token != ''
-        else:
-            has_ged = False
-
     # se o cliente nao tem ged, nao envia para o ged
-    if has_ged:
-        mc = MayanClient(ged_url, ged_token)
+    mc = MayanClient(tenant.tenantgeddata.url, tenant.tenantgeddata.token)
 
-        # salva o pdf no ged
-        try:
-            status_code, response, ged_id = mc.document_create(data, absolute_path)
-        except Exception as e:
-            message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(e)
+    # salva o pdf no ged
+    try:
+        status_code, response, ged_id = mc.document_create(data, absolute_path)
+    except Exception as e:
+        message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(e)
+        logging.exception(message)
+
+        return 0, message, 0
+    else:
+        if status_code != 201:
+            message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(status_code) + ' - ' + response
             logging.exception(message)
 
-            return 0, message, 0
+            return status_code, response, 0
         else:
-            if status_code != 201:
-                message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(status_code) + ' - ' + response
+            try:
+                ged_document_data = mc.document_read(ged_id)
+            except Exception as e:
+                message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
                 logging.exception(message)
+                return 0, message, 0
 
-                return status_code, response, 0
-            else:
-                try:
-                    ged_document_data = mc.document_read(ged_id)
-                except Exception as e:
-                    message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
-                    logging.exception(message)
-
-                return status_code, ged_document_data, ged_id
-
-
-def save_ged_data(document, ged_data, parent=None):
-    if parent:
-        # cria documento do word relacionado ao documento pdf principal
-        document.id = None
-        document.doc_uuid = uuid.uuid4()
-        document.ged_id = ged_document_data['id']
-        document.ged_link = ged_document_data['latest_version']['download_url']
-        document.ged_uuid = ged_document_data['uuid']
-        document.absolute_path = absolute_path
-        document.status = DocumentStatus.INSERIDO_GED.value
-        document.file_kind = DocumentFileKind.DOCX.value
-        document.parent = parent
-
-        # salva dados do ged do documento no educa legal
-        document.save()
-    else:
-        document.ged_id = ged_data['id']
-        document.ged_link = ged_data['latest_version']['download_url']
-        document.ged_uuid = ged_data['uuid']
-        document.absolute_path = absolute_path
-        document.status = DocumentStatus.INSERIDO_GED.value
-        document.file_kind = DocumentFileKind.PDF.value
-
-        # salva dados do ged do documento no educa legal
-        document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'absolute_path', 'status', 'file_kind'])
-
-    # # se o cliente nao tem ged, nao envia para o ged
-    # if has_ged:
-    #     # salva o docx no ged
-    #     try:
-    #         ged_status_code, ged_response, ged_id = mc.document_create(data, absolute_path)
-    #     except Exception as e:
-    #         message = 'Não foi possível inserir o docx no GED. Erro: ' + str(e)
-    #         logging.exception(message)
-    #     else:
-    #         if ged_status_code != 201:
-    #             message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(ged_status_code) + ' - ' + \
-    #                       ged_response
-    #             logging.exception(message)
-    #         else:
-    #             try:
-    #                 ged_document_data = mc.document_read(ged_id)
-    #             except Exception as e:
-    #                 message = 'Não foi possível localizar o docx no GED. Erro: ' + str(e)
-    #                 logging.exception(message)
-    #             else:
+            return status_code, ged_document_data, ged_id
 
 
 class DocumentDownloadViewSet(viewsets.ModelViewSet):

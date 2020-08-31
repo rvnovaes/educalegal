@@ -3,6 +3,7 @@ import logging
 import json
 import pandas as pd
 import requests
+import uuid
 
 from mongoengine.errors import ValidationError
 from celery import chain
@@ -37,7 +38,7 @@ from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
-from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus
+from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus, DocumentFileKind
 from .tasks import create_document, submit_to_esignature, send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
@@ -878,3 +879,41 @@ def post_signer_key(recipients, esignature_app, tenant):
                 return False
 
     return True
+
+
+def save_document_data(document, has_ged, ged_data, absolute_path, parent=None):
+    if has_ged:
+        document.ged_id = ged_data['id']
+        document.ged_link = ged_data['latest_version']['download_url']
+        document.ged_uuid = ged_data['uuid']
+
+    document.absolute_path = absolute_path
+    document.status = DocumentStatus.INSERIDO_GED.value
+
+    if parent:
+        # cria documento do word relacionado ao documento pdf principal
+        document.id = None
+        document.doc_uuid = uuid.uuid4()
+        document.file_kind = DocumentFileKind.DOCX.value
+        document.parent = parent
+        document.document_data = None
+
+        try:
+            # salva dados do ged do documento no educa legal
+            document.save()
+        except Exception as e:
+            message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
+            logging.exception(message)
+    else:
+        document.file_kind = DocumentFileKind.PDF.value
+
+        try:
+            if has_ged:
+                # salva dados do ged do documento no educa legal
+                document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'absolute_path', 'status', 'file_kind'])
+            else:
+                # salva dados do ged do documento no educa legal
+                document.save(update_fields=['absolute_path', 'status', 'file_kind'])
+        except Exception as e:
+            message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
+            logging.exception(message)

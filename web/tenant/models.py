@@ -74,6 +74,20 @@ class Tenant(models.Model):
     def __str__(self):
         return self.name
 
+    def has_ged(self):
+        # verifica se cliente esta num plano com ged
+        if not self.plan.use_ged:
+            return False
+        else:
+            if self.tenantgeddata:
+                ged_url = self.tenantgeddata.url
+                ged_token = self.tenantgeddata.token
+
+                # verifica se o ged esta configurado
+                return ged_url != '' and ged_token != ''
+            else:
+                return False
+
 
 class TenantAwareModel(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, default=1)

@@ -4,6 +4,7 @@ import logging
 import os
 import xmltodict
 
+from copy import deepcopy
 from pathlib import Path
 
 from django.views.decorators.http import require_POST
@@ -12,6 +13,7 @@ from django.http import HttpResponse
 from django.conf import settings
 
 from document.models import Document, Envelope, Signer, DocumentStatus
+from document.views import save_document_data
 from interview.models import Interview
 from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
 
@@ -205,7 +207,8 @@ def docusign_webhook_listener(request):
                 )
                 logger.debug(envelope_data)
 
-                if tenant.plan.use_ged:
+                has_ged = tenant.has_ged()
+                if has_ged:
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
 
@@ -214,7 +217,7 @@ def docusign_webhook_listener(request):
                     mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
                     document_description = interview.description if interview.description else ''
 
-                    data = {
+                    post_data = {
                         "description": document_description,
                         "document_type": interview.document_type.pk,
                         "label": interview.name,
@@ -223,14 +226,35 @@ def docusign_webhook_listener(request):
 
                     pdf_filenames = list()
                     for pdf in envelope_data["pdf_documents"]:
-                        response = mc.document_create(data, pdf["full_filename"])
-                        logger.debug("Posting document to GED: " + pdf["filename"])
-                        logger.debug(response.text)
+                        try:
+                            status_code, ged_data, ged_id = mc.document_create(post_data, pdf["full_filename"])
+                        except Exception as e:
+                            message = str(e)
+                            logging.exception(message)
+                            return HttpResponse(message)
+                        else:
+                            logger.debug("Posting document to GED: " + pdf["filename"])
+                            logger.debug(ged_data.text)
 
-                        pdf_filenames.append(pdf["filename"])
+                            pdf_filenames.append(pdf["filename"])
+
+                            if status_code == 201:
+                                # salva o documento baixado no EL como documento relacionado
+                                related_document = deepcopy(document)
+                                save_document_data(related_document, has_ged, ged_data, pdf["full_filename"], document)
+                            else:
+                                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                                    str(status_code), ged_data)
+                                logging.error(message)
+                                return HttpResponse(message)
 
                     # separa os documentos com ENTER
                     pdf_filenames = chr(10).join(pdf_filenames)
+                else:
+                    for pdf in envelope_data["pdf_documents"]:
+                        # salva o documento baixado no EL como documento relacionado
+                        related_document = deepcopy(document)
+                        save_document_data(related_document, has_ged, None, pdf["full_filename"], document)
             except Exception as e:
                 message = str(e)
                 logger.exception(message)
