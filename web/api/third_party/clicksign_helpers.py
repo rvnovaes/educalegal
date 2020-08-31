@@ -158,13 +158,13 @@ def webhook_listener(request):
                     post_data = {
                         "description": document_description,
                         "document_type": interview.document_type.pk,
-                        "label": interview.name,
                         "language": interview.language,
                     }
 
                     try:
                         logging.info('passou_aqui_3')
                         # salva documento no ged
+                        post_data["label"] = filename
                         status_code, ged_data, ged_id = save_in_ged(post_data, fullpath, document.tenant)
                     except Exception as e:
                         logging.info('passou_aqui_4')
@@ -180,6 +180,7 @@ def webhook_listener(request):
                             logging.info('passou_aqui_6')
                             # salva o documento baixado no EL como documento relacionado
                             related_document = deepcopy(document)
+                            related_document.name = pdf["filename"]
                             related_document.file_kind = DocumentFileKind.PDF_SIGNED.value
                             save_document_data(related_document, has_ged, ged_data, fullpath, document)
                         else:
@@ -192,6 +193,7 @@ def webhook_listener(request):
                     logging.info('passou_aqui_8')
                     # salva o documento baixado no EL como documento relacionado
                     related_document = deepcopy(document)
+                    related_document.name = pdf["filename"]
                     related_document.file_kind = DocumentFileKind.PDF_SIGNED.value
                     save_document_data(related_document, has_ged, None, fullpath, document)
 

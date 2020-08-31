@@ -220,7 +220,6 @@ def docusign_webhook_listener(request):
                     post_data = {
                         "description": document_description,
                         "document_type": interview.document_type.pk,
-                        "label": interview.name,
                         "language": interview.language,
                     }
 
@@ -228,6 +227,7 @@ def docusign_webhook_listener(request):
                     for pdf in envelope_data["pdf_documents"]:
                         try:
                             logging.info('passou_aqui_3')
+                            post_data["label"] = pdf["filename"]
                             status_code, ged_data, ged_id = save_in_ged(post_data, pdf["full_filename"], document.tenant)
 
                             logging.info('passou_aqui_3-1-status_code')
@@ -250,6 +250,7 @@ def docusign_webhook_listener(request):
                                 logging.info('passou_aqui_6')
                                 # salva o documento baixado no EL como documento relacionado
                                 related_document = deepcopy(document)
+                                related_document.name = pdf["filename"]
                                 related_document.file_kind = pdf["file_kind"]
                                 save_document_data(related_document, has_ged, ged_data, pdf["full_filename"], document)
                             else:
@@ -266,6 +267,7 @@ def docusign_webhook_listener(request):
                         logging.info('passou_aqui_8')
                         # salva o documento baixado no EL como documento relacionado
                         related_document = deepcopy(document)
+                        related_document.name = pdf["filename"]
                         related_document.file_kind = pdf["file_kind"]
                         save_document_data(related_document, has_ged, None, pdf["full_filename"], document)
             except Exception as e:
