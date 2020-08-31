@@ -113,6 +113,7 @@
     {% endif %}
 
     {% if related_documents %}
+      <div class="card">
         <div class="card-header">
             <h5>Documentos Relacionados</h5>
         </div>
@@ -123,6 +124,7 @@
                        target="_blank">{{ related_document.name }}</a></li>
             {% endfor %}
         </ul>
+      </div>
     {% endif %}
 
     <script type="text/javascript">
