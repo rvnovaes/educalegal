@@ -12,12 +12,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.conf import settings
 
+from api.views_v2 import save_in_ged
 from document.models import Document, Envelope, Signer, DocumentStatus, DocumentFileKind
 from document.views import save_document_data
 from interview.models import Interview
-from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
-
-from .mayan_client import MayanClient
+from tenant.models import Tenant, ESignatureAppProvider
 
 
 logger = logging.getLogger(__name__)
@@ -216,10 +215,6 @@ def docusign_webhook_listener(request):
                     logging.info('passou_aqui_2')
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
-
-                    # Post documents to GED if envelope_status is completed
-                    tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
-                    mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
                     document_description = interview.description if interview.description else ''
 
                     post_data = {
@@ -233,9 +228,7 @@ def docusign_webhook_listener(request):
                     for pdf in envelope_data["pdf_documents"]:
                         try:
                             logging.info('passou_aqui_3')
-                            post_data["filename"] = pdf['filename']
-                            post_data["full_filename"] = pdf['full_filename']
-                            status_code, ged_data, ged_id = mc.document_create(post_data, pdf["full_filename"])
+                            status_code, ged_data, ged_id = save_in_ged(post_data, pdf["full_filename"], document.tenant)
 
                             logging.info('passou_aqui_3-1-status_code')
                             logging.info(status_code)

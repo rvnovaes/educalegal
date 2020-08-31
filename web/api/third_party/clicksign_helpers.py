@@ -13,12 +13,11 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
+from api.views_v2 import save_in_ged
 from document.models import Document, Envelope, Signer, DocumentStatus, DocumentFileKind
 from document.views import save_document_data
 from interview.models import Interview
 from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
-
-from .mayan_client import MayanClient
 
 
 envelope_statuses = {
@@ -154,13 +153,7 @@ def webhook_listener(request):
                 if has_ged:
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
-                    document_type_pk = interview.document_type.pk
-                    document_language = interview.language
                     document_description = interview.description if interview.description else ''
-
-                    # Post documents to GED if envelope_status is completed
-                    tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
-                    mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
 
                     post_data = {
                         "description": document_description,
@@ -172,7 +165,7 @@ def webhook_listener(request):
                     try:
                         logging.info('passou_aqui_3')
                         # salva documento no ged
-                        status_code, ged_data, ged_id = mc.document_create(post_data, fullpath)
+                        status_code, ged_data, ged_id = save_in_ged(post_data, fullpath, document.tenant)
                     except Exception as e:
                         logging.info('passou_aqui_4')
                         message = str(e)
