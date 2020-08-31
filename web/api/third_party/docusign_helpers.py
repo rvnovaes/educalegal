@@ -231,6 +231,11 @@ def docusign_webhook_listener(request):
                         try:
                             logging.info('passou_aqui_3')
                             status_code, ged_data, ged_id = mc.document_create(post_data, pdf["full_filename"])
+
+                            logging.info('passou_aqui_3-1-status_code')
+                            logging.info(status_code)
+                            logging.info('passou_aqui_3-1')
+                            logging.info(ged_data)
                         except Exception as e:
                             logging.info('passou_aqui_4')
                             message = str(e)
