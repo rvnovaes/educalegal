@@ -181,7 +181,7 @@ def webhook_listener(request):
                     else:
                         logging.info('passou_aqui_5')
                         logging.debug("Posting document to GED: " + filename)
-                        logging.debug(ged_data.text)
+                        logging.debug(ged_data)
 
                         if status_code == 201:
                             logging.info('passou_aqui_6')

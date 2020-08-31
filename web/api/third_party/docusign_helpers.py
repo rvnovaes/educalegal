@@ -239,7 +239,7 @@ def docusign_webhook_listener(request):
                         else:
                             logging.info('passou_aqui_5')
                             logger.debug("Posting document to GED: " + pdf["filename"])
-                            logger.debug(ged_data.text)
+                            logger.debug(ged_data)
 
                             pdf_filenames.append(pdf["filename"])
 
