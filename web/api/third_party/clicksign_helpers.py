@@ -145,6 +145,8 @@ def webhook_listener(request):
             # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
             logging.info('passou_aqui_1')
             if envelope_status == "finalizado":
+                logging.info('signed_file_url')
+                logging.info(data)
                 fullpath, filename = pdf_file_saver(
                     data['document']['downloads']['signed_file_url'], envelope_number, document.name)
 
