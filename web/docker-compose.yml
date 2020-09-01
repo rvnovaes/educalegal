@@ -2,13 +2,13 @@ version: '3.7'
 
 services:
   educalegal_front:
-    image: rvnovaes/educalegal-front:0.2
+    image: rvnovaes/educalegal-front:0.3
     container_name: educalegal_front
     restart: unless-stopped
     build:
       context: ../front
-      args:
-        BACKEND_URL: "http://educalegal:8008"
+#      args:
+#        BACKEND_URL: "http://educalegal:8008"
     depends_on:
       - educalegal
     ports:

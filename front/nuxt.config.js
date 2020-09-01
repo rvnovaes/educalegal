@@ -75,7 +75,7 @@ module.exports = {
     // Default: http://[HOST]:[PORT][PREFIX]
     // Defines the base URL which is used and prepended to make server side requests.
     // Environment variable API_URL can be used to override baseURL.
-    // baseURL: 'http://localhost:8008'
+    // baseURL: 'http://educalegal:8008'
     baseURL: process.env.BACKEND_URL
   },
 
