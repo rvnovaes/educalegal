@@ -8,6 +8,7 @@ import uuid
 
 from mongoengine.errors import ValidationError
 from celery import chain
+from copy import deepcopy
 
 from django.conf import settings
 from django.contrib import messages
@@ -27,6 +28,7 @@ from rest_framework import generics
 from api.third_party.clicksign_client import ClickSignClient
 from api.third_party.docusign_client import DocuSignClient, make_document_base64
 from api.third_party.sendgrid_client import send_email as sendgrid_send_email
+from api.views_v2 import save_in_ged
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
 from tenant.models import Tenant, ESignatureAppProvider, ESignatureAppSignerKey
@@ -37,6 +39,7 @@ from util.mongo_util import (
     mongo_to_hierarchical_dict,
 )
 from util.file_import import is_csv_metadata_valid, is_csv_content_valid
+from util.util import save_file_from_url
 
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
@@ -534,18 +537,30 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 interview_variables["el_send_email"] = False
 
             if interview_variables["submit_to_esignature"]:
-                result = chain(
-                    create_document.s(
+                result = create_document(
                         base_url,
                         api_key,
                         secret,
                         interview_full_name,
                         interview_variables,
-                    ),
-                    submit_to_esignature.s(
-                        base_url, api_key, secret, interview_full_name
-                    ),
-                )()
+                    )
+
+                patch_document
+
+                submit_to_esignature(request, result)
+
+                # result = chain(
+                #     create_document.s(
+                #         base_url,
+                #         api_key,
+                #         secret,
+                #         interview_full_name,
+                #         interview_variables,
+                #     ),
+                #     submit_to_esignature.s(request,
+                #         base_url, api_key, secret, interview_full_name
+                #     ),
+                # )()
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(parent_id=result.parent.id, child_id=result.id)
                 el_document.task_create_document = result.parent.id
                 el_document.task_submit_to_esignature = result.id
@@ -571,8 +586,8 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 total_task_size += 2
 
             else:
-                result = create_document.delay(
-                # result = create_document(
+                # result = create_document.delay(
+                result = create_document(
                     base_url, api_key, secret, interview_full_name, interview_variables,
                 )
                 result_description = "Criação do documento: {id}".format(id=result.id)
@@ -693,7 +708,7 @@ def query_documents_by_args(pk=None, **kwargs):
 
 
 @login_required
-def send_email(request, doc_uuid):
+def send_email(request, doc_uuid, bulk_generation=False):
     try:
         document = Document.objects.get(doc_uuid=doc_uuid)
     except Document.DoesNotExist:
@@ -759,7 +774,7 @@ def send_email(request, doc_uuid):
 
 
 @login_required
-def send_to_esignature(request, doc_uuid):
+def send_to_esignature(request, doc_uuid, bulk_generation=False):
     try:
         document = Document.objects.get(doc_uuid=doc_uuid)
     except Document.DoesNotExist:
@@ -935,3 +950,55 @@ def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
         except Exception as e:
             message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
             logging.exception(message)
+
+
+def save_document_file(document, data, params):
+    has_ged = document.tenant.has_ged()
+
+    # salva o pdf no sistema de arquivos
+    data['name'] = params['pdf_filename']
+    relative_path = 'docassemble/' + params['pdf_filename'][:15]
+    absolute_path, relative_file_path = save_file_from_url(params['pdf_url'], relative_path, params['pdf_filename'])
+    document.file_kind = DocumentFileKind.PDF.value
+
+    if has_ged:
+        try:
+            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, document.tenant)
+        except Exception as e:
+            message = str(e)
+            logging.exception(message)
+        else:
+            if status_code == 201:
+                save_document_data(document, has_ged, ged_data, relative_file_path, None)
+            else:
+                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                    str(status_code), ged_data)
+                logging.error(message)
+    else:
+        save_document_data(document, has_ged, None, relative_file_path, None)
+
+    # salva o docx no sistema de arquivos
+    data['name'] = params['docx_filename']
+    relative_path = 'docassemble/' + params['docx_filename'][:15]
+    absolute_path, relative_file_path = save_file_from_url(params['docx_url'], relative_path, params['docx_filename'])
+
+    # salva o docx como documento relacionado
+    related_document = deepcopy(document)
+    related_document.name = params['docx_filename']
+    related_document.file_kind = DocumentFileKind.DOCX.value
+
+    if has_ged:
+        try:
+            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, document.tenant)
+        except Exception as e:
+            message = str(e)
+            logging.exception(message)
+        else:
+            if status_code == 201:
+                save_document_data(related_document, has_ged, ged_data, relative_file_path, document)
+            else:
+                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                    str(status_code), ged_data)
+                logging.error(message)
+    else:
+        save_document_data(related_document, has_ged, None, relative_file_path, document)

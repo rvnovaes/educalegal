@@ -5,6 +5,8 @@ import json
 from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
 
+from document.models import Document
+from document.views import send_email, send_to_esignature
 from util.docassemble_client import DocassembleClient, DocumentNotGeneratedException
 
 
@@ -12,9 +14,9 @@ logger = logging.getLogger(__name__)
 count_down = 5
 
 
-@shared_task(bind=True, max_retries=3)
-def create_document(self, base_url, api_key, secret, interview_full_name, interview_variables):
-# def create_document(base_url, api_key, secret, interview_full_name, interview_variables):
+# @shared_task(bind=True, max_retries=3)
+# def create_document(self, base_url, api_key, secret, interview_full_name, interview_variables):
+def create_document(base_url, api_key, secret, interview_full_name, interview_variables):
     try:
         dac = DocassembleClient(base_url, api_key)
         logger.info(
@@ -65,12 +67,14 @@ def create_document(self, base_url, api_key, secret, interview_full_name, interv
                             created_file_name=response["subquestionText"]
                         )
                         logger.info(message)
+
+                        doc_uuid = interview_variables["url_args"]["doc_uuid"]
                     else:
                         raise DocumentNotGeneratedException(json.dumps(response))
                 except KeyError:
                     raise DocumentNotGeneratedException(json.dumps(response))
 
-            return interview_session
+            return doc_uuid
 
     except NewConnectionError as e:
         message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
@@ -108,16 +112,12 @@ def create_document(self, base_url, api_key, secret, interview_full_name, interv
         raise
 
 
-@shared_task(bind=True, max_retries=3)
-def submit_to_esignature(
-    self,
-    interview_session,
-    base_url,
-    api_key,
-    secret,
-    interview_full_name
-):
+# @shared_task(bind=True, max_retries=3)
+def submit_to_esignature(request, doc_uuid):
     try:
+        send_to_esignature(request, doc_uuid)
+
+
         dac = DocassembleClient(base_url, api_key)
         logger.info(
             "Dados do servidor de entrevistas: {base_url} - {api_key}".format(

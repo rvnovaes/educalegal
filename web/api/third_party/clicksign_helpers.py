@@ -117,19 +117,19 @@ def webhook_listener(request):
             message = 'O documento do envelope {envelope_number} não existe.'.format(
                 envelope_number=envelope_number)
             logging.debug(message)
-            return HttpResponse(message)
+            return HttpResponse(status=400, reason=message)
         except Exception as e:
             message = str(e)
             logging.exception(message)
             logging.info(message)
-            return HttpResponse(message)
+            return HttpResponse(status=400, reason=message)
         else:
             # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
             # HMAC é uma forma de verificar a integridade das informações transmitidas em um meio não confiável, i.e. a
             # Internet, através de uma chave secreta compartilhada entre as partes para validar as informações transmitidas.
             # logging.info('hmac 3')
             # if not verify_hmac(request.headers, request.body, document.tenant.esignature_app.test_mode):
-            #     return HttpResponse('HMACs não correspondem.')
+            #     return HttpResponse(status=400, reason='HMACs não correspondem.')
             # logging.info('hmac 4')
 
             envelope_status = str(data['document']['status']).lower()
@@ -154,7 +154,7 @@ def webhook_listener(request):
                 if 'signed_file_url' not in data['document']['downloads']:
                     logging.info('Ignora requisição, pois evento {} não contém a chave signed_file_url'.format(
                         data['event']['name']))
-                    return HttpResponse("Success!")
+                    return HttpResponse(status=400, reason='Falta a chave signed_file_url')
 
                 logging.info('signed_file_url')
                 logging.info(data)
@@ -188,7 +188,7 @@ def webhook_listener(request):
                         logging.info('passou_aqui_4')
                         message = str(e)
                         logging.exception(message)
-                        return HttpResponse(message)
+                        return HttpResponse(status=400, reason=message)
                     else:
                         logging.info('passou_aqui_5')
                         logging.debug("Posting document to GED: " + filename)
@@ -206,7 +206,7 @@ def webhook_listener(request):
                             message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                 str(status_code), ged_data)
                             logging.error(message)
-                            return HttpResponse(message)
+                            return HttpResponse(status=400, reason=message)
                 else:
                     logging.info('passou_aqui_8')
                     # salva o documento baixado no EL como documento relacionado
@@ -302,7 +302,7 @@ def webhook_listener(request):
         logging.error(message)
 
     logging.info('passou_aqui_16')
-    return HttpResponse("Success!")
+    return HttpResponse(status=200, reason="Success!")
 
 
 def pdf_file_saver(url, relative_path, document_name):

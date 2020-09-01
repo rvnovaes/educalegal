@@ -1,7 +1,6 @@
 import io
 import logging
 
-from copy import deepcopy
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
@@ -18,12 +17,11 @@ from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 
 from api.third_party.mayan_client import MayanClient
-from document.models import Document, DocumentFileKind
-from document.views import save_document_data
+from document.models import Document
+from document.views import save_document_file
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
-from util.util import save_file_from_url
 
 from .serializers_v2 import (
     PlanSerializer,
@@ -208,60 +206,11 @@ class DocumentViewSet(viewsets.ModelViewSet):
             params = self.request.query_params
             if 'trigger' in params:
                 if params['trigger'] == 'docassemble':
-                    has_ged = instance.tenant.has_ged()
-
                     data = self.request.data.copy()
 
-                    # salva o pdf no sistema de arquivos
-                    data['name'] = params['pdf_filename']
-                    relative_path = 'docassemble/' + params['pdf_filename'][:15]
-                    absolute_path, relative_file_path = save_file_from_url(params['pdf_url'], relative_path,
-                                                                           params['pdf_filename'])
-                    instance.file_kind = DocumentFileKind.PDF.value
-
-                    if has_ged:
-                        try:
-                            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, instance.tenant)
-                        except Exception as e:
-                            message = str(e)
-                            logging.exception(message)
-                        else:
-                            if status_code == 201:
-                                save_document_data(instance, has_ged, ged_data, relative_file_path, None)
-                            else:
-                                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
-                                    str(status_code), ged_data)
-                                logging.error(message)
-                    else:
-                        save_document_data(instance, has_ged, None, relative_file_path, None)
-
-                    # salva o docx no sistema de arquivos
-                    data['name'] = params['docx_filename']
-                    relative_path = 'docassemble/' + params['docx_filename'][:15]
-                    absolute_path, relative_file_path = save_file_from_url(params['docx_url'], relative_path,
-                                                                           params['docx_filename'])
-
-                    # salva o docx como documento relacionado
-                    related_document = deepcopy(instance)
-                    related_document.name = params['docx_filename']
-                    related_document.file_kind = DocumentFileKind.DOCX.value
-
-                    if has_ged:
-                        try:
-                            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, instance.tenant)
-                        except Exception as e:
-                            message = str(e)
-                            logging.exception(message)
-                        else:
-                            if status_code == 201:
-                                save_document_data(related_document, has_ged, ged_data, relative_file_path, instance)
-                            else:
-                                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
-                                    str(status_code), ged_data)
-                                logging.error(message)
-                    else:
-                        save_document_data(related_document, has_ged, None, relative_file_path, instance)
-
+                    # salva o documento no sistema de arquivos e/ou ged
+                    save_document_file(instance, data, params)
+                    
             return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
