@@ -38,13 +38,6 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn
   },
-  methods: {
-    handleNew() {
-      this.$router.push({
-        path: "/escolas/criar"
-      });
-    },
-  },
   computed: {
     loading() {
       return this.$store.state.interviews.loading;
