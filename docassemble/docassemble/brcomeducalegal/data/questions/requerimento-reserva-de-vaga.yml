@@ -142,10 +142,10 @@ progress: 70
 section: Dados Contratuais
 question: Preço e custo operacional
 fields:
-  - 'Valor a ser pago pelo ato da reserva da vaga': input_value
+  - 'Valor referente à reserva de vaga': input_value
     datatype: currency
     hint: 0000,00
-  - 'Valor dos custos operacionais:': administrative_costs
+  - 'Valor retido no caso de desistência:': administrative_costs
     datatype: currency
     hint: 0000,00
 script: |
