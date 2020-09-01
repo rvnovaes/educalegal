@@ -103,7 +103,7 @@ class TestContratodeLocaodeImvel(WebTest):
             By.XPATH, "//form[@id='daform']/div[8]/div/div/input"
         ).send_keys("ADVOGADO júnior")
         self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[11]/div/div/input"
+            By.XPATH, "//form[@id='daform']/div[10]/div/div/input"
         ).send_keys("escola.educalegal@gmail.com")
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         self.wait.until(
@@ -176,7 +176,7 @@ class TestContratodeLocaodeImvel(WebTest):
             By.XPATH, "//form[@id='daform']/div[8]/div/div/input"
         ).send_keys("Empresária")
         self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[11]/div/div/input"
+            By.XPATH, "//form[@id='daform']/div[10]/div/div/input"
         ).send_keys("helena.gomes@educalegal.com.br")
         self.driver.find_element(By.XPATH, "//span[contains(.,'Continuar')]").click()
         self.wait.until(

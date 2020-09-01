@@ -308,6 +308,10 @@ code: |
   hosting_days = time_interval_days.split(".")
   hosting_days = hosting_days[0]
 ---
+code: |
+  arrival_date_format = format_date(arrival_date, format='dd/MM/yyyy')
+  departure_date_format = format_date(departure_date, format='dd/MM/yyyy')
+---
 section: Cláusulas
 progress: 80
 question: |

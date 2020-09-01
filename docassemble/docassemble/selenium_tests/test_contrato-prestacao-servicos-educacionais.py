@@ -187,21 +187,17 @@ class TestContratodoaluno(WebTest):
                 (By.XPATH, "//h1"), "Preço e Forma de Pagamento"
             )
         )
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[2]/div/div/input"
-        ).send_keys("1450000")
-        dropdown = self.driver.find_element(By.ID, "aGFzX2Rpc2NvdW50")
-        dropdown.find_element(By.XPATH, "//option[. = 'Sim']").click()
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[3]/div/select"
-        ).click()
-        self.driver.find_element(By.ID, "X2ZpZWxkXzI").send_keys(
-            "5% para pagamento até o dia 01 de cada mês."
-        )
-        self.driver.find_element(By.XPATH, "//span[contains(.,'13 parcelas')]").click()
-        self.driver.find_element(
-            By.XPATH, "//label[contains(.,'4 parcelas (na assinatura/30/60/90 dias)')]"
-        ).click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/div/input").send_keys("14500")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/fieldset/label").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[4]/div/div/textarea").send_keys(
+            "foi concedido 10% sobre o valor anual")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[5]/div/fieldset/label[2]/span[2]").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[11]/div/div/input").send_keys("10")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[12]/div/div/div/input").send_keys("1000")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[13]/div/div/input").send_keys("2020-08-31")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[8]/div/div/fieldset/label").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[9]/div/div/div/input").send_keys("2000")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[10]/div/div/input").send_keys("2020-08-21")
         self.driver.find_element(By.XPATH, "//span[contains(.,'Continuar')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Local e Data")
