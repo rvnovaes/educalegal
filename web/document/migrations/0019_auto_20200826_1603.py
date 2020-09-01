@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='document',
-            name='absolute_path',
-            field=models.FileField(blank=True, max_length=255, upload_to='', verbose_name='Caminho absoluto'),
+            name='relative_file_path',
+            field=models.FileField(blank=True, max_length=255, upload_to='', verbose_name='Caminho relativo do arquivo'),
         ),
     ]
