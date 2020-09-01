@@ -121,7 +121,7 @@ class TestContratodeConsultoria(WebTest):
         )
         self.driver.find_element(
             By.XPATH, "//form[@id='daform']/div[2]/div/input"
-        ).send_keys("FRANCISCO")
+        ).send_keys("FRANCISCO CHICO")
         for k in CNPJ:
             self.driver.find_element(
                 By.XPATH, "//form[@id='daform']/div[3]/div/input"
@@ -132,7 +132,7 @@ class TestContratodeConsultoria(WebTest):
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element(
-                (By.XPATH, "//h1"), "Endereço do(a) FRANCISCO"
+                (By.XPATH, "//h1"), "Endereço do(a) FRANCISCO CHICO"
             )
         )
         self.driver.find_element(
