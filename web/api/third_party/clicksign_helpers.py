@@ -147,6 +147,7 @@ def webhook_listener(request):
             if envelope_status == "finalizado":
                 logging.info('signed_file_url')
                 logging.info(data)
+                path = "/clicksign/" + str(envelope_number)
                 fullpath, filename = pdf_file_saver(
                     data['document']['downloads']['signed_file_url'], envelope_number, document.name)
 
@@ -167,7 +168,7 @@ def webhook_listener(request):
                         logging.info('passou_aqui_3')
                         # salva documento no ged
                         post_data["label"] = filename
-                        status_code, ged_data, ged_id = save_in_ged(post_data, fullpath, document.tenant)
+                        status_code, ged_data, ged_id = save_in_ged(post_data, path, document.tenant)
                     except Exception as e:
                         logging.info('passou_aqui_4')
                         message = str(e)
@@ -182,9 +183,9 @@ def webhook_listener(request):
                             logging.info('passou_aqui_6')
                             # salva o documento baixado no EL como documento relacionado
                             related_document = deepcopy(document)
-                            related_document.name = pdf["filename"]
+                            related_document.name = filename
                             related_document.file_kind = DocumentFileKind.PDF_SIGNED.value
-                            save_document_data(related_document, has_ged, ged_data, fullpath, document)
+                            save_document_data(related_document, has_ged, ged_data, path, document)
                         else:
                             logging.info('passou_aqui_7')
                             message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
@@ -197,7 +198,7 @@ def webhook_listener(request):
                     related_document = deepcopy(document)
                     related_document.name = pdf["filename"]
                     related_document.file_kind = DocumentFileKind.PDF_SIGNED.value
-                    save_document_data(related_document, has_ged, None, fullpath, document)
+                    save_document_data(related_document, has_ged, None, path, document)
 
             # atualiza o status do documento
             document.status = document_status
@@ -289,11 +290,9 @@ def webhook_listener(request):
     return HttpResponse("Success!")
 
 
-def pdf_file_saver(url, envelope_number, document_name):
+def pdf_file_saver(url, path, document_name):
     # salva o pdf em media/clicksign
-    envelope_dir = os.path.join(
-        settings.BASE_DIR, "media/clicksign/", envelope_number
-    )
+    envelope_dir = os.path.join(settings.BASE_DIR, "media", path)
     # cria diretorio e subdiretorio, caso nao exista
     Path(envelope_dir).mkdir(parents=True, exist_ok=True)
 

@@ -33,9 +33,15 @@
     <br/>
     <div class="text-center">
         {% if not document.parent %}
-            <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
+            {% if document.ged_link %}
+                <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
+            {% else %}
+                <a target="_blank" href="{{ document.absolute_path.url }}"><button type="button" class="btn btn-primary">PDF</button></a>
+            {% endif %}
             {% if docx_file.ged_link %}
                 <a target="_blank" href="{{ docx_file.ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
+            {% else %}
+                <a target="_blank" href="{{ docx_file.absolute_path.url }}"><button type="button" class="btn btn-primary">Word</button></a>
             {% endif %}
             {% if not document.submit_to_esignature %}
                 <a href="{% url 'document:send-to-esignature' document.doc_uuid %}"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>

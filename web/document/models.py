@@ -115,7 +115,7 @@ class Document(TenantAwareModel):
         help_text="UUID do documento. UUID = Universally Unique ID.",
         verbose_name="UUID",
     )
-    absolute_path = models.CharField(max_length=255, blank=True, verbose_name="Caminho absoluto")
+    absolute_path = models.FileField(max_length=255, blank=True, verbose_name="Caminho absoluto")
     description = models.TextField(default="", blank=True, verbose_name="Descrição")
     interview = models.ForeignKey(
         Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"

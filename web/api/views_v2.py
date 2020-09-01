@@ -215,29 +215,29 @@ class DocumentViewSet(viewsets.ModelViewSet):
                     # salva o pdf no sistema de arquivos
                     data['name'] = params['pdf_filename']
                     path = 'docassemble/' + params['pdf_filename'][:15]
-                    absolute_path = save_file_from_url(params['pdf_url'], path, params['pdf_filename'])
+                    save_file_from_url(params['pdf_url'], path, params['pdf_filename'])
                     instance.file_kind = DocumentFileKind.PDF.value
 
                     if has_ged:
                         try:
-                            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, instance.tenant)
+                            status_code, ged_data, ged_id = save_in_ged(data, path, instance.tenant)
                         except Exception as e:
                             message = str(e)
                             logging.exception(message)
                         else:
                             if status_code == 201:
-                                save_document_data(instance, has_ged, ged_data, absolute_path, None)
+                                save_document_data(instance, has_ged, ged_data, path, None)
                             else:
                                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                     str(status_code), ged_data)
                                 logging.error(message)
                     else:
-                        save_document_data(instance, has_ged, None, absolute_path, None)
+                        save_document_data(instance, has_ged, None, path, None)
 
                     # salva o docx no sistema de arquivos
                     data['name'] = params['docx_filename']
                     path = 'docassemble/' + params['docx_filename'][:15]
-                    absolute_path = save_file_from_url(params['docx_url'], path, params['docx_filename'])
+                    save_file_from_url(params['docx_url'], path, params['docx_filename'])
 
                     # salva o docx como documento relacionado
                     related_document = deepcopy(instance)
@@ -246,19 +246,19 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
                     if has_ged:
                         try:
-                            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, instance.tenant)
+                            status_code, ged_data, ged_id = save_in_ged(data, path, instance.tenant)
                         except Exception as e:
                             message = str(e)
                             logging.exception(message)
                         else:
                             if status_code == 201:
-                                save_document_data(related_document, has_ged, ged_data, absolute_path, instance)
+                                save_document_data(related_document, has_ged, ged_data, path, instance)
                             else:
                                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                     str(status_code), ged_data)
                                 logging.error(message)
                     else:
-                        save_document_data(related_document, has_ged, None, absolute_path, instance)
+                        save_document_data(related_document, has_ged, None, path, instance)
 
             return Response(serializer.data)
 
