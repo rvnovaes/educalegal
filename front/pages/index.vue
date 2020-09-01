@@ -44,7 +44,7 @@
                               v-model="credentials.password">
                   </base-input>
 
-                  <base-checkbox v-model="rememberMe">Lembrar</base-checkbox>
+<!--                  <base-checkbox v-model="rememberMe">Lembrar</base-checkbox>-->
                   <div class="text-center">
                     <base-button type="primary" native-type="submit" class="my-4">Entrar</base-button>
                   </div>
@@ -77,7 +77,7 @@
           username: '',
           password: '',
         },
-        rememberMe: false,
+        // rememberMe: false,
       };
     },
     methods: {
