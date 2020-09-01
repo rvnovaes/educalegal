@@ -36,19 +36,27 @@
             {% if document.ged_link %}
                 <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
             {% else %}
-                <a target="_blank" href="{{ document.absolute_path.url }}"><button type="button" class="btn btn-primary">PDF</button></a>
+                {% if document.relative_file_path %}
+                    <a target="_blank" href="{{ document.relative_file_path.url }}"><button type="button" class="btn btn-danger">PDF</button></a>
+                {% endif %}
             {% endif %}
             {% if docx_file.ged_link %}
                 <a target="_blank" href="{{ docx_file.ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
             {% else %}
-                <a target="_blank" href="{{ docx_file.absolute_path.url }}"><button type="button" class="btn btn-primary">Word</button></a>
+                {% if docx_file.relative_file_path %}
+                    <a target="_blank" href="{{ docx_file.relative_file_path.url }}"><button type="button" class="btn btn-primary">Word</button></a>
+                {% endif %}
             {% endif %}
-            {% if not document.submit_to_esignature %}
+            {% if not document.submit_to_esignature and document.tenant.plan.use_esignature %}
                 <a href="{% url 'document:send-to-esignature' document.doc_uuid %}"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>
             {% endif %}
             <a href="{% url 'document:send-email' document.doc_uuid %}"><button type="button" class="btn btn-info">Enviar por email</button></a>
         {% else %}
-            <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-primary">Download</button></a>
+            {% if document.ged_link %}
+                <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-primary">Download</button></a>
+            {% else %}
+                <a target="_blank" href="{{ document.relative_file_path.url }}"><button type="button" class="btn btn-primary">Download</button></a>
+            {% endif %}
         {% endif %}
     </div>
     <br/>

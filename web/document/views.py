@@ -1,6 +1,7 @@
 import io
 import logging
 import json
+import os
 import pandas as pd
 import requests
 import uuid
@@ -8,6 +9,7 @@ import uuid
 from mongoengine.errors import ValidationError
 from celery import chain
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
@@ -715,8 +717,9 @@ def send_email(request, doc_uuid):
             file_name = document.name
 
             file = None
-            if document.absolute_path:
-                file_path = document.absolute_path
+
+            if document.relative_file_path:
+                file_path = os.path.join(settings.BASE_DIR, "media/", document.relative_file_path.path)
             else:
                 file_path = ''
                 if document.tenant.plan.use_ged and document.ged_link:
@@ -766,13 +769,16 @@ def send_to_esignature(request, doc_uuid):
             esignature_app = document.tenant.esignature_app
             message = 'Não foi possível enviar para a assinatura eletrônica. Entre em contato com o suporte.'
 
-            documents = [
-                {
-                    'name': document.name,
-                    'fileExtension': 'pdf',
-                    'documentBase64': make_document_base64(document.absolute_path)
-                }
-            ]
+            if document.relative_file_path:
+                file_path = os.path.join(settings.BASE_DIR, "media/", document.relative_file_path.path)
+
+                documents = [
+                    {
+                        'name': document.name,
+                        'fileExtension': 'pdf',
+                        'documentBase64': make_document_base64(file_path)
+                    }
+                ]
 
             if esignature_app.provider == ESignatureAppProvider.DOCUSIGN.name:
                 dsc = DocuSignClient(esignature_app.client_id, esignature_app.impersonated_user_guid,
@@ -881,13 +887,13 @@ def post_signer_key(recipients, esignature_app, tenant):
     return True
 
 
-def save_document_data(document, has_ged, ged_data, absolute_path, parent=None):
+def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
     if has_ged:
         document.ged_id = ged_data['id']
         document.ged_link = ged_data['latest_version']['download_url']
         document.ged_uuid = ged_data['uuid']
 
-    document.absolute_path = absolute_path
+    document.relative_file_path = relative_path
     document.status = DocumentStatus.INSERIDO_GED.value
 
     if parent:
@@ -909,10 +915,11 @@ def save_document_data(document, has_ged, ged_data, absolute_path, parent=None):
         try:
             if has_ged:
                 # salva dados do ged do documento no educa legal
-                document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'absolute_path', 'status', 'file_kind'])
+                document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'relative_file_path', 'status',
+                                             'file_kind'])
             else:
                 # salva dados do ged do documento no educa legal
-                document.save(update_fields=['absolute_path', 'status', 'file_kind'])
+                document.save(update_fields=['relative_file_path', 'status', 'file_kind'])
         except Exception as e:
             message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
             logging.exception(message)

@@ -162,17 +162,20 @@ def docusign_webhook_listener(request):
     try:
         # Parses XML data and returns a dictionary and formated messages
         envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
-
+        relative_path = "docusign/" + str(envelope_data["envelope_id"])
         # Store the XML file on disk
-        envelope_dir = os.path.join(
-            settings.BASE_DIR, "media/docusign/", envelope_data["envelope_id"]
-        )
+        envelope_dir = os.path.join(settings.BASE_DIR, "media/", relative_path)
         Path(envelope_dir).mkdir(parents=True, exist_ok=True)
 
         filename = (
             envelope_data["envelope_time_generated"].strftime("%Y%m%d_%H%M%S") + ".xml"
         )  # substitute _ for : for windows-land
         filepath = os.path.join(envelope_dir, filename)
+        relative_file_path = os.path.join(relative_path, filename)
+
+        logging.info('passou_aqui_relative_file_path')
+        logging.info(relative_file_path)
+
         with open(filepath, "wb") as xml_file:
             xml_file.write(data)
     except Exception as e:
@@ -204,9 +207,7 @@ def docusign_webhook_listener(request):
         # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
         if envelope_status == "completed":
             try:
-                (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
-                    data, envelope_dir
-                )
+                (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(data, envelope_dir)
                 logger.debug(envelope_data)
 
                 logging.info('passou_aqui_1')
@@ -252,7 +253,7 @@ def docusign_webhook_listener(request):
                                 related_document = deepcopy(document)
                                 related_document.name = pdf["filename"]
                                 related_document.file_kind = pdf["file_kind"]
-                                save_document_data(related_document, has_ged, ged_data, pdf["full_filename"], document)
+                                save_document_data(related_document, has_ged, ged_data, relative_file_path, document)
                             else:
                                 logging.info('passou_aqui_7')
                                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
@@ -269,7 +270,7 @@ def docusign_webhook_listener(request):
                         related_document = deepcopy(document)
                         related_document.name = pdf["filename"]
                         related_document.file_kind = pdf["file_kind"]
-                        save_document_data(related_document, has_ged, None, pdf["full_filename"], document)
+                        save_document_data(related_document, has_ged, None, relative_file_path, document)
             except Exception as e:
                 logging.info('passou_aqui_9')
                 message = str(e)
