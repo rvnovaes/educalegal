@@ -74,9 +74,9 @@ export const actions = {
   async deleteSchool({commit}, school) {
     const res = await this.$axios.delete(`/v2/schools/${school.id}`);
     if (res.status === 204) {
-      console.log(res);
       commit("deleteSchool", school);
     }
+    return res
   },
   async createSchool({commit}, school) {
     const res = await this.$axios.post(`/v2/schools/`, school);

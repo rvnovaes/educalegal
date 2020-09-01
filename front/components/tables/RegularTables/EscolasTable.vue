@@ -96,7 +96,7 @@ export default {
   },
 
   created() {
-      this.$store.dispatch("schools/fetchAllSchools");
+    this.$store.dispatch("schools/fetchAllSchools");
   },
   computed: {
     schools() {
@@ -113,8 +113,8 @@ export default {
     handleEdit(index, row) {
       this.editRow(row);
     },
-    handleDelete(index, row) {
-      Swal.fire({
+    async handleDelete(index, row) {
+      const result = await Swal.fire({
         title: `Tem certeza que quer excluir ${row.name}?`,
         text: `Não é possível desfazer essa ação!`,
         icon: "warning",
@@ -126,20 +126,49 @@ export default {
         confirmButtonText: "Sim, excluir!",
         cancelButtonText: "Cancelar",
         buttonsStyling: false
-      }).then(result => {
-        if (result.value) {
-          this.deleteRow(row);
+      });
+      console.log(result.value)
+      if (result.value) {
+        console.log(result.value)
+        try {
+            const res = await this.$store.dispatch("schools/deleteSchool", row);
+            console.log(res)
+            if (res.status === 204) {
+              await Swal.fire({
+                title: "Excluída!",
+                text: `Você excluiu ${row.name}`,
+                icon: "success",
+                customClass: {
+                  confirmButton: "btn btn-success btn-fill",
+                },
+                buttonsStyling: false
+              });
+            }
+            if (res.status === 200) {
+              console.log(res)
+              await Swal.fire({
+                title: `Não é permitido excluir ${row.name}!`,
+                text: res.data,
+                icon: "warning",
+                customClass: {
+                  confirmButton: "btn btn-success btn-fill",
+                },
+                buttonsStyling: false
+              });
+            }
+        } catch (e) {
           Swal.fire({
-            title: "Excluída!",
-            text: `Você excluiu ${row.name}`,
-            icon: "success",
+            title: `Erro ao excluir ${row.name}`,
+            text: e,
+            icon: "error",
             customClass: {
-              confirmButton: "btn btn-success btn-fill",
+              confirmButton: "btn btn-info btn-fill",
             },
+            confirmButtonText: "OK",
             buttonsStyling: false
           });
         }
-      });
+      }
     },
     editRow(row) {
       let indexToEdit = row.id;
@@ -147,27 +176,9 @@ export default {
         path: "/escolas/" + indexToEdit
       });
     },
-    deleteRow(row) {
-      try {
-        console.log(row);
-        this.$store.dispatch("schools/deleteSchool", row);
-      } catch (e) {
-        Swal.fire({
-          title: `Erro ao excluir ${row.name}`,
-          text: e,
-          icon: "error",
-          customClass: {
-            confirmButton: "btn btn-info btn-fill",
-          },
-          confirmButtonText: "OK",
-          buttonsStyling: false
-        });
-      }
-      // }
-    },
     selectionChange(selectedRows) {
       this.selectedRows = selectedRows;
-    },
+    }
   }
 };
 </script>
