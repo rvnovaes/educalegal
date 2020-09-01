@@ -12,11 +12,10 @@ from .views_v2 import (
     TenantViewSet,
     DocumentViewSet,
     DocumentDownloadViewSet,
-    DocumentCountViewSet,
     SchoolViewSet,
     SchoolUnitViewSet,
-
-    UserView
+    UserView,
+    dashboard_data,
 )
 
 from .clicksign_helpers import webhook_listener
@@ -41,7 +40,7 @@ urlpatterns = [
     path("documents/", DocumentViewSet.as_view({"post": "create", "get": "list"})),
     path("documents/<str:identifier>", DocumentViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     path("documents/<str:identifier>/download", DocumentDownloadViewSet.as_view({"get": "retrieve", "delete": "destroy"})),
-    path("documents/count", DocumentCountViewSet.as_view({"get": "list"})),
+    path("dashboard/", dashboard_data),
     # Front end views
     path("schools/", SchoolViewSet.as_view({"post": "create", "get": "list"})),
     path("schools/<int:pk>", SchoolViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),

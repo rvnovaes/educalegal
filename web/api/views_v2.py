@@ -2,6 +2,7 @@ import logging
 import io
 from datetime import datetime
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 import pytz
 
 from django.db.models import Q
@@ -10,8 +11,6 @@ from django.http import FileResponse
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser, AllowAny
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework import viewsets
 from rest_framework.exceptions import (
     ValidationError,
@@ -21,7 +20,10 @@ from rest_framework.exceptions import (
 )
 from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.authtoken.models import Token
+from drf_yasg.renderers import SwaggerUIRenderer, OpenAPIRenderer
 from rest_framework.decorators import api_view, renderer_classes
+
 from validator_collection import checkers
 
 from document.models import *
@@ -35,7 +37,6 @@ from .serializers_v2 import (
     PlanSerializer,
     DocumentSerializer,
     DocumentDetailSerializer,
-    DocumentCountSerializer,
     InterviewSerializer,
     SchoolSerializer,
     SchoolUnitSerializer,
@@ -82,8 +83,6 @@ class PlanViewSet(viewsets.ReadOnlyModelViewSet):
             return queryset
         else:
             return self.queryset
-
-
 
 
 class TenantViewSet(viewsets.ModelViewSet):
@@ -134,7 +133,7 @@ class TenantViewSet(viewsets.ModelViewSet):
         # usamos *freemium_interviews antes da lista
         tenant.interview_set.add(*freemium_interviews)
         # splits the e-mail and uses the name part as username
-        unsername = email.split('@')[0]
+        username = email
         # Splits the full name field into first and "rest of the name" for the user
         first_name = full_name.split()[0]
         last_name = ""
@@ -142,13 +141,19 @@ class TenantViewSet(viewsets.ModelViewSet):
             last_name += " " + name
         last_name = last_name
         # Creates the user
-        user = CustomUser.objects.create_user(username=unsername,
+        user = CustomUser.objects.create_user(username=username,
                                               first_name=first_name,
                                               last_name=last_name,
                                               email=email,
                                               password=password,
                                               tenant=tenant)
         user.save()
+
+        # Creates the token for the user to create documents
+        token = Token()
+        token.user = user
+        token.save()
+
         return Response(status=status.HTTP_201_CREATED)
 
 
@@ -522,15 +527,6 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class DocumentCountViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = DocumentCount.objects.all()
-    serializer_class = DocumentCountSerializer
-
-    def get_queryset(self):
-        tenant = self.request.user.tenant
-        return self.queryset.get(pk=tenant.id)
-
-
 class SchoolViewSet(viewsets.ModelViewSet):
     queryset = School.objects.all()
     serializer_class = SchoolSerializer
@@ -543,6 +539,16 @@ class SchoolViewSet(viewsets.ModelViewSet):
             return queryset
         else:
             return self.queryset
+
+    def destroy(self, request, *args, **kwargs):
+        school = School.objects.get(pk=kwargs.get("pk"))
+        school_documents = Document.objects.filter(school=school)
+        if school_documents:
+            return Response("Não é possível excluir esta escola. Ela possui documentos gerados.",
+                            status=status.HTTP_200_OK)
+        else:
+            school.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SchoolUnitViewSet(viewsets.ModelViewSet):
@@ -564,9 +570,8 @@ class SchoolUnitViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-#################################### OTHERS ############################################################################
-
 class UserView(APIView):
+
     def get(self, request):
         """
         Return a list of all users.
@@ -574,3 +579,27 @@ class UserView(APIView):
         user = request.user
         user_data = UserSerializer(user)
         return Response(user_data.data)
+
+
+@api_view(['GET'])
+@renderer_classes([OpenAPIRenderer, SwaggerUIRenderer])
+def dashboard_data(request):
+    tenant = request.user.tenant
+    now = datetime.datetime.now()
+    tz = pytz.timezone("America/Sao_Paulo")
+    now = tz.localize(now)
+    begin_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    begin_last_month = begin_of_month - relativedelta(months=1)
+    current_month_documents = Document.objects.filter(tenant=tenant).filter(
+        created_date__gte=begin_of_month)
+    current_month_document_count = current_month_documents.count()
+    current_month_signature_count = current_month_documents.filter(envelope_id__isnull=False).count()
+    last_month_documents = Document.objects.filter(tenant=tenant).filter(created_date__gte=begin_last_month,
+                                                                         created_date__lt=begin_of_month)
+    last_month_document_count = last_month_documents.count()
+    last_month_signature_count = last_month_documents.filter(envelope_id__isnull=False).count()
+
+    return Response({"current_month_document_count": current_month_document_count,
+                     "last_month_document_count": last_month_document_count,
+                     "current_month_signature_count": current_month_signature_count,
+                     "last_month_signature_count": last_month_signature_count})
