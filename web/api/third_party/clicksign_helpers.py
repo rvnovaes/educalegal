@@ -278,9 +278,10 @@ def webhook_listener(request):
                                 logging.info(message)
                                 logging.exception(message)
     except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
         logging.info('passou_aqui_15')
-        logging.info('Exceção webhook clicksign')
-        logging.info(e)
+        logging.error('Exceção webhook clicksign')
+        logging.error(message)
 
     logging.info('passou_aqui_16')
     return HttpResponse("Success!")

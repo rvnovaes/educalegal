@@ -50,7 +50,7 @@
     <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
     {% include "snippets/messages.html" %}
     <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
-    {% if document.envelope %}
+    {% if document.envelope and not document.parent %}
         <div class="card">
             {% with envelope=document.envelope %}
                 <div class="card-header">
