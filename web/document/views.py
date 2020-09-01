@@ -741,7 +741,12 @@ def send_email(request, doc_uuid):
                     document.status = DocumentStatus.ENVIADO_EMAIL.value
                     document.save(update_fields=['send_email', 'status'])
 
-                    message = 'O e-mail foi enviado com sucesso.'
+                    to_recipients = ''
+                    for recipient in to_emails:
+                        to_recipients += recipient['email'] + ' - ' + recipient['name'] + '<br/>'
+
+                    message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:<br/>{}'.format(
+                        to_recipients))
                     messages.success(request, message)
                 else:
                     message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
@@ -833,7 +838,14 @@ def send_to_esignature(request, doc_uuid):
                         document.submit_to_esignature = True
                         document.save(update_fields=['status', 'envelope_number', 'submit_to_esignature'])
 
-                        messages.success(request, 'Documento enviado para a assinatura eletrônica com sucesso.')
+                        to_recipients = ''
+                        for recipient in document.recipients:
+                            to_recipients += recipient['email'] + ' - ' + recipient['name'] + '<br/>'
+
+                        message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com sucesso '
+                                            'para os destinatários:<br/>{}'.format(to_recipients))
+
+                        messages.success(request, message)
 
     return redirect("document:document-detail", doc_uuid)
 
