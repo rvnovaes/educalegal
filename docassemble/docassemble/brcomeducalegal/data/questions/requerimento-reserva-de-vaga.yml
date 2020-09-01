@@ -1,5 +1,5 @@
 metadata:
-  title: Termo de Reserva de Vaga
+  title: Requerimento Reserva de Vaga
 ---
 include:
   - element-tenant-school-interview.yml
@@ -25,7 +25,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "reserva-de-vaga.docx"
+  content_document = "requerimento-reserva-de-vaga.docx"
 ---
 id: logic
 mandatory: True
