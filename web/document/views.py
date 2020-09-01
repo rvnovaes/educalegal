@@ -743,9 +743,9 @@ def send_email(request, doc_uuid):
 
                     to_recipients = ''
                     for recipient in to_emails:
-                        to_recipients += recipient['email'] + ' - ' + recipient['name'] + '<br/>'
+                        to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
 
-                    message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:<br/>{}'.format(
+                    message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:{}'.format(
                         to_recipients))
                     messages.success(request, message)
                 else:
@@ -840,10 +840,10 @@ def send_to_esignature(request, doc_uuid):
 
                         to_recipients = ''
                         for recipient in document.recipients:
-                            to_recipients += recipient['email'] + ' - ' + recipient['name'] + '<br/>'
+                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
 
                         message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com sucesso '
-                                            'para os destinatários:<br/>{}'.format(to_recipients))
+                                            'para os destinatários:{}'.format(to_recipients))
 
                         messages.success(request, message)
 
