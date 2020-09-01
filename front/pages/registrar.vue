@@ -157,7 +157,6 @@ export default {
             confirmButton: "btn btn-success btn-fill",
           }
         });
-      }
       await this.$auth.loginWith("local", {
         data:
           {
@@ -169,7 +168,7 @@ export default {
         msg: "Usuário autenticado com sucesso"
       });
       await this.$router.push({path: "/painel"});
-
+      }
     }
   }
 };
