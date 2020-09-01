@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
 from billing.models import Plan
-from document.models import Document, DocumentCount, Envelope, Signer
+from document.models import Document, Envelope, Signer
 from interview.models import Interview
+from interview.util import get_interview_link as util_get_interview_link
 from school.models import School, SchoolUnit
 from tenant.models import Tenant, TenantGedData, ESignatureApp
 from users.models import CustomUser
@@ -16,6 +17,7 @@ class ESignatureAppSerializer(serializers.ModelSerializer):
 
 
 class InterviewSerializer(serializers.ModelSerializer):
+    interview_link = serializers.SerializerMethodField()
     class Meta:
         model = Interview
         ref_name = "Interview v2"
@@ -32,7 +34,11 @@ class InterviewSerializer(serializers.ModelSerializer):
                   "use_bulk_interview",
                   "yaml_name",
                   "document_type",
-                  "interview_server_config"]
+                  "interview_server_config",
+                  "interview_link"]
+
+    def get_interview_link(self, obj):
+        return util_get_interview_link(self.context['request'], obj.id)
 
 
 class PlanSerializer(serializers.ModelSerializer):
@@ -58,7 +64,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         ref_name = "Document v2"
-        fields = ["doc_uuid", "name", "interview_name", "school_name", "created_date", "altered_date", "status"]
+        fields = ["tenant", "doc_uuid", "name", "interview_name", "school_name", "created_date", "altered_date", "status"]
 
     def get_interview_name(self, obj):
         return obj.interview.name if obj.interview else ""
@@ -127,12 +133,6 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
                 # signer_statuses.append(signer.status)
                 signer_serialized_list.append(SignerSerializer(signer).data)
             return signer_serialized_list
-
-
-class DocumentCountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DocumentCount
-        fields = "__all__"
 
 
 class SchoolSerializer(serializers.ModelSerializer):
