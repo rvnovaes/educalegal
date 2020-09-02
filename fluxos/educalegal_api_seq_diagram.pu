@@ -52,7 +52,7 @@ deactivate Docassemble
 User -> Docassemble: Fills up the interview
 activate Docassemble
 
-Docassemble -> EducaLegal: POST elc.patch_document(data, params)
+Docassemble -> EducaLegal: PATCH elc.patch_document(data, params)
 activate EducaLegal
 
 note right
@@ -63,7 +63,7 @@ end note
 EducaLegal -> Docassemble: returns Educa Legal document data
 deactivate Docassemble
 
-EducaLegal -> GED: POST mc.document_create(data, absolute_path)
+EducaLegal -> GED: PATCH mc.document_create(data, absolute_path)
 activate GED
 
 note right
@@ -73,16 +73,22 @@ end note
 
 GED -> EducaLegal: response(many fields, specially document id)
 EducaLegal -> GED: GET mc.document_read(created_document_id)
+note left
+atualiza dados do GED no Educa Legal
+end note
 GED -> EducaLegal: created_document_data(status, id, url, uuid)
 deactivate GED
-EducaLegal -> EducaLegal: atualiza dados do GED no Educa Legal
+
+
 User -> EducaLegal: Clicks Button to ESignature
 
-EducaLegal -> ESignature: POST send_to_ESignature((recipients, documents, email_subject)
+EducaLegal -> ESignature: POST send_to_esignature((recipients, documents, email_subject)
+note left
+atualiza dados do GED no Educa Legal
+end note
 activate ESignature
 
 ESignature -> EducaLegal: envelope_data
-EducaLegal -> EducaLegal: atualiza dados do envelope no Educa Legal
 
 ESignature -> Recipients: Send emails
 activate Recipients
@@ -95,5 +101,6 @@ deactivate ESignature
 
 EducaLegal -> GED: POST mc.document_create(data, absolute_path)
 GED -> EducaLegal: dados do documento salvo
+GED -> EducaLegal: created_document_data(status, id, url, uuid)
 deactivate EducaLegal
 @enduml

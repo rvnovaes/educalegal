@@ -6,7 +6,7 @@ from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
 
 from document.models import Document
-from document.views import send_email, send_to_esignature
+# from document.views import send_email, send_to_esignature
 from util.docassemble_client import DocassembleClient, DocumentNotGeneratedException
 
 

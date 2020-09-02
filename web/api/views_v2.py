@@ -1,6 +1,7 @@
 import io
 import logging
 
+from copy import deepcopy
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
@@ -17,11 +18,12 @@ from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 
 from api.third_party.mayan_client import MayanClient
-from document.models import Document
-from document.views import save_document_file
+from document.models import Document, DocumentFileKind
+from document.views import save_document_data
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
+from util.util import save_file_from_url
 
 from .serializers_v2 import (
     PlanSerializer,
@@ -125,14 +127,14 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         """
-        Lista todos os documentos do cliente (tenant).
+        Lista todos os documentos principais do cliente (tenant).
 
-        Somente documetos que pertencem ao cliente ao qual o usuário está associado são listados.
+        Somente documentos que pertencem ao cliente ao qual o usuário está associado são listados.
 
         200 Sucesso
         """
         tenant_id = request.user.tenant.id
-        queryset = self.queryset.filter(tenant_id=tenant_id)
+        queryset = self.queryset.filter(tenant_id=tenant_id, parent=None)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
@@ -447,6 +449,58 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
         else:
             document.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def save_document_file(document, data, params):
+    has_ged = document.tenant.has_ged()
+
+    # salva o pdf no sistema de arquivos
+    data['name'] = params['pdf_filename']
+    relative_path = 'docassemble/' + params['pdf_filename'][:15]
+    absolute_path, relative_file_path = save_file_from_url(params['pdf_url'], relative_path, params['pdf_filename'])
+    document.file_kind = DocumentFileKind.PDF.value
+
+    if has_ged:
+        try:
+            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, document.tenant)
+        except Exception as e:
+            message = str(e)
+            logging.exception(message)
+        else:
+            if status_code == 201:
+                save_document_data(document, has_ged, ged_data, relative_file_path, None)
+            else:
+                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                    str(status_code), ged_data)
+                logging.error(message)
+    else:
+        save_document_data(document, has_ged, None, relative_file_path, None)
+
+    # salva o docx no sistema de arquivos
+    data['name'] = params['docx_filename']
+    relative_path = 'docassemble/' + params['docx_filename'][:15]
+    absolute_path, relative_file_path = save_file_from_url(params['docx_url'], relative_path, params['docx_filename'])
+
+    # salva o docx como documento relacionado
+    related_document = deepcopy(document)
+    related_document.name = params['docx_filename']
+    related_document.file_kind = DocumentFileKind.DOCX.value
+
+    if has_ged:
+        try:
+            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, document.tenant)
+        except Exception as e:
+            message = str(e)
+            logging.exception(message)
+        else:
+            if status_code == 201:
+                save_document_data(related_document, has_ged, ged_data, relative_file_path, document)
+            else:
+                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                    str(status_code), ged_data)
+                logging.error(message)
+    else:
+        save_document_data(related_document, has_ged, None, relative_file_path, document)
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
