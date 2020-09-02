@@ -817,6 +817,11 @@ def send_to_esignature(request, doc_uuid, bulk_generation=False):
             elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.name:
                 csc = ClickSignClient(esignature_app.private_key, esignature_app.test_mode)
 
+                documents[0]["tenant"] = dict()
+                documents[0]["school"] = dict()
+                documents[0]["tenant"]["esignature_folder"] = document.tenant.esignature_folder
+                documents[0]["school"]["esignature_folder"] = document.school.esignature_folder
+
                 # faz o upload do documento no clicksign
                 status_code, response_json, envelope_number = csc.upload_document(documents[0])
 
