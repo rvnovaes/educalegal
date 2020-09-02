@@ -32,6 +32,10 @@ code: |
     csc = ClickSignClient(tenant_private_key, tenant_test_mode)
 
     # faz o upload do documento no clicksign
+    documents[0]["tenant"] = dict()
+    documents[0]["school"] = dict()
+    documents[0]["tenant"]["esignature_folder"] = tenant_data["esignature_folder"]
+    documents[0]["school"]["esignature_folder"] = school["esignature_folder"]
     data_sent, data_received, status_code, envelope_id = csc.upload_document(documents[0])
 
     if status_code == 201:
