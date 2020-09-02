@@ -925,10 +925,12 @@ def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
     document.status = DocumentStatus.INSERIDO_GED.value
 
     if parent:
-        # cria documento do word relacionado ao documento pdf principal
+        # cria documento relacionado ao documento pdf principal
         document.id = None
         document.doc_uuid = uuid.uuid4()
         document.parent = parent
+        document.envelope_id = None
+        document.envelope_number = ''
         document.document_data = None
 
         try:
