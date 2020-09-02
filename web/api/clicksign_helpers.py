@@ -128,12 +128,12 @@ def webhook_listener(request):
             message = 'O documento do envelope {envelope_number} não existe.'.format(
                 envelope_number=envelope_number)
             logging.debug(message)
-            return HttpResponse(message)
+            return HttpResponse(status=400, reason=message)
         except Exception as e:
             message = str(e)
             logging.exception(message)
             logging.info(message)
-            return HttpResponse(message)
+            return HttpResponse(status=400, reason=message)
         else:
             envelope_status = str(data['document']['status']).lower()
             if envelope_status in envelope_statuses.keys():
@@ -147,6 +147,17 @@ def webhook_listener(request):
             tenant = Tenant.objects.get(pk=document.tenant.pk)
             # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
             if envelope_status == "finalizado":
+                # ao finalizar as assinaturas do documento estou recebendo um request.body sem a url do pdf assinado
+                # resposta do suporte da clicksign: Quando o evento auto_close é disparado pela primeira vez, alguns
+                # processos ainda são feitos internamente para que o documento assinado esteja pronto.
+                # Dessa forma, é possível que ao receber o primeiro evento, a cópia final ainda não esteja disponível.
+                # Sendo assim, recomendamos que a primeira tentativa seja recusada, ou que o evento só seja aceito com
+                # URL documento assinado.
+                if 'signed_file_url' not in data['document']['downloads']:
+                    logging.info('Ignora requisição, pois evento {} não contém a chave signed_file_url'.format(
+                        data['event']['name']))
+                    return HttpResponse(status=400, reason='Falta a chave signed_file_url')
+
                 fullpath, filename = pdf_file_saver(
                     data['document']['downloads']['signed_file_url'], envelope_number, document.name)
 
@@ -176,7 +187,7 @@ def webhook_listener(request):
                         message = str(e)
                         logging.exception(message)
                         logging.info(message)
-                        return HttpResponse(message)
+                        return HttpResponse(status=400, reason=message)
 
             # atualiza o status do documento
             document.status = document_status
@@ -256,7 +267,7 @@ def webhook_listener(request):
         logging.info('Exceção webhook clicksign')
         logging.info(e)
 
-    return HttpResponse("Success!")
+    return HttpResponse(status=200, reason="Success!")
 
 
 def pdf_file_saver(url, envelope_number, document_name):
