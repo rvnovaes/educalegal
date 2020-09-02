@@ -1,6 +1,5 @@
 import requests
 import configparser
-import subprocess
 import PySimpleGUI as sg
 from os import listdir
 from os.path import isfile, join
@@ -21,7 +20,7 @@ def da_user_list(api_key, server_url):
         raise ConnectionError("Não foi possível conectar-se com o Docassemble" + str(e))
 
     if r.status_code == 403:
-        raise PermissionError("Acesso Negado. Verifique a chake em upload_interviews_config")
+        raise PermissionError("Acesso Negado. Verifique a chave em upload_interviews_config")
 
     return r.json()
 
@@ -104,11 +103,20 @@ while True:
             user_options_dict = dict()
             user_emails = list()
 
-            for u in users:
-                id = u["id"]
-                email = u["email"]
-                user_options_dict[email] = id
-                user_emails.append(email)
+            # na versao 1.1.44 do DA houve alteracao nesse endpoint (/api/user_list)
+            # https://docassemble.org/docs/changelog.html
+            if 'items' in users:
+                for u in users['items']:
+                    id = u["id"]
+                    email = u["email"]
+                    user_options_dict[email] = id
+                    user_emails.append(email)
+            else:
+                for u in users:
+                    id = u["id"]
+                    email = u["email"]
+                    user_options_dict[email] = id
+                    user_emails.append(email)
             window["user_options"].update(values=user_emails)
 
         except Exception as e:

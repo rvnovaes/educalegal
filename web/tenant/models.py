@@ -65,6 +65,7 @@ class Tenant(models.Model):
         default=1,
         verbose_name='App de assinatura eletrônica')
     phone = models.CharField(max_length=50, blank=True, verbose_name="Telefone")
+    esignature_folder = models.CharField(max_length=255, blank=True, verbose_name="Pasta para upload dos documentos")
 
     class Meta:
         ordering = ["name"]
@@ -73,6 +74,11 @@ class Tenant(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.esignature_folder = self.esignature_folder.replace('/', '')
+        self.esignature_folder = self.esignature_folder.replace('\\', '')
+        super(Tenant, self).save(*args, **kwargs)
 
 
 class TenantAwareModel(models.Model):

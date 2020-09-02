@@ -1,3 +1,5 @@
+import os
+
 from requests import Session, RequestException
 
 # https://github.com/bustawin/retry-requests
@@ -60,9 +62,12 @@ class ClickSignClient:
         :param document: documento que será enviado para a Clicksign
         :return: JSON com dados do(s) documento(s) adicionado(s)
         """
+        path = os.path.join("/", document["tenant"]["esignature_folder"], document["school"]["esignature_folder"], 
+                            document['name'])
+
         payload = {
             "document": {
-                "path": "/" + document['name'],
+                "path": path,
                 "content_base64": 'data:application/pdf;base64,' + document['documentBase64'],
                 "sequence_enabled": True
                 }

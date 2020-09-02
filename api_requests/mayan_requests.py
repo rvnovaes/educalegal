@@ -9,6 +9,8 @@ from element_mayan_client import MayanClient
 
 base_url = 'http://ged:8000'
 tenant_ged_token = '483473d37efb328b827c354471be6e082236a2d9'
+# iasmini
+# tenant_ged_token = '47f210da48587cb14357e4352d31e0a9c3ae63c0'
 
 if __name__ == '__main__':
     mc = MayanClient(base_url, tenant_ged_token)
