@@ -115,7 +115,7 @@ def celery_create_document(base_url, api_key, secret, interview_full_name, inter
 # def celery_submit_to_esignature(self, request, doc_uuid):
 def celery_submit_to_esignature(request, doc_uuid):
     try:
-        send_to_esignature(request, doc_uuid, True)
+        send_to_esignature(request, doc_uuid, request.resolver_match.kwargs['bulk_document_generation_id'])
     except Exception as e:
         message = "Houve um erro inespecífico no envio para a assinatura eletrônica | {e}".format(
             e=str(e)

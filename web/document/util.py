@@ -323,8 +323,8 @@ def send_email(request, doc_uuid, bulk_generation=False):
 
 
 @login_required
-def send_to_esignature(request, doc_uuid, bulk_generation=False):
-    if bulk_generation:
+def send_to_esignature(request, doc_uuid, bulk_generation_id):
+    if bulk_generation_id:
         redirect_url = 'document:bulk-document-generation-progress'
     else:
         redirect_url = 'document:document-detail'
@@ -372,7 +372,7 @@ def send_to_esignature(request, doc_uuid, bulk_generation=False):
                         document.status = DocumentStatus.ENVIADO_ASS_ELET.value
                         document.envelope_number = response_json['envelopeId']
                         document.save(update_fields=['submit_to_esignature', 'status', 'envelope_number'])
-                        if not bulk_generation:
+                        if not bulk_generation_id:
                             messages.success(request, 'Documento enviado para a assinatura eletrônica com sucesso.')
 
             elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.name:
@@ -422,10 +422,13 @@ def send_to_esignature(request, doc_uuid, bulk_generation=False):
                         message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com sucesso '
                                             'para os destinatários:{}'.format(to_recipients))
 
-                        if not bulk_generation:
+                        if not bulk_generation_id:
                             messages.success(request, message)
 
-    return redirect(redirect_url, doc_uuid)
+    if bulk_generation_id:
+        return redirect(redirect_url, bulk_generation_id)
+    else:
+        return redirect(redirect_url, doc_uuid)
 
 
 def get_signer_key_by_email(recipients, tenant):
