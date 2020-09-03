@@ -5,8 +5,7 @@ import json
 from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
 
-from document.models import Document
-# from document.views import send_email, send_to_esignature
+from document.util import send_email, send_to_esignature
 from util.docassemble_client import DocassembleClient, DocumentNotGeneratedException
 
 
@@ -15,8 +14,8 @@ count_down = 5
 
 
 # @shared_task(bind=True, max_retries=3)
-# def create_document(self, base_url, api_key, secret, interview_full_name, interview_variables):
-def create_document(base_url, api_key, secret, interview_full_name, interview_variables):
+# def celery_create_document(self, base_url, api_key, secret, interview_full_name, interview_variables):
+def celery_create_document(base_url, api_key, secret, interview_full_name, interview_variables):
     try:
         dac = DocassembleClient(base_url, api_key)
         logger.info(
@@ -113,108 +112,27 @@ def create_document(base_url, api_key, secret, interview_full_name, interview_va
 
 
 # @shared_task(bind=True, max_retries=3)
-def submit_to_esignature(request, doc_uuid):
+# def celery_submit_to_esignature(self, request, doc_uuid):
+def celery_submit_to_esignature(request, doc_uuid):
     try:
-        send_to_esignature(request, doc_uuid)
-
-
-        dac = DocassembleClient(base_url, api_key)
-        logger.info(
-            "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
-                base_url=base_url, api_key=api_key
-            )
-        )
-        response, status_code = dac.interview_run_action(
-            secret,
-            interview_full_name,
-            interview_session,
-            "submit_to_esignature",
-            None,
-        )
-        message = "Status Code da assinatura: {status_code}".format(
-            status_code=status_code
-        )
-        logger.info(message)
-        if status_code != 204:
-            message = "Erro ao enviar para assinatura | Status Code: {status_code}".format(
-                status_code=status_code
-            )
-            logger.error(message)
-            raise self.retry(countdown=count_down ** self.request.retries)
-
-    except NewConnectionError as e:
-        message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
-            e=str(e)
-        )
-        logger.error(message)
-        raise self.retry(e=e, countdown=count_down ** self.request.retries)
-
-    except ConnectionError as e:
-        message = "Não foi possível conectar a sessão de entrevista. | {e}".format(
-            e=str(e)
-        )
-        logger.error(message)
-        raise self.retry(e=e, countdown=count_down ** self.request.retries)
-
+        send_to_esignature(request, doc_uuid, True)
     except Exception as e:
-        message = "Houve um erro inespecífico na criação do documento | {e}".format(
+        message = "Houve um erro inespecífico no envio para a assinatura eletrônica | {e}".format(
             e=str(e)
         )
         logger.error(message)
         raise
 
 
-@shared_task(bind=True, max_retries=3)
-def send_email(
-    self,
-    interview_session,
-    base_url,
-    api_key,
-    secret,
-    interview_full_name
-):
+# @shared_task(bind=True, max_retries=3)
+# def celery_send_email(self, request, doc_uuid):
+def celery_send_email(request, doc_uuid):
     try:
-        dac = DocassembleClient(base_url, api_key)
-        logger.info(
-            "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
-                base_url=base_url, api_key=api_key
-            )
-        )
-        response, status_code = dac.interview_run_action(
-            secret,
-            interview_full_name,
-            interview_session,
-            "el_send_email",
-            None,
-        )
-        message = "Status Code do envio do e-mail: {status_code}".format(
-            status_code=status_code
-        )
-        logger.info(message)
-        if status_code != 204:
-            message = "Erro ao enviar por e-mail | Status Code: {status_code}".format(
-                status_code=status_code
-            )
-            logger.error(message)
-            raise self.retry(countdown=count_down ** self.request.retries)
-
-    except NewConnectionError as e:
-        message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
-            e=str(e)
-        )
-        logger.error(message)
-        raise self.retry(e=e, countdown=count_down ** self.request.retries)
-
-    except ConnectionError as e:
-        message = "Não foi possível conectar a sessão de entrevista. | {e}".format(
-            e=str(e)
-        )
-        logger.error(message)
-        raise self.retry(e=e, countdown=count_down ** self.request.retries)
-
+        send_email(request, doc_uuid, True)
     except Exception as e:
-        message = "Houve um erro inespecífico na geração do e-mail documento | {e}".format(
+        message = "Houve um erro inespecífico no envio do e-mail | {e}".format(
             e=str(e)
         )
         logger.error(message)
         raise
+

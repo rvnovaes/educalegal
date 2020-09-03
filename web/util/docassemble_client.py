@@ -84,7 +84,7 @@ class DocassembleClient:
         final_url = self.api_base_url + "/api/session"
         logger.info("Final URL em interview_set_variables: " + final_url)
 
-        variables = json.dumps(variables)
+        # variables = json.dumps(variables)
 
         payload = {
             "i": interview_name,

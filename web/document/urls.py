@@ -1,4 +1,6 @@
 from django.urls import path
+
+from .util import send_email, send_to_esignature
 from .views import (
     DocumentListView,
     DocumentDetailView,
@@ -7,8 +9,6 @@ from .views import (
     ValidateCSVFile,
     generate_bulk_documents,
     bulk_generation_progress,
-    send_email,
-    send_to_esignature
 )
 
 app_name = "document"
