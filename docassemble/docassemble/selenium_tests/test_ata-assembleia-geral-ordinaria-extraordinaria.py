@@ -12,10 +12,10 @@ class TestAtaassembleiageralordinaria(WebTest):
     environment = list()
     if RUN_TESTS_AUTOTEST:
         environment.append(("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
-                            "Autotest_Ata da Assembleia Geral Ordinária"),)
+                            "Autotest_Ata da Assembleia Geral Ordinária-Extraordinária"),)
     if RUN_TESTS_PRODUCTION:
         environment.append(("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
-                            "Ata da Assembleia Geral Ordinária"),)
+                            "Ata da Assembleia Geral Ordinária-Extraordinária"),)
 
     @pytest.mark.parametrize("server,user,password,document_name", environment,)
     def test_ataassembleiageralordinaria(self, server, user, password, document_name):
