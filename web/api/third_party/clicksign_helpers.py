@@ -152,8 +152,8 @@ def webhook_listener(request):
                 # Sendo assim, recomendamos que a primeira tentativa seja recusada, ou que o evento só seja aceito com
                 # URL documento assinado.
                 if 'signed_file_url' not in data['document']['downloads']:
-                    logging.info('Ignora requisição, pois evento {} não contém a chave signed_file_url'.format(
-                        data['event']['name']))
+                    logging.info('Ignora requisição, pois evento {event} não contém a chave signed_file_url. '
+                                 'ID do ocumento {doc_id}'.format(event=data['event']['name'], doc_id=document.id))
                     return HttpResponse(status=400, reason='Falta a chave signed_file_url')
 
                 logging.info('signed_file_url')
