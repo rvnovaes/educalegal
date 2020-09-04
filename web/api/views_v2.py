@@ -5,10 +5,13 @@ from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 import pytz
 
+from django.utils import timezone
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -21,8 +24,14 @@ from rest_framework.exceptions import (
 from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, renderer_classes, permission_classes
+from rest_framework.permissions import AllowAny
 from drf_yasg.renderers import SwaggerUIRenderer, OpenAPIRenderer
-from rest_framework.decorators import api_view, renderer_classes
+
+from allauth.utils import build_absolute_uri
+from allauth.account.adapter import get_adapter
+from allauth.account.forms import default_token_generator
+from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
 
 from validator_collection import checkers
 
@@ -41,7 +50,8 @@ from .serializers_v2 import (
     SchoolSerializer,
     SchoolUnitSerializer,
     TenantSerializer,
-    UserSerializer
+    TenantGedDataSerializer,
+    UserSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -54,6 +64,7 @@ class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
     Retorna a lista de todas as entrevistas ou os detalhes de uma entrevista.
 
     """
+
     serializer_class = InterviewSerializer
 
     def get_queryset(self):
@@ -72,6 +83,7 @@ class PlanViewSet(viewsets.ReadOnlyModelViewSet):
     Retorna dados dos planos disponíveis para contratação.
 
     """
+
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
 
@@ -88,73 +100,87 @@ class PlanViewSet(viewsets.ReadOnlyModelViewSet):
 class TenantViewSet(viewsets.ModelViewSet):
     """
     # Retorna a listagem de clientes (tenants) ou o cliente específico.
-    #
+    # Inclui os dados do provedor de assinatura eletrônica e do plano contratado.
     """
+
     queryset = Tenant.objects.all()
     serializer_class = TenantSerializer
 
-    def create(self, request, *args, **kwargs):
-        full_name = request.data.get("full_name").strip()
-        tenant_name = request.data.get("tenant_name").strip()
-        phone = request.data.get("phone").strip()
-        email = request.data.get("email").strip()
-        password = request.data.get("password")
 
-        tenant = Tenant.objects.filter(name=tenant_name)
-        if tenant:
-            logger.info("Houve tentativa de criação de um tenant repetido pela auto-inscrição: " + tenant[0].name)
-            return Response(
-                "Já existe uma escola com esse nome. Favor escolher um nome diferente ou pedir à sua escola que o cadastre como usuário.",
-                status=status.HTTP_200_OK)
-        user = CustomUser.objects.filter(email=email)
-        if user:
-            logger.info("Houve tentativa de criação de um usuário repetido pela auto-inscrição: " + user[0].email)
-            return Response(
-                "Já existe uma usuário cadastrado com esse e-mail. Favor verificar se sua escola já está cadastrada no sistema ou usar outro e-mail.",
-                status=status.HTTP_200_OK)
-        logger.info("Novo tenant sendo criado:" + tenant_name)
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def create_tenant(request):
+    full_name = request.data.get("full_name").strip()
+    tenant_name = request.data.get("tenant_name").strip()
+    phone = request.data.get("phone").strip()
+    email = request.data.get("email").strip()
+    password = request.data.get("password")
 
-        essential_plan = Plan.objects.get(pk=1)
-
-        tenant = Tenant.objects.create(
-            name=tenant_name,
-            subdomain_prefix=None,
-            eua_agreement=True,
-            plan=essential_plan,
-            auto_enrolled=True,
-            esignature_app=None,
-            phone=phone,
+    tenant = Tenant.objects.filter(name=tenant_name)
+    if tenant:
+        logger.info(
+            "Houve tentativa de criação de um tenant repetido pela auto-inscrição: "
+            + tenant[0].name
         )
-        tenant.save()
-        # Selects every freemium interview and adds to newly created tenant
-        freemium_interviews = Interview.objects.filter(is_freemium=True)
-        # https://docs.djangoproject.com/en/3.0/ref/models/relations/#django.db.models.fields.related.RelatedManager.add
-        # add não aceita uma lista, mas um número arbitrário de objetos. Para expandir uma lista em vários objetos,
-        # usamos *freemium_interviews antes da lista
-        tenant.interview_set.add(*freemium_interviews)
-        # splits the e-mail and uses the name part as username
-        username = email
-        # Splits the full name field into first and "rest of the name" for the user
-        first_name = full_name.split()[0]
-        last_name = ""
-        for name in full_name.split()[1:]:
-            last_name += " " + name
-        last_name = last_name
-        # Creates the user
-        user = CustomUser.objects.create_user(username=username,
-                                              first_name=first_name,
-                                              last_name=last_name,
-                                              email=email,
-                                              password=password,
-                                              tenant=tenant)
-        user.save()
+        return Response(
+            "Já existe uma escola com esse nome. Favor escolher um nome diferente ou pedir à sua escola que o cadastre como usuário.",
+            status=status.HTTP_200_OK,
+        )
+    user = CustomUser.objects.filter(email=email)
+    if user:
+        logger.info(
+            "Houve tentativa de criação de um usuário repetido pela auto-inscrição: "
+            + user[0].email
+        )
+        return Response(
+            "Já existe uma usuário cadastrado com esse e-mail. Favor verificar se sua escola já está cadastrada no sistema ou usar outro e-mail.",
+            status=status.HTTP_200_OK,
+        )
+    logger.info("Novo tenant sendo criado:" + tenant_name)
 
-        # Creates the token for the user to create documents
-        token = Token()
-        token.user = user
-        token.save()
+    essential_plan = Plan.objects.get(pk=1)
 
-        return Response(status=status.HTTP_201_CREATED)
+    tenant = Tenant.objects.create(
+        name=tenant_name,
+        subdomain_prefix=None,
+        eua_agreement=True,
+        plan=essential_plan,
+        auto_enrolled=True,
+        esignature_app=None,
+        phone=phone,
+    )
+    tenant.save()
+    # Selects every freemium interview and adds to newly created tenant
+    freemium_interviews = Interview.objects.filter(is_freemium=True)
+    # https://docs.djangoproject.com/en/3.0/ref/models/relations/#django.db.models.fields.related.RelatedManager.add
+    # add não aceita uma lista, mas um número arbitrário de objetos. Para expandir uma lista em vários objetos,
+    # usamos *freemium_interviews antes da lista
+    tenant.interview_set.add(*freemium_interviews)
+    # splits the e-mail and uses the name part as username
+    username = email
+    # Splits the full name field into first and "rest of the name" for the user
+    first_name = full_name.split()[0]
+    last_name = ""
+    for name in full_name.split()[1:]:
+        last_name += " " + name
+    last_name = last_name
+    # Creates the user
+    user = CustomUser.objects.create_user(
+        username=username,
+        first_name=first_name,
+        last_name=last_name,
+        email=email,
+        password=password,
+        tenant=tenant,
+    )
+    user.save()
+
+    # Creates the token for the user to create documents
+    token = Token()
+    token.user = user
+    token.save()
+
+    return Response(status=status.HTTP_201_CREATED)
 
 
 # Document Views #######################################################################################################
@@ -207,7 +233,9 @@ class DocumentViewSet(viewsets.ModelViewSet):
         queryset = self.queryset.filter(tenant_id=tenant_id)
         status_filter_param = request.query_params.getlist("status[]")
         school_filter_param = request.query_params.getlist("school[]")
-        interview_filter_param = request.query_params.getlist("interview[]")
+        interview_filter_param = request.query_params.getlist(
+            "interview[]"
+        )  # TODO parametro de onlyParent
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
         if status_filter_param:
@@ -233,7 +261,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
             # Abaixo o retorno é splitado no até (se houver) e cada data tem os espaços em branco nos extremos removidos
             dates_list = list(map(str.strip, created_date_range.split("até")))
             tz = pytz.timezone("America/Sao_Paulo")
-            from_date = datetime.datetime.strptime(dates_list[0], '%d/%m/%Y')
+            from_date = datetime.datetime.strptime(dates_list[0], "%d/%m/%Y")
             from_date = tz.localize(from_date)
             # Filtering a DateTimeFieldwith dates won’t include items on the last day, because the bounds are
             # interpreted as " 0am on the given date”. Por isso, somamos mais um ao dia para incluir o dia de fim
@@ -241,7 +269,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 to_date = from_date + timedelta(days=1)
                 queryset = queryset.filter(created_date__range=(from_date, to_date))
             if len(dates_list) > 1:
-                to_date = datetime.datetime.strptime(dates_list[1], '%d/%m/%Y')
+                to_date = datetime.datetime.strptime(dates_list[1], "%d/%m/%Y")
                 to_date += timedelta(days=1)
                 to_date = tz.localize(to_date)
                 queryset = queryset.filter(created_date__range=(from_date, to_date))
@@ -544,8 +572,10 @@ class SchoolViewSet(viewsets.ModelViewSet):
         school = School.objects.get(pk=kwargs.get("pk"))
         school_documents = Document.objects.filter(school=school)
         if school_documents:
-            return Response("Não é possível excluir esta escola. Ela possui documentos gerados.",
-                            status=status.HTTP_200_OK)
+            return Response(
+                "Não é possível excluir esta escola. Ela possui documentos gerados.",
+                status=status.HTTP_200_OK,
+            )
         else:
             school.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -556,11 +586,12 @@ class SchoolUnitViewSet(viewsets.ModelViewSet):
     Permite criar, alterar, listar e apagar as unidades das escolas.
     Só permite excluir escola vinculada ao tenant referente ao token informado.
     """
+
     queryset = SchoolUnit.objects.all()
     serializer_class = SchoolUnitSerializer
 
     def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
+        if getattr(self, "swagger_fake_view", False):
             # queryset just for schema generation metadata
             # https://github.com/axnsan12/drf-yasg/issues/333
             return SchoolUnit.objects.none()
@@ -570,8 +601,21 @@ class SchoolUnitViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class UserView(APIView):
+class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = TenantGedData.objects.all()
+    serializer_class = TenantGedDataSerializer
 
+    def get_queryset(self):
+        user_tenant = self.request.user.tenant
+        tenant = Tenant.objects.get(pk=self.kwargs.get("pk"))
+        if user_tenant == tenant:
+            return self.queryset
+        else:
+            message = "O usuário não tem autorização para acessar estes dados."
+            logger.info(message)
+            raise PermissionDenied(message)
+        
+class UserView(APIView):
     def get(self, request):
         """
         Return a list of all users.
@@ -581,25 +625,137 @@ class UserView(APIView):
         return Response(user_data.data)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @renderer_classes([OpenAPIRenderer, SwaggerUIRenderer])
 def dashboard_data(request):
     tenant = request.user.tenant
+    user = request.user
+    use_ged = tenant.plan.use_ged
     now = datetime.datetime.now()
     tz = pytz.timezone("America/Sao_Paulo")
-    now = tz.localize(now)
     begin_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     begin_last_month = begin_of_month - relativedelta(months=1)
-    current_month_documents = Document.objects.filter(tenant=tenant).filter(
-        created_date__gte=begin_of_month)
-    current_month_document_count = current_month_documents.count()
-    current_month_signature_count = current_month_documents.filter(envelope_id__isnull=False).count()
-    last_month_documents = Document.objects.filter(tenant=tenant).filter(created_date__gte=begin_last_month,
-                                                                         created_date__lt=begin_of_month)
-    last_month_document_count = last_month_documents.count()
-    last_month_signature_count = last_month_documents.filter(envelope_id__isnull=False).count()
+    tz.localize(begin_of_month)
+    tz.localize(begin_last_month)
+    if not user.is_superuser:
+        total_docs = Document.objects.filter(tenant=tenant)
+    else:
+        total_docs = Document.objects.all()
+    total_docs_count = total_docs.count()
+    # TODO excluir os documentos filhos
+    # Current Month Documents
+    cm_docs = total_docs.filter(created_date__gte=begin_of_month)
+    # Last Month Documents
+    lm_docs = total_docs.filter(created_date__gte=begin_last_month,
+                                                            created_date__lt=begin_of_month)
+    # Se usa GED, consideramos finalizado somente depois do envio para o GED. Portanto, excluimos da contagem
+    # também os documentos criados
+    if use_ged:
+        cm_docs_count = cm_docs.exclude(Q(status="rascunho") | Q(status="criado")).count()
+        lm_docs_count = lm_docs.exclude(Q(status="rascunho") | Q(status="criado")).count()
+        cm_in_progress_docs_count = cm_docs.filter(Q(status="rascunho") | Q(status="criado")).count()
+        lm_in_progress_docs_count = lm_docs.filter(Q(status="rascunho") | Q(status="criado")).count()
+    else:
+        cm_docs_count = cm_docs.exclude(status="rascunho").count()
+        lm_docs_count = lm_docs.exclude(status="rascunho").count()
+        cm_in_progress_docs_count = cm_docs.filter(status="rascunho").count()
+        lm_in_progress_docs_count = lm_docs.filter(status="rascunho").count()
 
-    return Response({"current_month_document_count": current_month_document_count,
-                     "last_month_document_count": last_month_document_count,
-                     "current_month_signature_count": current_month_signature_count,
-                     "last_month_signature_count": last_month_signature_count})
+    cm_signature_count = cm_docs.filter(Q(status="assinado") | Q(status="assinatura recusada/inválida")).count()
+    lm_signature_count = lm_docs.filter(Q(status="assinado") | Q(status="assinatura recusada/inválida")).count()
+    cm_in_progress_signature_count = cm_docs.filter(status="enviado para assinatura").count()
+    lm_in_progress_signature_count = lm_docs.filter(status="enviado para assinatura").count()
+
+    return Response(
+        {
+            "tenant_name": tenant.name,
+            "total_docs_count": total_docs_count,
+            "cm_docs_count": cm_docs_count,
+            "lm_docs_count": lm_docs_count,
+            "cm_in_progress_docs_count": cm_in_progress_docs_count,
+            "lm_in_progress_docs_count": lm_in_progress_docs_count,
+            "cm_signature_count": cm_signature_count,
+            "lm_signature_count": lm_signature_count,
+            "cm_in_progress_signature_count": cm_in_progress_signature_count,
+            "lm_in_progress_signature_count": lm_in_progress_signature_count,
+        }
+    )
+
+
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def recover_password(request):
+    email = request.data.get("email")
+    try:
+        user = CustomUser.objects.get(email=email)
+        # Adaptado de  allauth.account.forms.ResetPasswordForm.save()
+        current_site = get_current_site(request)
+        temp_key = default_token_generator.make_token(user)
+        # Regista a temp key no usuario para conferencia posterior quando da redefinicao da senha. A temp_key e gravada
+        # também com created_date = now, para verificar sua validade.
+        user.temp_key = temp_key
+        user.save()
+        # send the password reset email
+        path = "/redefinir/" + user_pk_to_url_str(user) + "-" + temp_key
+        url = build_absolute_uri(request, path)
+        context = {
+            "current_site": current_site,
+            "user": user,
+            "password_reset_url": url,
+            "request": request,
+        }
+
+        get_adapter(request).send_mail(
+            "account/email/password_reset_key", email, context
+        )
+
+    except CustomUser.DoesNotExist:
+        log_message = "Houve tentativa de recuperação de senha com e-mail inválido {email}".format(
+            email=email
+        )
+        logger.info(log_message)
+
+    message = "Se houver usuário associado a este e-mail, em breve você receberá instruções para recuperação da senha."
+    return Response(message)
+
+
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def reset_password(request):
+    password = request.data.get("password")
+    key = request.data.get("key")
+    user_id_str = key.split("-")[0]
+    user_id = url_str_to_user_pk(user_id_str)
+    temp_key = key[len(user_id_str) + 1:]
+    try:
+        user = CustomUser.objects.get(pk=user_id)
+        now = timezone.now()
+        ten_minutes_ago = now - relativedelta(minutes=10)
+        if user.temp_key:
+            if (
+                    user.temp_key != temp_key
+                    or (user.temp_key_created_date - ten_minutes_ago).total_seconds() > 600
+            ):
+                message = "A chave de redefinição está expirada. Favor refazer o processo de redefinição de senha."
+                return Response(message, status=status.HTTP_403_FORBIDDEN)
+            else:
+                user.set_password(password)
+                user.temp_key = None
+                user.temp_key_created_date = None
+                user.save()
+                message = "A senha foi alterada com sucesso!"
+                return Response(message)
+        else:
+            log_message = "Foi feita uma tentativa de recuperação de senha sem temp_key definida: {temp_key}".format(
+                temp_key=temp_key
+            )
+            logger.error(log_message)
+            return Response(log_message, status=status.HTTP_403_FORBIDDEN)
+    except CustomUser.DoesNotExist:
+        log_message = "Foi feita uma tentativa de recuperação de senha com um usuário inexistente {temp_key}".format(
+            temp_key=temp_key
+        )
+        logger.info(log_message)
+        # Mesmo assim a mensagem é a mesma para evitar informar se o user existe ou não
+        message = "A chave de redefinição está expirada. Favor refazer o processo de redefinição de senha."
+        return Response(message, status=status.HTTP_403_FORBIDDEN)
