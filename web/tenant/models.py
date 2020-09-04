@@ -153,6 +153,7 @@ class TenantGedData(models.Model):
 
 class ESignatureAppSignerKey(TenantAwareModel):
     email = models.EmailField(max_length=255, verbose_name="E-mail")
+    name = models.CharField(max_length=255, verbose_name="Nome")
     key = models.CharField(max_length=255, verbose_name="Chave")
     esignature_app = models.ForeignKey(
         ESignatureApp,
@@ -164,7 +165,7 @@ class ESignatureAppSignerKey(TenantAwareModel):
         ordering = ["email"]
         verbose_name = "Chave do signatário para assinatura eletrônica"
         verbose_name_plural = "Chaves do signatário para assinatura eletrônica"
-        unique_together = (('email', 'tenant', 'esignature_app'),)
+        unique_together = (('email', 'name', 'tenant', 'esignature_app'),)
 
     def __str__(self):
         return self.email + ' - ' + self.key
