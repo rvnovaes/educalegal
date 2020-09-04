@@ -132,7 +132,6 @@ export default {
         console.log(result.value)
         try {
             const res = await this.$store.dispatch("schools/deleteSchool", row);
-            console.log(res)
             if (res.status === 204) {
               await Swal.fire({
                 title: "Excluída!",
@@ -145,7 +144,6 @@ export default {
               });
             }
             if (res.status === 200) {
-              console.log(res)
               await Swal.fire({
                 title: `Não é permitido excluir ${row.name}!`,
                 text: res.data,
@@ -157,7 +155,7 @@ export default {
               });
             }
         } catch (e) {
-          Swal.fire({
+          await Swal.fire({
             title: `Erro ao excluir ${row.name}`,
             text: e,
             icon: "error",
