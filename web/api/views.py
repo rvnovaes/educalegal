@@ -150,9 +150,12 @@ class ESignatureAppSignerKeyViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # deve ser usada a funcao filter e nao a get para que seja retornado um queryset e nao um
         # ESignatureAppSignerKey
-        # como cada cliente tem uma conta da clicksig, deve ser verificado o tenant tbm
+        # como cada cliente tem uma conta da clicksign, deve ser verificado o tenant tbm
+        # como tem ambiente de producao e homologacao, verificar esignature_app
+        # como o mesmo email pode ser usado por pessoas diferentes na entrevista (email de PJ), verificar nome
 
         return ESignatureAppSignerKey.objects.filter(
             tenant=self.request.user.tenant.id,
             esignature_app=self.request.user.tenant.esignature_app,
-            email=self.kwargs['email'])
+            email=self.kwargs['email'],
+            name=self.kwargs['name'])
