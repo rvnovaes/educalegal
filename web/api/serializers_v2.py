@@ -13,11 +13,14 @@ class ESignatureAppSerializer(serializers.ModelSerializer):
     class Meta:
         model = ESignatureApp
         ref_name = "ESignatureApp v2"
-        fields = "__all__"
+        # Nao eviamos os campos de chave privada, id do usuario, etc, uma vez que envia-los apresentaria risco de seguranca
+        # e eles nao sao usados no front
+        fields = ["id", "provider", "test_mode"]
 
 
 class InterviewSerializer(serializers.ModelSerializer):
     interview_link = serializers.SerializerMethodField()
+
     class Meta:
         model = Interview
         ref_name = "Interview v2"
@@ -50,6 +53,7 @@ class PlanSerializer(serializers.ModelSerializer):
 
 class TenantSerializer(serializers.ModelSerializer):
     esignature_app = ESignatureAppSerializer(many=False, read_only=True)
+    plan = PlanSerializer(many=False, read_only=True)
 
     class Meta:
         model = Tenant
@@ -64,7 +68,8 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         ref_name = "Document v2"
-        fields = ["tenant", "doc_uuid", "name", "interview_name", "school_name", "created_date", "altered_date", "status"]
+        fields = ["tenant", "doc_uuid", "name", "interview_name", "school_name", "created_date", "altered_date",
+                  "status"]
 
     def get_interview_name(self, obj):
         return obj.interview.name if obj.interview else ""
@@ -154,8 +159,10 @@ class SchoolUnitSerializer(serializers.ModelSerializer):
 class TenantGedDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantGedData
-        ref_name = "TenantGedData v2"
-        fields = "__all__"
+        ref_name = "Tenant Ged Data v2"
+        fields = ["tenant",
+                  "url",
+                  "token"]
 
 
 class UserSerializer(serializers.ModelSerializer):

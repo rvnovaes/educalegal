@@ -1,5 +1,5 @@
 from rest_framework.schemas import get_schema_view
-from django.urls import path, include
+from django.urls import path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -10,12 +10,16 @@ from .views_v2 import (
     InterviewViewSet,
     PlanViewSet,
     TenantViewSet,
+    create_tenant,
     DocumentViewSet,
     DocumentDownloadViewSet,
     SchoolViewSet,
     SchoolUnitViewSet,
+    TenantGedDataViewSet,
     UserView,
     dashboard_data,
+    recover_password,
+    reset_password
 )
 
 from .clicksign_helpers import webhook_listener
@@ -29,22 +33,22 @@ API_DESCRIPTION = (
 schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
-    # Administrative Views
     path("interviews/", InterviewViewSet.as_view({"get": "list"})),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
     path("plans/", PlanViewSet.as_view({"get": "list"})),
     path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
-    path("tenants/", TenantViewSet.as_view({"get": "list", "post": "create"})),
+    path("tenants/", create_tenant),
+    path("tenants/", TenantViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>", TenantViewSet.as_view({"get": "retrieve"})),
-    # Documents Views
+    path("tenants/<int:pk>/ged_data", TenantGedDataViewSet.as_view({"get": "retrieve"})),
     path("documents/", DocumentViewSet.as_view({"post": "create", "get": "list"})),
     path("documents/<str:identifier>", DocumentViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     path("documents/<str:identifier>/download", DocumentDownloadViewSet.as_view({"get": "retrieve", "delete": "destroy"})),
     path("dashboard/", dashboard_data),
-    # Front end views
+    path("recover_password/", recover_password),
+    path("reset_password/", reset_password),
     path("schools/", SchoolViewSet.as_view({"post": "create", "get": "list"})),
     path("schools/<int:pk>", SchoolViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
-
     path("schools/<int:spk>/school_units", SchoolUnitViewSet.as_view({"post": "create", "get": "list"})),
     path("schools/<int:spk>/school_units/<int:pk>", SchoolUnitViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
 
@@ -57,7 +61,6 @@ urlpatterns = [
     path("users/", UserView.as_view(), name="users"),
     path("docusign/webhook", docusign_webhook_listener),
     path("schema/", schema_view),
-
     path("token/", TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path("token_refresh/", TokenRefreshView.as_view(), name='token_refresh')
 
