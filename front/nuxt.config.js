@@ -64,7 +64,6 @@ module.exports = {
     "@nuxtjs/axios",
     "@nuxtjs/pwa",
     "@nuxtjs/auth",
-    "@nuxtjs/toast",
   ],
 
   /*

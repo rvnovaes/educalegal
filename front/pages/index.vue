@@ -67,6 +67,8 @@
 </template>
 <script>
 
+  import Swal from "sweetalert2";
+
   export default {
     layout: 'AuthLayout',
     data() {
@@ -81,20 +83,31 @@
       };
     },
     methods: {
-
       async onSubmit() {
         const credentials = this.credentials
         try {
           await this.$auth.loginWith('local', { data: credentials })
           // await this.$auth.loginWith('customScheme', { data: credentials })
-          this.$toasted.global.defaultSuccess({
-              msg: 'Usuário autenticado com sucesso'
+          await Swal.fire({
+            title: "Bem-vindo ao Educa Legal!",
+            buttonsStyling: false,
+            icon: "success",
+            timer: 3000,
+            customClass: {
+              confirmButton: "btn btn-success btn-fill",
+            }
           })
           } catch (e) {
-            console.log(e)
-            this.$toasted.global.defaultError({
-            msg: 'Usuário ou senha inválidos.'
-            })
+          await Swal.fire({
+            title: "Usuário ou senha inválidos!",
+            text: e,
+            icon: "error",
+            customClass: {
+              confirmButton: "btn btn-info btn-fill",
+            },
+            confirmButtonText: "OK",
+            buttonsStyling: false
+          });
         }
       }
     }
