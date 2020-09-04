@@ -43,6 +43,7 @@ export const getters = {
 export const actions = {
   async fetchPaginatedDocuments({commit}, payload) {
     commit("toggleLoading", true);
+    // TODO parametro de pegar onlyParents false
     const res = await this.$axios.get("/v2/documents/", {
       params:
         {
