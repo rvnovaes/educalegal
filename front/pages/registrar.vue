@@ -78,7 +78,7 @@
 
                   <div class="row my-4">
                     <div class="col-12">
-                      <base-input :rules="{ required: { allowFalse: false } }" name=EUA>
+                      <base-input :rules="{ required: { allowFalse: false } }" name="Política de privacidade e termos de uso">
                         <base-checkbox v-model="model.eua">
                           <span class="text-muted">Concordo com a<a
                             href="https://www.educalegal.com.br/politica-de-privacidade/" target="_blank"> política de privacidade e os termos de uso*</a></span>
@@ -122,20 +122,13 @@ export default {
   },
   methods: {
     async onSubmit() {
-      const tokenRes = await this.$axios.post("v2/token/", {
-        username: "token.fetcher@educalegal.com.br",
-        password: "Silex@568"
-      });
-      const config = {
-        headers: {Authorization: "Bearer " + tokenRes.data.access}
-      };
       const res = await this.$axios.post("/v2/tenants/", {
         full_name: this.model.fullName,
         tenant_name: this.model.tenantName,
         phone: this.model.phone,
         email: this.model.email,
         password: this.model.password,
-      }, config);
+      });
       if (res.status === 200) {
         await Swal.fire({
           title: `Não foi possível criar sua conta...`,
