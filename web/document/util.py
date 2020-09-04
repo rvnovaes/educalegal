@@ -438,12 +438,15 @@ def get_signer_key_by_email(recipients, tenant):
     for recipient in recipients:
         if recipient['group'] == 'signers':
             recipient['group'] = 'sign'
+            # a clicksign nao aceita barras no nome
+            recipient['name'] = recipient['name'].replace('/', '')
+            recipient['name'] = recipient['name'].replace('\\', '')
             recipients_sign.append(recipient)
 
     for recipient in recipients_sign:
         try:
             e_signature_app_signer_key = ESignatureAppSignerKey.objects.get(
-                tenant=tenant, email=recipient['email'])
+                tenant=tenant, esignature_app=tenant.esignature_app, email=recipient['email'], name=recipient['name'])
         except ESignatureAppSignerKey.DoesNotExist:
             recipient['key'] = ''
             recipient['new_signer'] = True
@@ -465,6 +468,7 @@ def post_signer_key(recipients, esignature_app, tenant):
         if recipient['new_signer'] and recipient['status_code'] == 201:
             e_signature_app_signer_key = ESignatureAppSignerKey(
                 email=recipient['email'],
+                name=recipient['name'],
                 key=recipient['key'],
                 esignature_app=esignature_app,
                 tenant=tenant,
