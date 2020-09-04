@@ -57,6 +57,13 @@
         <h6 class="navbar-heading p-0 text-muted">Links Úteis</h6>
 
         <ul class="navbar-nav mb-md-3">
+          <li v-if="gedUrl" class="nav-item">
+            <a class="nav-link" :href="gedUrl.url"
+               target="_blank" rel="noopener">
+              <i class="fa fa-cloud text-primary"></i>
+              <span class="nav-link-text">GED</span>
+            </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="https://atendimento.atlassian.net/servicedesk/customer/portal/2"
                target="_blank" rel="noopener">
@@ -125,8 +132,15 @@
       }
     },
     mounted() {
+      this.$store.dispatch("tenant/fetchTenantGedData", this.$auth.user.tenant)
       this.initScrollbar()
-    }
+    },
+    computed:
+      {
+        gedUrl() {
+          return this.$store.state.tenant.tenantGedData;
+        }
+      }
   };
 </script>
 <style lang="scss">
