@@ -280,11 +280,14 @@ class EducaLegalClient:
         for recipient in recipients:
             if recipient['group'] == 'signers':
                 recipient['group'] = 'sign'
+                # a clicksign nao aceita barras no nome
+                recipient['name'] = recipient['name'].replace('/', '')
+                recipient['name'] = recipient['name'].replace('\\', '')
                 recipients_sign.append(recipient)
 
         for recipient in recipients_sign:
-            final_url = self.api_base_url + "/v1/esignature-app-signer-keys/{email}".format(
-                email=recipient['email'])
+            final_url = self.api_base_url + "/v1/esignature-app-signer-keys/{email}/{name}".format(
+                email=recipient['email'], name=recipient['name'])
             try:
                 response = self.session.get(final_url)
             except Exception as e:
@@ -312,6 +315,7 @@ class EducaLegalClient:
             if recipient['new_signer'] and recipient['status_code'] == 201:
                 payload = {
                     "email": recipient['email'],
+                    "name": recipient['name'],
                     "key": recipient['key'],
                     "tenant": tenant_id,
                     "esignature_app": e_signature_app,
