@@ -544,7 +544,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                         interview_full_name,
                         interview_variables,
                     ),
-                    celery_submit_to_esignature.s(request, result),
+                    celery_submit_to_esignature.s(request, el_document.doc_uuid),
                 )()
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
@@ -560,7 +560,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                         interview_full_name,
                         interview_variables,
                     ),
-                    celery_send_email.s(request, result),
+                    celery_send_email.s(request, el_document.doc_uuid),
                 )()
                 result_description = "Criação do documento: {parent_id} | Envio por e-mail: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
