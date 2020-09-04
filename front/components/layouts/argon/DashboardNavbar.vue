@@ -24,24 +24,24 @@
         <template>
 
           <div class="dropdown-header noti-title">
-            <h6 class="text-overflow m-0">Welcome!</h6>
+            <h6 class="text-overflow m-0">Bem-vindo!</h6>
           </div>
-          <a href="#!" class="dropdown-item">
-            <i class="ni ni-single-02"></i>
-            <span>My profile</span>
-          </a>
-          <a href="#!" class="dropdown-item">
+<!--          <a href="#!" class="dropdown-item">-->
+<!--            <i class="ni ni-single-02"></i>-->
+<!--            <span>My profile</span>-->
+<!--          </a>-->
+          <a href="/plano" class="dropdown-item">
             <i class="ni ni-settings-gear-65"></i>
-            <span>Settings</span>
+            <span>Dados do Plano</span>
           </a>
-          <a href="#!" class="dropdown-item">
-            <i class="ni ni-calendar-grid-58"></i>
-            <span>Activity</span>
-          </a>
-          <a href="#!" class="dropdown-item">
-            <i class="ni ni-support-16"></i>
-            <span>Support</span>
-          </a>
+<!--          <a href="#!" class="dropdown-item">-->
+<!--            <i class="ni ni-calendar-grid-58"></i>-->
+<!--            <span>Activity</span>-->
+<!--          </a>-->
+<!--          <a href="#!" class="dropdown-item">-->
+<!--            <i class="ni ni-support-16"></i>-->
+<!--            <span>Support</span>-->
+<!--          </a>-->
           <div class="dropdown-divider"></div>
           <!--          <a href="#!" class="dropdown-item">-->
           <nuxt-link @click.native="onLogout" class="dropdown-item" to="/">
