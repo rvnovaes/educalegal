@@ -30,7 +30,7 @@ from util.mongo_util import (
 )
 from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
-from .util import custom_class_name, dict_to_docassemble_objects, create_secret
+from .util import custom_class_name, dict_to_docassemble_objects, create_secret, send_to_esignature
 from .forms import BulkDocumentGenerationForm
 from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus, DocumentFileKind
 from .tasks import celery_create_document, celery_submit_to_esignature, celery_send_email
@@ -534,7 +534,8 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 #         interview_variables,
                 #     )
                 #
-                # celery_submit_to_esignature(request, result)
+                # # celery_submit_to_esignature(el_document.doc_uuid)
+                # status_code, message = send_to_esignature(el_document.doc_uuid)
 
                 result = chain(
                     celery_create_document.s(
@@ -544,7 +545,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                         interview_full_name,
                         interview_variables,
                     ),
-                    celery_submit_to_esignature.s(request, el_document.doc_uuid),
+                    celery_submit_to_esignature.s(el_document.doc_uuid),
                 )()
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
@@ -560,7 +561,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                         interview_full_name,
                         interview_variables,
                     ),
-                    celery_send_email.s(request, el_document.doc_uuid),
+                    celery_send_email.s(request.__dict__, el_document.doc_uuid),
                 )()
                 result_description = "Criação do documento: {parent_id} | Envio por e-mail: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)

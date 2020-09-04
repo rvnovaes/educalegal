@@ -259,7 +259,7 @@ def _create_address_obj(document, person_list_name, index):
 @login_required
 def send_email(request, doc_uuid, bulk_generation_id=None):
     if bulk_generation_id:
-        redirect_url = 'document:bulk-document-generation-progress'
+        redirect_url = 'document:bulk-document-generation-result'
     else:
         redirect_url = 'document:document-detail'
 
@@ -332,17 +332,21 @@ def send_email(request, doc_uuid, bulk_generation_id=None):
 
 
 @login_required
-def send_to_esignature(request, doc_uuid, bulk_generation_id=None):
-    if bulk_generation_id:
-        redirect_url = 'document:bulk-document-generation-progress'
-    else:
-        redirect_url = 'document:document-detail'
+def redirect_send_to_esignature(request, doc_uuid):
+    status_code, message = send_to_esignature(doc_uuid)
 
+    if status_code == 202:
+        messages.success(request, 'Documento enviado para a assinatura eletrônica com sucesso.')
+    else:
+        messages.error(request, message)
+    return redirect('document:document-detail', doc_uuid)
+
+
+def send_to_esignature(doc_uuid):
     try:
         document = Document.objects.get(doc_uuid=doc_uuid)
     except Document.DoesNotExist:
         message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
-        messages.error(request, message)
         logger.error(message)
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
@@ -374,15 +378,12 @@ def send_to_esignature(request, doc_uuid, bulk_generation_id=None):
                         document.recipients, documents, email_subject="Documento para sua assinatura")
                 except Exception as e:
                     logger.error(str(type(e).__name__) + " : " + str(e))
-                    messages.error(request, message)
                 else:
                     if status_code == 201:
                         document.submit_to_esignature = True
                         document.status = DocumentStatus.ENVIADO_ASS_ELET.value
                         document.envelope_number = response_json['envelopeId']
                         document.save(update_fields=['submit_to_esignature', 'status', 'envelope_number'])
-                        if not bulk_generation_id:
-                            messages.success(request, 'Documento enviado para a assinatura eletrônica com sucesso.')
 
             elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.name:
                 csc = ClickSignClient(esignature_app.private_key, esignature_app.test_mode)
@@ -399,19 +400,16 @@ def send_to_esignature(request, doc_uuid, bulk_generation_id=None):
                     # verifica se o signer ja foi enviado para a clicksign
                     success, recipients_sign = get_signer_key_by_email(document.recipients, document.tenant)
                     if not success:
-                        messages.error(request, message)
-                        return redirect(redirect_url, doc_uuid)
+                        return status_code, message
 
                     # cria os destinatarios
                     status_code, reason = csc.add_signer(recipients_sign)
                     if status_code != 201:
-                        messages.error(request, message)
-                        return redirect(redirect_url, doc_uuid)
+                        return status_code, message
 
                     # adiciona signer key no educa legal
                     if not post_signer_key(recipients_sign, esignature_app, document.tenant):
-                        messages.error(request, message)
-                        return redirect(redirect_url, doc_uuid)
+                        return status_code, message
 
                     # adiciona os signatarios ao documento e envia por email para o primeiro signatario
                     # o envelope_id eh a key do documento no clicksign
@@ -424,20 +422,14 @@ def send_to_esignature(request, doc_uuid, bulk_generation_id=None):
                         document.submit_to_esignature = True
                         document.save(update_fields=['status', 'envelope_number', 'submit_to_esignature'])
 
-                        if not bulk_generation_id:
-                            to_recipients = ''
-                            for recipient in document.recipients:
-                                to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+                        to_recipients = ''
+                        for recipient in document.recipients:
+                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
 
-                            message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
-                                                'sucesso para os destinatários:{}'.format(to_recipients))
+                        message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
+                                            'sucesso para os destinatários:{}'.format(to_recipients))
 
-                            messages.success(request, message)
-
-    if bulk_generation_id:
-        return redirect(redirect_url, bulk_generation_id)
-    else:
-        return redirect(redirect_url, doc_uuid)
+    return status_code, message
 
 
 def get_signer_key_by_email(recipients, tenant):
