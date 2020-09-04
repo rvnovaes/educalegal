@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 count_down = 5
 
 
-# @shared_task(bind=True, max_retries=3)
-# def celery_create_document(self, base_url, api_key, secret, interview_full_name, interview_variables):
-def celery_create_document(base_url, api_key, secret, interview_full_name, interview_variables):
+@shared_task(bind=True, max_retries=3)
+def celery_create_document(self, base_url, api_key, secret, interview_full_name, interview_variables):
+# def celery_create_document(base_url, api_key, secret, interview_full_name, interview_variables):
     try:
         dac = DocassembleClient(base_url, api_key)
         logger.info(
@@ -97,41 +97,41 @@ def celery_create_document(base_url, api_key, secret, interview_full_name, inter
         raise self.retry(e=e, countdown=count_down ** self.request.retries)
 
     except KeyError as e:
-        message = "Não foi possível identificar algums chaeves na resposta do servidor. | {e}".format(
+        message = "Não foi possível identificar algums chaves na resposta do servidor. | {e}".format(
             e=str(e)
         )
         logger.error(message)
         raise self.retry(e=e, countdown=count_down ** self.request.retries)
 
     except Exception as e:
-        message = "Houve um erro inespecífico na criação do documento | {exc}".format(
+        message = "Houve um erro na criação do documento | {exc}".format(
             exc=str(type(e).__name__) + " : " + str(e)
         )
         logger.error(message)
         raise
 
 
-# @shared_task(bind=True, max_retries=3)
-# def celery_submit_to_esignature(self, request, doc_uuid):
-def celery_submit_to_esignature(request, doc_uuid):
+@shared_task(bind=True, max_retries=3)
+def celery_submit_to_esignature(self, request, doc_uuid):
+# def celery_submit_to_esignature(request, doc_uuid):
     try:
         send_to_esignature(request, doc_uuid, request.resolver_match.kwargs['bulk_document_generation_id'])
     except Exception as e:
-        message = "Houve um erro inespecífico no envio para a assinatura eletrônica | {e}".format(
-            e=str(e)
+        message = "Houve um erro no envio para a assinatura eletrônica | {e}".format(
+            e=str(type(e).__name__) + " : " + str(e)
         )
         logger.error(message)
         raise
 
 
-# @shared_task(bind=True, max_retries=3)
-# def celery_send_email(self, request, doc_uuid):
-def celery_send_email(request, doc_uuid):
+@shared_task(bind=True, max_retries=3)
+def celery_send_email(self, request, doc_uuid):
+# def celery_send_email(request, doc_uuid):
     try:
-        send_email(request, doc_uuid, True)
+        send_email(request, doc_uuid, request.resolver_match.kwargs['bulk_document_generation_id'])
     except Exception as e:
-        message = "Houve um erro inespecífico no envio do e-mail | {e}".format(
-            e=str(e)
+        message = "Houve um erro no envio do e-mail | {e}".format(
+            e=str(type(e).__name__) + " : " + str(e)
         )
         logger.error(message)
         raise

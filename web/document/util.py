@@ -257,7 +257,12 @@ def _create_address_obj(document, person_list_name, index):
 
 
 @login_required
-def send_email(request, doc_uuid, bulk_generation=False):
+def send_email(request, doc_uuid, bulk_generation_id=None):
+    if bulk_generation_id:
+        redirect_url = 'document:bulk-document-generation-progress'
+    else:
+        redirect_url = 'document:document-detail'
+
     try:
         document = Document.objects.get(doc_uuid=doc_uuid)
     except Document.DoesNotExist:
@@ -305,13 +310,14 @@ def send_email(request, doc_uuid, bulk_generation=False):
                     document.status = DocumentStatus.ENVIADO_EMAIL.value
                     document.save(update_fields=['send_email', 'status'])
 
-                    to_recipients = ''
-                    for recipient in to_emails:
-                        to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+                    if not bulk_generation_id:
+                        to_recipients = ''
+                        for recipient in to_emails:
+                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
 
-                    message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:{}'.format(
-                        to_recipients))
-                    messages.success(request, message)
+                        message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:{}'.format(
+                            to_recipients))
+                        messages.success(request, message)
                 else:
                     message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
                     error_message = message + "{} - {}".format(status_code, response_json)
@@ -319,11 +325,14 @@ def send_email(request, doc_uuid, bulk_generation=False):
                     logger.error(error_message)
                     messages.error(request, message)
 
-    return redirect("document:document-detail", doc_uuid)
+    if bulk_generation_id:
+        return redirect(redirect_url, bulk_generation_id)
+    else:
+        return redirect(redirect_url, doc_uuid)
 
 
 @login_required
-def send_to_esignature(request, doc_uuid, bulk_generation_id):
+def send_to_esignature(request, doc_uuid, bulk_generation_id=None):
     if bulk_generation_id:
         redirect_url = 'document:bulk-document-generation-progress'
     else:
@@ -415,14 +424,14 @@ def send_to_esignature(request, doc_uuid, bulk_generation_id):
                         document.submit_to_esignature = True
                         document.save(update_fields=['status', 'envelope_number', 'submit_to_esignature'])
 
-                        to_recipients = ''
-                        for recipient in document.recipients:
-                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
-
-                        message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com sucesso '
-                                            'para os destinatários:{}'.format(to_recipients))
-
                         if not bulk_generation_id:
+                            to_recipients = ''
+                            for recipient in document.recipients:
+                                to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+
+                            message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
+                                                'sucesso para os destinatários:{}'.format(to_recipients))
+
                             messages.success(request, message)
 
     if bulk_generation_id:

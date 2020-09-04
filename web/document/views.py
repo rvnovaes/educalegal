@@ -526,55 +526,49 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 interview_variables["el_send_email"] = False
 
             if interview_variables["submit_to_esignature"]:
-                result = celery_create_document(
-                        base_url,
-                        api_key,
-                        secret,
-                        interview_full_name,
-                        interview_variables,
-                    )
-
-                celery_submit_to_esignature(request, result)
-
-                # result = chain(
-                #     create_document.s(
+                # result = celery_create_document(
                 #         base_url,
                 #         api_key,
                 #         secret,
                 #         interview_full_name,
                 #         interview_variables,
-                #     ),
-                #     submit_to_esignature.s(request,
-                #         base_url, api_key, secret, interview_full_name
-                #     ),
-                # )()
-                result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(parent_id=result.parent.id, child_id=result.id)
-                el_document.task_create_document = result.parent.id
-                el_document.task_submit_to_esignature = result.id
-                total_task_size += 2
+                #     )
+                #
+                # celery_submit_to_esignature(request, result)
 
-            elif interview_variables["el_send_email"]:
                 result = chain(
-                    celery_create_document().s(
+                    celery_create_document.s(
                         base_url,
                         api_key,
                         secret,
                         interview_full_name,
                         interview_variables,
                     ),
-                    celery_send_email.s(
-                        base_url, api_key, secret, interview_full_name
+                    celery_submit_to_esignature.s(request, result),
+                )()
+                result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
+                    parent_id=result.parent.id, child_id=result.id)
+                el_document.task_create_document = result.parent.id
+                el_document.task_submit_to_esignature = result.id
+                total_task_size += 2
+            elif interview_variables["el_send_email"]:
+                result = chain(
+                    celery_create_document.s(
+                        base_url,
+                        api_key,
+                        secret,
+                        interview_full_name,
+                        interview_variables,
                     ),
+                    celery_send_email.s(request, result),
                 )()
                 result_description = "Criação do documento: {parent_id} | Envio por e-mail: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
                 el_document.task_create_document = result.parent.id
                 el_document.task_send_email = result.id
                 total_task_size += 2
-
             else:
-                # result = create_document.delay(
-                result = celery_create_document(
+                result = celery_create_document.delay(
                     base_url, api_key, secret, interview_full_name, interview_variables,
                 )
                 result_description = "Criação do documento: {id}".format(id=result.id)
@@ -599,7 +593,8 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         return HttpResponse(json.dumps(payload), content_type="application/json")
 
     except Exception as e:
-        error_message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
+        error_message = "Houve erro no processo de geração em lote. | {exc}".format(
+            exc=str(type(e).__name__) + " : " + str(e))
         logger.error(error_message)
 
         payload = {
