@@ -541,6 +541,7 @@ def generate_document(request, **kwargs):
     * Requires token authentication.
     """
     try:
+        # deve ser passado um request do django e não do drf
         response = validate_document(request._request, **kwargs)
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
