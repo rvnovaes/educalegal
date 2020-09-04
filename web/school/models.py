@@ -57,9 +57,15 @@ class School(TenantAwareModel):
     country = models.CharField(max_length=255, default="Brasil", verbose_name="País")
     letterhead = models.CharField(max_length=255, default="timbrado-padrao.docx", verbose_name="Timbrado")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação", blank=True)
+    esignature_folder = models.CharField(max_length=255, blank=True, verbose_name="Pasta para upload dos documentos")
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.esignature_folder = self.esignature_folder.replace('/', '')
+        self.esignature_folder = self.esignature_folder.replace('\\', '')
+        super(School, self).save(*args, **kwargs)
 
     @property
     def address(self):

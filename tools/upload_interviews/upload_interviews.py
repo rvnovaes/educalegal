@@ -20,7 +20,7 @@ def da_user_list(api_key, server_url):
         raise ConnectionError("Não foi possível conectar-se com o Docassemble" + str(e))
 
     if r.status_code == 403:
-        raise PermissionError("Acesso Negado. Verifique a chake em upload_interviews_config")
+        raise PermissionError("Acesso Negado. Verifique a chave em upload_interviews_config")
 
     return r.json()
 

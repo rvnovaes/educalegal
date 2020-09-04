@@ -11,12 +11,16 @@ sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
 from element_mayan_client import MayanClient
 
 # https://ged-educalegal.educalegal.com.br (Educa Legal)
-base_url = 'https://ged-educalegal.educalegal.com.br'
-tenant_ged_token = 'aaa4d93a7611637578984d43958eedc6316e42f3'
+# base_url = 'https://ged-educalegal.educalegal.com.br'
+# tenant_ged_token = 'aaa4d93a7611637578984d43958eedc6316e42f3'
 
 # https://gedtest.educalegal.com.br (Development)
 # base_url = 'https://gedtest.educalegal.com.br'
 # tenant_ged_token = '5bbf160ccb0d02c7da908a7fea5301bdd07f132e'
+base_url = 'http://ged:8000'
+tenant_ged_token = '483473d37efb328b827c354471be6e082236a2d9'
+# iasmini
+# tenant_ged_token = '47f210da48587cb14357e4352d31e0a9c3ae63c0'
 
 if __name__ == '__main__':
     mc = MayanClient(base_url, tenant_ged_token)
