@@ -1,25 +1,30 @@
 export const state = () => ({
-  currentMonthDocumentCount: null,
-  lastMonthDocumentCount: null,
-  currentMonthSignatureCount: null,
-  lastMonthSignatureCount: null,
+  "totalDocsCount": null,
+  "cmDocsCount": null,
+  "lmDocsCount": null,
+  "cmInProgressDocsCount": null,
+  "lmInProgressDocsCount": null,
+  "cmSignatureCount": null,
+  "lmSignatureCount": null,
+  "cmInProgressSignatureCount": null,
+  "lmInProgressSignatureCount": null,
   loading: null,
 
 });
 
 export const mutations = {
-  setCurrentMonthDocumentCount(state, data) {
-    state.currentMonthDocumentCount = data.current_month_document_count;
+  setDashboardData(state, data) {
+    state.totalDocsCount = data.total_docs_count
+    state.cmDocsCount = data.cm_docs_count
+    state.lmDocsCount = data.lm_docs_count
+    state.cmInProgressDocsCount = data.cm_in_progress_docs_count;
+    state.lmInProgressDocsCount = data.lm_in_progress_docs_count
+    state.cmSignatureCount = data.cm_signature_count
+    state.lmSignatureCount = data.lm_signature_count
+    state.cmInProgressSignatureCount = data.cm_in_progress_signature_count
+    state.lmInProgressSignatureCount = data.lm_in_progress_signature_count
   },
-  setLastMonthDocumentCount(state, data) {
-    state.lastMonthDocumentCount = data.last_month_document_count;
-  },
-  setCurrentMonthSignatureCount(state, data) {
-    state.currentMonthSignatureCount = data.current_month_signature_count;
-  },
-  setLastMonthSignatureCount(state, data) {
-    state.lastMonthSignatureCount = data.last_month_signature_count;
-  },
+
   toggleLoading(state, value) {
     state.loading = value
   },
@@ -38,10 +43,7 @@ export const actions = {
     const res = await this.$axios.get("/v2/dashboard/");
     console.log(res)
     if (res.status === 200) {
-      commit("setCurrentMonthDocumentCount", res.data);
-      commit("setLastMonthDocumentCount", res.data);
-      commit("setCurrentMonthSignatureCount", res.data);
-      commit("setLastMonthSignatureCount", res.data);
+      commit("setDashboardData", res.data);
       commit("toggleLoading", false);
     }
   },
