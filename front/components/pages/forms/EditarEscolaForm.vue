@@ -291,7 +291,7 @@ export default {
         state: this.school.state
       };
       try {
-        this.$axios.patch(`v2/tenant/schools/${this.school.id}`, payload)
+        this.$axios.patch(`v2/schools/${this.school.id}`, payload)
           .then((data) => {
             Swal.fire({
               title: `Você atualizou ${this.school.name} com sucesso!`,
