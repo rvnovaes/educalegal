@@ -538,6 +538,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 # celery_submit_to_esignature(str(el_document.doc_uuid))
 
                 result = chain(
+                    # nao é necessario passar o self, é passado automaticamente
                     celery_create_document.s(
                         base_url,
                         api_key,
@@ -545,6 +546,8 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                         interview_full_name,
                         interview_variables,
                     ),
+                    # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
+                    # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
                     celery_submit_to_esignature.s(),
                 )()
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
@@ -554,6 +557,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 total_task_size += 2
             elif interview_variables["el_send_email"]:
                 result = chain(
+                    # nao é necessario passar o self, é passado automaticamente
                     celery_create_document.s(
                         base_url,
                         api_key,
@@ -561,7 +565,9 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                         interview_full_name,
                         interview_variables,
                     ),
-                    celery_send_email.s(request.__dict__, el_document.doc_uuid),
+                    # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
+                    # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
+                    celery_send_email.s(),
                 )()
                 result_description = "Criação do documento: {parent_id} | Envio por e-mail: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)

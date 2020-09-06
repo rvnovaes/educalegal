@@ -257,21 +257,24 @@ def _create_address_obj(document, person_list_name, index):
 
 
 @login_required
-def send_email(request, doc_uuid, bulk_generation_id=None):
-    if bulk_generation_id:
-        redirect_url = 'document:bulk-document-generation-result'
-    else:
-        redirect_url = 'document:document-detail'
+def redirect_send_email(request, doc_uuid):
+    status_code, message = send_email(doc_uuid)
 
+    if status_code == 202:
+        messages.success(request, message)
+    else:
+        messages.error(request, message)
+    return redirect('document:document-detail', doc_uuid)
+
+
+def send_email(doc_uuid):
     try:
         document = Document.objects.get(doc_uuid=doc_uuid)
     except Document.DoesNotExist:
         message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
-        messages.error(request, message)
         logger.error(message)
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
-        messages.error(request, message)
         logger.error(message)
     else:
         if document.recipients:
@@ -303,32 +306,25 @@ def send_email(request, doc_uuid, bulk_generation_id=None):
                 error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
                 logger.debug(error_message)
                 logger.error(error_message)
-                messages.error(request, message)
             else:
                 if status_code == 202:
                     document.send_email = True
                     document.status = DocumentStatus.ENVIADO_EMAIL.value
                     document.save(update_fields=['send_email', 'status'])
 
-                    if not bulk_generation_id:
-                        to_recipients = ''
-                        for recipient in to_emails:
-                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+                    to_recipients = ''
+                    for recipient in to_emails:
+                        to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
 
-                        message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:{}'.format(
-                            to_recipients))
-                        messages.success(request, message)
+                    message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:{}'.format(
+                        to_recipients))
                 else:
                     message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
                     error_message = message + "{} - {}".format(status_code, response_json)
                     logger.debug(error_message)
                     logger.error(error_message)
-                    messages.error(request, message)
 
-    if bulk_generation_id:
-        return redirect(redirect_url, bulk_generation_id)
-    else:
-        return redirect(redirect_url, doc_uuid)
+    return status_code, message
 
 
 @login_required
@@ -336,7 +332,7 @@ def redirect_send_to_esignature(request, doc_uuid):
     status_code, message = send_to_esignature(doc_uuid)
 
     if status_code == 202:
-        messages.success(request, 'Documento enviado para a assinatura eletrônica com sucesso.')
+        messages.success(request, message)
     else:
         messages.error(request, message)
     return redirect('document:document-detail', doc_uuid)

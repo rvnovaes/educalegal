@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .util import send_email, redirect_send_to_esignature
+from .util import redirect_send_email, redirect_send_to_esignature
 from .views import (
     DocumentListView,
     DocumentDetailView,
@@ -29,6 +29,6 @@ urlpatterns = [
          name="bulk-document-generation-result"),
     path("bulk_document_generation/generate/progress/<int:bulk_document_generation_id>", bulk_generation_progress,
          name="bulk-document-generation-progress"),
-    path("send_email/<str:doc_uuid>", send_email, name="send-email"),
+    path("send_email/<str:doc_uuid>", redirect_send_email, name="send-email"),
     path("send_to_esignature/<str:doc_uuid>", redirect_send_to_esignature, name="send-to-esignature"),
 ]

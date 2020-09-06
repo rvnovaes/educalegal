@@ -126,14 +126,15 @@ def celery_submit_to_esignature(self, doc_uuid):
 
 
 @shared_task(bind=True, max_retries=3)
-def celery_send_email(self, request, doc_uuid):
-# def celery_send_email(request, doc_uuid):
+def celery_send_email(self, doc_uuid):
+# def celery_send_email(doc_uuid):
     try:
-        send_email(request, doc_uuid, request.resolver_match.kwargs['bulk_document_generation_id'])
+        send_email(doc_uuid)
     except Exception as e:
         message = "Houve um erro no envio do e-mail | {e}".format(
             e=str(type(e).__name__) + " : " + str(e)
         )
         logger.error(message)
+        self.retry(exc=e)
         raise
 
