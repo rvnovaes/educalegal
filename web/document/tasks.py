@@ -5,8 +5,8 @@ import json
 from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
 
-from document.util import send_email, send_to_esignature
-from util.docassemble_client import DocassembleClient, DocumentNotGeneratedException
+from api.third_party.docassemble_client import DocassembleClient, DocumentNotGeneratedException
+from .util import send_email, send_to_esignature
 
 
 logger = logging.getLogger(__name__)
@@ -121,6 +121,7 @@ def celery_submit_to_esignature(self, doc_uuid):
             e=str(type(e).__name__) + " : " + str(e)
         )
         logger.error(message)
+        self.retry(exc=e)
         raise
 
 

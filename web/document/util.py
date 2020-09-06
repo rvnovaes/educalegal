@@ -7,7 +7,7 @@ import requests
 
 from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
-from util.docassemble_client import DocassembleClient, DocassembleAPIException
+from api.third_party.docassemble_client import DocassembleClient, DocassembleAPIException
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
