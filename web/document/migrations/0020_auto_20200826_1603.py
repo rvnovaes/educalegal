@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('document', '0018_alter_document_task_view'),
+        ('document', '0019_auto_20200818_0932'),
     ]
 
     operations = [

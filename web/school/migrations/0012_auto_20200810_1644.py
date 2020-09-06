@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('school', '0009_auto_20200721_1103'),
+        ('school', '0011_school_esignature_folder'),
     ]
 
     operations = [
