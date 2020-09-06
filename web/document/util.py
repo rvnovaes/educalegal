@@ -1,9 +1,26 @@
+import io
 import logging
+import os
+from enum import Enum
 from datetime import datetime
+import requests
 
 from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
-from util.docassemble_client import DocassembleClient, DocassembleAPIException
+from api.third_party.docassemble_client import DocassembleClient, DocassembleAPIException
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.db import IntegrityError
+from django.shortcuts import redirect
+from django.utils.safestring import mark_safe
+
+from api.third_party.clicksign_client import ClickSignClient
+from api.third_party.docusign_client import DocuSignClient, make_document_base64
+from api.third_party.sendgrid_client import send_email as sendgrid_send_email
+from document.models import DocumentStatus
+from tenant.models import ESignatureAppProvider, ESignatureAppSignerKey
 
 from .models import DocumentType
 
@@ -119,7 +136,8 @@ def dict_to_docassemble_objects(documents, interview_type_id):
         # insere campos fixos
         document["reviewed_school_email_answer"] = True
 
-        # remove campos herdados do mongo e que nao existem na entrevista e converte o objeto OB ID do mongo em campo doc_uuid
+        # remove campos herdados do mongo e que nao existem na entrevista e converte o objeto OB ID do mongo
+        # em campo doc_uuid
         mongo_id = str(document.get("id"))
         document.pop('id')
         document["mongo_uuid"] = mongo_id
@@ -225,7 +243,233 @@ def _create_person_obj(document, person_type, person_list_name, index):
 
 
 def _create_address_obj(document, person_list_name, index):
-    document[person_list_name]["elements"][index]['address']["instanceName"] = person_list_name + '[' + str(index) + '].address'
+    document[person_list_name]["elements"][index]['address']["instanceName"] = person_list_name + \
+                                                                               '[' + str(index) + '].address'
     document[person_list_name]["elements"][index]['address']["_class"] = "docassemble.base.util.Address"
     document[person_list_name]["auto_gather"] = False
     document[person_list_name]["gathered"] = True
+
+
+@login_required
+def redirect_send_email(request, doc_uuid):
+    status_code, message = send_email(doc_uuid)
+
+    if status_code == 202:
+        messages.success(request, message)
+    else:
+        messages.error(request, message)
+    return redirect('document:document-detail', doc_uuid)
+
+
+def send_email(doc_uuid):
+    try:
+        document = Document.objects.get(doc_uuid=doc_uuid)
+    except Document.DoesNotExist:
+        message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
+        logger.error(message)
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+    else:
+        if document.recipients:
+            to_emails = document.recipients
+            school_name = document.school.name if document.school.name else document.school.legal_name
+            interview_name = document.interview.name if document.interview.name else ''
+            subject = "IMPORTANTE: " + school_name + " | " + interview_name
+            category = document.name
+            if category.endswith('.pdf'):
+                category = category[:-4]
+            html_content = "<h3>" + document.interview.name + "</h3><p>Leia com atenção o documento em anexo.</p>"
+            file_name = document.name
+
+            file = None
+
+            if document.relative_file_path:
+                file_path = os.path.join(settings.BASE_DIR, "media/", document.relative_file_path.path)
+            else:
+                file_path = ''
+                if document.tenant.plan.use_ged and document.ged_link:
+                    response = requests.get(document.ged_link)
+                    file = io.BytesIO(response.content)
+
+            try:
+                status_code, response_json = sendgrid_send_email(
+                    to_emails, subject, html_content, category, file_path, file_name, file)
+            except Exception as e:
+                message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
+                error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
+                logger.debug(error_message)
+                logger.error(error_message)
+            else:
+                if status_code == 202:
+                    document.send_email = True
+                    document.status = DocumentStatus.ENVIADO_EMAIL.value
+                    document.save(update_fields=['send_email', 'status'])
+
+                    to_recipients = ''
+                    for recipient in to_emails:
+                        to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+
+                    message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:{}'.format(
+                        to_recipients))
+                else:
+                    message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
+                    error_message = message + "{} - {}".format(status_code, response_json)
+                    logger.debug(error_message)
+                    logger.error(error_message)
+
+    return status_code, message
+
+
+@login_required
+def redirect_send_to_esignature(request, doc_uuid):
+    status_code, message = send_to_esignature(doc_uuid)
+
+    if status_code == 202:
+        messages.success(request, message)
+    else:
+        messages.error(request, message)
+    return redirect('document:document-detail', doc_uuid)
+
+
+def send_to_esignature(doc_uuid):
+    try:
+        document = Document.objects.get(doc_uuid=doc_uuid)
+    except Document.DoesNotExist:
+        message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
+        logger.error(message)
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+    else:
+        if document.recipients:
+            esignature_app = document.tenant.esignature_app
+            message = 'Não foi possível enviar para a assinatura eletrônica. Entre em contato com o suporte.'
+
+            if not document.relative_file_path:
+                message = 'Não foi encontrado o caminho do arquivo. Entre em contato com o suporte.'
+
+            file_path = os.path.join(settings.BASE_DIR, "media/", document.relative_file_path.path)
+
+            documents = [
+                {
+                    'name': document.name,
+                    'fileExtension': 'pdf',
+                    'documentBase64': make_document_base64(file_path)
+                }
+            ]
+
+            if esignature_app.provider == ESignatureAppProvider.DOCUSIGN.name:
+                dsc = DocuSignClient(esignature_app.client_id, esignature_app.impersonated_user_guid,
+                                     esignature_app.test_mode, esignature_app.private_key)
+
+                try:
+                    status_code, response_json = dsc.send_to_docusign(
+                        document.recipients, documents, email_subject="Documento para sua assinatura")
+                except Exception as e:
+                    logger.error(str(type(e).__name__) + " : " + str(e))
+                else:
+                    if status_code == 201:
+                        document.submit_to_esignature = True
+                        document.status = DocumentStatus.ENVIADO_ASS_ELET.value
+                        document.envelope_number = response_json['envelopeId']
+                        document.save(update_fields=['submit_to_esignature', 'status', 'envelope_number'])
+
+            elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.name:
+                csc = ClickSignClient(esignature_app.private_key, esignature_app.test_mode)
+
+                documents[0]["tenant"] = dict()
+                documents[0]["school"] = dict()
+                documents[0]["tenant"]["esignature_folder"] = document.tenant.esignature_folder
+                documents[0]["school"]["esignature_folder"] = document.school.esignature_folder
+
+                # faz o upload do documento no clicksign
+                status_code, response_json, envelope_number = csc.upload_document(documents[0])
+
+                if status_code == 201:
+                    # verifica se o signer ja foi enviado para a clicksign
+                    success, recipients_sign = get_signer_key_by_email(document.recipients, document.tenant)
+                    if not success:
+                        return status_code, message
+
+                    # cria os destinatarios
+                    status_code, reason = csc.add_signer(recipients_sign)
+                    if status_code != 201:
+                        return status_code, message
+
+                    # adiciona signer key no educa legal
+                    if not post_signer_key(recipients_sign, esignature_app, document.tenant):
+                        return status_code, message
+
+                    # adiciona os signatarios ao documento e envia por email para o primeiro signatario
+                    # o envelope_id eh a key do documento no clicksign
+                    status_code, response_json = csc.send_to_signers(envelope_number, recipients_sign)
+
+                    if status_code == 202:
+                        # atualiza dados do envelope no documento do EL
+                        document.status = DocumentStatus.ENVIADO_ASS_ELET.value
+                        document.envelope_number = envelope_number
+                        document.submit_to_esignature = True
+                        document.save(update_fields=['status', 'envelope_number', 'submit_to_esignature'])
+
+                        to_recipients = ''
+                        for recipient in document.recipients:
+                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+
+                        message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
+                                            'sucesso para os destinatários:{}'.format(to_recipients))
+
+    return status_code, message
+
+
+def get_signer_key_by_email(recipients, tenant):
+    # separa somente os destinatarios que assinam o documento
+    recipients_sign = list()
+    for recipient in recipients:
+        if recipient['group'] == 'signers':
+            recipient['group'] = 'sign'
+            # a clicksign nao aceita barras no nome
+            recipient['name'] = recipient['name'].replace('/', '')
+            recipient['name'] = recipient['name'].replace('\\', '')
+            recipients_sign.append(recipient)
+
+    for recipient in recipients_sign:
+        try:
+            e_signature_app_signer_key = ESignatureAppSignerKey.objects.get(
+                tenant=tenant, esignature_app=tenant.esignature_app, email=recipient['email'], name=recipient['name'])
+        except ESignatureAppSignerKey.DoesNotExist:
+            recipient['key'] = ''
+            recipient['new_signer'] = True
+            recipient['status_code'] = 404
+        except Exception as e:
+            message = 'Erro ao obter a chave do signatário. ' + str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return False, None
+        else:
+            recipient['key'] = e_signature_app_signer_key.key
+            recipient['new_signer'] = False
+            recipient['status_code'] = 200
+
+    return True, recipients_sign
+
+
+def post_signer_key(recipients, esignature_app, tenant):
+    for recipient in recipients:
+        if recipient['new_signer'] and recipient['status_code'] == 201:
+            e_signature_app_signer_key = ESignatureAppSignerKey(
+                email=recipient['email'],
+                name=recipient['name'],
+                key=recipient['key'],
+                esignature_app=esignature_app,
+                tenant=tenant,
+            )
+            try:
+                e_signature_app_signer_key.save()
+            except IntegrityError:
+                pass
+            except Exception as e:
+                message = str(type(e).__name__) + " : " + str(e)
+                logger.error(message)
+                return False
+
+    return True

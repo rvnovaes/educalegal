@@ -65,6 +65,7 @@ class Tenant(models.Model):
         default=1,
         verbose_name='App de assinatura eletrônica')
     phone = models.CharField(max_length=50, blank=True, verbose_name="Telefone")
+    esignature_folder = models.CharField(max_length=255, blank=True, verbose_name="Pasta para upload dos documentos")
     webhook_production = models.URLField(max_length=255, blank=True, verbose_name='Webhook de produção')
     webhook_sandbox = models.URLField(max_length=255, blank=True, verbose_name='Webhook de homologação')
 
@@ -75,6 +76,25 @@ class Tenant(models.Model):
 
     def __str__(self):
         return self.name
+
+    def has_ged(self):
+        # verifica se cliente esta num plano com ged
+        if not self.plan.use_ged:
+            return False
+        else:
+            if self.tenantgeddata:
+                ged_url = self.tenantgeddata.url
+                ged_token = self.tenantgeddata.token
+
+                # verifica se o ged esta configurado
+                return ged_url != '' and ged_token != ''
+            else:
+                return False
+
+    def save(self, *args, **kwargs):
+        self.esignature_folder = self.esignature_folder.replace('/', '')
+        self.esignature_folder = self.esignature_folder.replace('\\', '')
+        super(Tenant, self).save(*args, **kwargs)
 
 
 class TenantAwareModel(models.Model):
@@ -135,13 +155,19 @@ class TenantGedData(models.Model):
 
 class ESignatureAppSignerKey(TenantAwareModel):
     email = models.EmailField(max_length=255, verbose_name="E-mail")
+    name = models.CharField(max_length=255, verbose_name="Nome")
     key = models.CharField(max_length=255, verbose_name="Chave")
+    esignature_app = models.ForeignKey(
+        ESignatureApp,
+        on_delete=models.PROTECT,
+        default=3,
+        verbose_name='App de assinatura eletrônica')
 
     class Meta:
         ordering = ["email"]
         verbose_name = "Chave do signatário para assinatura eletrônica"
         verbose_name_plural = "Chaves do signatário para assinatura eletrônica"
-        unique_together = (('email', 'tenant'),)
+        unique_together = (('email', 'name', 'tenant', 'esignature_app'),)
 
     def __str__(self):
         return self.email + ' - ' + self.key

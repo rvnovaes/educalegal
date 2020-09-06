@@ -225,6 +225,15 @@ pipeline {
                }    }
            }
        }
+       stage('test_termo-de-retificacao-de-acordo-individual-de-trabalho-coronavirus.py') {
+           steps {
+               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                   dir('docassemble/docassemble/selenium_tests/'){
+                       sh './jenkins_test_termo-de-retificacao-de-acordo-individual-de-trabalho-coronavirus.sh'
+                   }
+               }
+           }
+       }
    }
    post {
         always  {

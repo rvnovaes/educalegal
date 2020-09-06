@@ -1,0 +1,197 @@
+metadata:
+  title: Termo de Reserva de Vaga
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-ged.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+---
+sections:
+  - Aluno(a)
+  - Contratantes
+  - Dados Contratuais
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "reserva-de-vaga.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
+    students.target_number = 1
+    for item in students:
+      item.name.text
+    for item in contractors:
+      item.name.text
+    school_year
+    input_value
+    signature_local
+    generated_file
+    el_document_patched_with_docassemble_data
+    if plan_use_ged:
+      el_document_patched_with_ged_data
+    document_ready_screen
+  all_done
+---
+objects:
+  - students: DAList.using(object_type=Person, ask_number=True)
+---
+ga id: |
+  code: ga_id_begin
+section: Aluno
+progress: 5
+question: Número de Alunos
+fields:
+  - Número: students.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 10
+section: Aluno(a)
+question: Dados do(a) ${word(ordinal(i)) } Aluno(a)
+fields:
+  - 'Nome completo: ': students[i].name.text
+    datatype: text
+  - 'Data de nascimento: ': students[i].birth_date
+    datatype: date
+  - 'Série: ': students[i].grade
+    datatype: dropdown
+    choices:
+    - Berçário: Berçário
+    - Maternal I: Maternal I
+    - Maternal II: Maternal II
+    - Maternal III: Maternal III
+    - 1º período do ensino infantil: 1º período do ensino infantil
+    - 2º período do ensino infantil: 2º período do ensino infantil
+    - 1º ano do ensino fundamental: 1º ano do ensino fundamental
+    - 2º ano do ensino fundamental: 2º ano do ensino fundamental
+    - 3º ano do ensino fundamental: 3º ano do ensino fundamental
+    - 4º ano do ensino fundamental: 4º ano do ensino fundamental
+    - 5º ano do ensino fundamental: 5º ano do ensino fundamental
+    - 6º ano do ensino fundamental: 6º ano do ensino fundamental
+    - 7º ano do ensino fundamental: 7º ano do ensino fundamental
+    - 8º ano do ensino fundamental: 8º ano do ensino fundamental
+    - 9º ano do ensino fundamental: 9º ano do ensino fundamental
+    - 1º ano do ensino médio: 1º ano do ensino médio
+    - 2º ano do ensino médio: 2º ano do ensino médio
+    - 3º ano do ensino médio: 3º ano do ensino médio
+  - 'Período: ': students[i].period
+    choices:
+    - matutino: matutino
+    - vespertino: vespertino
+    - noturno: noturno
+    - integral: integral
+    datatype: dropdown
+---
+objects:
+  - contractors: DAList.using(object_type=Person, there_are_any=True)
+---
+progress: 20
+section: Companhia
+question: |
+  Dados do(a) Contratante
+fields:
+  - "Nome completo:": contractors[i].name.text
+    required: True
+  - "Telefone:": contractors[i].telephone
+    required: True
+  - "E-mail:": contractors[i].email
+    required: True
+list collect: True
+---
+progress: 50
+section: Dados Contratuais
+question: Ano Letivo
+fields:
+  - 'Ano Letivo: ': school_year
+    datatype: integer
+    default: |
+      ${ school_year_default }
+---
+code: |
+  from datetime import date
+  school_year_default = date.today().year + 1
+---
+code: |
+  from num2words import num2words
+  input_value_words = num2words(input_value, lang='pt_BR', to='currency')
+  administrative_costs_words = num2words(administrative_costs, lang='pt_BR', to='currency')
+---
+progress: 70
+section: Dados Contratuais
+question: Preço e custo operacional
+fields:
+  - 'Valor a ser pago pelo ato da reserva da vaga': input_value
+    datatype: currency
+    hint: 0000,00
+  - 'Valor dos custos operacionais:': administrative_costs
+    datatype: currency
+    hint: 0000,00
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#aW5wdXRfdmFsdWU').mask('000000000000000.00', {reverse: true});
+        $('#YWRtaW5pc3RyYXRpdmVfY29zdHM').mask('000000000000000.00', {reverse: true});
+      });
+  </script>
+---
+code: |
+  recipients = list()
+  for item in contractors:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  documents = [
+      {
+          'name': document_name,
+          'fileExtension': 'pdf',
+          'documentBase64': make_document_base64(generated_file.pdf.path())
+      }
+  ]

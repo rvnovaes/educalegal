@@ -1,63 +1,15 @@
 # DocuSign Integration for Docassemble
-
+import base64
+import logging
+import json
+import jwt
+import re
 import requests
 import time
-import jwt
-import json
-import base64
-import re
-from docassemble.base.util import (
-    DAError,
-    log,
-    interview_url,
-    DAObject,
-    defined,
-    get_config,
-    all_variables,
-    DARedis,
-    user_info,
-    url_of,
-)
 
-__all__ = ["DocuSignClient", "generate_anchor", "make_document_base64"]
+__all__ = ["DocuSignClient", "make_document_base64"]
 
-el_environment = get_config('el environment')
-
-if el_environment == "production":
-    webhook_url = "https://app.educalegal.com.br/v1/docusign/webhook"
-else:
-    webhook_url = "https://test.educalegal.com.br/v1/docusign/webhook"
-
-event_notification = {
-    "url": webhook_url,
-    "loggingEnabled": "true",  # The api wants strings for true/false
-    "requireAcknowledgment": "true",
-    "useSoapInterface": "false",
-    "includeCertificateWithSoap": "false",
-    "signMessageWithX509Cert": "false",
-    "includeDocuments": "true",
-    "includeEnvelopeVoidReason": "true",
-    "includeTimeZone": "true",
-    "includeSenderAccountAsCustomField": "true",
-    "includeDocumentFields": "true",
-    "includeCertificateOfCompletion": "true",
-    "envelopeEvents": [  # for this recipe, we're requesting notifications
-        # for all envelope and recipient events
-        {"envelopeEventStatusCode": "sent"},
-        {"envelopeEventStatusCode": "delivered"},
-        {"envelopeEventStatusCode": "completed"},
-        {"envelopeEventStatusCode": "declined"},
-        {"envelopeEventStatusCode": "voided"},
-    ],
-    "recipientEvents": [
-        {"recipientEventStatusCode": "Sent"},
-        {"recipientEventStatusCode": "Delivered"},
-        {"recipientEventStatusCode": "Completed"},
-        {"recipientEventStatusCode": "Declined"},
-        {"recipientEventStatusCode": "AuthenticationFailed"},
-        {"recipientEventStatusCode": "AutoResponded"},
-    ],
-}
+logger = logging.getLogger(__name__)
 
 RECIPIENT_TYPES = {
     "agents": {},
@@ -110,7 +62,41 @@ class DocuSignClient:
         self.test_mode = test_mode
         self.private_key = private_key
 
-        self.target_uri = url_of("interview", _external=True)
+        if self.test_mode:
+            webhook_url = "https://test.educalegal.com.br/v1/docusign/webhook"
+        else:
+            webhook_url = "https://app.educalegal.com.br/v1/docusign/webhook"
+
+        self.event_notification = {
+            "url": webhook_url,
+            "loggingEnabled": "true",  # The api wants strings for true/false
+            "requireAcknowledgment": "true",
+            "useSoapInterface": "false",
+            "includeCertificateWithSoap": "false",
+            "signMessageWithX509Cert": "false",
+            "includeDocuments": "true",
+            "includeEnvelopeVoidReason": "true",
+            "includeTimeZone": "true",
+            "includeSenderAccountAsCustomField": "true",
+            "includeDocumentFields": "true",
+            "includeCertificateOfCompletion": "true",
+            "envelopeEvents": [  # for this recipe, we're requesting notifications
+                # for all envelope and recipient events
+                {"envelopeEventStatusCode": "sent"},
+                {"envelopeEventStatusCode": "delivered"},
+                {"envelopeEventStatusCode": "completed"},
+                {"envelopeEventStatusCode": "declined"},
+                {"envelopeEventStatusCode": "voided"},
+            ],
+            "recipientEvents": [
+                {"recipientEventStatusCode": "Sent"},
+                {"recipientEventStatusCode": "Delivered"},
+                {"recipientEventStatusCode": "Completed"},
+                {"recipientEventStatusCode": "Declined"},
+                {"recipientEventStatusCode": "AuthenticationFailed"},
+                {"recipientEventStatusCode": "AutoResponded"},
+            ],
+        }
 
     def authorization_link(self):
         if self.test_mode:
@@ -121,9 +107,7 @@ class DocuSignClient:
             base_url + "?response_type=code&scope=signature%20impersonation&client_id="
         )
         url += self.client_id
-        url += "&redirect_uri="
-        url += url_of("interview", _external=True)
-        # log("URL Generated: " + url, "console")
+
         return url
 
     def get_token(self):
@@ -186,7 +170,6 @@ class DocuSignClient:
         recipients,
         documents,
         custom_fields=[],
-        send_immediately=False,
         email_subject="Please Sign",
         assign_doc_ids=True,
         assign_recipient_ids=True,
@@ -196,42 +179,41 @@ class DocuSignClient:
         """Creates an envelope and prepares it to be sent to a number of recipients."""
         # Check received recipients are okay whilst rotating the format to fix Docusign API
         rotated_recipients = {}
+        message = ''
         for index, recipient in enumerate(recipients):
             if "name" not in recipient.keys():
-                raise DAError("Missing 'name' in recipient")
+                message = "Falta a chave 'name' nos destinatários."
             if "email" not in recipient.keys():
-                raise DAError("Missing 'email' in recipient")
+                message = "Falta a chave 'email' nos destinatários."
             if "routingOrder" not in recipient.keys():
-                raise DAError("Missing 'routingOrder' in recipient")
+                message = "Falta a chave 'routingOrder' nos destinatários."
             else:
                 if not re.match(
                     r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",
                     recipient["email"],
                 ):
-                    raise DAError("Email incorrectly formatted")
+                    message = "Email formatado incorretamente."
             if assign_recipient_ids:
                 recipient["recipientId"] = index + 1
             elif "recipientId" not in recipient.keys():
-                raise DAError(
-                    "Missing 'recipientId' in recipient whilst assign_recipient_ids is False"
+                message = (
+                    "Falta a chave 'recipientId' nos destinatários."
                 )
             if "tabs" in recipient.keys():
                 rotated_tabs = {}
                 for tab in recipient["tabs"]:
                     if "type" not in tab.keys():
-                        raise DAError("Missing 'type' in tab")
+                        message = "Falta a chave 'type' na tab."
                     tab_type = tab["type"]
                     tab_type_extended = tab_type + "Tabs"
                     del tab["type"]
                     if tab_type not in TAB_TYPES.keys():
-                        raise DAError("Invalid tab type")
+                        message = "Tipo de tab inválida."
                     if not TAB_TYPES[tab_type]["set_value"]:
                         if not all(
                             key not in tab.keys() for key in ["locked", "originalValue"]
                         ):
-                            raise DAError(
-                                "Value cannot be controlled for this tab type"
-                            )
+                            message = "Valor não pode ser controlado para esse tipo de tab."
                     if tab_type_extended not in rotated_tabs.keys():
                         rotated_tabs[tab_type_extended] = [tab]
                     else:
@@ -239,7 +221,7 @@ class DocuSignClient:
                 del recipient["tabs"]
                 recipient["tabs"] = rotated_tabs
             if "group" not in recipient.keys():
-                raise DAError("Missing 'group' in recipient")
+                message = "Falta a chave 'group' nos destinatários."
             recipient_group = recipient["group"]
             del recipient["group"]
             if recipient_group not in rotated_recipients.keys():
@@ -250,17 +232,15 @@ class DocuSignClient:
         # Check received documents are okay whilst assigning ids if asked to
         for index, document in enumerate(documents):
             if "name" not in document.keys():
-                raise DAError("Missing 'name' in document")
+                message = "Falta a chave 'name' no documento."
             if "fileExtension" not in document.keys():
-                raise DAError("Missing 'fileExtension' in document")
+                message = "Falta a chave 'fileExtension' no documento."
             if assign_doc_ids:
                 document["documentId"] = index + 1
             elif "documentId" not in document.keys():
-                raise DAError(
-                    "Missing 'documentId' in document whilst assign_doc_ids is False"
-                )
+                message = "Falta a chave 'documentId' no documento."
             if "documentBase64" not in document.keys():
-                raise DAError("Missing 'documentBase64' in document")
+                message = "Falta a chave 'documentBase64' no documento."
 
         # Check received envelope custom fields and rotate format
         rotated_fields = {"listCustomFields": [], "textCustomFields": []}
@@ -268,11 +248,9 @@ class DocuSignClient:
             if assign_field_ids:
                 field["fieldId"] = index + 1
             elif "fieldId" not in field.keys():
-                raise DAError(
-                    "Missing 'fieldId' in field whilst assign_field_ids is False"
-                )
+                message = "Missing 'fieldId' no campo."
             if "type" not in field.keys():
-                raise DAError("Missing 'type' in custom field")
+                message = "Falta a chave 'type' no campo customizado."
             if field["type"] == "list":
                 del field["type"]
                 rotated_fields["listCustomFields"].append(field)
@@ -280,47 +258,42 @@ class DocuSignClient:
                 del field["type"]
                 rotated_fields["textCustomFields"].append(field)
             else:
-                raise DAError("Invalid custom field type")
+                message = "Campo customizado inválido."
+        if message:
+            message = 'Não foi possível enviar para a assinatura eletrônica. Motivo: ' + message
+            return message
 
         # Build our request json
-        if send_immediately:
-            status = "sent"
-        else:
-            status = "created"
         request_json = {
-            "status": status,
+            "status": "sent",
             "emailSubject": email_subject,
             "recipients": rotated_recipients,
             "documents": documents,
             "envelopecustomFields": rotated_fields,
-            "eventNotification": event_notification,
+            "eventNotification": self.event_notification,
         }
 
         for key in kwargs:
             request_json[key] = kwargs[key]
 
         # Send off envelope request and return the results
-        if send_immediately:
-            self.get_token()
-            self.get_user_info()
+        self.get_token()
+        self.get_user_info()
+        try:
             envelope = requests.post(
                 self.extended_base_uri + "/envelopes",
                 headers=self.authorization_header,
                 json=request_json,
             )
             envelope.raise_for_status()
-            return request_json, json.loads(envelope.text), envelope.status_code
-        else:
-            return request_json
+            return envelope.status_code, json.loads(envelope.text)
+        except Exception as e:
+            message = str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return 0, message
 
 
 def make_document_base64(document_path):
     """Converts your document from document_path to a base64 string, as used by Docusign"""
     with open(document_path, "rb") as document:
         return base64.b64encode(document.read()).decode("utf-8")
-
-
-def generate_anchor(tab_type, email):
-    """Generate 15 numeric anchor using hash of tab_type and email"""
-    text = str(tab_type) + email
-    return abs(hash(text)) % (10 ** 15)

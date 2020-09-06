@@ -12,11 +12,11 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
-from document.models import Document, Envelope, Signer, DocumentStatus
+from api.views_v2 import save_in_ged
+from document.models import Document, Envelope, Signer, DocumentStatus, DocumentFileKind
+from document.views import save_document_data
 from interview.models import Interview
 from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
-
-from .mayan_helpers import MayanClient
 
 
 envelope_statuses = {
@@ -54,17 +54,13 @@ recipient_types = {
 
 logger = logging.getLogger(__name__)
 
-# if os.environ['EL_ENV'] == 'production':
-#     secret_key = 'gerar no ambiente de producao'
-# else:
-#     secret_key = '6c49e1a0f98862bd735efec7548148b4'
 
-# DEVELOPMENT - VER COMO PEGO O EL_ENV DO CONTAINER
-secret_key = '6c49e1a0f98862bd735efec7548148b4'
+def verify_hmac(headers, request_body, test_mode):
+    if test_mode:
+        secret_key = '3d46fb2ab42bb79822d7294923bc071b'
+    else:
+        secret_key = '49bc7fbfbe3e41188c0cd5ce679eff56'
 
-
-def verify_hmac(headers, request_body):
-    # Note: HTTP headers are case insensitive
     try:
         received_mac = headers.get('Content-Hmac')
         logging.info('received_mac')
@@ -110,14 +106,6 @@ def webhook_listener(request):
         # converte json para dict
         data = json.loads(request.body)
 
-        # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
-        # HMAC é uma forma de verificar a integridade das informações transmitidas em um meio não confiável, i.e. a
-        # Internet, através de uma chave secreta compartilhada entre as partes para validar as informações transmitidas.
-        # logging.info('hmac 3')
-        # if not verify_hmac(request.headers, request.body):
-        #     return HttpResponse('HMACs não correspondem.')
-        # logging.info('hmac 4')
-
         # localiza o documento pelo uuid
         envelope_number = data['document']['key']
         try:
@@ -128,13 +116,21 @@ def webhook_listener(request):
             message = 'O documento do envelope {envelope_number} não existe.'.format(
                 envelope_number=envelope_number)
             logging.debug(message)
-            return HttpResponse(message)
+            return HttpResponse(status=400, reason=message)
         except Exception as e:
             message = str(e)
             logging.exception(message)
             logging.info(message)
-            return HttpResponse(message)
+            return HttpResponse(status=400, reason=message)
         else:
+            # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
+            # HMAC é uma forma de verificar a integridade das informações transmitidas em um meio não confiável, i.e. a
+            # Internet, através de uma chave secreta compartilhada entre as partes para validar as informações transmitidas.
+            # logging.info('hmac 3')
+            # if not verify_hmac(request.headers, request.body, document.tenant.esignature_app.test_mode):
+            #     return HttpResponse(status=400, reason='HMACs não correspondem.')
+            # logging.info('hmac 4')
+
             envelope_status = str(data['document']['status']).lower()
             if envelope_status in envelope_statuses.keys():
                 document_status = envelope_statuses[envelope_status]['el']
@@ -147,36 +143,79 @@ def webhook_listener(request):
             tenant = Tenant.objects.get(pk=document.tenant.pk)
             # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
             if envelope_status == "finalizado":
+                # ao finalizar as assinaturas do documento estou recebendo um request.body sem a url do pdf assinado
+                # resposta do suporte da clicksign: Quando o evento auto_close é disparado pela primeira vez, alguns
+                # processos ainda são feitos internamente para que o documento assinado esteja pronto.
+                # Dessa forma, é possível que ao receber o primeiro evento, a cópia final ainda não esteja disponível.
+                # Sendo assim, recomendamos que a primeira tentativa seja recusada, ou que o evento só seja aceito com
+                # URL documento assinado.
+                if 'signed_file_url' not in data['document']['downloads']:
+                    logging.info('Ignora requisição, pois evento {event} não contém a chave signed_file_url. '
+                                 'ID do ocumento {doc_id}'.format(event=data['event']['name'], doc_id=document.id))
+                    return HttpResponse(status=400, reason='Falta a chave signed_file_url')
+
+                relative_path = "clicksign/" + str(envelope_number)
                 fullpath, filename = pdf_file_saver(
                     data['document']['downloads']['signed_file_url'], envelope_number, document.name)
 
-                if tenant.plan.use_ged:
+                relative_file_path = os.path.join(relative_path, filename)
+
+                has_ged = tenant.has_ged()
+                if has_ged:
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
-                    document_type_pk = interview.document_type.pk
-                    document_language = interview.language
                     document_description = interview.description if interview.description else ''
 
-                    # Post documents to GED if envelope_status is completed
-                    tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
-                    mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
+                    post_data = {
+                        "description": document_description,
+                        "document_type": interview.document_type.pk,
+                        "language": interview.language,
+                    }
 
                     try:
                         # salva documento no ged
-                        response = mc.document_create(
-                            fullpath,
-                            document_type_pk,
-                            filename,
-                            document_language,
-                            document_description,
-                        )
-                        logging.debug("Posting document to GED: " + filename)
-                        logging.debug(response.text)
+                        post_data["label"] = filename
+                        status_code, ged_data, ged_id = save_in_ged(post_data, fullpath, document.tenant)
                     except Exception as e:
                         message = str(e)
                         logging.exception(message)
-                        logging.info(message)
-                        return HttpResponse(message)
+                        return HttpResponse(status=400, reason=message)
+                    else:
+                        logging.debug("Posting document to GED: " + filename)
+                        logging.debug(ged_data)
+
+                        if status_code == 201:
+                            # salva o documento baixado no EL como documento relacionado. copia do pai algumas
+                            # propriedades
+                            related_document = Document(
+                                name=filename,
+                                description=document.description,
+                                interview=document.interview,
+                                school=document.school,
+                                tenant=document.tenant,
+                                bulk_generation=document.bulk_generation,
+                                file_kind=DocumentFileKind.PDF_SIGNED.value,
+                            )
+
+                            save_document_data(related_document, has_ged, ged_data, relative_path, document)
+                        else:
+                            message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                                str(status_code), ged_data)
+                            logging.error(message)
+                            return HttpResponse(status=400, reason=message)
+                else:
+                    # salva o documento baixado no EL como documento relacionado. copia do pai algumas
+                    # propriedades
+                    related_document = Document(
+                        name=filename,
+                        description=document.description,
+                        interview=document.interview,
+                        school=document.school,
+                        tenant=document.tenant,
+                        bulk_generation=document.bulk_generation,
+                        file_kind=DocumentFileKind.PDF_SIGNED.value,
+                    )
+                    save_document_data(related_document, has_ged, None, relative_path, document)
 
             # atualiza o status do documento
             document.status = document_status
@@ -256,17 +295,16 @@ def webhook_listener(request):
                                 logging.info(message)
                                 logging.exception(message)
     except Exception as e:
-        logging.info('Exceção webhook clicksign')
-        logging.info(e)
+        message = str(type(e).__name__) + " : " + str(e)
+        logging.error('Exceção webhook clicksign')
+        logging.error(message)
 
-    return HttpResponse("Success!")
+    return HttpResponse(status=200, reason="Success!")
 
 
-def pdf_file_saver(url, envelope_number, document_name):
+def pdf_file_saver(url, relative_path, document_name):
     # salva o pdf em media/clicksign
-    envelope_dir = os.path.join(
-        settings.BASE_DIR, "media/clicksign/", envelope_number
-    )
+    envelope_dir = os.path.join(settings.BASE_DIR, "media", relative_path)
     # cria diretorio e subdiretorio, caso nao exista
     Path(envelope_dir).mkdir(parents=True, exist_ok=True)
 
