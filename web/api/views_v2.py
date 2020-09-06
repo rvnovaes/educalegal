@@ -188,6 +188,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
 
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_superuser:
+            tenant = self.request.user.tenant
+            queryset = self.queryset.filter(tenant=tenant)
+            return queryset
+        else:
+            return self.queryset
+
     def retrieve(self, request, *args, **kwargs):
         """
         Recupera o documento com base em um identificador (identifier).
@@ -229,8 +238,6 @@ class DocumentViewSet(viewsets.ModelViewSet):
         """
         paginator = LimitOffsetPagination()
         paginator.page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
-        tenant_id = request.user.tenant.id
-        queryset = self.queryset.filter(tenant_id=tenant_id)
         status_filter_param = request.query_params.getlist("status[]")
         school_filter_param = request.query_params.getlist("school[]")
         interview_filter_param = request.query_params.getlist(
@@ -238,6 +245,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         )  # TODO parametro de onlyParent
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
+        queryset = self.queryset
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
@@ -630,6 +638,10 @@ class UserView(APIView):
 def dashboard_data(request):
     tenant = request.user.tenant
     user = request.user
+    if not user.is_superuser:
+        total_docs = Document.objects.filter(tenant=tenant)
+    else:
+        total_docs = Document.objects.all()
     use_ged = tenant.plan.use_ged
     now = datetime.datetime.now()
     tz = pytz.timezone("America/Sao_Paulo")
@@ -637,10 +649,6 @@ def dashboard_data(request):
     begin_last_month = begin_of_month - relativedelta(months=1)
     tz.localize(begin_of_month)
     tz.localize(begin_last_month)
-    if not user.is_superuser:
-        total_docs = Document.objects.filter(tenant=tenant)
-    else:
-        total_docs = Document.objects.all()
     total_docs_count = total_docs.count()
     # TODO excluir os documentos filhos
     # Current Month Documents
