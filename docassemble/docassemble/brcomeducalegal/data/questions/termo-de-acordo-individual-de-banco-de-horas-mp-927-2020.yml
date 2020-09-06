@@ -44,7 +44,6 @@ code: |
     generated_file
     el_patch_document
     document_ready_screen
-  all_done
 ---
 objects:
   - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
