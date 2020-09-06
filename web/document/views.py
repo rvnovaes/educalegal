@@ -548,6 +548,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                     ),
                     # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
                     # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
+                    # https://docs.celeryproject.org/en/stable/userguide/canvas.html#chains
                     celery_submit_to_esignature.s(),
                 )()
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
@@ -567,6 +568,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                     ),
                     # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
                     # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
+                    # https://docs.celeryproject.org/en/stable/userguide/canvas.html#chains
                     celery_send_email.s(),
                 )()
                 result_description = "Criação do documento: {parent_id} | Envio por e-mail: {child_id}".format(
