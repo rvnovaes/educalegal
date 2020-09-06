@@ -30,7 +30,7 @@ from util.mongo_util import (
 )
 from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
-from .util import custom_class_name, dict_to_docassemble_objects, create_secret, send_to_esignature
+from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
 from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus, DocumentFileKind
 # https://docs.celeryproject.org/en/latest/userguide/tasks.html#task-naming-relative-imports
