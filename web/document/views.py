@@ -33,7 +33,8 @@ from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret, send_to_esignature
 from .forms import BulkDocumentGenerationForm
 from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus, DocumentFileKind
-from .tasks import celery_create_document, celery_submit_to_esignature, celery_send_email
+# https://docs.celeryproject.org/en/latest/userguide/tasks.html#task-naming-relative-imports
+from document.tasks import celery_create_document, celery_submit_to_esignature, celery_send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
 logger = logging.getLogger(__name__)
@@ -534,8 +535,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 #         interview_variables,
                 #     )
                 #
-                # # celery_submit_to_esignature(el_document.doc_uuid)
-                # status_code, message = send_to_esignature(el_document.doc_uuid)
+                # celery_submit_to_esignature(str(el_document.doc_uuid))
 
                 result = chain(
                     celery_create_document.s(
@@ -545,7 +545,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                         interview_full_name,
                         interview_variables,
                     ),
-                    celery_submit_to_esignature.s(el_document.doc_uuid),
+                    celery_submit_to_esignature.s(),
                 )()
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
@@ -701,12 +701,8 @@ def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
 
     if parent:
         # cria documento relacionado ao documento pdf principal
-        document.id = None
         document.doc_uuid = uuid.uuid4()
         document.parent = parent
-        document.envelope_id = None
-        document.envelope_number = ''
-        document.document_data = None
 
         try:
             # salva dados do ged do documento no educa legal

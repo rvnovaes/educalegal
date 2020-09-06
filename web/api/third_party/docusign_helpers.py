@@ -4,7 +4,6 @@ import logging
 import os
 import xmltodict
 
-from copy import deepcopy
 from pathlib import Path
 
 from django.views.decorators.http import require_POST
@@ -249,10 +248,17 @@ def docusign_webhook_listener(request):
 
                             if status_code == 201:
                                 logging.info('passou_aqui_6')
-                                # salva o documento baixado no EL como documento relacionado
-                                related_document = deepcopy(document)
-                                related_document.name = pdf["filename"]
-                                related_document.file_kind = pdf["file_kind"]
+                                # salva o documento baixado no EL como documento relacionado. copia do pai algumas
+                                # propriedades
+                                related_document = Document(
+                                    name=pdf["filename"],
+                                    description=document.description,
+                                    interview=document.interview,
+                                    school=document.school,
+                                    tenant=document.tenant,
+                                    bulk_generation=document.bulk_generation,
+                                    file_kind=pdf["file_kind"],
+                                )
                                 save_document_data(related_document, has_ged, ged_data, relative_file_path, document)
                             else:
                                 logging.info('passou_aqui_7')
@@ -266,10 +272,17 @@ def docusign_webhook_listener(request):
                 else:
                     for pdf in envelope_data["pdf_documents"]:
                         logging.info('passou_aqui_8')
-                        # salva o documento baixado no EL como documento relacionado
-                        related_document = deepcopy(document)
-                        related_document.name = pdf["filename"]
-                        related_document.file_kind = pdf["file_kind"]
+                        # salva o documento baixado no EL como documento relacionado. copia do pai algumas
+                        # propriedades
+                        related_document = Document(
+                            name=pdf["filename"],
+                            description=document.description,
+                            interview=document.interview,
+                            school=document.school,
+                            tenant=document.tenant,
+                            bulk_generation=document.bulk_generation,
+                            file_kind=pdf["file_kind"],
+                        )
                         save_document_data(related_document, has_ged, None, relative_file_path, document)
             except Exception as e:
                 logging.info('passou_aqui_9')

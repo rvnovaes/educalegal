@@ -5,7 +5,6 @@ import logging
 import os
 import urllib.request
 
-from copy import deepcopy
 from pathlib import Path
 
 from django.conf import settings
@@ -196,10 +195,18 @@ def webhook_listener(request):
 
                         if status_code == 201:
                             logging.info('passou_aqui_6')
-                            # salva o documento baixado no EL como documento relacionado
-                            related_document = deepcopy(document)
-                            related_document.name = filename
-                            related_document.file_kind = DocumentFileKind.PDF_SIGNED.value
+                            # salva o documento baixado no EL como documento relacionado. copia do pai algumas
+                            # propriedades
+                            related_document = Document(
+                                name=filename,
+                                description=document.description,
+                                interview=document.interview,
+                                school=document.school,
+                                tenant=document.tenant,
+                                bulk_generation=document.bulk_generation,
+                                file_kind=DocumentFileKind.PDF_SIGNED.value,
+                            )
+
                             save_document_data(related_document, has_ged, ged_data, relative_path, document)
                         else:
                             logging.info('passou_aqui_7')
@@ -209,10 +216,17 @@ def webhook_listener(request):
                             return HttpResponse(status=400, reason=message)
                 else:
                     logging.info('passou_aqui_8')
-                    # salva o documento baixado no EL como documento relacionado
-                    related_document = deepcopy(document)
-                    related_document.name = pdf["filename"]
-                    related_document.file_kind = DocumentFileKind.PDF_SIGNED.value
+                    # salva o documento baixado no EL como documento relacionado. copia do pai algumas
+                    # propriedades
+                    related_document = Document(
+                        name=filename,
+                        description=document.description,
+                        interview=document.interview,
+                        school=document.school,
+                        tenant=document.tenant,
+                        bulk_generation=document.bulk_generation,
+                        file_kind=DocumentFileKind.PDF_SIGNED.value,
+                    )
                     save_document_data(related_document, has_ged, None, relative_path, document)
 
             # atualiza o status do documento

@@ -1,7 +1,6 @@
 import io
 import logging
 
-from copy import deepcopy
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
@@ -481,10 +480,16 @@ def save_document_file(document, data, params):
     relative_path = 'docassemble/' + params['docx_filename'][:15]
     absolute_path, relative_file_path = save_file_from_url(params['docx_url'], relative_path, params['docx_filename'])
 
-    # salva o docx como documento relacionado
-    related_document = deepcopy(document)
-    related_document.name = params['docx_filename']
-    related_document.file_kind = DocumentFileKind.DOCX.value
+    # salva o docx como documento relacionado. copia do pai algumas propriedades
+    related_document = Document(
+        name=params['docx_filename'],
+        description=document.description,
+        interview=document.interview,
+        school=document.school,
+        tenant=document.tenant,
+        bulk_generation=document.bulk_generation,
+        file_kind=DocumentFileKind.DOCX.value,
+    )
 
     if has_ged:
         try:
