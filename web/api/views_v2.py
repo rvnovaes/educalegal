@@ -1,10 +1,10 @@
-import logging
 import io
+import logging
+import pytz
+
 from datetime import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
-import pytz
-
 from django.utils import timezone
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -43,7 +43,6 @@ from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
 from util.util import save_file_from_url
 from users.models import CustomUser
-from .mayan_helpers import MayanClient
 
 from .serializers_v2 import (
     PlanSerializer,
@@ -667,8 +666,6 @@ def save_document_file(document, data, params):
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
 # and are composed by TenantAwareAPIMixin, which filters the queryset by tenant
-
-class TenantSchoolViewSet(TenantAwareAPIMixin, viewsets.ModelViewSet):
 
 class SchoolViewSet(viewsets.ModelViewSet):
     queryset = School.objects.all()
