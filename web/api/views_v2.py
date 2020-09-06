@@ -9,36 +9,24 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
-from rest_framework import viewsets
 from rest_framework.exceptions import (
     ValidationError,
     PermissionDenied,
     NotFound,
     APIException,
 )
-from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
 from validator_collection import checkers
 
-from django.shortcuts import get_object_or_404
-from django.http import FileResponse
-
 from api.third_party.mayan_client import MayanClient
-from document.models import Document, DocumentFileKind
+from document.models import Document, DocumentFileKind, DocumentType
 from document.views import save_document_data
-from interview.models import Interview
-from school.models import School, SchoolUnit
-from tenant.models import Plan, Tenant, TenantGedData
 from util.util import save_file_from_url
-from document.models import Document, DocumentType
 from document.views import validate_data_mongo, generate_document_from_mongo
 from interview.models import Interview
-from util.mongo_util import create_dynamic_document_class
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
 from util.file_import import is_metadata_valid, is_content_valid
-
-from .mayan_helpers import MayanClient
+from util.mongo_util import create_dynamic_document_class
 
 from .serializers_v2 import (
     PlanSerializer,
