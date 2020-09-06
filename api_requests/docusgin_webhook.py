@@ -8,37 +8,6 @@ payload = {"xml": '''
 <?xml version="1.0" encoding="UTF-8"?>
 '''}
 
-event_notification = {
-    "url": webhook_url,
-    "loggingEnabled": "true",  # The api wants strings for true/false
-    "requireAcknowledgment": "true",
-    "useSoapInterface": "false",
-    "includeCertificateWithSoap": "false",
-    "signMessageWithX509Cert": "false",
-    "includeDocuments": "true",
-    "includeEnvelopeVoidReason": "true",
-    "includeTimeZone": "true",
-    "includeSenderAccountAsCustomField": "true",
-    "includeDocumentFields": "true",
-    "includeCertificateOfCompletion": "true",
-    "envelopeEvents": [  # for this recipe, we're requesting notifications
-        # for all envelope and recipient events
-        {"envelopeEventStatusCode": "sent"},
-        {"envelopeEventStatusCode": "delivered"},
-        {"envelopeEventStatusCode": "completed"},
-        {"envelopeEventStatusCode": "declined"},
-        {"envelopeEventStatusCode": "voided"},
-    ],
-    "recipientEvents": [
-        {"recipientEventStatusCode": "Sent"},
-        {"recipientEventStatusCode": "Delivered"},
-        {"recipientEventStatusCode": "Completed"},
-        {"recipientEventStatusCode": "Declined"},
-        {"recipientEventStatusCode": "AuthenticationFailed"},
-        {"recipientEventStatusCode": "AutoResponded"},
-    ],
-}
-
 
 def test_web_hook(url):
     response = requests.post(url, data=payload)

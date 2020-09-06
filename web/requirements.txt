@@ -40,8 +40,11 @@ django-money~=1.1
 # MongoDB
 pymongo~=3.11.0
 mongoengine~=0.20.0
-# Used to test docusign requests
+
+# Used to in docusign requests
 PyJWT~=1.7.1
+cryptography~=3.1
+
 # Validations
 validator-collection~=1.4.2
 validator-collection-br~=0.0.10
@@ -64,3 +67,4 @@ dateparser~=0.7.6
 # graphene-django~=2.12.1
 # https://dateutil.readthedocs.io/en/latest/
 python-dateutil
+sendgrid~=6.4.6

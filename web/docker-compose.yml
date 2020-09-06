@@ -29,6 +29,7 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.development_docker
       - EL_ENV=development
+      - SENDGRID_API_KEY=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
     depends_on:
       - educalegal_rabbitmq
       - mongo

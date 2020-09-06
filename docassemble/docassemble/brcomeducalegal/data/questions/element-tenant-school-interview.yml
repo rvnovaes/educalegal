@@ -216,9 +216,9 @@ code: |
     ga_id_e_signature = str(interview_document_type) + '-e_signature'
 ---
 modules:
-  - .element_base_domain
-  - .element_educalegal_client
-  - .element_mayan_client
+  - .module_base_domain
+  - .module_educalegal_client
+  - .module_mayan_client
 ---
 include:
   - element-tenant-school-interview-error-screens.yml

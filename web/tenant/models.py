@@ -75,6 +75,20 @@ class Tenant(models.Model):
     def __str__(self):
         return self.name
 
+    def has_ged(self):
+        # verifica se cliente esta num plano com ged
+        if not self.plan.use_ged:
+            return False
+        else:
+            if self.tenantgeddata:
+                ged_url = self.tenantgeddata.url
+                ged_token = self.tenantgeddata.token
+
+                # verifica se o ged esta configurado
+                return ged_url != '' and ged_token != ''
+            else:
+                return False
+
     def save(self, *args, **kwargs):
         self.esignature_folder = self.esignature_folder.replace('/', '')
         self.esignature_folder = self.esignature_folder.replace('\\', '')
@@ -139,6 +153,7 @@ class TenantGedData(models.Model):
 
 class ESignatureAppSignerKey(TenantAwareModel):
     email = models.EmailField(max_length=255, verbose_name="E-mail")
+    name = models.CharField(max_length=255, verbose_name="Nome")
     key = models.CharField(max_length=255, verbose_name="Chave")
     esignature_app = models.ForeignKey(
         ESignatureApp,
@@ -150,7 +165,7 @@ class ESignatureAppSignerKey(TenantAwareModel):
         ordering = ["email"]
         verbose_name = "Chave do signatário para assinatura eletrônica"
         verbose_name_plural = "Chaves do signatário para assinatura eletrônica"
-        unique_together = (('email', 'tenant', 'esignature_app'),)
+        unique_together = (('email', 'name', 'tenant', 'esignature_app'),)
 
     def __str__(self):
         return self.email + ' - ' + self.key

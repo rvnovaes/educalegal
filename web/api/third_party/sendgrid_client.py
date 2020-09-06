@@ -2,12 +2,25 @@
 # https://github.com/sendgrid/sendgrid-python
 import os
 import base64
+import logging
 
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Category, Attachment, FileContent, FileType, FileName, Disposition, To, From, Bcc
+from sendgrid.helpers.mail import (
+    Mail,
+    Category,
+    Attachment,
+    FileContent,
+    FileType,
+    FileName,
+    Disposition,
+    To,
+    From,
+    Bcc)
+
+logger = logging.getLogger(__name__)
 
 
-def send_email_sendgrid(to_emails, subject, html_content, category, file_path, file_name):
+def send_email(to_emails, subject, html_content, category, file_path, file_name, file):
     message = Mail(
         subject=subject,
         html_content=html_content)
@@ -26,31 +39,36 @@ def send_email_sendgrid(to_emails, subject, html_content, category, file_path, f
         to_emails_deduplication.append(current_email)
     message.to = to_emails_names
     message.category = Category(category)
-    file_path = file_path
-    with open(file_path, 'rb') as f:
+    if file_path:
+        with open(file_path, 'rb') as f:
+            data = f.read()
+            f.close()
+    else:
+        f = file
         data = f.read()
         f.close()
-    encoded = base64.b64encode(data).decode()
-    attachment = Attachment()
-    attachment.file_content = FileContent(encoded)
-    attachment.file_type = FileType('application/pdf')
-    attachment.file_name = FileName(file_name)
-    attachment.disposition = Disposition('attachment')
-    message.attachment = attachment
+
+    if data:
+        encoded = base64.b64encode(data).decode()
+        attachment = Attachment()
+        attachment.file_content = FileContent(encoded)
+        attachment.file_type = FileType('application/pdf')
+        attachment.file_name = FileName(file_name)
+        attachment.disposition = Disposition('attachment')
+        message.attachment = attachment
 
     try:
+        # SENDGRID_API_KEY - variave de ambiente criada no container do EL
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        # para debugar pela venv use a chave abaixo
         # sg = SendGridAPIClient('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')
         response = sg.send(message)
         if response.status_code == 202:
-            success_message = "E-mail enviado com sucesso!"
-            return response.status_code, success_message
+            return response.status_code, 'Email enviado com sucesso'
         else:
-            error_message = "Hove falha no envio do e-mail..."
-            return response.status_code, error_message
+            return response.status_code, response.body
     except Exception as e:
-        exception_status_code = 1
-        return exception_status_code, str(e)
+        return 0, str(e)
 
 
 if __name__ == "__main__":
@@ -58,6 +76,5 @@ if __name__ == "__main__":
                   {"email": "rvnovaes@gmail.com", "name": "Roberto"},
                   {"email": "roberto.novaes@educalegal.com.br", "name": "Roberto EducaLegal"}]
 
-
-    print(send_email_sendgrid(recipients, "TESTE", "<h1>Hello World",
-                        "Desenvolvimento", "lorem-ipsum.pdf", "lorem-ipsum.pdf"))
+    print(send_email(recipients, "TESTE", "<h1>Hello World",
+                        "Desenvolvimento", "lorem-ipsum.pdf", "lorem-ipsum.pdf", None))

@@ -1,10 +1,10 @@
 from rest_framework.schemas import get_schema_view
-from django.urls import path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
 
+from django.urls import path
 
 from .views_v2 import (
     InterviewViewSet,
@@ -22,8 +22,8 @@ from .views_v2 import (
     reset_password
 )
 
-from .clicksign_helpers import webhook_listener
-from .docusign_helpers import docusign_webhook_listener
+from api.third_party.clicksign_helpers import webhook_listener
+from api.third_party.docusign_helpers import docusign_webhook_listener
 
 API_TITLE = "Educa Legal API V2"
 API_DESCRIPTION = (
