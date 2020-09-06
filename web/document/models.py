@@ -263,7 +263,7 @@ class DocumentTaskView(TenantAwareModel):
     )
     document_status = models.CharField(max_length=256, default="", verbose_name="Status do Documento")
     ged_id = models.CharField(
-        max_length=128, default="", verbose_name="ID do Documento no GED"
+        max_length=128, default="", verbose_name="ID do documento no GED"
     )
     ged_link = models.CharField(max_length=256, default="", verbose_name="Link")
     ged_uuid = models.CharField(
