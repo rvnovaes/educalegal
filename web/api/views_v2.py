@@ -1,9 +1,8 @@
+import datetime
 import io
 import logging
 import pytz
 
-from datetime import datetime
-from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from django.db.models import Q
@@ -276,11 +275,11 @@ class DocumentViewSet(viewsets.ModelViewSet):
             # Filtering a DateTimeFieldwith dates won’t include items on the last day, because the bounds are
             # interpreted as " 0am on the given date”. Por isso, somamos mais um ao dia para incluir o dia de fim
             if len(dates_list) == 1:
-                to_date = from_date + timedelta(days=1)
+                to_date = from_date + datetime.timedelta(days=1)
                 queryset = queryset.filter(created_date__range=(from_date, to_date))
             if len(dates_list) > 1:
                 to_date = datetime.datetime.strptime(dates_list[1], "%d/%m/%Y")
-                to_date += timedelta(days=1)
+                to_date += datetime.timedelta(days=1)
                 to_date = tz.localize(to_date)
                 queryset = queryset.filter(created_date__range=(from_date, to_date))
 
