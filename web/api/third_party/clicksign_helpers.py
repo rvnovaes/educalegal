@@ -142,7 +142,6 @@ def webhook_listener(request):
             filename = ''
             tenant = Tenant.objects.get(pk=document.tenant.pk)
             # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
-            logging.info('passou_aqui_1')
             if envelope_status == "finalizado":
                 # ao finalizar as assinaturas do documento estou recebendo um request.body sem a url do pdf assinado
                 # resposta do suporte da clicksign: Quando o evento auto_close é disparado pela primeira vez, alguns
@@ -155,17 +154,12 @@ def webhook_listener(request):
                                  'ID do ocumento {doc_id}'.format(event=data['event']['name'], doc_id=document.id))
                     return HttpResponse(status=400, reason='Falta a chave signed_file_url')
 
-                logging.info('signed_file_url')
-                logging.info(data)
                 relative_path = "clicksign/" + str(envelope_number)
                 fullpath, filename = pdf_file_saver(
                     data['document']['downloads']['signed_file_url'], envelope_number, document.name)
 
                 relative_file_path = os.path.join(relative_path, filename)
-                logging.info('passou_aqui_relative_file_path')
-                logging.info(relative_file_path)
 
-                logging.info('passou_aqui_2')
                 has_ged = tenant.has_ged()
                 if has_ged:
                     # Get document related interview data to post to GED
@@ -179,22 +173,18 @@ def webhook_listener(request):
                     }
 
                     try:
-                        logging.info('passou_aqui_3')
                         # salva documento no ged
                         post_data["label"] = filename
                         status_code, ged_data, ged_id = save_in_ged(post_data, fullpath, document.tenant)
                     except Exception as e:
-                        logging.info('passou_aqui_4')
                         message = str(e)
                         logging.exception(message)
                         return HttpResponse(status=400, reason=message)
                     else:
-                        logging.info('passou_aqui_5')
                         logging.debug("Posting document to GED: " + filename)
                         logging.debug(ged_data)
 
                         if status_code == 201:
-                            logging.info('passou_aqui_6')
                             # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                             # propriedades
                             related_document = Document(
@@ -209,13 +199,11 @@ def webhook_listener(request):
 
                             save_document_data(related_document, has_ged, ged_data, relative_path, document)
                         else:
-                            logging.info('passou_aqui_7')
                             message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                 str(status_code), ged_data)
                             logging.error(message)
                             return HttpResponse(status=400, reason=message)
                 else:
-                    logging.info('passou_aqui_8')
                     # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                     # propriedades
                     related_document = Document(
@@ -235,10 +223,8 @@ def webhook_listener(request):
 
             # se o envelope já existe atualiza o status, caso contrário, cria o envelope
             try:
-                logging.info('passou_aqui_9')
                 envelope = Envelope.objects.get(identifier=envelope_number)
             except Envelope.DoesNotExist:
-                logging.info('passou_aqui_10')
                 envelope = Envelope(
                     identifier=envelope_number,
                     status=envelope_status,
@@ -255,7 +241,6 @@ def webhook_listener(request):
                 document.envelope_number = envelope.identifier
                 document.save(update_fields=['envelope', 'envelope_number'])
             else:
-                logging.info('passou_aqui_11')
                 envelope.status = envelope_status
                 envelope.status_update_date = data['document']['updated_at']
                 envelope.save(update_fields=['status', 'status_update_date'])
@@ -272,7 +257,6 @@ def webhook_listener(request):
             if recipient_status:
                 for recipient in data['document']['signers']:
                     try:
-                        logging.info('passou_aqui_12')
                         # se já tem o status para o email e para o documento, não salva outro igual
                         # só cria outro se o status do recipient mudou
                         signer = Signer.objects.get(
@@ -291,7 +275,6 @@ def webhook_listener(request):
 
                         if create_signer:
                             try:
-                                logging.info('passou_aqui_13')
                                 signer = Signer(
                                     name=recipient['name'],
                                     email=recipient['email'],
@@ -305,17 +288,14 @@ def webhook_listener(request):
 
                                 signer.save()
                             except Exception as e:
-                                logging.info('passou_aqui_14')
                                 message = 'Não foi possível salvar o Signer: ' + str(e)
                                 logging.info(message)
                                 logging.exception(message)
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
-        logging.info('passou_aqui_15')
         logging.error('Exceção webhook clicksign')
         logging.error(message)
 
-    logging.info('passou_aqui_16')
     return HttpResponse(status=200, reason="Success!")
 
 

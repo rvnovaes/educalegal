@@ -172,9 +172,6 @@ def docusign_webhook_listener(request):
         filepath = os.path.join(envelope_dir, filename)
         relative_file_path = os.path.join(relative_path, filename)
 
-        logging.info('passou_aqui_relative_file_path')
-        logging.info(relative_file_path)
-
         with open(filepath, "wb") as xml_file:
             xml_file.write(data)
     except Exception as e:
@@ -209,10 +206,8 @@ def docusign_webhook_listener(request):
                 (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(data, envelope_dir)
                 logger.debug(envelope_data)
 
-                logging.info('passou_aqui_1')
                 has_ged = tenant.has_ged()
                 if has_ged:
-                    logging.info('passou_aqui_2')
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
                     document_description = interview.description if interview.description else ''
@@ -226,28 +221,17 @@ def docusign_webhook_listener(request):
                     pdf_filenames = list()
                     for pdf in envelope_data["pdf_documents"]:
                         try:
-                            logging.info('passou_aqui_3')
                             post_data["label"] = pdf["filename"]
                             status_code, ged_data, ged_id = save_in_ged(post_data, pdf["full_filename"], document.tenant)
-
-                            logging.info('passou_aqui_3-1-status_code')
-                            logging.info(status_code)
-                            logging.info('passou_aqui_3-1-ged_data')
-                            logging.info(ged_data)
                         except Exception as e:
-                            logging.info('passou_aqui_4')
                             message = str(e)
                             logging.exception(message)
                             return HttpResponse(message)
                         else:
-                            logging.info('passou_aqui_5')
                             logger.debug("Posting document to GED: " + pdf["filename"])
-                            logger.debug(ged_data)
-
                             pdf_filenames.append(pdf["filename"])
 
                             if status_code == 201:
-                                logging.info('passou_aqui_6')
                                 # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                                 # propriedades
                                 related_document = Document(
@@ -261,7 +245,6 @@ def docusign_webhook_listener(request):
                                 )
                                 save_document_data(related_document, has_ged, ged_data, relative_file_path, document)
                             else:
-                                logging.info('passou_aqui_7')
                                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                     str(status_code), ged_data)
                                 logging.error(message)
@@ -271,7 +254,6 @@ def docusign_webhook_listener(request):
                     pdf_filenames = chr(10).join(pdf_filenames)
                 else:
                     for pdf in envelope_data["pdf_documents"]:
-                        logging.info('passou_aqui_8')
                         # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                         # propriedades
                         related_document = Document(
@@ -285,13 +267,11 @@ def docusign_webhook_listener(request):
                         )
                         save_document_data(related_document, has_ged, None, relative_file_path, document)
             except Exception as e:
-                logging.info('passou_aqui_9')
                 message = str(e)
                 logger.exception(message)
                 logging.info(message)
                 return HttpResponse(message)
 
-        logging.info('passou_aqui_10')
         if envelope_status in envelope_statuses.keys():
             document.status = envelope_statuses[envelope_status]['el']
         else:
@@ -302,10 +282,8 @@ def docusign_webhook_listener(request):
 
         # se o envelope já existe atualiza o status, caso contrário, cria o envelope
         try:
-            logging.info('passou_aqui_11')
             envelope = Envelope.objects.get(identifier=envelope_data["envelope_id"])
         except Envelope.DoesNotExist:
-            logging.info('passou_aqui_12')
             envelope = Envelope(
                 identifier=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
@@ -322,14 +300,12 @@ def docusign_webhook_listener(request):
             document.envelope_number = envelope.identifier
             document.save(update_fields=['envelope', 'envelope_number'])
         else:
-            logging.info('passou_aqui_13')
             envelope.status = envelope_data_translated['envelope_status']
             envelope.status_update_date = envelope_data['envelope_time_generated']
             envelope.save(update_fields=['status', 'status_update_date'])
 
         for recipient_status in recipient_statuses:
             try:
-                logging.info('passou_aqui_14')
                 # se já tem o status para o email e para o documento, não salva outro igual
                 # só cria outro se o status do recipient mudou
                 signer = Signer.objects.get(
@@ -338,7 +314,6 @@ def docusign_webhook_listener(request):
                     status=recipient_status['Status'])
             except Signer.DoesNotExist:
                 try:
-                    logging.info('passou_aqui_15')
                     signer = Signer(
                         name=recipient_status['UserName'],
                         email=recipient_status['Email'],
@@ -352,10 +327,8 @@ def docusign_webhook_listener(request):
 
                     signer.save()
                 except Exception as e:
-                    logging.info('passou_aqui_16')
                     message = 'Não foi possível salvar o Signer: ' + str(e)
                     logging.info(message)
                     logger.exception(message)
 
-    logging.info('passou_aqui_17')
     return HttpResponse("Success!")
