@@ -346,8 +346,8 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         return HttpResponse(json.dumps(payload), content_type="application/json")
 
 
-def generate_document_from_mongo(request, dynamic_document_class, interview_id):
-    mongo_documents_collection = dynamic_document_class.objects
+def generate_document_from_mongo(request, dynamic_document_class, interview_id, mongo_document_id):
+    mongo_documents_collection = dynamic_document_class.objects.filter(id=mongo_document_id)
 
     logger.info(
         "Recuperados {n} documento(s) do Mongo".format(n=len(mongo_documents_collection))
@@ -754,7 +754,7 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
                 interview=interview,
                 school=school,
                 bulk_generation=bulk_generation if is_bulk_generation else None,
-                mongo_uuid=mongo_document_data.id,
+                mongo_uuid=str(mongo_document_data.id),
                 submit_to_esignature=mongo_document_data.submit_to_esignature,
                 send_email=mongo_document_data.el_send_email
             )

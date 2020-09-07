@@ -147,7 +147,7 @@
       "3000"
    ],
    "single_installment_date": [
-      "DateTimeField",
+      "StringField",
       "false",
       null,
       "Data do vencimento da parcela única",
@@ -168,7 +168,7 @@
       null
    ],
    "input_date": [
-      "DateTimeField",
+      "StringField",
       "false",
       null,
       "Data do vencimento da parcela de entrada",
@@ -189,7 +189,7 @@
       null
    ],
    "installments_date": [
-      "DateTimeField",
+      "StringField",
       "false",
       null,
       "Data de vencimento da primeira parcela",
@@ -203,7 +203,7 @@
       "Belo Horizonte"
    ],
    "signature_date": [
-      "DateTimeField",
+      "StringField",
       "true",
       null,
       "Data da assinatura",

@@ -18,7 +18,7 @@ from rest_framework.exceptions import (
 from validator_collection import checkers
 
 from api.third_party.mayan_client import MayanClient
-from document.models import Document, DocumentFileKind, DocumentType
+from document.models import Document, DocumentFileKind, BulkDocumentKind
 from document.views import save_document_data
 from util.util import save_file_from_url
 from document.views import validate_data_mongo, generate_document_from_mongo
@@ -533,12 +533,12 @@ def validate_document(request, **kwargs):
             )})
 
     # verifica se informou um tipo de documento valido
-    if interview.document_type.id not in DocumentType.id_choices():
+    if interview.document_type.id not in BulkDocumentKind.id_choices():
         return Response({
             "status_code": 422,
-            "error": "Os tipos de documento que permitem geração via API são {}".format(
-                DocumentType.choices()
-            )})
+            "error": "O tipo de documento informado ID = {id} não está na lista dos que permitem geração via API: "
+                     "{document_types}".format(id=interview.document_type.id, document_types=BulkDocumentKind.choices())
+            })
 
     try:
         # valida os dados recebidos de forma automatica no mongo
@@ -560,6 +560,7 @@ def validate_document(request, **kwargs):
 
     return Response({
         "status_code": 200,
+        "mongo_document_id": str(mongo_document.id),
         "response_data": response_data,
         "dynamic_document_class_name": dynamic_document_class_name,
         "field_types_dict": field_types_dict,
@@ -591,8 +592,12 @@ def generate_document(request, **kwargs):
         return Response(message)
 
     # retorna erro caso os dados nao tenham sido validados
-    if response.data['status_code'] != 200:
+    if response.status_code != 200:
         return Response(response)
+
+    if 'status_code' in response.data:
+        if response.data['status_code'] != 200:
+            return Response(response.data)
 
     dynamic_document_class = create_dynamic_document_class(
         response.data['dynamic_document_class_name'],
@@ -605,7 +610,7 @@ def generate_document(request, **kwargs):
 
     try:
         success, data = generate_document_from_mongo(
-            request._request, dynamic_document_class, kwargs["interview_id"])
+            request._request, dynamic_document_class, kwargs["interview_id"], response.data['mongo_document_id'])
 
         if success:
             return Response({

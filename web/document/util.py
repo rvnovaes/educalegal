@@ -22,7 +22,7 @@ from api.third_party.sendgrid_client import send_email as sendgrid_send_email
 from document.models import DocumentStatus
 from tenant.models import ESignatureAppProvider, ESignatureAppSignerKey
 
-from .models import DocumentType
+from .models import BulkDocumentKind
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +82,7 @@ def dict_to_docassemble_objects(documents, interview_type_id):
             )
         )
 
-        if interview_type_id == DocumentType.PRESTACAO_SERVICOS_ESCOLARES.value:
+        if interview_type_id == BulkDocumentKind.PRESTACAO_SERVICOS_ESCOLARES.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['students', 'contractors']
 
@@ -98,7 +98,7 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
 
-        elif interview_type_id == DocumentType.NOTIFICACAO_EXTRAJUDICIAL.value:
+        elif interview_type_id == BulkDocumentKind.NOTIFICACAO_EXTRAJUDICIAL.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['notifieds']
 
@@ -114,7 +114,7 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
             document["content_document"] = "notificacao-extrajudicial.docx"
 
-        elif interview_type_id == DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
+        elif interview_type_id == BulkDocumentKind.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['workers']
 
