@@ -457,16 +457,17 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
             if interview_variables["submit_to_esignature"]:
                 interview_variables["el_send_email"] = False
 
-            # if interview_variables["submit_to_esignature"]:
-            #     result = celery_create_document(
-            #             base_url,
-            #             api_key,
-            #             secret,
-            #             interview_full_name,
-            #             interview_variables,
-            #         )
-            #
-            #     celery_submit_to_esignature(str(el_document.doc_uuid))
+            if interview_variables["submit_to_esignature"]:
+
+                # result = celery_create_document(
+                #         base_url,
+                #         api_key,
+                #         secret,
+                #         interview_full_name,
+                #         interview_variables,
+                #     )
+                #
+                # celery_submit_to_esignature(str(el_document.doc_uuid))
 
                 result = chain(
                     # nao é necessario passar o self, é passado automaticamente
@@ -484,10 +485,24 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
                 )()
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
+
+                # faz refresh pq alguns campos sao atualizados nas funcoes que o celery chama
+                el_document.refresh_from_db()
                 el_document.task_create_document = result.parent.id
                 el_document.task_submit_to_esignature = result.id
                 total_task_size += 2
             elif interview_variables["el_send_email"]:
+
+                # result = celery_create_document(
+                #         base_url,
+                #         api_key,
+                #         secret,
+                #         interview_full_name,
+                #         interview_variables,
+                #     )
+                #
+                # celery_send_email(str(el_document.doc_uuid))
+
                 result = chain(
                     # nao é necessario passar o self, é passado automaticamente
                     celery_create_document.s(
@@ -504,6 +519,9 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
                 )()
                 result_description = "Criação do documento: {parent_id} | Envio por e-mail: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
+
+                # faz refresh pq alguns campos sao atualizados nas funcoes que o celery chama
+                el_document.refresh_from_db()
                 el_document.task_create_document = result.parent.id
                 el_document.task_send_email = result.id
                 total_task_size += 2
@@ -512,6 +530,9 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
                     base_url, api_key, secret, interview_full_name, interview_variables,
                 )
                 result_description = "Criação do documento: {id}".format(id=result.id)
+
+                # faz refresh pq alguns campos sao atualizados nas funcoes que o celery chama
+                el_document.refresh_from_db()
                 el_document.task_create_document = result.id
                 total_task_size += 1
 

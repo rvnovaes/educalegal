@@ -115,7 +115,13 @@ def celery_create_document(self, base_url, api_key, secret, interview_full_name,
 def celery_submit_to_esignature(self, doc_uuid):
 # def celery_submit_to_esignature(doc_uuid):
     try:
-        send_to_esignature(doc_uuid)
+        status_code, response = send_to_esignature(doc_uuid)
+        if status_code != 202:
+            message = "Houve um erro no para a assinatura eletrônica | {}".format(response)
+            logger.error(message)
+            self.retry(exc=response)
+            raise
+
     except Exception as e:
         message = "Houve um erro no envio para a assinatura eletrônica | {e}".format(
             e=str(type(e).__name__) + " : " + str(e)
@@ -129,7 +135,12 @@ def celery_submit_to_esignature(self, doc_uuid):
 def celery_send_email(self, doc_uuid):
 # def celery_send_email(doc_uuid):
     try:
-        send_email(doc_uuid)
+        status_code, response = send_email(doc_uuid)
+        if status_code != 202:
+            message = "Houve um erro no envio do e-mail | {}".format(response)
+            logger.error(message)
+            self.retry(exc=response)
+
     except Exception as e:
         message = "Houve um erro no envio do e-mail | {e}".format(
             e=str(type(e).__name__) + " : " + str(e)

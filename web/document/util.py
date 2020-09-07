@@ -300,8 +300,7 @@ def send_email(doc_uuid):
             except Exception as e:
                 message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
                 error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
-                logger.debug(error_message)
-                logger.error(error_message)
+                raise
             else:
                 if status_code == 202:
                     document.send_email = True
@@ -319,8 +318,8 @@ def send_email(doc_uuid):
                     error_message = message + "{} - {}".format(status_code, response_json)
                     logger.debug(error_message)
                     logger.error(error_message)
-
         else:
+
             return 0, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
     return status_code, message

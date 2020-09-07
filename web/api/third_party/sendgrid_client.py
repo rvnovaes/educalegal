@@ -63,12 +63,13 @@ def send_email(to_emails, subject, html_content, category, file_path, file_name,
         # para debugar pela venv use a chave abaixo
         # sg = SendGridAPIClient('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')
         response = sg.send(message)
+    except Exception as e:
+        raise
+    else:
         if response.status_code == 202:
             return response.status_code, 'Email enviado com sucesso'
         else:
             return response.status_code, response.body
-    except Exception as e:
-        return 0, str(e)
 
 
 if __name__ == "__main__":
