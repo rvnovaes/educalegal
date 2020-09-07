@@ -612,7 +612,7 @@ def query_documents_by_args(pk=None, **kwargs):
 def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
     if has_ged:
         document.ged_id = ged_data['id']
-        document.ged_link = ged_data['latest_version']['document_url']
+        document.ged_link = ged_data['latest_version']['document_url'] + 'download/'
         document.ged_uuid = ged_data['uuid']
 
     document.relative_file_path = relative_path
