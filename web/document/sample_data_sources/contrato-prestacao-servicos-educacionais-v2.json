@@ -4,7 +4,7 @@
       "true",
       null,
       "Escola",
-      "Development Escola da Lagoa"
+      "Development Colégio Bacana"
    ],
    "school_division": [
       "StringField",
@@ -270,7 +270,7 @@
       "true",
       "contractors",
       "E-mail",
-      "fake@gmail.com"
+      "iasmini.gomes@gmail.com"
    ],
    "contractors_zip": [
       "StringField",
