@@ -346,8 +346,11 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         return HttpResponse(json.dumps(payload), content_type="application/json")
 
 
-def generate_document_from_mongo(request, dynamic_document_class, interview_id, mongo_document_id):
-    mongo_documents_collection = dynamic_document_class.objects.filter(id=mongo_document_id)
+def generate_document_from_mongo(request, dynamic_document_class, interview_id, mongo_document_id=None):
+    if mongo_document_id:
+        mongo_documents_collection = dynamic_document_class.objects.filter(id=mongo_document_id)
+    else:
+        mongo_documents_collection = dynamic_document_class.objects
 
     logger.info(
         "Recuperados {n} documento(s) do Mongo".format(n=len(mongo_documents_collection))
@@ -454,16 +457,16 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
             if interview_variables["submit_to_esignature"]:
                 interview_variables["el_send_email"] = False
 
-            if interview_variables["submit_to_esignature"]:
-                # result = celery_create_document(
-                #         base_url,
-                #         api_key,
-                #         secret,
-                #         interview_full_name,
-                #         interview_variables,
-                #     )
-                #
-                # celery_submit_to_esignature(str(el_document.doc_uuid))
+            # if interview_variables["submit_to_esignature"]:
+            #     result = celery_create_document(
+            #             base_url,
+            #             api_key,
+            #             secret,
+            #             interview_full_name,
+            #             interview_variables,
+            #         )
+            #
+            #     celery_submit_to_esignature(str(el_document.doc_uuid))
 
                 result = chain(
                     # nao é necessario passar o self, é passado automaticamente
@@ -681,6 +684,7 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
     # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
     # no Mongo
     mongo_document_data_list = list()
+    mongo_document = None
 
     for register_index, row in enumerate(
             bulk_data_content.itertuples(index=False)
@@ -742,6 +746,7 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
             interview_name = interview.name + "-rascunho-em-lote"
         else:
             interview_name = interview.name
+            bulk_generation = None
 
         el_document_list = list()
         for mongo_document_data in mongo_document_data_list:
@@ -753,7 +758,7 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
                 description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
                 interview=interview,
                 school=school,
-                bulk_generation=bulk_generation if is_bulk_generation else None,
+                bulk_generation=bulk_generation,
                 mongo_uuid=str(mongo_document_data.id),
                 submit_to_esignature=mongo_document_data.submit_to_esignature,
                 send_email=mongo_document_data.el_send_email

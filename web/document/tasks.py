@@ -137,4 +137,3 @@ def celery_send_email(self, doc_uuid):
         logger.error(message)
         self.retry(exc=e)
         raise
-
