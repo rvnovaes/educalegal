@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Educa Legal API
-  description: Advocacia Virtual para Escolas alterado agora
+  description: Advocacia Virtual para Escola
   termsOfService: 'https://www.educalegal.com.br'
   contact:
     email: sistemas@educalegal.com.br
