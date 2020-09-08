@@ -58,12 +58,14 @@ def send_email(to_emails, subject, html_content, category, file_path, file_name,
         message.attachment = attachment
 
     try:
-        # SENDGRID_API_KEY - variave de ambiente criada no container do EL
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        # para debugar pela venv use a chave abaixo
-        # sg = SendGridAPIClient('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')
+        # SENDGRID_API_KEY - variavel de ambiente criada no container do EL
+        if not os.environ.get("SENDGRID_API_KEY"):
+            # para debugar pela venv use a chave abaixo
+            sg = SendGridAPIClient('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')
+        else:
+            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
-    except Exception as e:
+    except Exception:
         raise
     else:
         if response.status_code == 202:
