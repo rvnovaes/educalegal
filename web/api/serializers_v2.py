@@ -24,24 +24,26 @@ class InterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
         ref_name = "Interview v2"
-        fields = ["id",
-                  "name",
-                  "version",
-                  "date_available",
-                  "description",
-                  "language",
-                  "custom_file_name",
-                  "base_url",
-                  "is_generic",
-                  "is_freemium",
-                  "use_bulk_interview",
-                  "yaml_name",
-                  "document_type",
-                  "interview_server_config",
-                  "interview_link"]
+        fields = [
+            "id",
+            "name",
+            "version",
+            "date_available",
+            "description",
+            "language",
+            "custom_file_name",
+            "base_url",
+            "is_generic",
+            "is_freemium",
+            "use_bulk_interview",
+            "yaml_name",
+            "document_type",
+            "interview_server_config",
+            "interview_link",
+        ]
 
     def get_interview_link(self, obj):
-        return util_get_interview_link(self.context['request'], obj.id)
+        return util_get_interview_link(self.context["request"], obj.id)
 
 
 class PlanSerializer(serializers.ModelSerializer):
@@ -68,8 +70,19 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         ref_name = "Document v2"
-        fields = ["tenant", "doc_uuid", "name", "interview_name", "school_name", "created_date", "altered_date",
-                  "status"]
+        fields = [
+            "tenant",
+            "doc_uuid",
+            "name",
+            "interview",
+            "interview_name",
+            "school",
+            "school_name",
+            "created_date",
+            "altered_date",
+            "status",
+            "description",
+        ]
 
     def get_interview_name(self, obj):
         return obj.interview.name if obj.interview else ""
@@ -127,7 +140,10 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
                         where
                              s1.document_id = s2.document_id and 
                             s1.email = s2.email 
-                ) order by s1.created_date desc;""".format(document_id=obj.id))
+                ) order by s1.created_date desc;""".format(
+                    document_id=obj.id
+                )
+            )
         except:
             return None
         else:
@@ -160,9 +176,7 @@ class TenantGedDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantGedData
         ref_name = "Tenant Ged Data v2"
-        fields = ["tenant",
-                  "url",
-                  "token"]
+        fields = ["tenant", "url", "token"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -185,7 +199,7 @@ class UserSerializer(serializers.ModelSerializer):
             "tenant",
             "groups",
             "user_permissions",
-            "tenant_name"
+            "tenant_name",
         ]
 
     def get_tenant_name(self, obj):
