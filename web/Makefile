@@ -1,5 +1,8 @@
 build:
 	docker-compose build educalegal
+
+build_all_educalegal:
+	docker-compose build educalegal educalegal_celery educalegal_front educalegal_flower
 # parametros
 # e=prod - conecta como producao
 # e=nodebug - conecta sem modo de debug (-d: detached mode)
