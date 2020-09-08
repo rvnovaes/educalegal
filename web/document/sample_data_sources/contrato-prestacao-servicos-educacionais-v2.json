@@ -1,0 +1,338 @@
+{
+   "selected_school": [
+      "StringField",
+      "true",
+      null,
+      "Escola",
+      "Development Colégio Bacana"
+   ],
+   "school_division": [
+      "StringField",
+      "true",
+      null,
+      "Unidade",
+      "System Super Bacana"
+   ],
+   "students_name_text": [
+      "StringField",
+      "true",
+      "students",
+      "Nome",
+      "Agatha Elza Teixeira"
+   ],
+   "students_nationality": [
+      "StringField",
+      "true",
+      "students",
+      "Nacionalidade",
+      "brasileiro(a)"
+   ],
+   "students_cpf": [
+      "StringField",
+      "true",
+      "students",
+      "CPF",
+      "009.175.002-45"
+   ],
+   "students_rg": [
+      "StringField",
+      "true",
+      "students",
+      "RG",
+      "37.750.612-6"
+   ],
+   "students_zip": [
+      "StringField",
+      "true",
+      "students",
+      "CEP",
+      "69945-970"
+   ],
+   "students_street_name": [
+      "StringField",
+      "true",
+      "students",
+      "Logradouro",
+      "Avenida Paraná"
+   ],
+   "students_street_number": [
+      "StringField",
+      "true",
+      "students",
+      "Número",
+      "206"
+   ],
+   "students_unit": [
+      "StringField",
+      "false",
+      "students",
+      "Complemento",
+      null
+   ],
+   "students_neighborhood": [
+      "StringField",
+      "true",
+      "students",
+      "Bairro",
+      "Centro"
+   ],
+   "students_city": [
+      "StringField",
+      "true",
+      "students",
+      "Cidade",
+      "Acrelândia"
+   ],
+   "students_state": [
+      "StringField",
+      "true",
+      "students",
+      "Estado",
+      "AC"
+   ],
+   "students_grade": [
+      "StringField",
+      "true",
+      "students",
+      "Série",
+      "1° ano do ensino fundamental"
+   ],
+   "students_period": [
+      "StringField",
+      "true",
+      "students",
+      "Período",
+      "matutino"
+   ],
+   "school_year": [
+      "IntField",
+      "true",
+      null,
+      "Ano letivo",
+      "2021"
+   ],
+   "annual_value": [
+      "FloatField",
+      "true",
+      null,
+      "Valor anual",
+      "3000"
+   ],
+   "has_discount": [
+      "BooleanField",
+      "true",
+      null,
+      "Tem desconto",
+      "false"
+   ],
+   "discount_notes": [
+      "StringField",
+      "false",
+      null,
+      "Observações",
+      null
+   ],
+   "method_payment": [
+      "StringField",
+      "true",
+      null,
+      "Forma de pagamento",
+      "à vista"
+   ],
+   "single_installment_value": [
+      "FloatField",
+      "false",
+      null,
+      "Valor da parcela única",
+      "3000"
+   ],
+   "single_installment_date": [
+      "StringField",
+      "false",
+      null,
+      "Data do vencimento da parcela única",
+      "10/11/2020"
+   ],
+   "has_input_value": [
+      "BooleanField",
+      "true",
+      null,
+      "Haverá parcela de entrada",
+      "false"
+   ],
+   "input_value": [
+      "FloatField",
+      "false",
+      null,
+      "Valor da parcela de entrada",
+      null
+   ],
+   "input_date": [
+      "StringField",
+      "false",
+      null,
+      "Data do vencimento da parcela de entrada",
+      null
+   ],
+   "quantity_installments": [
+      "IntField",
+      "false",
+      null,
+      "Quantidade de parcelas",
+      null
+   ],
+   "installments_value": [
+      "FloatField",
+      "false",
+      null,
+      "Valor da parcela",
+      null
+   ],
+   "installments_date": [
+      "StringField",
+      "false",
+      null,
+      "Data de vencimento da primeira parcela",
+      null
+   ],
+   "signature_local": [
+      "StringField",
+      "true",
+      null,
+      "Local da assinatura",
+      "Belo Horizonte"
+   ],
+   "signature_date": [
+      "StringField",
+      "true",
+      null,
+      "Data da assinatura",
+      "09/04/2020"
+   ],
+   "contractors_name_text": [
+      "StringField",
+      "true",
+      "contractors",
+      "Nome",
+      "Gabriel Luiz Juan Moura"
+   ],
+   "contractors_nationality": [
+      "StringField",
+      "true",
+      "contractors",
+      "nacionalidade",
+      "brasileiro(a)"
+   ],
+   "contractors_marital_status": [
+      "StringField",
+      "true",
+      "contractors",
+      "estadocivil",
+      "casado(a)"
+   ],
+   "contractors_occupation": [
+      "StringField",
+      "true",
+      "contractors",
+      "Profissão",
+      "contador"
+   ],
+   "contractors_cpf": [
+      "StringField",
+      "true",
+      "contractors",
+      "CPF",
+      "619.474.792-70"
+   ],
+   "contractors_rg": [
+      "StringField",
+      "true",
+      "contractors",
+      "RG",
+      "10.812.773-4"
+   ],
+   "contractors_phone_number": [
+      "StringField",
+      "true",
+      "contractors",
+      "Telefone",
+      "31 3213-6184"
+   ],
+   "contractors_whatsapp_number": [
+      "StringField",
+      "true",
+      "contractors",
+      "WhatsApp",
+      "31 99888-1122"
+   ],
+   "contractors_email": [
+      "EmailField",
+      "true",
+      "contractors",
+      "E-mail",
+      "iasmini.gomes@gmail.com"
+   ],
+   "contractors_zip": [
+      "StringField",
+      "true",
+      "contractors",
+      "CEP",
+      "77405-105"
+   ],
+   "contractors_street_name": [
+      "StringField",
+      "true",
+      "contractors",
+      "Logradouro",
+      "Rua Presidente Juscelino Kubitschek"
+   ],
+   "contractors_street_number": [
+      "StringField",
+      "true",
+      "contractors",
+      "Número",
+      "649"
+   ],
+   "contractors_unit": [
+      "StringField",
+      "false",
+      "contractors",
+      "complemento",
+      "102"
+   ],
+   "contractors_neighborhood": [
+      "StringField",
+      "true",
+      "contractors",
+      "bairro",
+      "Setor Central"
+   ],
+   "contractors_city": [
+      "StringField",
+      "true",
+      "contractors",
+      "Cidade",
+      "Gurupi"
+   ],
+   "contractors_state": [
+      "StringField",
+      "true",
+      "contractors",
+      "UF",
+      "TO"
+   ],
+   "submit_to_esignature": [
+      "BooleanField",
+      "true",
+      null,
+      "Enviar para assinatura eletrônica",
+      "true"
+   ],
+   "el_send_email": [
+      "BooleanField",
+      "true",
+      null,
+      "Enviar por e-mail",
+      "False"
+   ]
+}

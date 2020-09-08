@@ -28,6 +28,20 @@ class DocumentStatus(Enum):
         return [(x.name, x.value) for x in cls]
 
 
+class BulkDocumentKind(Enum):
+    PRESTACAO_SERVICOS_ESCOLARES = 2
+    NOTIFICACAO_EXTRAJUDICIAL = 8
+    ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
+
+    @classmethod
+    def id_choices(cls):
+        return [x.value for x in cls]
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
+
+
 # evitando usar type pq no graphql da conflito
 class DocumentFileKind(Enum):
     PDF = "pdf"

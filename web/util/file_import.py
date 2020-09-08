@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def is_dataframe_empty(bulk_data: pd.DataFrame):
     if bulk_data.empty:
-        raise ValueError("O arquivo CSV está vazio ou contém apenas linhas de cabeçalho, sem nenhum dado.\n")
+        raise ValueError("O arquivo recebido está vazio ou contém apenas linhas de cabeçalho, sem nenhum dado.\n")
     else:
         return False
 
@@ -62,7 +62,7 @@ def is_boolean_flag_valid(field_name, field_boolean_name):
         return True
 
 
-def is_csv_metadata_valid(bulk_data: pd.DataFrame):
+def is_metadata_valid(bulk_data: pd.DataFrame):
     if not isinstance(bulk_data, pd.DataFrame):
         raise ValueError("O valor não é um Dataframe Pandas.\n")
     is_dataframe_empty(bulk_data)
@@ -80,42 +80,43 @@ def is_csv_metadata_valid(bulk_data: pd.DataFrame):
     return field_types_dict, required_fields_dict, True
 
 
-def is_csv_content_valid(bulk_data: pd.DataFrame):
+def is_content_valid(data: pd.DataFrame):
 
-    if not isinstance(bulk_data, pd.DataFrame):
+    if not isinstance(data, pd.DataFrame):
         raise ValueError("O valor não é um Dataframe Pandas.\n")
 
     # Corta o df apenas nos os dados, sem as linhas: de tipo, required e labels para usuário final
     # para testar se os dados estão vazios
     # Lembre-se que a linha de header do df se mantem
-    is_dataframe_empty(bulk_data.drop(bulk_data.index[range(0, 4)]))
+    is_dataframe_empty(data.drop(data.index[range(0, 4)]))
 
-    if "selected_school" not in bulk_data.columns:
+    if "selected_school" not in data.columns:
         raise ValueError("Não existe a coluna selected_school. Ela é obrigatória.\n")
 
-    if "school_division" not in bulk_data.columns:
+    if "school_division" not in data.columns:
         raise ValueError("Não existe a coluna school_division. Ela é obrigatória.\n")
 
-    if "submit_to_esignature" not in bulk_data.columns:
+    if "submit_to_esignature" not in data.columns:
         raise ValueError("Não existe a coluna submit_to_esignature. Ela é obrigatória.\n")
 
-    if "el_send_email" not in bulk_data.columns:
+    if "el_send_email" not in data.columns:
         raise ValueError("Não existe a coluna el_send_email. Ela é obrigatória.\n")
 
     # Substitui os campos de unidade escolar vazios, aos quais o Pandas havia atribuido nan, por ---
-    bulk_data["school_division"][4:] = bulk_data["school_division"][4:].replace({np.nan: "---"})
+    data["school_division"][4:] = data["school_division"][4:].replace({np.nan: "---"})
 
     # Substitui os campos vazios, aos quais o Pandas havia atribuido nan, por None
-    bulk_data = bulk_data.replace({np.nan: None})
+    data = data.replace({np.nan: None})
 
     # Cria dicionario para guardar o objeto (parent) de cada campo
     # A segunda linha do csv representa o objeto ao qual o campo pertence
     # Por exemplo: {"name_text": "notified"} significa que a propriedade name_text é de um notified (objeto Person/Individual)
-    parent_fields_dict = bulk_data.loc[2].to_dict()
+    parent_fields_dict = data.loc[2].to_dict()
 
     error_messages = list()
 
-    for column_name, column in bulk_data.iteritems():
+    data_content = None
+    for column_name, column in data.iteritems():
         field_type_name = column[0]
         if column[1].lower() == 'true':
             field_required = True
@@ -128,26 +129,25 @@ def is_csv_content_valid(bulk_data: pd.DataFrame):
                 )
             except ValueError as e:
                 message = (
-                        str(type(e).__name__)
-                        + " : "
-                        + "Não foi possível validar ou converter o valor {row_value} da coluna {column_name} - linha: {row_index} em um campo tipo {field_type_name} - {field_required}.\n".format(
-                    row_value=row_value, column_name=column_name, row_index=str(row_index + 2), field_type_name=field_type_name, field_required=field_required
-                )
-                        + str(e)
+                    str(type(e).__name__)
+                    + " : "
+                    + "Não foi possível validar ou converter o valor {row_value} da coluna {column_name} - linha: {row_index} em um campo tipo {field_type_name} - {field_required}.\n".format(
+                        row_value=row_value, column_name=column_name, row_index=str(row_index + 2),
+                        field_type_name=field_type_name, field_required=field_required) + str(e)
                 )
                 logger.error(message)
                 error_messages.append(message)
             else:
-                bulk_data[column_name].loc[row_index] = validated_field_value
+                data[column_name].loc[row_index] = validated_field_value
 
-        bulk_data_content = bulk_data.drop(bulk_data.index[range(0, 4)])
+        data_content = data.drop(data.index[range(0, 4)])
 
     if len(error_messages) > 0:
-        csv_content_valid = False
+        content_valid = False
     else:
-        csv_content_valid = True
+        content_valid = True
 
-    return bulk_data_content, parent_fields_dict, error_messages, csv_content_valid
+    return data_content, parent_fields_dict, error_messages, content_valid
 
 
 def validate_field(column_name, row_index, field_type_name, field_required, value):
