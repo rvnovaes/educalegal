@@ -528,7 +528,7 @@ def validate_document(request, **kwargs):
     except Interview.DoesNotExist:
         return Response({
             "status_code": 404,
-            "error": "Não existe um tipo de documento com ID = {interview_id}".format(
+            "error": "Não existe entrevista com ID = {interview_id}".format(
                 interview_id=kwargs["interview_id"]
             )})
 
