@@ -1,24 +1,24 @@
-# 0.56
-django~=3.1
+# 2.0
+django~=3.1.1
 # API
 djangorestframework~=3.11.1
-django-cors-headers~=3.4.0
+django-cors-headers~=3.5.0
 drf-yasg~=1.17.1
 django-rest-auth~=0.9.5
 retry-requests~=1.0.1
 djangorestframework-simplejwt
 # Formating of forms
-django-crispy-forms~=1.9.1
+django-crispy-forms~=1.9.2
 # Database Access
-psycopg2-binary~=2.8.5
+psycopg2-binary~=2.8.6
 # Authentication
 django-allauth~=0.42.0
 # Used to create tables and filtering
 django-tables2~=2.3.1
 django-filter~=2.3.0
 # Store files on Digital Ocean Spaces
-django-storages~=1.9.1
-boto3~=1.14.32
+django-storages~=1.10
+boto3~=1.14.57
 # Production server
 gunicorn~=20.0.4
 # Misc
@@ -32,7 +32,7 @@ django-debug-toolbar~=2.2
 # API Debugging
 django-silk~=4.1.0
 # Read csv
-pandas~=1.1.0
+pandas~=1.1.2
 # Django models currency
 django-money~=1.1
 # Google Analytics
@@ -47,7 +47,7 @@ cryptography~=3.1
 
 # Validations
 validator-collection~=1.4.2
-validator-collection-br~=0.0.10
+validator-collection-br~=0.0.11
 # Celery
 celery~=4.4.7
 django-celery-results~=1.2.1
@@ -55,8 +55,8 @@ future~=0.18.2
 # Tests
 pytest~=6.0.1
 # https://github.com/izimobil/django-rest-framework-datatables
-djangorestframework-datatables
-PySimpleGUI~=4.26.0
+djangorestframework-datatables~=0.5.2
+PySimpleGUI~=4.29.0
 dateparser~=0.7.6
 # GraphQL
 # FOr JWT authentication. Userd with Nuxt Authetication
@@ -66,5 +66,6 @@ dateparser~=0.7.6
 # graphene~=2.1.8
 # graphene-django~=2.12.1
 # https://dateutil.readthedocs.io/en/latest/
-python-dateutil
+python-dateutil~=2.8.1
 sendgrid~=6.4.6
+pytz~=2020.1
