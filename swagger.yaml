@@ -1,0 +1,1932 @@
+swagger: '2.0'
+info:
+  title: Educa Legal API
+  description: Advocacia Virtual para Escolas alterado agora
+  termsOfService: 'https://www.educalegal.com.br'
+  contact:
+    email: sistemas@educalegal.com.br
+  license:
+    name: Proprietary. ALl rights reserved.
+  version: v1
+host: 'app.educalegal.com.br'
+schemes:
+  - http
+basePath: /
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  Basic:
+    type: basic
+security:
+  - Basic: []
+paths:
+  /v1/documents/:
+    post:
+      operationId: v1_documents_create
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Document v1'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Document v1'
+      tags:
+        - v1
+    patch:
+      operationId: v1_documents_partial_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Document v1'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Document v1'
+      tags:
+        - v1
+    parameters: []
+  '/v1/documents/{id}':
+    get:
+      operationId: v1_documents_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Document v1'
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this document.
+        required: true
+        type: integer
+  '/v1/documents/{uuid}/envelope_logs/':
+    post:
+      operationId: v1_documents_envelope_logs_create
+      description: |-
+        Cria um novo log do envelope (envelope log), caso não exista.
+        Se já existir, retorna o envelope log encontrado.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/EnvelopeLog v1'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/EnvelopeLog v1'
+      tags:
+        - v1
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        type: string
+  '/v1/envelope_logs/{id}/signer_logs/':
+    post:
+      operationId: v1_envelope_logs_signer_logs_create
+      description: Cria um novo log do assinante (signer log).
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/SignerLog v1'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/SignerLog v1'
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this Signatário.
+        required: true
+        type: integer
+  '/v1/interviews/{id}':
+    get:
+      operationId: v1_interviews_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Interview v1'
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this interview.
+        required: true
+        type: integer
+  '/v1/plans/{id}':
+    get:
+      operationId: v1_plans_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Plan v1'
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this Plano.
+        required: true
+        type: integer
+  /v1/tenants/:
+    get:
+      operationId: v1_tenants_list
+      description: Returns a list or retrieves a tenant.
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/Tenant v1'
+      tags:
+        - v1
+    parameters: []
+  '/v1/tenants/{id}':
+    get:
+      operationId: v1_tenants_read
+      description: Returns a list or retrieves a tenant.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Tenant v1'
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this Instância.
+        required: true
+        type: integer
+  '/v1/tenants/{id}/documents/':
+    get:
+      operationId: v1_tenants_documents_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  '/v1/tenants/{id}/ged/':
+    get:
+      operationId: v1_tenants_ged_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TenantGedData v1'
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  '/v1/tenants/{id}/interviews/':
+    get:
+      operationId: v1_tenants_interviews_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  '/v1/tenants/{id}/schools/':
+    get:
+      operationId: v1_tenants_schools_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  '/v1/tenants/{id}/schools/{spk}':
+    get:
+      operationId: v1_tenants_schools_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - v1
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+      - name: spk
+        in: path
+        required: true
+        type: string
+  /v2/documents/:
+    get:
+      operationId: v2_documents_list
+      summary: Lista todos os documentos do cliente (tenant).
+      description: >-
+        Somente documetos que pertencem ao cliente ao qual o usuário está
+        associado são listados.
+
+
+        200 Sucesso
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/Document v2'
+      tags:
+        - v2
+    post:
+      operationId: v2_documents_create
+      summary: Cria um novo documento.
+      description: >-
+        Nõa é necessário informar o tenant no corpo da requisição. O sistema usa
+        o cliente do usuário ao qual o usuário está vinculado.
+
+
+        400 BAD REQUEST: Se for tentada a criação de um documento em um cliente
+        (tenant) distinto daquele ao qual o usuário está vinculado.
+            => "Somente é permitida a criação de documentos no seu cliente (tenant)."
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Document v2'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Document v2'
+      tags:
+        - v2
+    parameters: []
+  '/v2/documents/{identifier}':
+    get:
+      operationId: v2_documents_read
+      summary: Recupera o documento com base em um identificador (identifier).
+      description: >-
+        O identificador, neste método, pode ser uma id (inteiro) ou doc_uuid
+        (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+
+
+        Somente documentos que pertencem ao cliente (tenant) ao qual o usuário
+        está vinculado são recuperados.
+
+
+        400 BAD REQUEST: Se for feita uma requisição e o valor informado não for
+        um id numérico (inteiro) ou não for um uuid válido, mno formato
+        xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            => "O doc_uuid ou o id do documento não são valores válidos."
+
+        404 NOT FOUND: Se o documento (id ou doc_uuid) não existir ou se o
+        documento requisitado não pertencer ao cliente
+
+        (tenant) ao qual o usuário da requisição está vinculado.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Document v2'
+      tags:
+        - v2
+    patch:
+      operationId: v2_documents_partial_update
+      summary: Atualiza parcialmente um documento já existente.
+      description: >-
+        Atualização requer como parâmetro doc_uuid
+        (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+
+
+        400 BAD REQUEST: Tentativa de alteração de documento que não pertence ao
+        cliente (tenant) ao qual o usuário está vinculado
+            => "Não é permitido alterar o cliente (tenant) proprietário do documento."
+
+        400 BAD REQUEST: Se o campo doc_uuid não for válido
+            => "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+        404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento
+        requisitado não pertencer ao cliente
+
+        (tenant) ao qual o usuário da requisição está vinculado.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Document v2'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Document v2'
+      tags:
+        - v2
+    delete:
+      operationId: v2_documents_delete
+      summary: Exclui o documento.
+      description: >-
+        Exclusão requer como parâmetro doc_uuid
+        (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+
+
+        400 BAD REQUEST: Se o campo doc_uuid não for válido:
+            => "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+        403 FORBIDDEN: Tentativa de exlusão de documento por usuário sem
+        permissões (is_staff = True).
+            => "Somente usuários administradores podem excluir documentos."
+
+        404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento
+        requisitado não pertencer ao cliente
+
+        (tenant) ao qual o usuário da requisição está vinculado.
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - v2
+    parameters:
+      - name: identifier
+        in: path
+        required: true
+        type: string
+  '/v2/documents/{identifier}/download':
+    get:
+      operationId: v2_documents_download_read
+      summary: Baixa o documento do GED.
+      description: >-
+        Download requer como parâmetro doc_uuid
+        (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+
+
+        400 BAD REQUEST: Se o campo doc_uuid não for válido:
+            => "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+        403 FORBIDDEN: O cliente deve possuir GED para poder baixar documentos
+            => "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
+
+        404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento
+        requisitado não pertencer ao cliente
+            (tenant) ao qual o usuário da requisição está vinculado.
+
+        404 NOT FOUND: Se o documento existir no Educa Legal mas não for
+        encontrado no GED. Pode ocorrer de um usuário excluir o documento
+        diretamente no GED.
+            => "O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal.  Verifique a lixeira no GED."
+
+        500 INTERNAL SERVER ERROR: Se o cliente estiver num plano que possui GED
+        mas não há GED configurado para ele.
+            => "O cliente está cadastrado num plano que possui GED mas mão há GED configurado para ele."
+
+        500 INTERNAL SERVER ERROR: Se há GED cadastrado para o cliente mas não
+        há URL ou TOKEN cadastrados.
+            => "O GED do cliente não possui uma URL válida ou não possui token configurado"
+
+        500 INTERNAL SERVER ERROR: Se houver problemas na conexão com o GED (não
+        está disponível, por exemplo).
+            => "Failed to establish a new connection: [Errno 111] Connection refused"
+
+
+        :param request: HttpRequest
+
+        :param identifier: id ou doc_uui do documento no Educa Legal
+
+        :return: O arquivo do documento no GED
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Document v2'
+      tags:
+        - v2
+    delete:
+      operationId: v2_documents_download_delete
+      summary: Exclui o documento do Educa Legal e do GED.
+      description: >-
+        Download requer como parâmetro doc_uuid
+        (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+
+
+        204 Sucesso
+
+
+        400 BAD REQUEST: Se o campo doc_uuid não for válido:
+            => "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+        403 FORBIDDEN: O cliente deve possuir GED para poder baixar documentos
+            => "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
+
+        404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento
+        requisitado não pertencer ao cliente
+            (tenant) ao qual o usuário da requisição está vinculado.
+
+        404 NOT FOUND: Se o documento existir no Educa Legal mas não for
+        encontrado no GED. Pode ocorrer de um usuário excluir o documento
+        diretamente no GED.
+            => "O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal.  Verifique a lixeira no GED."
+
+        500 INTERNAL SERVER ERROR: Se o cliente estiver num plano que possui GED
+        mas não há GED configurado para ele.
+            => "O cliente está cadastrado num plano que possui GED mas mão há GED configurado para ele."
+
+        500 INTERNAL SERVER ERROR: Se há GED cadastrado para o cliente mas não
+        há URL ou TOKEN cadastrados.
+            => "O GED do cliente não possui uma URL válida ou não possui token configurado"
+
+        500 INTERNAL SERVER ERROR: Se houver problemas na conexão com o GED (não
+        está disponível, por exemplo).
+            => "Failed to establish a new connection: [Errno 111] Connection refused"
+
+
+        :param request: HttpRequest
+
+        :param identifier: id ou doc_uui do documento no Educa Legal
+
+        :return: O arquivo do documento no GED
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - v2
+    parameters:
+      - name: identifier
+        in: path
+        required: true
+        type: string
+  /v2/interviews/:
+    get:
+      operationId: v2_interviews_list
+      summary: Retorna a lista de todas as entrevistas.
+      description: Disponível apenas para administradores.
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/Interview v2'
+      tags:
+        - v2
+    parameters: []
+  '/v2/interviews/{id}':
+    get:
+      operationId: v2_interviews_read
+      summary: Retorna a lista de todas as entrevistas.
+      description: Disponível apenas para administradores.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Interview v2'
+      tags:
+        - v2
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this interview.
+        required: true
+        type: integer
+  /v2/plans/:
+    get:
+      operationId: v2_plans_list
+      summary: Retorna dados dos planos disponíveis para contratação.
+      description: Disponível apenas para administradores.
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/Plan v2'
+      tags:
+        - v2
+    parameters: []
+  '/v2/plans/{id}':
+    get:
+      operationId: v2_plans_read
+      summary: Retorna dados dos planos disponíveis para contratação.
+      description: Disponível apenas para administradores.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Plan v2'
+      tags:
+        - v2
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this Plano.
+        required: true
+        type: integer
+  /v2/tenant/plans/:
+    get:
+      operationId: v2_tenant_plans_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Plan v2'
+      tags:
+        - v2
+    parameters: []
+  /v2/tenant/schools/:
+    get:
+      operationId: v2_tenant_schools_list
+      description: ''
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/School v2'
+      tags:
+        - v2
+    post:
+      operationId: v2_tenant_schools_create
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/School v2'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/School v2'
+      tags:
+        - v2
+    parameters: []
+  '/v2/tenant/schools/{id}':
+    get:
+      operationId: v2_tenant_schools_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/School v2'
+      tags:
+        - v2
+    patch:
+      operationId: v2_tenant_schools_partial_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/School v2'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/School v2'
+      tags:
+        - v2
+    delete:
+      operationId: v2_tenant_schools_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - v2
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this Escola.
+        required: true
+        type: integer
+  '/v2/tenant/schools/{spk}/school_units':
+    get:
+      operationId: v2_tenant_schools_school_units_list
+      description: ''
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/SchoolUnit v2'
+      tags:
+        - v2
+    post:
+      operationId: v2_tenant_schools_school_units_create
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/SchoolUnit v2'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/SchoolUnit v2'
+      tags:
+        - v2
+    parameters:
+      - name: spk
+        in: path
+        required: true
+        type: string
+  '/v2/tenant/schools/{spk}/school_units/{id}':
+    get:
+      operationId: v2_tenant_schools_school_units_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/SchoolUnit v2'
+      tags:
+        - v2
+    patch:
+      operationId: v2_tenant_schools_school_units_partial_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/SchoolUnit v2'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/SchoolUnit v2'
+      tags:
+        - v2
+    delete:
+      operationId: v2_tenant_schools_school_units_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - v2
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this Unidade Escolar.
+        required: true
+        type: integer
+      - name: spk
+        in: path
+        required: true
+        type: string
+  /v2/tenants/:
+    get:
+      operationId: v2_tenants_list
+      summary: Retorna a listagem de clientes (tenants) ou o cliente específico.
+      description: Disponível apenas para administradores.
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/Tenant v2'
+      tags:
+        - v2
+    parameters: []
+  '/v2/tenants/{id}':
+    get:
+      operationId: v2_tenants_read
+      summary: Retorna a listagem de clientes (tenants) ou o cliente específico.
+      description: Disponível apenas para administradores.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Tenant v2'
+      tags:
+        - v2
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this Instância.
+        required: true
+        type: integer
+definitions:
+  Document v1:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      interview_name:
+        title: Interview name
+        type: string
+        readOnly: true
+      school_name:
+        title: School name
+        type: string
+        readOnly: true
+      name:
+        title: Nome
+        type: string
+        maxLength: 512
+        minLength: 1
+      created_date:
+        title: Criação
+        type: string
+        format: date-time
+        readOnly: true
+      altered_date:
+        title: Alteração
+        type: string
+        format: date-time
+        readOnly: true
+      signing_provider:
+        title: Provedor
+        type: string
+        maxLength: 256
+        minLength: 1
+      envelope_id:
+        title: Id do Envelope
+        type: string
+        maxLength: 256
+        minLength: 1
+      status:
+        title: Status
+        type: string
+        maxLength: 256
+        minLength: 1
+      ged_id:
+        title: ID do Documento no GED
+        type: string
+        maxLength: 128
+        minLength: 1
+      ged_link:
+        title: Link
+        type: string
+        maxLength: 256
+        minLength: 1
+      ged_uuid:
+        title: UUID
+        description: UUID do documento. UUID = Universally Unique ID.
+        type: string
+        maxLength: 256
+        minLength: 1
+      description:
+        title: Descrição
+        type: string
+        minLength: 1
+      document_data:
+        title: Dados do Documento
+        type: object
+        x-nullable: true
+      doc_uuid:
+        title: UUID
+        type: string
+        format: uuid
+        readOnly: true
+      task_create_document:
+        title: Task de criação de documento
+        type: string
+        maxLength: 256
+        minLength: 1
+      task_submit_to_esignature:
+        title: Task de assinatura
+        type: string
+        maxLength: 256
+        minLength: 1
+      task_send_email:
+        title: Task de envio de e-mail
+        type: string
+        maxLength: 256
+        minLength: 1
+      submit_to_esignature:
+        title: A Elet
+        type: boolean
+      send_email:
+        title: E-mail?
+        type: boolean
+      mongo_uuid:
+        title: UUID do Mongo
+        type: string
+        maxLength: 256
+        minLength: 1
+      tenant:
+        title: Tenant
+        type: integer
+      interview:
+        title: Modelo
+        type: integer
+        x-nullable: true
+      school:
+        title: Escola
+        type: integer
+        x-nullable: true
+      related_documents:
+        title: Related documents
+        type: integer
+        x-nullable: true
+      bulk_generation:
+        title: Criação em Lote
+        type: integer
+        x-nullable: true
+  EnvelopeLog v1:
+    required:
+      - envelope_id
+      - status
+      - envelope_created_date
+      - document
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      created_date:
+        title: Criação
+        type: string
+        format: date-time
+        readOnly: true
+      altered_date:
+        title: Alteração
+        type: string
+        format: date-time
+        readOnly: true
+      envelope_id:
+        title: ID
+        type: string
+        maxLength: 256
+        minLength: 1
+      status:
+        title: Status
+        type: string
+        maxLength: 256
+        minLength: 1
+      envelope_created_date:
+        title: Criação do envelope
+        type: string
+        format: date-time
+      sent_date:
+        title: Envio
+        type: string
+        format: date-time
+        x-nullable: true
+      status_update_date:
+        title: Alteração do status
+        type: string
+        format: date-time
+        x-nullable: true
+      tenant:
+        title: Tenant
+        type: integer
+      document:
+        title: Documento
+        type: integer
+  SignerLog v1:
+    required:
+      - name
+      - email
+      - type
+      - status
+      - envelope_log
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      created_date:
+        title: Criação
+        type: string
+        format: date-time
+        readOnly: true
+      name:
+        title: Nome
+        type: string
+        maxLength: 256
+        minLength: 1
+      email:
+        title: E-mail
+        type: string
+        format: email
+        maxLength: 256
+        minLength: 1
+      type:
+        title: Tipo
+        type: string
+        maxLength: 256
+        minLength: 1
+      status:
+        title: Status
+        type: string
+        maxLength: 256
+        minLength: 1
+      sent_date:
+        title: Envio
+        type: string
+        format: date-time
+        x-nullable: true
+      pdf_filenames:
+        title: PDFs
+        type: string
+      tenant:
+        title: Tenant
+        type: integer
+      envelope_log:
+        title: Andamento da Assinatura Eletrônica
+        type: integer
+  Interview v1:
+    required:
+      - name
+      - version
+      - custom_file_name
+      - document_type
+      - tenants
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Nome
+        type: string
+        maxLength: 512
+        minLength: 1
+      version:
+        title: Versão
+        type: string
+        maxLength: 30
+        minLength: 1
+      date_available:
+        title: Disponibilização
+        type: string
+        format: date
+      description:
+        title: Descrição
+        type: string
+      language:
+        title: Idioma
+        type: string
+        maxLength: 64
+        minLength: 1
+      custom_file_name:
+        title: Nome do arquivo a ser gerado
+        type: string
+        maxLength: 255
+        minLength: 1
+      base_url:
+        title: URL Customizada
+        description: >-
+          O valor desse campo sobrescreve qualquer valor de configuração de
+          Servidor de Entrevistas. Deve ser usado para inserir URLs arbitrárias
+          de entrevistas.
+        type: string
+        format: uri
+        maxLength: 200
+        x-nullable: true
+      is_generic:
+        title: Inserir dados de acesso?
+        description: >-
+          Se marcado, insere na URL da entrevista os parâmetros de acesso
+          (tenand id, user token, e interview id).
+        type: boolean
+      is_freemium:
+        title: É Freemium?
+        description: >-
+          Se marcado, a entrevista é disponibilizada para o cliente (tenant) que
+          se auto inscreve no site.
+        type: boolean
+      use_bulk_interview:
+        title: Usa geração em lote?
+        type: boolean
+      yaml_name:
+        title: Nome do YAML
+        type: string
+        maxLength: 255
+        minLength: 1
+      document_type:
+        title: Document type
+        type: integer
+      interview_server_config:
+        title: Servidor de Entrevistas
+        description: >-
+          Configuração do Servidor de Entrevistas usado para montar a URL da
+          entrevista. Esse valor é sobrescrito se o valor URL customizada for
+          preenchido.
+        type: integer
+      tenants:
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
+  Plan v1:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Plano
+        type: string
+        maxLength: 255
+        minLength: 1
+      value_currency:
+        title: Value currency
+        type: string
+        readOnly: true
+        minLength: 1
+      value:
+        title: Valor Mensal
+        type: string
+        format: decimal
+      document_limit:
+        title: Limite de Documentos
+        description: >-
+          Para documentos ilimitados, deixar o campo em branco ou preencher com
+          0 (zero).
+        type: integer
+        maximum: 2147483647
+        minimum: -2147483648
+        x-nullable: true
+      plan_type:
+        title: Tipo de Plano
+        type: string
+        enum:
+          - ESSENTIAL
+          - STANDARD
+          - PREMIUM
+          - CORPORATE
+      use_esignature:
+        title: Usa assinatura eletrônica
+        type: boolean
+      use_ged:
+        title: Usa gestão eletrônica de documentos
+        type: boolean
+      use_bulk_interview:
+        title: Usa geração em lote
+        type: boolean
+  ESignatureApp v1:
+    title: Esignature app
+    required:
+      - private_key
+      - client_id
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Nome da Aplicação Cliente
+        type: string
+        maxLength: 255
+        minLength: 1
+      provider:
+        title: Fornecedor
+        type: string
+        maxLength: 255
+        minLength: 1
+      private_key:
+        title: Private Key
+        type: string
+        minLength: 1
+      client_id:
+        title: Client ID
+        description: AKA Integration Key
+        type: string
+        maxLength: 255
+        minLength: 1
+      impersonated_user_guid:
+        title: Impersonated User
+        description: AKA API Username
+        type: string
+        maxLength: 255
+      notes:
+        title: Observações
+        type: string
+        x-nullable: true
+      test_mode:
+        title: Test Mode
+        type: boolean
+  Tenant v1:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      esignature_app:
+        $ref: '#/definitions/ESignatureApp v1'
+      name:
+        title: Name
+        type: string
+        maxLength: 255
+        minLength: 1
+      subdomain_prefix:
+        title: Subdomain prefix
+        type: string
+        maxLength: 100
+        x-nullable: true
+      eua_agreement:
+        title: Concordo com os termos de uso
+        type: boolean
+      created_date:
+        title: Criação
+        type: string
+        format: date-time
+        readOnly: true
+      auto_enrolled:
+        title: Autoinscrito
+        type: boolean
+      plan:
+        title: Plano
+        type: integer
+  TenantGedData v1:
+    required:
+      - tenant
+      - url
+      - token
+      - database
+      - database_user
+      - database_user_password
+      - database_host
+      - database_port
+      - storage_provider
+      - storage_access_key
+      - storage_secret_key
+      - storage_bucket_name
+      - storage_endpoint_url
+      - storage_region_name
+    type: object
+    properties:
+      tenant:
+        title: Tenant
+        type: integer
+      url:
+        title: URL
+        type: string
+        maxLength: 512
+        minLength: 1
+      token:
+        title: Token da API
+        type: string
+        maxLength: 255
+        minLength: 1
+      database:
+        title: Banco de Dados
+        type: string
+        maxLength: 255
+        minLength: 1
+      database_user:
+        title: Usuário do Banco de Dados
+        type: string
+        maxLength: 255
+        minLength: 1
+      database_user_password:
+        title: Senha do Usuário do Banco de Dados
+        type: string
+        maxLength: 255
+        minLength: 1
+      database_host:
+        title: Host do Banco de Dados
+        type: string
+        maxLength: 255
+        minLength: 1
+      database_port:
+        title: Porta do Banco de Dados
+        type: string
+        maxLength: 255
+        minLength: 1
+      database_database_engine:
+        title: Sistema de Banco de Dados
+        type: string
+        maxLength: 255
+        minLength: 1
+      storage_provider:
+        title: Fornecedor de Armazenamento
+        type: string
+        maxLength: 255
+        minLength: 1
+      storage_access_key:
+        title: Access Key Token
+        type: string
+        maxLength: 255
+        minLength: 1
+      storage_secret_key:
+        title: Secret Key
+        type: string
+        maxLength: 255
+        minLength: 1
+      storage_bucket_name:
+        title: Nome do Bucket
+        type: string
+        maxLength: 255
+        minLength: 1
+      storage_default_acl:
+        title: ACL padrão
+        type: string
+        maxLength: 255
+        minLength: 1
+      storage_endpoint_url:
+        title: URL do Endpoint
+        type: string
+        maxLength: 255
+        minLength: 1
+      storage_region_name:
+        title: Região
+        type: string
+        maxLength: 255
+        minLength: 1
+  Document v2:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      interview_name:
+        title: Interview name
+        type: string
+        readOnly: true
+      school_name:
+        title: School name
+        type: string
+        readOnly: true
+      name:
+        title: Nome
+        type: string
+        maxLength: 512
+        minLength: 1
+      created_date:
+        title: Criação
+        type: string
+        format: date-time
+        readOnly: true
+      altered_date:
+        title: Alteração
+        type: string
+        format: date-time
+        readOnly: true
+      signing_provider:
+        title: Provedor
+        type: string
+        maxLength: 256
+        minLength: 1
+      envelope_id:
+        title: Id do Envelope
+        type: string
+        maxLength: 256
+        minLength: 1
+      status:
+        title: Status
+        type: string
+        maxLength: 256
+        minLength: 1
+      ged_id:
+        title: ID do Documento no GED
+        type: string
+        maxLength: 128
+        minLength: 1
+      ged_link:
+        title: Link
+        type: string
+        maxLength: 256
+        minLength: 1
+      ged_uuid:
+        title: UUID
+        description: UUID do documento. UUID = Universally Unique ID.
+        type: string
+        maxLength: 256
+        minLength: 1
+      description:
+        title: Descrição
+        type: string
+        minLength: 1
+      document_data:
+        title: Dados do Documento
+        type: object
+        x-nullable: true
+      doc_uuid:
+        title: UUID
+        type: string
+        format: uuid
+        readOnly: true
+      task_create_document:
+        title: Task de criação de documento
+        type: string
+        maxLength: 256
+        minLength: 1
+      task_submit_to_esignature:
+        title: Task de assinatura
+        type: string
+        maxLength: 256
+        minLength: 1
+      task_send_email:
+        title: Task de envio de e-mail
+        type: string
+        maxLength: 256
+        minLength: 1
+      submit_to_esignature:
+        title: A Elet
+        type: boolean
+      send_email:
+        title: E-mail?
+        type: boolean
+      mongo_uuid:
+        title: UUID do Mongo
+        type: string
+        maxLength: 256
+        minLength: 1
+      tenant:
+        title: Tenant
+        type: integer
+      interview:
+        title: Modelo
+        type: integer
+        x-nullable: true
+      school:
+        title: Escola
+        type: integer
+        x-nullable: true
+      related_documents:
+        title: Related documents
+        type: integer
+        x-nullable: true
+      bulk_generation:
+        title: Criação em Lote
+        type: integer
+        x-nullable: true
+  Interview v2:
+    required:
+      - name
+      - version
+      - custom_file_name
+      - document_type
+      - tenants
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Nome
+        type: string
+        maxLength: 512
+        minLength: 1
+      version:
+        title: Versão
+        type: string
+        maxLength: 30
+        minLength: 1
+      date_available:
+        title: Disponibilização
+        type: string
+        format: date
+      description:
+        title: Descrição
+        type: string
+      language:
+        title: Idioma
+        type: string
+        maxLength: 64
+        minLength: 1
+      custom_file_name:
+        title: Nome do arquivo a ser gerado
+        type: string
+        maxLength: 255
+        minLength: 1
+      base_url:
+        title: URL Customizada
+        description: >-
+          O valor desse campo sobrescreve qualquer valor de configuração de
+          Servidor de Entrevistas. Deve ser usado para inserir URLs arbitrárias
+          de entrevistas.
+        type: string
+        format: uri
+        maxLength: 200
+        x-nullable: true
+      is_generic:
+        title: Inserir dados de acesso?
+        description: >-
+          Se marcado, insere na URL da entrevista os parâmetros de acesso
+          (tenand id, user token, e interview id).
+        type: boolean
+      is_freemium:
+        title: É Freemium?
+        description: >-
+          Se marcado, a entrevista é disponibilizada para o cliente (tenant) que
+          se auto inscreve no site.
+        type: boolean
+      use_bulk_interview:
+        title: Usa geração em lote?
+        type: boolean
+      yaml_name:
+        title: Nome do YAML
+        type: string
+        maxLength: 255
+        minLength: 1
+      document_type:
+        title: Document type
+        type: integer
+      interview_server_config:
+        title: Servidor de Entrevistas
+        description: >-
+          Configuração do Servidor de Entrevistas usado para montar a URL da
+          entrevista. Esse valor é sobrescrito se o valor URL customizada for
+          preenchido.
+        type: integer
+      tenants:
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
+  Plan v2:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Plano
+        type: string
+        maxLength: 255
+        minLength: 1
+      value_currency:
+        title: Value currency
+        type: string
+        readOnly: true
+        minLength: 1
+      value:
+        title: Valor Mensal
+        type: string
+        format: decimal
+      document_limit:
+        title: Limite de Documentos
+        description: >-
+          Para documentos ilimitados, deixar o campo em branco ou preencher com
+          0 (zero).
+        type: integer
+        maximum: 2147483647
+        minimum: -2147483648
+        x-nullable: true
+      plan_type:
+        title: Tipo de Plano
+        type: string
+        enum:
+          - ESSENTIAL
+          - STANDARD
+          - PREMIUM
+          - CORPORATE
+      use_esignature:
+        title: Usa assinatura eletrônica
+        type: boolean
+      use_ged:
+        title: Usa gestão eletrônica de documentos
+        type: boolean
+      use_bulk_interview:
+        title: Usa geração em lote
+        type: boolean
+  School v2:
+    required:
+      - school_units
+      - legal_name
+      - cnpj
+      - phone
+      - site
+      - email
+      - street
+      - street_number
+      - neighborhood
+      - zip
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      city:
+        title: City
+        type: string
+        readOnly: true
+      state:
+        title: State
+        type: string
+        readOnly: true
+      country:
+        title: Country
+        type: string
+        readOnly: true
+      school_units:
+        type: array
+        items:
+          type: string
+        uniqueItems: true
+      legal_name:
+        title: Razão social
+        type: string
+        maxLength: 255
+        minLength: 1
+      name:
+        title: Nome Fantasia
+        type: string
+        maxLength: 255
+      legal_type:
+        title: Tipo
+        type: string
+        enum:
+          - F
+          - J
+      cnpj:
+        title: CNPJ/CPF
+        type: string
+        maxLength: 255
+        minLength: 1
+      logo:
+        title: Logo
+        type: string
+        readOnly: true
+        format: uri
+      phone:
+        title: Telefone
+        type: string
+        maxLength: 255
+        minLength: 1
+      site:
+        title: Site
+        type: string
+        format: uri
+        maxLength: 200
+        minLength: 1
+      email:
+        title: E-mail
+        type: string
+        format: email
+        maxLength: 254
+        minLength: 1
+      street:
+        title: Logradouro
+        type: string
+        maxLength: 255
+        minLength: 1
+      street_number:
+        title: Número
+        type: string
+        maxLength: 255
+        minLength: 1
+      unit:
+        title: Complemento
+        type: string
+        maxLength: 255
+      neighborhood:
+        title: Bairro
+        type: string
+        maxLength: 255
+        minLength: 1
+      zip:
+        title: CEP
+        type: string
+        maxLength: 255
+        minLength: 1
+      letterhead:
+        title: Timbrado
+        type: string
+        maxLength: 255
+        minLength: 1
+      tenant:
+        title: Tenant
+        type: integer
+  SchoolUnit v2:
+    required:
+      - school
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Nome
+        type: string
+        maxLength: 255
+      tenant:
+        title: Tenant
+        type: integer
+      school:
+        title: Unidade Escolar
+        type: integer
+  ESignatureApp v2:
+    title: Esignature app
+    required:
+      - private_key
+      - client_id
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Nome da Aplicação Cliente
+        type: string
+        maxLength: 255
+        minLength: 1
+      provider:
+        title: Fornecedor
+        type: string
+        maxLength: 255
+        minLength: 1
+      private_key:
+        title: Private Key
+        type: string
+        minLength: 1
+      client_id:
+        title: Client ID
+        description: AKA Integration Key
+        type: string
+        maxLength: 255
+        minLength: 1
+      impersonated_user_guid:
+        title: Impersonated User
+        description: AKA API Username
+        type: string
+        maxLength: 255
+      notes:
+        title: Observações
+        type: string
+        x-nullable: true
+      test_mode:
+        title: Test Mode
+        type: boolean
+  Tenant v2:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      esignature_app:
+        $ref: '#/definitions/ESignatureApp v2'
+      name:
+        title: Name
+        type: string
+        maxLength: 255
+        minLength: 1
+      subdomain_prefix:
+        title: Subdomain prefix
+        type: string
+        maxLength: 100
+        x-nullable: true
+      eua_agreement:
+        title: Concordo com os termos de uso
+        type: boolean
+      created_date:
+        title: Criação
+        type: string
+        format: date-time
+        readOnly: true
+      auto_enrolled:
+        title: Autoinscrito
+        type: boolean
+      plan:
+        title: Plano
+        type: integer
