@@ -11,11 +11,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.conf import settings
 
-from document.models import Document, Envelope, Signer, DocumentStatus
+from api.views_v2 import save_in_ged
+from document.models import Document, Envelope, Signer, DocumentStatus, DocumentFileKind
+from document.views import save_document_data
 from interview.models import Interview
-from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
-
-from .mayan_helpers import MayanClient
+from tenant.models import Tenant, ESignatureAppProvider
 
 
 logger = logging.getLogger(__name__)
@@ -125,9 +125,11 @@ def docusign_pdf_files_saver(data, envelope_dir):
     # Loop through the DocumentPDFs element, storing each document.
     for pdf in xml["DocumentPDFs"]["DocumentPDF"]:
         if pdf["DocumentType"] == "CONTENT":
+            file_kind = DocumentFileKind.PDF_SIGNED.value
             filename = main_filename_no_extension + "_assinado.pdf"
             description = main_filename_no_extension + ".pdf completo."
         elif pdf["DocumentType"] == "SUMMARY":
+            file_kind = DocumentFileKind.PDF_CERTIFIED.value
             filename = main_filename_no_extension + "_certificado.pdf"
             description = (
                 main_filename_no_extension + ".pdf certificado de assinaturas."
@@ -138,6 +140,7 @@ def docusign_pdf_files_saver(data, envelope_dir):
 
         full_filename = os.path.join(envelope_dir, filename)
         pdf_file_data = dict()
+        pdf_file_data["file_kind"] = file_kind
         pdf_file_data["filename"] = filename
         pdf_file_data["description"] = description
         pdf_file_data["full_filename"] = full_filename
@@ -158,17 +161,17 @@ def docusign_webhook_listener(request):
     try:
         # Parses XML data and returns a dictionary and formated messages
         envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
-
+        relative_path = "docusign/" + str(envelope_data["envelope_id"])
         # Store the XML file on disk
-        envelope_dir = os.path.join(
-            settings.BASE_DIR, "media/docusign/", envelope_data["envelope_id"]
-        )
+        envelope_dir = os.path.join(settings.BASE_DIR, "media/", relative_path)
         Path(envelope_dir).mkdir(parents=True, exist_ok=True)
 
         filename = (
             envelope_data["envelope_time_generated"].strftime("%Y%m%d_%H%M%S") + ".xml"
         )  # substitute _ for : for windows-land
         filepath = os.path.join(envelope_dir, filename)
+        relative_file_path = os.path.join(relative_path, filename)
+
         with open(filepath, "wb") as xml_file:
             xml_file.write(data)
     except Exception as e:
@@ -200,37 +203,69 @@ def docusign_webhook_listener(request):
         # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
         if envelope_status == "completed":
             try:
-                (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(
-                    data, envelope_dir
-                )
+                (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(data, envelope_dir)
                 logger.debug(envelope_data)
 
-                if tenant.plan.use_ged:
+                has_ged = tenant.has_ged()
+                if has_ged:
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
-                    document_type_pk = interview.document_type.pk
-                    document_language = interview.language
+                    document_description = interview.description if interview.description else ''
 
-                    # Post documents to GED if envelope_status is completed
-                    tenant_ged_data = TenantGedData.objects.get(pk=document.tenant.pk)
-                    mc = MayanClient(tenant_ged_data.url, tenant_ged_data.token)
+                    post_data = {
+                        "description": document_description,
+                        "document_type": interview.document_type.pk,
+                        "language": interview.language,
+                    }
 
                     pdf_filenames = list()
                     for pdf in envelope_data["pdf_documents"]:
-                        response = mc.document_create(
-                            pdf["full_filename"],
-                            document_type_pk,
-                            pdf["filename"],
-                            document_language,
-                            pdf["description"],
-                        )
-                        logger.debug("Posting document to GED: " + pdf["filename"])
-                        logger.debug(response.text)
+                        try:
+                            post_data["label"] = pdf["filename"]
+                            status_code, ged_data, ged_id = save_in_ged(post_data, pdf["full_filename"], document.tenant)
+                        except Exception as e:
+                            message = str(e)
+                            logging.exception(message)
+                            return HttpResponse(message)
+                        else:
+                            logger.debug("Posting document to GED: " + pdf["filename"])
+                            pdf_filenames.append(pdf["filename"])
 
-                        pdf_filenames.append(pdf["filename"])
+                            if status_code == 201:
+                                # salva o documento baixado no EL como documento relacionado. copia do pai algumas
+                                # propriedades
+                                related_document = Document(
+                                    name=pdf["filename"],
+                                    description=document.description,
+                                    interview=document.interview,
+                                    school=document.school,
+                                    tenant=document.tenant,
+                                    bulk_generation=document.bulk_generation,
+                                    file_kind=pdf["file_kind"],
+                                )
+                                save_document_data(related_document, has_ged, ged_data, relative_file_path, document)
+                            else:
+                                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                                    str(status_code), ged_data)
+                                logging.error(message)
+                                return HttpResponse(message)
 
                     # separa os documentos com ENTER
                     pdf_filenames = chr(10).join(pdf_filenames)
+                else:
+                    for pdf in envelope_data["pdf_documents"]:
+                        # salva o documento baixado no EL como documento relacionado. copia do pai algumas
+                        # propriedades
+                        related_document = Document(
+                            name=pdf["filename"],
+                            description=document.description,
+                            interview=document.interview,
+                            school=document.school,
+                            tenant=document.tenant,
+                            bulk_generation=document.bulk_generation,
+                            file_kind=pdf["file_kind"],
+                        )
+                        save_document_data(related_document, has_ged, None, relative_file_path, document)
             except Exception as e:
                 message = str(e)
                 logger.exception(message)

@@ -1,8 +1,8 @@
 import sys
 
 sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
-from element_educalegal_client import EducaLegalClient
-from module_clicksign_client import ClickSignClient
+from module_educalegal_client import EducaLegalClient
+from api.third_party.clicksign_client import ClickSignClient
 
 ###### PRODUCTION ######
 # token_csc = "4806d373-89b8-4dcc-aa04-87dc8f1a31ea"
@@ -18,6 +18,10 @@ csc = ClickSignClient(token_csc, True)
 ###### LOCALHOST ######
 api_base_url = "http://localhost:8001"
 token = "9fa535d8bcfb4ce6410a59d46c61368334c96ddc"
+##### app.educalegal.com.br #####
+# api_base_url = "https://app.educalegal.com.br"
+# token = "dbc67c03a50a11f974276fdb08a5820ecda6249b"
+elc = EducaLegalClient(api_base_url, token)
 
 
 def send_to_clicksign():
@@ -81,24 +85,39 @@ def send_to_clicksign():
     # faz o upload do documento no clicksign
     data_sent, data_received, status_code, envelope_id = csc.upload_document(document)
 
-    # verifica se o signer ja foi enviado para a clicksign
-    data_sent, data_received, status_code = elc.get_signer_key_by_email(recipients)
-
     recipients_sign = data_received.copy()
 
     # cria os destinatarios
     data_sent, data_received, status_code = csc.add_signer(recipients_sign)
 
-    # adiciona signer key no educa legal
-    data_sent, data_received, status_code = elc.post_signer_key(recipients_sign, 1, 3)
-
     data_sent, data_received, status_code = csc.send_to_signers(envelope_id, recipients_sign)
     print(data_received, status_code)
 
 
-if __name__ == "__main__":
-    elc = EducaLegalClient(api_base_url, token)
+def patch_document():
+    data = {
+        "description": 'teste | teste | 2020-05-26',
+        "status": "criado",
+        "school": 1,
+        "document_type": 1,
+        "parent": None,
+        'document_data': '{"url_args": {"tid": "1", "ut": "9fa535d8bcfb4ce6410a59d46c61368334c96ddc", "intid": "80", "doc_uuid": "dde71b0a-9a16-438c-8eb6-e16a5a9d4fe1"}, "nav": {"past": ["Escola", "Aluno(a)"], "current": "Aluno(a)", "hidden": false, "progressive": true}, "envelope_statuses": {"sent": "enviado para assinatura", "delivered": "enviado para assinatura", "completed": "assinado", "declined": "assinatura recusada/inv\\u00e1lida", "voided": "assinatura recusada/inv\\u00e1lida"}, "recipient_group_types_dict": {"agents": {"type": "agent", "pt-br": "agente"}, "carbonCopies": {"type": "carboncopy", "pt-br": "em c\\u00f3pia"}, "certifiedDeliveries": {"type": "certifieddelivery", "pt-br": "entrega certificada"}, "editors": {"type": "editor", "pt-br": "editor"}, "inPersonSigners": {"type": "inpersonsigner", "pt-br": "assinatura presencial"}, "intermediaries": {"type": "intermediary", "pt-br": "intermedi\\u00e1rio"}, "seals": {"type": "seal", "pt-br": "selo"}, "signers": {"type": "signer", "pt-br": "signat\\u00e1rio"}, "witness": {"type": "witness", "pt-br": "testemunha"}}, "el_environment": null, "el_log_to_console": null, "educalegal_url": "http://educalegal:8008", "ut": "9fa535d8bcfb4ce6410a59d46c61368334c96ddc", "tid": "1", "intid": "80", "doc_uuid": "dde71b0a-9a16-438c-8eb6-e16a5a9d4fe1", "elc": null, "school_names_list": ["Development Col\\u00e9gio Bacana", "Development Escola da Fam\\u00edlia", "Development Escola da Lagoa"], "school_units_dict": {"Development Col\\u00e9gio Bacana": ["System Fundamental I", "System Fundamental II", "System Super Bacana"], "Development Escola da Fam\\u00edlia": ["System Familiar 1"], "Development Escola da Lagoa": []}, "school_data_dict": {"Development Col\\u00e9gio Bacana": {"id": 1, "city": "Belo Horizonte", "state": "MG", "country": "1", "school_units": ["System Fundamental I", "System Fundamental II", "System Super Bacana"], "legal_name": "Development Sociedade de Ensino Col\\u00e9gio Bacana Ltda.", "name": "Development Col\\u00e9gio Bacana", "legal_type": "J", "cnpj": "22.870.852/0001-72", "logo": "/media/colegio_bacana.png", "phone": "31-3223-0227", "site": "https://www.colegiobacana.com.br", "email": "silex@silexsistemas.com.br", "street": "Rua Cara\\u00e7a", "street_number": "28", "unit": "", "neighborhood": "Serra", "zip": "30220-260", "letterhead": "timbrado-colegio-bacana.docx", "created_date": "2020-05-13T17:05:32.225610-03:00", "tenant": 1}, "Development Escola da Fam\\u00edlia": {"id": 2, "city": "S\\u00e3o Paulo", "state": "SP", "country": "1", "school_units": ["System Familiar 1"], "legal_name": "Development Funda\\u00e7\\u00e3o Educacional Santa Helena", "name": "Development Escola da Fam\\u00edlia", "legal_type": "J", "cnpj": "79.225.578/0001-04", "logo": "/media/escola_da_familia.png", "phone": "11-3425-3565", "site": "https://www.escoladafamilia.edu", "email": "escola.educalegal@gmail.com", "street": "Rua da Consola\\u00e7\\u00e3o", "street_number": "2301", "unit": "", "neighborhood": "Consola\\u00e7\\u00e3o", "zip": "01301-100", "letterhead": "timbrado-escola-da-familia.docx", "created_date": "2020-05-13T17:05:32.225610-03:00", "tenant": 1}, "Development Escola da Lagoa": {"id": 3, "city": "Rio de Janeiro", "state": "RJ", "country": "1", "school_units": [], "legal_name": "Development Mendon\\u00e7a e Machado Servi\\u00e7os Educacionais S/A", "name": "Development Escola da Lagoa", "legal_type": "J", "cnpj": "56.324.235/0001-93", "logo": "/media/esocola_da_lagoa.png", "phone": "21-5689-2356", "site": "https://www.escoladalagoa.com.br", "email": "escola.educalegal@gmail.com", "street": "Av. Borges de Medeiros", "street_number": "2525", "unit": "", "neighborhood": "Lagoa", "zip": "22470-022", "letterhead": "timbrado-bek.docx", "created_date": "2020-05-13T17:05:32.225610-03:00", "tenant": 1}}, "__warningregistry__": {"version": 2308, "None": true}, "tenant_data": {"id": 1, "esignature_app": {"id": 3, "name": "Clicksign Development", "provider": "CLICKSIGN", "private_key": "dc0251e3-bb8e-4813-84c0-1158ba0bdbcf", "client_id": "Clicksign Development", "impersonated_user_guid": "", "notes": "", "test_mode": true}, "name": "Development", "subdomain_prefix": "sys", "eua_agreement": true, "created_date": "2020-05-13T17:05:32.225610-03:00", "auto_enrolled": false, "phone": "11-3425-3565", "plan": 4}, "plan_data": {"id": 4, "name": "Corporate", "value_currency": "BRL", "value": "2999.00", "document_limit": null, "plan_type": "CORPORATE", "use_esignature": true, "use_ged": true, "use_bulk_interview": true}, "plan_use_ged": true, "plan_use_esignature": true, "tenant_ged_data": {"tenant": 1, "url": "http://ged:8000", "token": "47f210da48587cb14357e4352d31e0a9c3ae63c0", "database": "educa-legal-app", "database_user": "educa-legal-app", "database_user_password": "e60k17byidfg20ye", "database_host": "educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com", "database_port": "25060", "database_database_engine": "django.db.backends.postgresql", "storage_provider": "Digital Ocean", "storage_access_key": "QR3GRQYL26DWRS5NKPC4", "storage_secret_key": "I/GOZ5ZY1cB6r8+T9YiMWSNJhRhPir5Kke3uzhqYLFI", "storage_bucket_name": "educalegal-storage-educalegal", "storage_default_acl": "private", "storage_endpoint_url": "https://nyc3.digitaloceanspaces.com", "storage_region_name": "nyc3"}, "tenant_ged_url": "http://ged:8000", "tenant_ged_token": "47f210da48587cb14357e4352d31e0a9c3ae63c0", "mc": null, "interview_data": {"id": 80, "name": "Teste iasmini", "version": "teste", "date_available": "2020-05-26", "description": "teste", "language": "por", "custom_file_name": "entrevista-debug-return-app", "base_url": null, "is_generic": true, "is_freemium": false, "use_bulk_interview": true, "yaml_name": "entrevista-debug-return-app.yml", "document_type": 1, "interview_server_config": 11, "tenants": [1]}, "interview_document_type": 1, "document_type_data": {"delete_time_period": 30, "delete_time_unit": "days", "documents_url": "http://ged:8000/api/document_types/1/documents/", "documents_count": 26, "id": 1, "label": "Default", "filenames": [], "trash_time_period": null, "trash_time_unit": null, "url": "http://ged:8000/api/document_types/1/"}, "valid_data": true, "menu_items": [{"label": "Roteiro", "url": "?action=eyJhY3Rpb24iOiAicm9hZG1hcCIsICJhcmd1bWVudHMiOiB7fX0&i=docassemble.playground1Development:entrevista-debug-return-app.yml"}], "selected_school": "Development Col\\u00e9gio Bacana", "school": {"id": 1, "city": "Belo Horizonte", "state": "MG", "country": "1", "school_units": ["System Fundamental I", "System Fundamental II", "System Super Bacana"], "legal_name": "Development Sociedade de Ensino Col\\u00e9gio Bacana Ltda.", "name": "Development Col\\u00e9gio Bacana", "legal_type": "J", "cnpj": "22.870.852/0001-72", "logo": "/media/colegio_bacana.png", "phone": "31-3223-0227", "site": "https://www.colegiobacana.com.br", "email": "silex@silexsistemas.com.br", "street": "Rua Cara\\u00e7a", "street_number": "28", "unit": "", "neighborhood": "Serra", "zip": "30220-260", "letterhead": "timbrado-colegio-bacana.docx", "created_date": "2020-05-13T17:05:32.225610-03:00", "tenant": 1}, "school_units_list": ["System Fundamental I", "System Fundamental II", "System Super Bacana"], "school_id": 1, "school_name": "Development Col\\u00e9gio Bacana", "school_legal_name": "Development Sociedade de Ensino Col\\u00e9gio Bacana Ltda.", "school_cnpj": "22.870.852/0001-72", "school_email": "silex@silexsistemas.com.br", "school_phone": "31-3223-0227", "school_street": "Rua Cara\\u00e7a", "school_street_number": "28", "school_unit": "", "school_neighborhood": "Serra", "school_city": "Belo Horizonte", "school_state": "MG", "school_zip": "30220-260", "school_letterhead": "timbrado-colegio-bacana.docx", "nomeAluno": "Anton Bruckner", "Enum": null, "DocumentStatus": null, "session_local": {"_class": "docassemble.base.core.DASessionLocal", "instanceName": "session_local"}, "device_local": {"_class": "docassemble.base.core.DADeviceLocal", "instanceName": "device_local"}, "user_local": {"_class": "docassemble.base.core.DAUserLocal", "instanceName": "user_local"}, "interview_label": "Teste iasmini", "interview_description": "teste | teste | 2020-05-26", "interview_language": "por", "interview_custom_file_name_string": "entrevista-debug-return-app", "interview_is_freemium": false, "custom_file_name": "20200826-120915-entrevista-debug-return-app", "content_document": "entrevista-debug-return-app.docx", "generated_file": {"_class": "docassemble.base.core.DAFileCollection", "instanceName": "generated_file", "info": {"name": "Teste iasmini", "filename": "20200826-120915-entrevista-debug-return-app", "description": "", "valid_formats": ["pdf", "docx"], "formats": ["pdf", "docx"], "attachment": {"name": "Question_154", "number": 0}, "extension": {"docx": "docx", "pdf": "pdf"}, "mimetype": {"docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "pdf": "application/pdf"}, "content": {}, "markdown": {}, "metadata": {}, "convert_to_pdf_a": false, "convert_to_tagged_pdf": false, "raw": false, "permissions": null}, "docx": {"_class": "docassemble.base.core.DAFile", "instanceName": "generated_file.docx", "filename": "20200826-120915-entrevista-debug-return-app.docx", "has_specific_filename": true, "mimetype": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "extension": "docx", "number": 354, "ok": true, "private": false}, "pdf": {"_class": "docassemble.base.core.DAFile", "instanceName": "generated_file.pdf", "filename": "20200826-120915-entrevista-debug-return-app.pdf", "has_specific_filename": true, "mimetype": "application/pdf", "extension": "pdf", "number": 355, "ok": true, "private": false}}}'
+    }
 
+    params = {
+        "trigger": "docassemble",
+        "pdf_url": 'http://docassemble/uploadedfile/6/20200826-073801-entrevista-debug-return-app.pdf',
+        "pdf_filename": '20200826-000002-entrevista-debug-return-app.pdf',
+        "docx_url": 'http://docassemble/uploadedfile/5/20200826-073801-entrevista-debug-return-app.docx',
+        "docx_filename": '20200826-000002-entrevista-debug-return-app.docx',
+        "tenant_id": 1,
+        "doc_uuid": 'dfbfe5ee-7cf5-44df-bb01-a90c81820f81',
+    }
+
+    status_code, el_patch_document = elc.patch_document(data, params)
+
+
+if __name__ == "__main__":
     # # Dados do Tenant
     # print(elc.tenants_read(2))
     #
@@ -137,7 +156,7 @@ if __name__ == "__main__":
     # tenant = 2
     # school = 2
     # interview = 82
-    # # related_documents = None
+    # # parent = None
     # # document_data = "test"
     #
     # response = elc.create_document(
@@ -147,7 +166,7 @@ if __name__ == "__main__":
     #     tenant,
     #     interview,
     #     school,
-    #     # related_documents,
+    #     # parent,
     #     # document_data,
     # )
     # el_document_created_id = response["id"]
@@ -159,12 +178,12 @@ if __name__ == "__main__":
     # ged_link = "ged_link"
     # ged_uuid = "010101010101"
     #
-    # response = elc.patch_document_with_email_data(
+    # response = elc.patch_document(PARAMETROS DEVEM SER PASSADOS COMO DICT (data, params)
     #     el_document_created_doc_uuid, send_email=True, status="enviado por e-mail"
     # )
     # print(response)
     #
-    # response = elc.patch_document_with_ged_data(
+    # response = elc.patch_document(PARAMETROS DEVEM SER PASSADOS COMO DICT (data, params)
     #     el_document_created_doc_uuid, ged_id, ged_link, ged_uuid, status="inserido no GED",
     # )
     #
@@ -175,52 +194,15 @@ if __name__ == "__main__":
     # ged_id = 1
     # new_status = "modificado"
     # new_envelope_number = '3fc59949-23ab-4301-b4ce-1176f1246954'
-    # response = elc.patch_document_with_esignature_data(
+    # response = elc.patch_document(PARAMETROS DEVEM SER PASSADOS COMO DICT (data, params)
     #     el_document_created_doc_uuid, new_status, new_envelope_number, submit_to_esignature=False
     # )
     # print(response)
-
-    # =========== elc.post_envelope ============= #
-    # tid = 1
-    # data_received = {
-    #   "envelopeId": "aaa",
-    #   "status": "sent",
-    #   "statusDateTime": "2020-07-30T16:49:23.7938569Z",
-    #   "uri": "/envelopes/b08b6022-fbb9-4e47-955f-eda4ac3f13a0"
-    # }
-    # esignature_provider = 'Docusign'
     #
-    # response, status_code = elc.post_envelope(tid, esignature_provider, data_received)
-    #
-    # print(status_code)
-    #
-    # print(response)
-    # =========== elc.post_envelope ============= #
-
-
-    # =========== elc.post_signers ============= #
-    # el_recipients = [
-    #     {'name': 'Ut est sed sed ipsa', 'email': 'dogoka@mailinator.com', 'group': 'signers', 'status': 'gerado',
-    #      'sent_date': '', 'tenant': '1', 'envelope_log': 27,
-    #      'pdf_filenames': '20200717-112740-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.pdf'},
-    #     {'name': 'Development Sociedade de Ensino Colégio Bacana Ltda.', 'email': 'silex@silexsistemas.com.br',
-    #      'group': 'signers', 'status': 'gerado', 'sent_date': '', 'tenant': '1', 'envelope_log': 27,
-    #      'pdf_filenames': '20200717-112740-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.pdf'}
-    # ]
-    #
-    # documents = {'name': 'documento.pdf'}
-    # tid = 1
-    # envelope_log_response = dict()
-    # envelope_log_response['id'] = 27
-    #
-    # el_post_signers_log, status_code = elc.post_signers_log(el_recipients, documents, tid, envelope_log_response['id'])
-    #
-    # print(status_code)
-    #
-    # print(el_post_signers_log)
-    # =========== elc.post_signers ============= #
-
-
     # =========== envio do documento para assinatura clicksign ============= #
-    send_to_clicksign()
-    # =========== elc.get_signer_key_by_email ============= #
+    # send_to_clicksign()
+    # =========== envio do documento para assinatura clicksign ============= #
+
+    # =========== patch_document() ============= #
+    patch_document()
+    # =========== patch_document() ============= #

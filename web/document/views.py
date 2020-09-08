@@ -1,27 +1,29 @@
 import logging
 import json
 import pandas as pd
+import uuid
 
 from mongoengine.errors import ValidationError
 from celery import chain
 
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.messages import get_messages
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableView
-from django.contrib import messages
-from django.contrib.messages import get_messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse
 from django.utils.safestring import mark_safe
 from django.views import View
+from rest_framework import generics
 
+from interview.models import Interview, InterviewServerConfig
+from interview.util import build_interview_full_name
 from tenant.models import Tenant
 from tenant.mixins import TenantAwareViewMixin
 from school.models import SchoolUnit
-from interview.models import Interview, InterviewServerConfig
-from interview.util import build_interview_full_name
 from util.mongo_util import (
     create_dynamic_document_class,
     mongo_to_hierarchical_dict,
@@ -30,8 +32,9 @@ from util.file_import import is_csv_metadata_valid, is_csv_content_valid
 
 from .util import custom_class_name, dict_to_docassemble_objects, create_secret
 from .forms import BulkDocumentGenerationForm
-from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus
-from .tasks import create_document, submit_to_esignature, send_email
+from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus, DocumentFileKind
+# https://docs.celeryproject.org/en/latest/userguide/tasks.html#task-naming-relative-imports
+from document.tasks import celery_create_document, celery_submit_to_esignature, celery_send_email
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
 logger = logging.getLogger(__name__)
@@ -50,13 +53,36 @@ DOCUMENT_COLUMNS = (
 )
 
 
-class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
+class MultipleFieldLookupMixin(generics.GenericAPIView):
+    def __init__(self):
+        if not hasattr(self, 'lookup_fields'):
+            raise AssertionError("Expected view {} to have `.lookup_fields` attribute".format(self.__class__.__name__))
+
+    def get_object(self):
+        for field in self.lookup_fields:
+            if field in self.kwargs:
+                self.lookup_field = field
+                break
+        else:
+            raise AssertionError(
+                'Expected view %s to be called with one of the lookup_fields: %s' %
+                (self.__class__.__name__, self.lookup_fields))
+
+        return super().get_object()
+
+
+class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, MultipleFieldLookupMixin, DetailView):
     model = Document
     context_object_name = "document"
+    lookup_fields = ('pk', 'doc_uuid')
 
     def get_context_data(self, **kwargs):
+        if 'doc_uuid' in self.kwargs:
+            document = Document.objects.get(doc_uuid=self.kwargs["doc_uuid"])
+        else:
+            document = Document.objects.get(pk=self.kwargs["pk"])
+
         context = super().get_context_data(**kwargs)
-        document = Document.objects.get(pk=self.kwargs["pk"])
 
         try:
             # busca somente o último signer de cada email do documento
@@ -80,6 +106,8 @@ class DocumentDetailView(LoginRequiredMixin, TenantAwareViewMixin, DetailView):
             pass
         else:
             context['signers'] = list(signers)
+            context['docx_file'] = document.get_docx_file()
+            context['related_documents'] = document.get_related_documents()
             signer_statuses = list()
             for signer in signers:
                 signer_statuses.append(signer.status)
@@ -494,50 +522,62 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 )
             )
 
-            # Se for enviar por e-mail nao enviar para Docusign
-            if interview_variables["submit_to_esignature"] == True:
+            # Se for enviar para assinatura eletrônica nao enviar por e-mail
+            if interview_variables["submit_to_esignature"]:
                 interview_variables["el_send_email"] = False
 
             if interview_variables["submit_to_esignature"]:
+                # result = celery_create_document(
+                #         base_url,
+                #         api_key,
+                #         secret,
+                #         interview_full_name,
+                #         interview_variables,
+                #     )
+                #
+                # celery_submit_to_esignature(str(el_document.doc_uuid))
+
                 result = chain(
-                    create_document.s(
+                    # nao é necessario passar o self, é passado automaticamente
+                    celery_create_document.s(
                         base_url,
                         api_key,
                         secret,
                         interview_full_name,
                         interview_variables,
                     ),
-                    submit_to_esignature.s(
-                        base_url, api_key, secret, interview_full_name
-                    ),
+                    # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
+                    # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
+                    # https://docs.celeryproject.org/en/stable/userguide/canvas.html#chains
+                    celery_submit_to_esignature.s(),
                 )()
-                result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(parent_id=result.parent.id, child_id=result.id)
+                result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
+                    parent_id=result.parent.id, child_id=result.id)
                 el_document.task_create_document = result.parent.id
                 el_document.task_submit_to_esignature = result.id
                 total_task_size += 2
-
             elif interview_variables["el_send_email"]:
                 result = chain(
-                    create_document.s(
+                    # nao é necessario passar o self, é passado automaticamente
+                    celery_create_document.s(
                         base_url,
                         api_key,
                         secret,
                         interview_full_name,
                         interview_variables,
                     ),
-                    send_email.s(
-                        base_url, api_key, secret, interview_full_name
-                    ),
+                    # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
+                    # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
+                    # https://docs.celeryproject.org/en/stable/userguide/canvas.html#chains
+                    celery_send_email.s(),
                 )()
                 result_description = "Criação do documento: {parent_id} | Envio por e-mail: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
                 el_document.task_create_document = result.parent.id
                 el_document.task_send_email = result.id
                 total_task_size += 2
-
             else:
-                result = create_document.delay(
-                # result = create_document(
+                result = celery_create_document.delay(
                     base_url, api_key, secret, interview_full_name, interview_variables,
                 )
                 result_description = "Criação do documento: {id}".format(id=result.id)
@@ -562,7 +602,8 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         return HttpResponse(json.dumps(payload), content_type="application/json")
 
     except Exception as e:
-        error_message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
+        error_message = "Houve erro no processo de geração em lote. | {exc}".format(
+            exc=str(type(e).__name__) + " : " + str(e))
         logger.error(error_message)
 
         payload = {
@@ -571,7 +612,6 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         }
 
         return HttpResponse(json.dumps(payload), content_type="application/json")
-
 
 
 @login_required
@@ -625,7 +665,7 @@ def query_documents_by_args(pk=None, **kwargs):
     else:
         order_column = order_column[1]
 
-    queryset = Document.objects.filter(tenant=pk)
+    queryset = Document.objects.filter(tenant=pk, parent=None)
     total = queryset.count()
 
     if search_value:
@@ -656,3 +696,39 @@ def query_documents_by_args(pk=None, **kwargs):
         'draw': draw,
     }
     return data
+
+
+def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
+    if has_ged:
+        document.ged_id = ged_data['id']
+        document.ged_link = ged_data['latest_version']['document_url'] + 'download/'
+        document.ged_uuid = ged_data['uuid']
+
+    document.relative_file_path = relative_path
+    document.status = DocumentStatus.INSERIDO_GED.value
+
+    if parent:
+        # cria documento relacionado ao documento pdf principal
+        document.doc_uuid = uuid.uuid4()
+        document.parent = parent
+
+        try:
+            # salva dados do ged do documento no educa legal
+            document.save()
+        except Exception as e:
+            message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
+            logging.exception(message)
+    else:
+        document.file_kind = DocumentFileKind.PDF.value
+
+        try:
+            if has_ged:
+                # salva dados do ged do documento no educa legal
+                document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'relative_file_path', 'status',
+                                             'file_kind'])
+            else:
+                # salva dados do ged do documento no educa legal
+                document.save(update_fields=['relative_file_path', 'status', 'file_kind'])
+        except Exception as e:
+            message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
+            logging.exception(message)

@@ -1,50 +1,9 @@
 import xmltodict
 
 from datetime import datetime as dt
-from enum import Enum
 
-
-class DocumentStatus(Enum):
-    RASCUNHO = "rascunho"
-    CRIADO = "criado"
-    INSERIDO_GED = "inserido no GED"
-    ENVIADO_EMAIL = "enviado por e-mail"
-    ENVIADO_ASS_ELET = "enviado para assinatura"
-    ASSINADO = "assinado"
-    RECUSADO_INVALIDO = "assinatura recusada/inválida"
-    NAO_ENCONTRADO = "não encontrado"
-
-
-envelope_statuses = {
-    "sent": {"docusign": "enviado", "el": DocumentStatus.ENVIADO_ASS_ELET.value},
-    "delivered": {"docusign": "entregue", "el": DocumentStatus.ENVIADO_ASS_ELET.value},
-    "completed": {"docusign": "finalizado", "el": DocumentStatus.ASSINADO.value},
-    "declined": {"docusign": "recusado", "el": DocumentStatus.RECUSADO_INVALIDO.value},
-    "voided": {"docusign": "inválido", "el": DocumentStatus.RECUSADO_INVALIDO.value},
-}
-
-recipient_statuses_dict = {
-    "created": "criado",
-    "sent": "enviado",
-    "delivered": "entregue",
-    "signed": "assinado",
-    "declined": "recusado",
-    "completed": "finalizado",
-    "faxpending": "anexo de fax pendente",
-    "autoresponded": "respondido automaticamente",
-}
-
-recipient_types_dict = {
-    "agent": "agente",
-    "carboncopy": "em cópia",
-    "certifieddelivery": "entrega certificada",
-    "editor": "editor",
-    "inpersonsigner": "assinatura presencial",
-    "intermediary": "intermediário",
-    "seal": "selo",
-    "signer": "signatário",
-    "witness": "testemunha",
-}
+from api.third_party.docusign_helpers import envelope_statuses, recipient_statuses_dict, recipient_types_dict
+from document.models import DocumentStatus
 
 
 def docusign_xml_parser(data):

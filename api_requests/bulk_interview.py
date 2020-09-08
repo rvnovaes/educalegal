@@ -1,6 +1,6 @@
 import pandas as pd
 
-from docassemble_client import DocassembleClient
+from api.third_party.docassemble_client import DocassembleClient
 
 
 ###### LOCALHOST ######

@@ -1,5 +1,5 @@
 @startuml
-header Integration - EducaLegal + Docassemble + Mayan + Docusign
+header Integration - EducaLegal + Docassemble + GED + ESignature
 actor User
 autonumber
 
@@ -12,7 +12,7 @@ activate Docassemble
 note right
 element-tenant-school-interview.yml +
 element-tenant-school-interview-error-screens.yml +
-element_educalegal_client.py
+module_educalegal_client.py
 end note
 
 Docassemble -> EducaLegal: GET tenants_school_names_school_data(tid)
@@ -28,16 +28,16 @@ Docassemble -> EducaLegal: GET tenants_ged_read(tid)
 EducaLegal -> Docassemble: tenant_ged_data(url, token)
 deactivate EducaLegal
 
-Docassemble -> Mayan: GET document_type_read(interview_document_type)
-activate Mayan
+Docassemble -> GED: GET document_type_read(interview_document_type)
+activate GED
 
 note left
 element-tenant-school-interview.yml +
-element_mayan_client.py
+module_mayan_client.py
 end note
 
-Mayan -> Docassemble: document_type_data{id, url, label}
-deactivate Mayan
+GED -> Docassemble: document_type_data{id, url, label}
+deactivate GED
 
 Docassemble -> EducaLegal: GET interviews_read(intid)
 activate EducaLegal
@@ -52,61 +52,55 @@ deactivate Docassemble
 User -> Docassemble: Fills up the interview
 activate Docassemble
 
-Docassemble -> EducaLegal: POST elc.patch_document_with_docassemble_data(doc_uuid, name, status, description, tenant, school, interview, related_documents, document_data)
+Docassemble -> EducaLegal: PATCH elc.patch_document(data, params)
 activate EducaLegal
-
 
 note right
 element-educalegal-patch-document.yml +
-element_educalegal_client.py
+module_educalegal_client.py
 end note
 
 EducaLegal -> Docassemble: returns Educa Legal document data
-deactivate EducaLegal
+deactivate Docassemble
 
-Docassemble -> Mayan: POST mc.document_create(file, doc_type, file_name, lang, desc)
-activate Mayan
+EducaLegal -> GED: PATCH mc.document_create(data, absolute_path)
+activate GED
 
 note right
 Only if tenant_use_ged == True
-element-ged.yml + 
-element_mayan_client.py +
-element_educalegal_client.py
+mayan_client.py
 end note
 
-Mayan -> Docassemble: response(many fields, specially document id)
-Docassemble -> Mayan: GET mc.document_read(created_document_id)
-Mayan -> Docassemble: created_document_data(status, id, url, uuid)
-deactivate Mayan
-Docassemble -> EducaLegal: PATCH elc.patch_document_with_ged_data(el_document_created_id, cd_ged_id, cd_ged_link, cd_ged_uuid, cd_status)
-deactivate Docassemble
-User -> Docassemble: Clicks Button to ESignature
-activate Docassemble
-
-Docassemble -> Docusign: POST send_to_docusign((recipients, documents, send_immediately, email_subject)
-activate Docusign
-
+GED -> EducaLegal: response(many fields, specially document id)
+EducaLegal -> GED: GET mc.document_read(created_document_id)
 note left
-element-esignature.yml
-element_docusign.py
+atualiza dados do GED no Educa Legal
 end note
+GED -> EducaLegal: created_document_data(status, id, url, uuid)
+deactivate GED
 
 
-Docusign -> Docassemble: envelope_data
-Docassemble -> EducaLegal: PATCH patch_document_with_esignature_data(doc_uuid, status, envelope_number, submit_to_esignature)
-deactivate Docassemble
-activate EducaLegal
+User -> EducaLegal: Clicks Button to ESignature
 
-Docusign -> Recipients: Send emails
+EducaLegal -> ESignature: POST send_to_esignature((recipients, documents, email_subject)
+note left
+atualiza dados do GED no Educa Legal
+end note
+activate ESignature
+
+ESignature -> EducaLegal: envelope_data
+
+ESignature -> Recipients: Send emails
 activate Recipients
-Recipients -> Docusign: Send Signatures
-Docusign/ClickSign -> EducaLegal: POST webhook_listener(statuses changes)
-Recipients -> Docusign: Send Signatures
+ESignature -> EducaLegal: POST webhook_listener(statuses changes)
+Recipients -> ESignature: Send Signatures
 deactivate Recipients
 
-Docusign/ClickSign -> EducaLegal: POST webhook_listener(final status + signed document + certificate)
-deactivate Docusign
+ESignature -> EducaLegal: POST webhook_listener(final status + signed document + certificate)
+deactivate ESignature
 
-EducaLegal -> Mayan: POST mc.document_create(file, doc_type, file_name, lang, desc)
+EducaLegal -> GED: POST mc.document_create(data, absolute_path)
+GED -> EducaLegal: dados do documento salvo
+GED -> EducaLegal: created_document_data(status, id, url, uuid)
 deactivate EducaLegal
 @enduml

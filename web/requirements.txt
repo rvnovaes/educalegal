@@ -39,8 +39,11 @@ django-money~=1.1
 # MongoDB
 pymongo~=3.10.1
 mongoengine~=0.20.0
-# Used to test docusign requests
+
+# Used to in docusign requests
 PyJWT~=1.7.1
+cryptography~=3.1
+
 # Validations
 validator-collection~=1.4.2
 validator-collection-br~=0.0.10
@@ -54,3 +57,4 @@ pytest~=5.4.3
 djangorestframework-datatables
 PySimpleGUI~=4.24.0
 dateparser~=0.7.6
+sendgrid~=6.4.6
