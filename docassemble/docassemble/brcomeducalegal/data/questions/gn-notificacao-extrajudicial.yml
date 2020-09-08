@@ -10,12 +10,12 @@ include:
   - element-generate-file.yml
   - element-signature.yml
   - element-educalegal-patch-document.yml
-  - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
 ---
 sections:
   - Notificado
@@ -30,7 +30,6 @@ code:  |
 id: logic
 mandatory: True
 code: |
-
   if valid_data:
     menu_items
     if len(school_names_list) > 1:
@@ -47,11 +46,8 @@ code: |
     financeiro_email
     signature_local
     generated_file
-    el_document_patched_with_docassemble_data
-    if plan_use_ged:
-      el_document_patched_with_ged_data
+    el_patch_document
     document_ready_screen
-  all_done
 ---
 objects:
   - notifieds: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
@@ -236,14 +232,6 @@ code: |
   recipients.append(financeiro_recipient)
 
   document_name = custom_file_name + '.pdf'
-
-  documents = [
-      {
-          'name': document_name,
-          'fileExtension': 'pdf',
-          'documentBase64': make_document_base64(generated_file.pdf.path())
-      }
-  ]
 ---
 code: |
   if plan_use_esignature:
