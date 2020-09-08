@@ -4,11 +4,6 @@ import logging
 import pytz
 import pandas as pd
 
-from django.shortcuts import get_object_or_404
-from django.http import FileResponse
-from rest_framework import viewsets, status, permissions
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from django.db.models import Q
@@ -19,32 +14,32 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
+from rest_framework import pagination
+from rest_framework import permissions
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import authentication_classes
+from rest_framework import status
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, renderer_classes, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import (
     ValidationError,
     PermissionDenied,
     NotFound,
     APIException,
 )
-from rest_framework import status
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, renderer_classes, permission_classes
-from rest_framework.permissions import AllowAny
 from drf_yasg.renderers import SwaggerUIRenderer, OpenAPIRenderer
-
 from allauth.utils import build_absolute_uri
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
-
 from validator_collection import checkers
 
 from api.third_party.mayan_client import MayanClient
 from document.models import Document, DocumentFileKind, BulkDocumentKind
 from document.views import save_document_data
-from util.util import save_file_from_url
 from document.views import validate_data_mongo, generate_document_from_mongo
 from interview.models import Interview
 from school.models import School, SchoolUnit
@@ -78,6 +73,9 @@ class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     serializer_class = InterviewSerializer
+    # Como o page size padrao esta definido no base.py como 50, precisamos sobrescrever esse default aqui
+    #https://stackoverflow.com/questions/35432985/django-rest-framework-override-page-size-in-viewset
+    pagination.PageNumberPagination.page_size = 150
 
     def get_queryset(self):
         user = self.request.user
@@ -257,7 +255,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         )  # TODO parametro de onlyParent
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
-        queryset = self.queryset
+        queryset = self.queryset.filter(parent=None)
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
@@ -933,6 +931,7 @@ def dashboard_data(request):
         total_docs = Document.objects.filter(tenant=tenant)
     else:
         total_docs = Document.objects.all()
+    total_docs = total_docs.filter(parent=None)
     use_ged = tenant.plan.use_ged
     now = datetime.datetime.now()
     tz = pytz.timezone("America/Sao_Paulo")
