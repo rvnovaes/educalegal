@@ -2,7 +2,13 @@ import datetime
 import io
 import logging
 import pytz
+import pandas as pd
 
+from django.shortcuts import get_object_or_404
+from django.http import FileResponse
+from rest_framework import viewsets, status, permissions
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from django.db.models import Q
@@ -13,6 +19,7 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
 from rest_framework.exceptions import (
     ValidationError,
@@ -35,13 +42,17 @@ from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
 from validator_collection import checkers
 
 from api.third_party.mayan_client import MayanClient
-from document.models import Document, DocumentFileKind
+from document.models import Document, DocumentFileKind, BulkDocumentKind
 from document.views import save_document_data
+from util.util import save_file_from_url
+from document.views import validate_data_mongo, generate_document_from_mongo
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
 from util.util import save_file_from_url
 from users.models import CustomUser
+from util.file_import import is_metadata_valid, is_content_valid
+from util.mongo_util import create_dynamic_document_class
 
 from .serializers_v2 import (
     PlanSerializer,
@@ -603,6 +614,183 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
         else:
             document.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# Clients should authenticate by passing the token key in the "Authorization"
+# HTTP header, prepended with the string "Token ".  For example:
+# Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def validate_document(request, **kwargs):
+    """
+    Validate document received in request.body.
+
+    * Requires token authentication.
+    """
+
+    # Transforma o dicionario em um dataframe
+    data = pd.DataFrame.from_dict(request.data)
+
+    try:
+        # Valida os metadados do recebidos (tipos de campos e flags booleanas)
+        # Se os dados forem validos, retorna dois dicionarios: o de tipos de campos e
+        # os de obrigatoriedade dos registros
+        # Ambos são usados para criar a classe dinamica
+        (
+            field_types_dict,
+            required_fields_dict,
+            metadata_valid,
+        ) = is_metadata_valid(data)
+
+    except ValueError as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+
+        return Response({
+            "status_code": 422,
+            "error": message})
+
+    # Valida o conteudo dos campos de acordo com seus tipos de dados e sua obrigadoriedade
+    # trata os registros para valores aceitáveis pelos documentos
+    # usando validators collection
+    # Também valida se existe a coluna selected_school e school_division
+    # Para outras validações de conteúdo, veja a função
+    # Os campos vazios são transformados em None e deve ser tratados posteriormente ao fazer a chamada de API
+    # do Docassemble para que não saiam como None ou com erro nos documentos
+    # O campo school_division é transformado em ---
+    try:
+        (
+            data_content,
+            parent_fields_dict,
+            error_messages,
+            content_valid,
+        ) = is_content_valid(data)
+    except ValueError as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+
+        return Response({
+            "status_code": 422,
+            "error": message})
+
+    if not content_valid:
+        return Response({
+            "status_code": 422,
+            "error": error_messages})
+
+    # Se houver registro invalido, esta variavel sera definida como False ao final da funcao.
+    # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
+    # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
+    # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
+    data_valid = metadata_valid and content_valid
+
+    try:
+        interview = Interview.objects.get(pk=kwargs["interview_id"])
+    except Interview.DoesNotExist:
+        return Response({
+            "status_code": 404,
+            "error": "Não existe entrevista com ID = {interview_id}".format(
+                interview_id=kwargs["interview_id"]
+            )})
+
+    # verifica se informou um tipo de documento valido
+    if interview.document_type.id not in BulkDocumentKind.id_choices():
+        return Response({
+            "status_code": 422,
+            "error": "O tipo de documento informado ID = {id} não está na lista dos que permitem geração via API: "
+                     "{document_types}".format(id=interview.document_type.id, document_types=BulkDocumentKind.choices())
+            })
+
+    try:
+        # valida os dados recebidos de forma automatica no mongo
+        mongo_document, dynamic_document_class_name, school_names_set, school_units_names_set = validate_data_mongo(
+            request, interview.pk, data_valid, data_content, field_types_dict, required_fields_dict, parent_fields_dict,
+            False)
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+
+        return Response({
+            "status_code": 400,
+            "error": message})
+
+    response_data = {"interview_id": interview.pk, "data_valid": data_valid}
+
+    if not data_valid:
+        mongo_document.drop_collection()
+
+    return Response({
+        "status_code": 200,
+        "mongo_document_id": str(mongo_document.id),
+        "response_data": response_data,
+        "dynamic_document_class_name": dynamic_document_class_name,
+        "field_types_dict": field_types_dict,
+        "required_fields_dict": required_fields_dict,
+        "parent_fields_dict": parent_fields_dict,
+        "school_names_set": school_names_set,
+        "school_units_names_set": school_units_names_set
+    })
+
+
+# Clients should authenticate by passing the token key in the "Authorization"
+# HTTP header, prepended with the string "Token ".  For example:
+# Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def generate_document(request, **kwargs):
+    """
+    Validate and generate document received in request.body.
+
+    * Requires token authentication.
+    """
+    try:
+        # deve ser passado um request do django e não do drf
+        response = validate_document(request._request, **kwargs)
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+        return Response(message)
+
+    # retorna erro caso os dados nao tenham sido validados
+    if response.status_code != 200:
+        return Response(response)
+
+    if 'status_code' in response.data:
+        if response.data['status_code'] != 200:
+            return Response(response.data)
+
+    dynamic_document_class = create_dynamic_document_class(
+        response.data['dynamic_document_class_name'],
+        response.data['field_types_dict'],
+        response.data['required_fields_dict'],
+        response.data['parent_fields_dict'],
+        school_names_set=list(response.data['school_names_set']),
+        school_units_names_set=list(response.data['school_units_names_set']),
+    )
+
+    try:
+        success, data = generate_document_from_mongo(
+            request._request, dynamic_document_class, kwargs["interview_id"], response.data['mongo_document_id'])
+
+        if success:
+            return Response({
+                "status_code": 200,
+                "response_data": 'Documento gerado com sucesso'
+            })
+        else:
+            return Response({
+                "status_code": 400,
+                "error": data
+            })
+    except Exception as e:
+        message = str(type(e).__name__) + " : " + str(e)
+        logger.error(message)
+
+        return Response({
+            "status_code": 400,
+            "error": message})
 
 
 def save_document_file(document, data, params):

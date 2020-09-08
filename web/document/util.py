@@ -1,7 +1,6 @@
 import io
 import logging
 import os
-from enum import Enum
 from datetime import datetime
 import requests
 
@@ -19,18 +18,12 @@ from django.utils.safestring import mark_safe
 from api.third_party.clicksign_client import ClickSignClient
 from api.third_party.docusign_client import DocuSignClient, make_document_base64
 from api.third_party.sendgrid_client import send_email as sendgrid_send_email
-from document.models import DocumentStatus
+from document.models import Document, DocumentStatus
 from tenant.models import ESignatureAppProvider, ESignatureAppSignerKey
 
-from .models import Document
+from .models import BulkDocumentKind
 
 logger = logging.getLogger(__name__)
-
-
-class DocumentType(Enum):
-    PRESTACAO_SERVICOS_ESCOLARES = 2
-    NOTIFICACAO_EXTRAJUDICIAL = 8
-    ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
 
 
 def custom_class_name(interview_custom_file_name):
@@ -88,7 +81,7 @@ def dict_to_docassemble_objects(documents, interview_type_id):
             )
         )
 
-        if interview_type_id == DocumentType.PRESTACAO_SERVICOS_ESCOLARES.value:
+        if interview_type_id == BulkDocumentKind.PRESTACAO_SERVICOS_ESCOLARES.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['students', 'contractors']
 
@@ -104,7 +97,7 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
 
-        elif interview_type_id == DocumentType.NOTIFICACAO_EXTRAJUDICIAL.value:
+        elif interview_type_id == BulkDocumentKind.NOTIFICACAO_EXTRAJUDICIAL.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['notifieds']
 
@@ -120,7 +113,7 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
             document["content_document"] = "notificacao-extrajudicial.docx"
 
-        elif interview_type_id == DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
+        elif interview_type_id == BulkDocumentKind.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
             # tipos de pessoa no contrato de prestacao de servicos
             person_types = ['workers']
 
@@ -273,10 +266,13 @@ def send_email(doc_uuid):
     except Document.DoesNotExist:
         message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
         logger.error(message)
+        return 0, message
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
+        return 0, message
     else:
+        status_code = 0
         if document.recipients:
             to_emails = document.recipients
             school_name = document.school.name if document.school.name else document.school.legal_name
@@ -304,8 +300,7 @@ def send_email(doc_uuid):
             except Exception as e:
                 message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
                 error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
-                logger.debug(error_message)
-                logger.error(error_message)
+                raise
             else:
                 if status_code == 202:
                     document.send_email = True
@@ -323,6 +318,9 @@ def send_email(doc_uuid):
                     error_message = message + "{} - {}".format(status_code, response_json)
                     logger.debug(error_message)
                     logger.error(error_message)
+        else:
+
+            return 0, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
     return status_code, message
 
@@ -344,10 +342,13 @@ def send_to_esignature(doc_uuid):
     except Document.DoesNotExist:
         message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
         logger.error(message)
+        return 0, message
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
+        return 0, message
     else:
+        status_code = 0
         if document.recipients:
             esignature_app = document.tenant.esignature_app
             message = 'Não foi possível enviar para a assinatura eletrônica. Entre em contato com o suporte.'
@@ -424,6 +425,8 @@ def send_to_esignature(doc_uuid):
 
                         message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
                                             'sucesso para os destinatários:{}'.format(to_recipients))
+        else:
+            return 0, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
     return status_code, message
 

@@ -29,6 +29,20 @@ class DocumentStatus(Enum):
         return [(x.name, x.value) for x in cls]
 
 
+class BulkDocumentKind(Enum):
+    PRESTACAO_SERVICOS_ESCOLARES = 2
+    NOTIFICACAO_EXTRAJUDICIAL = 8
+    ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
+
+    @classmethod
+    def id_choices(cls):
+        return [x.value for x in cls]
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
+
+
 # evitando usar type pq no graphql da conflito
 class DocumentFileKind(Enum):
     PDF = "pdf"
@@ -250,14 +264,14 @@ class DocumentTaskView(TenantAwareModel):
     )
     document_status = models.CharField(max_length=256, default="", verbose_name="Status do Documento")
     ged_id = models.CharField(
-        max_length=128, default="", verbose_name="ID do PDF do documento no GED"
+        max_length=128, default="", verbose_name="ID do documento no GED"
     )
-    ged_link = models.CharField(max_length=256, default="", verbose_name="Link do PDF")
+    ged_link = models.CharField(max_length=256, default="", verbose_name="Link")
     ged_uuid = models.CharField(
         max_length=256,
         default="",
         help_text="UUID do documento. UUID = Universally Unique ID.",
-        verbose_name="UUID do PDF",
+        verbose_name="UUID",
     )
     description = models.TextField(default="", verbose_name="Descrição")
     interview = models.ForeignKey(
