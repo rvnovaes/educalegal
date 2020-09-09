@@ -1,7 +1,16 @@
 swagger: '2.0'
 info:
   title: Educa Legal API
-  description: Advocacia Virtual para Escolas
+  description: |
+    Advocacia Virtual para Escolas.
+
+    O Educa Legal é uma plataforma web de geração de documentos, assinatura eletrônica e armazenamento em nuvem. Tudo de forma mais rápida, padronizada, segura e acessível e a qualquer tempo.
+
+    O objetivo desta documentação é orientar o desenvolvedor sobre como integrar com a API do Educa Legal, descrevendo as funcionalidades, os métodos a serem utilizados e listando informações a serem enviadas e recebidas.
+
+    Para facilitar, são disponibilizados códigos prontos de exemplos em diversas linguagens de programação. O mecanismo de integração com o Educa Legal é simples, são necessários apenas conhecimentos intermediários em linguagem de programação para Web, requisições HTTP/HTTPS e manipulação de arquivos JSON.
+
+    Nesse manual você encontrará a referência sobre todas as operações disponíveis na API REST do Educa Legal. Estas operações devem ser executadas utilizando sua chave (token) nos endpoints.
   termsOfService: 'https://www.educalegal.com.br'
   contact:
     email: sistemas@educalegal.com.br
@@ -409,6 +418,9 @@ paths:
         - Nome do campo visível para o usuário (usado somente no caso de importação de planilha).
         - Conteúdo do campo.
 
+        Quando houver erro será retornado um dicionário com o seguinte modelo:
+        {"status_code": <n° do erro>, "error": <"mensagem de erro">}
+
         Exemplo de JSON para geração do contrato de prestação de serviços escolares:
 
         ```json
@@ -754,7 +766,19 @@ paths:
       parameters: []
       responses:
         '201':
-          description: ''
+          description: |
+            Retorna dicionário com status_code 201.
+            {"status_code": 201, "response_data": Documento gerado com sucesso}
+        '404':
+          description: |
+            404 - NOT FOUND
+            Se não encontrar o id da entrevista passado.
+            Erro: Não existe entrevista com ID = XX.
+        '422':
+          description: |
+            O tipo de documento informado ID = <"ID"> não está na lista dos que permitem geração via API: [('PRESTACAO_SERVICOS_ESCOLARES', 2), ('NOTIFICACAO_EXTRAJUDICIAL', 8), ('ACORDOS_TRABALHISTAS_INDIVIDUAIS', 37)].
+
+            Outros erros inespecíficos estão sendo tratados com esse mesmo status code.
       tags:
         - v2
     parameters:
@@ -765,12 +789,13 @@ paths:
   '/v2/documents/validate/{interview_id}':
     post:
       operationId: v2_documents_validate_create
-      summary: 'Valida o documento recebido como json no request.body. para posterior geração em lote ou via API.'
-      description: ''
+      description: 'Valida o documento recebido como json no request.body. para posterior geração em lote ou via API.'
       parameters: []
       responses:
         '201':
-          description: ''
+          description: |
+            Retorna dicionário com status_code 200 e dados do documento.
+            {"status_code": 201, "response_data": <"dados do documento e da validação no Mongo">}
       tags:
         - v2
     parameters:
