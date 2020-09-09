@@ -2,7 +2,8 @@
   <div class="card">
     <div class="border-0 card-header">
       <div class="col-lg-12 col-5 text-right">
-        <base-input v-model="searchQuery"
+        <base-input input-classes="busca-modelos"
+                    v-model="searchQuery"
                     prepend-icon="fas fa-search"
                     placeholder="Pesquise por qualquer termo...">
         </base-input>
@@ -16,6 +17,7 @@
       <el-table-column
         v-for="column in tableColumns"
         :key="column.label"
+        :class-name="column.ots"
         v-bind="column"></el-table-column>
       <el-table-column min-width="100px" align="right" label="Ações">
         <div slot-scope="{$index, row}" class="d-flex">
@@ -26,7 +28,7 @@
             size="sm"
             icon
           >
-            <i class="text-white fa fa-plus-circle"></i> Novo Documento
+            <i class="text-white fa fa-plus-circle"></i> Criar
           </base-button>
           <!--          <base-button-->
         </div>
@@ -54,25 +56,29 @@ export default {
           prop: "name",
           label: "Nome",
           minWidth: 240,
-          sortable: false
+          sortable: false,
+          ots: "nome-entrevista"
         },
         {
           prop: "description",
           label: "Descrição",
           minWidth: 220,
-          sortable: false
+          sortable: false,
+          ots: "descricao-entrevista"
         },
         {
           prop: "version",
           label: "Versão",
           minWidth: 80,
-          sortable: false
+          sortable: false,
+          ots: "versao-entrevista"
         },
         {
           prop: "date_available",
           label: "Disponibilização",
           minWidth: 100,
-          sortable: false
+          sortable: false,
+          ots: "disponibilizacao-entrevista"
         }
       ],
     };

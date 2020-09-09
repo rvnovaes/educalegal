@@ -121,7 +121,7 @@
     components: {
       DashboardNavbar,
       ContentFooter,
-      DashboardContent
+      DashboardContent,
     },
     methods: {
       initScrollbar() {

@@ -20,9 +20,12 @@ import {Input, Tooltip, Popover, Loading} from "element-ui";
 import {ValidationProvider, ValidationObserver} from "vee-validate";
 import {Select, Option} from "element-ui";
 import HourGlassSpinner from "@/components/widgets/HourGlassSpinner";
+import VueTour from "vue-tour";
+import 'vue-tour/dist/vue-tour.css';
 
 import Vue from "vue";
 import flatPickr from "vue-flatpickr-component";
+
 
 /**
  * You can register global components here and use them as a plugin in your main Vue instance
@@ -56,3 +59,4 @@ Vue.use(Option);
 Vue.use(Loading);
 Vue.use(flatPickr);
 Vue.use(HourGlassSpinner);
+Vue.use(VueTour)
