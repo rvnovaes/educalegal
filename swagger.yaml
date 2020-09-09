@@ -101,7 +101,7 @@ paths:
     post:
       operationId: v1_envelopes_create
       description: |
-        Cria um envelope.  
+        Cria um envelope.
         Ao enviar um documento para assinatura eletrônica é gerado o ID do envelope no provedor de assinaturas. Esse envelope é salvo no Educa Legal e vinculado ao documento.
       parameters:
         - name: data
@@ -121,7 +121,7 @@ paths:
     post:
       operationId: v1_esignature-app-signer-keys_create
       description: |
-        Cria o signatário que será enviado para a assinatura eletrônica.  
+        Cria o signatário que será enviado para a assinatura eletrônica.
         Toda vez que é feito um envio para o Clicksign, o signatário (e-mail e nome) é cadastrado em sua base. Com isso, o Educa Legal faz o cadastro do signatário em seu próprio banco de dados para não enviar cadastros duplicados para o Clicksign.
       parameters:
         - name: data
@@ -141,8 +141,8 @@ paths:
     get:
       operationId: v1_esignature-app-signer-keys_read
       description: |
-        Retorna o signatário que será enviado para a assinatura eletrônica por e-mail e nome.  
-        É necessário buscar pelo nome também, pois as escolas usam o mesmo e-mail com nomes diferentes e esse nome aparece no certificado da assinatura eletrônica.  
+        Retorna o signatário que será enviado para a assinatura eletrônica por e-mail e nome.
+        É necessário buscar pelo nome também, pois as escolas usam o mesmo e-mail com nomes diferentes e esse nome aparece no certificado da assinatura eletrônica.
         Toda vez que é feito um envio para o Clicksign, o signatário (e-mail e nome) é cadastrado em sua base. Com isso, o Educa Legal faz o cadastro do signatário em seu próprio banco de dados para não enviar cadastros duplicados para o Clicksign.
       parameters: []
       responses:
@@ -336,7 +336,7 @@ paths:
     get:
       operationId: v2_documents_list
       description: |
-        Retorna a lista de documentos gerados pelo id da instância.  
+        Retorna a lista de documentos gerados pelo id da instância.
         São listados somente os documentos que pertencem ao cliente ao qual o usuário está
         associado.
       parameters:
@@ -373,7 +373,7 @@ paths:
     post:
       operationId: v2_documents_create
       description: |
-        Cria um novo documento.  
+        Cria um novo documento.
         Não é necessário informar a instância (tenant) no corpo da requisição. O sistema usa
         o cliente ao qual o usuário está vinculado.
       parameters:
@@ -387,8 +387,8 @@ paths:
           description: ''
         '400':
           description: |
-            400 - BAD REQUEST  
-            Se for tentada a criação de um documento em um cliente (tenant) distinto daquele ao qual o usuário está vinculado.  
+            400 - BAD REQUEST
+            Se for tentada a criação de um documento em um cliente (tenant) distinto daquele ao qual o usuário está vinculado.
             Somente é permitida a criação de documentos no seu cliente (tenant).
       tags:
         - v2
@@ -397,17 +397,19 @@ paths:
     post:
       operationId: v2_documents_generate_create
       description: |
-        Valida e gera o documento recebido como json no request.body.  
+        Valida e gera o documento recebido como json no request.body.
+        Cria o PDF e o DOCX, insere esses arquivos no sistema de arquivos e/ou GED.
+        Permite enviar por e-mail ou assinatura eletrônica.
         Para cada chave do dicionário temos suas propriedades e valores em uma lista na seguinte ordem:
         - Chave do dicionário com o nome interno do campo.
-        - Tipo do campo. Tipos possíveis: BooleanField, EmailField, FloatField, IntField, StringField, CpfField, CnpjField.  
+        - Tipo do campo. Tipos possíveis: BooleanField, EmailField, FloatField, IntField, StringField, CpfField, CnpjField.
           O tipo DateTimeField não deve ser usado, pois não é serializável.
         - Obrigatoriedade do campo: True ou False.
         - Parent do campo. É indicado pela Educa Legal quando deve ser usado.
         - Nome do campo visível para o usuário (usado somente no caso de importação de planilha).
         - Conteúdo do campo.
 
-        Exemplo de JSON para geração do contrato de prestação de serviços escolares:  
+        Exemplo de JSON para geração do contrato de prestação de serviços escolares:
 
         ```json
           {
@@ -682,7 +684,7 @@ paths:
               "true",
               "contractors",
               "E-mail",
-              "iasmini.gomes@gmail.com"
+              "fake@gmail.com"
            ],
            "contractors_zip": [
               "StringField",
@@ -748,7 +750,7 @@ paths:
               "False"
            ]
           }
-        ```        
+        ```
       parameters: []
       responses:
         '201':
@@ -763,7 +765,7 @@ paths:
   '/v2/documents/validate/{interview_id}':
     post:
       operationId: v2_documents_validate_create
-      summary: 'Valida o documento recebido como json no request.body.'
+      summary: 'Valida o documento recebido como json no request.body. para posterior geração em lote ou via API.'
       description: ''
       parameters: []
       responses:
@@ -780,7 +782,7 @@ paths:
     get:
       operationId: v2_documents_read
       description: |
-        Retorna o documento pelo seu id (inteiro) ou uuid (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) dependendo de qual for passado.  
+        Retorna o documento pelo seu id (inteiro) ou uuid (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) dependendo de qual for passado.
         São recuperados somente documentos que pertencem ao cliente (tenant) ao qual o usuário está vinculado.
       parameters: []
       responses:
@@ -790,19 +792,19 @@ paths:
             $ref: '#/definitions/Document v2'
         '400':
           description: |
-            400 - BAD REQUEST  
-            Se for feita uma requisição e o valor informado não for um id numérico (inteiro) ou um uuid válido (formato xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) retorna o erro:  
+            400 - BAD REQUEST
+            Se for feita uma requisição e o valor informado não for um id numérico (inteiro) ou um uuid válido (formato xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) retorna o erro:
             O doc_uuid ou o id do documento não são valores válidos.
         '404':
           description: |
-            404 - NOT FOUND  
+            404 - NOT FOUND
             Se o documento (id ou doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente (tenant) ao qual o usuário da requisição está vinculado.
       tags:
         - v2
     patch:
       operationId: v2_documents_partial_update
       description: |
-        Atualiza parcialmente um documento já existente pelo seu uuid (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).  
+        Atualiza parcialmente um documento já existente pelo seu uuid (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
       parameters:
         - name: data
           in: body
@@ -816,15 +818,15 @@ paths:
             $ref: '#/definitions/Document v2'
         '400':
           description: |
-            400 - BAD REQUEST  
-            Tentativa de alteração de documento que não pertence ao cliente (tenant) ao qual o usuário está vinculado.  
-            Erro: Não é permitido alterar o cliente (tenant) proprietário do documento.  
+            400 - BAD REQUEST
+            Tentativa de alteração de documento que não pertence ao cliente (tenant) ao qual o usuário está vinculado.
+            Erro: Não é permitido alterar o cliente (tenant) proprietário do documento.
 
-            Se o campo doc_uuid não for válido:  
+            Se o campo doc_uuid não for válido:
             Erro: O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
         '404':
           description: |
-            404 - NOT FOUND  
+            404 - NOT FOUND
             Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente (tenant) ao qual o usuário da requisição está vinculado.
       tags:
         - v2
@@ -838,21 +840,21 @@ paths:
           description: ''
         '400':
           description: |
-            400 - BAD REQUEST  
-            Se o campo doc_uuid não for válido:  
+            400 - BAD REQUEST
+            Se o campo doc_uuid não for válido:
             Erro: O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.
         '403':
           description: |
-            403 - FORBIDDEN  
-            Tentativa de exlusão de documento por usuário sem permissões (is_staff = False).  
+            403 - FORBIDDEN
+            Tentativa de exlusão de documento por usuário sem permissões (is_staff = False).
             Erro: Somente usuários administradores podem excluir documentos.
         '404':
           description: |
-            404 - NOT FOUND  
+            404 - NOT FOUND
             Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente (tenant) ao qual o usuário da requisição está vinculado.
         '405':
           description: |
-            405 - Método "DELETE" não é permitido  
+            405 - Método "DELETE" não é permitido
             Se não for informado o doc_uuid.
       tags:
         - v2
@@ -883,31 +885,31 @@ paths:
           description: 'O arquivo do documento no GED.'
         '400':
           description: |
-            400 - BAD REQUEST  
-            Se o campo doc_uuid não for válido:  
+            400 - BAD REQUEST
+            Se o campo doc_uuid não for válido:
             Erro: O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.
         '403':
           description: |
-            403 - FORBIDDEN  
-            O cliente deve possuir GED para poder baixar documentos.  
+            403 - FORBIDDEN
+            O cliente deve possuir GED para poder baixar documentos.
             Erro: Somente clientes cadastrados num plano que possui GED podem baixar documentos.
         '404':
           description: |
-            404 - NOT FOUND  
+            404 - NOT FOUND
             Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente (tenant) ao qual o usuário da requisição está vinculado.
-            
+
             Se o documento existir no Educa Legal mas não for encontrado no GED. Pode ocorrer de um usuário excluir o documento diretamente no GED.
             Erro: O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal. Verifique a lixeira no GED.
         '500':
           description: |
-            500 - INTERNAL SERVER ERROR  
-            Se o cliente estiver num plano que possui GED, mas não há GED configurado para ele.  
+            500 - INTERNAL SERVER ERROR
+            Se o cliente estiver num plano que possui GED, mas não há GED configurado para ele.
             Erro: O cliente está cadastrado num plano que possui GED mas mão há GED configurado para ele.
-            
-            Se há GED cadastrado para o cliente, mas não há URL ou TOKEN cadastrados.  
+
+            Se há GED cadastrado para o cliente, mas não há URL ou TOKEN cadastrados.
             Erro: O GED do cliente não possui uma URL válida ou não possui token configurado.
-            
-            Se houver problemas na conexão com o GED (não está disponível, por exemplo).  
+
+            Se houver problemas na conexão com o GED (não está disponível, por exemplo).
             Erro: Failed to establish a new connection: [Errno 111] Connection refused".
       tags:
         - v2
@@ -932,31 +934,31 @@ paths:
           description: 'Sucesso'
         '400':
           description: |
-            400 - BAD REQUEST  
-            Se o campo doc_uuid não for válido:  
+            400 - BAD REQUEST
+            Se o campo doc_uuid não for válido:
             Erro: O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
         '403':
           description: |
-            403 - FORBIDDEN  
-            O cliente deve possuir GED para poder baixar documentos.  
+            403 - FORBIDDEN
+            O cliente deve possuir GED para poder baixar documentos.
             Erro: Somente clientes cadastrados num plano que possui GED podem baixar documentos.
         '404':
           description: |
-            404 - NOT FOUND  
+            404 - NOT FOUND
             Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente (tenant) ao qual o usuário da requisição está vinculado.
-            
-            Se o documento existir no Educa Legal mas não for encontrado no GED. Pode ocorrer de um usuário excluir o documento diretamente no GED.  
+
+            Se o documento existir no Educa Legal mas não for encontrado no GED. Pode ocorrer de um usuário excluir o documento diretamente no GED.
             Erro: O documento não foi encontrado no GED. Possivelmente ele foi excluído diretamente no GED sem utilização do app Educa Legal. Verifique a lixeira no GED.
         '500':
           description: |
-            500 - INTERNAL SERVER ERROR  
-            Se o cliente estiver num plano que possui GED, mas não há GED configurado para ele.  
+            500 - INTERNAL SERVER ERROR
+            Se o cliente estiver num plano que possui GED, mas não há GED configurado para ele.
             Erro: O cliente está cadastrado num plano que possui GED, mas mão há GED configurado para ele.
-            
-            Se há GED cadastrado para o cliente, mas não há URL ou TOKEN cadastrados.  
+
+            Se há GED cadastrado para o cliente, mas não há URL ou TOKEN cadastrados.
             Erro: O GED do cliente não possui uma URL válida ou não possui token configurado.
-            
-            Se houver problemas na conexão com o GED (não está disponível, por exemplo).  
+
+            Se houver problemas na conexão com o GED (não está disponível, por exemplo).
             Erro: Failed to establish a new connection: [Errno 111] Connection refused.
       tags:
         - v2
@@ -969,7 +971,7 @@ paths:
     get:
       operationId: v2_interviews_list
       description: |
-        Retorna a lista de todas as entrevistas ou os detalhes de uma entrevista.  
+        Retorna a lista de todas as entrevistas ou os detalhes de uma entrevista.
         Disponível apenas para administradores.
       parameters:
         - name: page
@@ -1176,7 +1178,7 @@ paths:
     delete:
       operationId: v2_tenant_schools_delete
       description: |
-        Apaga uma escola.  
+        Apaga uma escola.
         Só permite excluir escola vinculada ao tenant referente ao token informado.
       parameters: []
       responses:
