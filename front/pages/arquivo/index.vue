@@ -3,15 +3,16 @@
     <base-header class="pb-6">
       <div class="row align-items-center py-4">
         <div class="col-11">
-          <h6 class="h2 text-white d-inline-block mb-0">Arquivo</h6>
+          <h6 class="h2 text-white d-inline-block mb-0 arquivo">Arquivo</h6>
           <p class="text-sm text-white font-weight-bold mb-0">
             Documentos já gerados por sua escola
           </p>
         </div>
         <div v-if="loading" class="col-1">
-          <div>
-            <HourGlassSpinner></HourGlassSpinner>
-          </div>
+          <HourGlassSpinner></HourGlassSpinner>
+        </div>
+        <div v-else class="col-1 text-right">
+          <base-button size="sm" type="neutral" @click="tour">Ajuda</base-button>
         </div>
       </div>
     </base-header>
@@ -107,19 +108,19 @@
               </div>
 
 
-              </div>
+            </div>
 
             <div class="col-12 d-flex justify-content-end  flex-wrap filter-buttons "
             >
 
-                <div id="filter-buttons">
-                  <base-button @click="applyFilters" type="primary">
-                    <i class="fa fa-search"></i> Buscar
-                  </base-button>
-                  <base-button @click="cleanFilters" type="warning">
-                    <i class="fa fa-sync"></i> Limpar
-                  </base-button>
-                </div>
+              <div id="filter-buttons">
+                <base-button @click="applyFilters" type="primary">
+                  <i class="fa fa-search"></i> Buscar
+                </base-button>
+                <base-button @click="cleanFilters" type="warning">
+                  <i class="fa fa-sync"></i> Limpar
+                </base-button>
+              </div>
 
 
             </div>
@@ -194,8 +195,8 @@
         </card>
       </div>
     </div>
-  </div
-  >
+    <v-tour name="arquivoTour" :steps="steps" :options="tourOptions"></v-tour>
+  </div>
 </template>
 <script>
 import {Table, TableColumn, Select, Option} from "element-ui";
@@ -294,6 +295,71 @@ export default {
       selectedStatuses: [],
       selectedInterviews: [],
       selectedSchools: [],
+      tourOptions: {
+        useKeyboardNavigation: true,
+        debug: true,
+        labels: {
+          buttonSkip: "Dispensar",
+          buttonPrevious: "Anterior",
+          buttonNext: "Próximo",
+          buttonStop: "Fim"
+        }
+      },
+      steps: [
+        {
+          target: ".arquivo",
+          header: {
+            title: "Arquivo",
+          },
+          content: `No arquivo você acessa e pesquisa todos os documentos já gerados por sua escola`,
+          params: {
+            placement: "right",
+            enableScrolling: false
+          }
+        },
+        //Aqui tivemos que usar o target como classe, pq so conseguimos passar para a coluna (que e outro componente) a classe
+        {
+          target: ".nome-entrevista",
+          content: `Esse é o nome pelo qual o tipo de documento ou contrato é identificado na plataforma. Sempre use esse nome ao se referir ao documento. A busca procura por palavras no nome.`,
+          params: {
+            placement: "bottom",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".descricao-entrevista",
+          content: `Aqui você encontra informações úteis sobre quando e como usar o documento. A pesquisa desta página também procura por palavras na descrição. `,
+          params: {
+            placement: "bottom",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".versao-entrevista",
+          content: `Estamos sempre trabalhando em atualizações dos documentos em virtude de novas leis e de melhores práticas jurídicas e de gestão.`,
+          params: {
+            placement: "bottom",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".disponibilizacao-entrevista",
+          content: `Essa é a data na qual a versão do documento foi disponibilizada para uso na plataforma.`,
+          params: {
+            placement: "bottom",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".edit",
+          content: `Clique nesse botão para criar o documento.`,
+          params: {
+            placement: "top",
+            highlight: false,
+            enableScrolling: false
+          }
+        },
+      ]
     };
   },
   computed: {
@@ -397,7 +463,6 @@ export default {
       this.updatePagination("Modificada ordenacao de data");
       this.$store.dispatch("documents/fetchPaginatedDocuments", {offset: 0, createdDateOrdering: order});
     },
-
     // Sempre que ocorre um evento  no componente de paginacao base-pagination essa funcao e chamada
     updatePagination(args) {
       // console.log("Disparado evento input no componente de paginacao");
@@ -452,6 +517,9 @@ export default {
       this.selectedSchools = [];
       this.createdDateRange = null;
       this.applyFilters();
+    },
+    tour() {
+      this.$tours["arquivoTour"].start();
     }
   },
 }

@@ -3,7 +3,7 @@
     <base-header class="pb-6">
       <div class="row align-items-center py-4">
         <div class="col-11">
-          <h6 class="h2 text-white d-inline-block mb-0">Criar documentos</h6>
+          <h6 class="h2 text-white d-inline-block mb-0 criar">Criar documentos</h6>
           <p class="text-sm text-white font-weight-bold mb-0">
             Os modelos abaixo são usados para gerar novos contratos e documentos
           </p>
@@ -44,7 +44,6 @@ export default {
     return {
       tourOptions: {
         useKeyboardNavigation: true,
-        highlight: true,
         debug: true,
         labels: {
           buttonSkip: "Dispensar",
@@ -55,9 +54,20 @@ export default {
       },
       steps: [
         {
-          // target: "[ots=\"busca-modelos\"]",
+          target: ".criar",
+          header: {
+            title: "Criar documentos",
+          },
+          content: `Nesta página você tem acesso a todos os modelos de documentos disponibilizados para sua escola.`,
+          params: {
+            placement: "right",
+            enableScrolling: false
+          }
+        },
+        {
+          //Aqui tivemos que usar o target como classe, pq so conseguimos passar para a coluna (que e outro componente) a classe
           target: ".busca-modelos",
-          content: `Você pode pesquisar o documento por qualquer palavra no nome ou na descrição. Mesmo que você digite algo errado, nós vamos tentar encontrar o documento para você.`,
+          content: `Você pode pesquisar o modelo por qualquer palavra no nome ou na descrição. Mesmo que você digite algo errado, nós vamos tentar encontrá-lo para você.`,
           params: {
             placement: "top",
             enableScrolling: false
@@ -66,39 +76,43 @@ export default {
         //Aqui tivemos que usar o target como classe, pq so conseguimos passar para a coluna (que e outro componente) a classe
         {
           target: ".nome-entrevista",
-          content: `Esse é o nome pelo qual o tipo de documento ou contrato é identificado na plataforma. Sempre use esse nome ao se referir ao documento. A busca procura por palavras no nome.`,
+          content: `Esse é o nome pelo qual o modelo de documento ou contrato é identificado na plataforma. Sempre use esse nome ao se referir ao documento. A busca procura por palavras no nome do modelo.`,
           params: {
-            placement: "bottom",
+            placement: "top",
             enableScrolling: false
           }
         },
         {
           target: ".descricao-entrevista",
-          content: `Aqui você encontra informações úteis sobre quando e como usar o documento. A pesquisa desta página também procura por palavras na descrição. `,
+          content: `Aqui você encontra informações úteis sobre quando e como usar o modelo. A pesquisa desta página também procura por palavras na descrição. `,
           params: {
-            placement: "bottom"
+            placement: "top",
+            enableScrolling: false
           }
         },
         {
           target: ".versao-entrevista",
-          content: `Estamos sempre trabalhando em atualizações dos documentos em virtude de novas leis e de melhores práticas jurídicas e de gestão.`,
+          content: `Estamos sempre trabalhando em atualizações dos modelos em virtude de novas leis e de melhores práticas jurídicas e de gestão.`,
           params: {
-            placement: "bottom"
+            placement: "top",
+            enableScrolling: false
           }
         },
         {
           target: ".disponibilizacao-entrevista",
-          content: `Essa é a data na qual a versão do documento foi disponibilizada para uso na plataforma.`,
+          content: `Essa é a data na qual a versão do modelo foi disponibilizada para uso na plataforma.`,
           params: {
-            placement: "bottom"
+            placement: "top",
+            enableScrolling: false
           }
         },
         {
           target: ".edit",
-          content: `Clique nesse botão para criar o documento.`,
+          content: `Clique nesse botão para criar um novo documento com base neste modelo.`,
           params: {
             placement: "top",
-            highlight: false
+            highlight: false,
+            enableScrolling: false
           }
         },
       ]

@@ -25,31 +25,21 @@ export default {
     };
   },
   methods: {
-    sortChange({prop, order}) {
-      if (prop) {
-        this.tableData.sort((a, b) => {
-          let aVal = a[prop];
-          let bVal = b[prop];
-          if (order === "ascending") {
-            return aVal > bVal ? 1 : -1;
-          }
-          return bVal - aVal ? 1 : -1;
-        });
-      } else {
-        this.tableData.sort((a, b) => {
-          return a.id - b.id;
-        });
-      }
-    },
+    refreshFuseSearch() {
+      this.fuseSearch = new Fuse(this.tableData, {
+        keys: ["name", "description"],
+        // At what point does the match algorithm give up. A threshold of 0.0 requires a perfect match
+        //   (of both letters and location), a threshold of 1.0 would match anything.
+        // https://fusejs.io/concepts/scoring-theory.html#scoring-theory
+        // ignoreLocation não funcionou...
+        threshold: 0.4,
+        distance: 2000
+      });
+    }
+
   },
   mounted() {
-    // Fuse search initialization.
-    this.fuseSearch = new Fuse(this.tableData, {
-      keys: ["name", "description"],
-      // At what point does the match algorithm give up. A threshold of 0.0 requires a perfect match
-      //   (of both letters and location), a threshold of 1.0 would match anything.
-      threshold: 0.4
-    });
+    this.refreshFuseSearch();
   },
   watch: {
     /**
@@ -66,13 +56,8 @@ export default {
     },
     // Como o carregamento de dados para tableData e assincrono, toda vez que for alterado esse valor  (eg page refresh)
     // o FUSE deve ser novamente gerado, senao a busca nao funciona.
-    tableData(value){
-      this.fuseSearch = new Fuse(this.tableData, {
-        keys: ["name", "description"],
-        // At what point does the match algorithm give up. A threshold of 0.0 requires a perfect match
-        //   (of both letters and location), a threshold of 1.0 would match anything.
-        threshold: 0.4
-      });
+    tableData() {
+      this.refreshFuseSearch();
     }
   }
 };

@@ -3,7 +3,7 @@
     <base-header class="pb-6">
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-7">
-          <h6 class="h2 text-white d-inline-block mb-0" ots="painel">Painel</h6>
+          <h6 class="h2 text-white d-inline-block mb-0 painel">Painel</h6>
         </div>
         <div class="col-lg-6 col-5 text-right">
           <base-button size="sm" type="neutral" @click="tour">Ajuda</base-button>
@@ -12,19 +12,19 @@
       <!-- Card stats -->
       <div class="row">
         <div class="col-xl-3 col-md-6">
-          <stats-card ots="documentos-gerados"
+          <stats-card class="documentos-gerados"
                       title="Documentos gerados no mês"
                       type="gradient-green"
                       :sub-title="cmDocsCount"
                       icon="fa fa-file">
             <template slot="footer">
               <div v-if="finishedDocDelta >= 0">
-                <span ots="documentos-gerados-mes-anterior" class="text-success mr-2"><i
+                <span class="text-success mr-2 documentos-gerados-mes-anterior"><i
                   class="fa fa-arrow-up"></i> {{ finishedDocDelta }} %</span><span
                 class="text-nowrap">Em relação ao mês anterior ({{ lmDocsCount }})</span>
               </div>
               <div v-else>
-                <span ots="documentos-gerados-mes-anterior" class="text-danger mr-2"><i
+                <span class="text-danger mr-2 documentos-gerados-mes-anterior"><i
                   class="fa fa-arrow-down"></i> {{ finishedDocDelta }} %</span><span
                 class="text-nowrap">Em relação ao mês anterior ({{ lmDocsCount }})</span>
               </div>
@@ -33,7 +33,7 @@
         </div>
 
         <div class="col-xl-3 col-md-6">
-          <stats-card ots="documentos-andamento"
+          <stats-card class="documentos-andamento"
                       title="Documentos em andamento no mês"
                       type="gradient-orange"
                       :sub-title="cmInProgressDocsCount"
@@ -52,7 +52,7 @@
         </div>
 
         <div class="col-xl-3 col-md-6">
-          <stats-card ots="assinaturas"
+          <stats-card class="assinaturas"
                       title="Assinaturas Eletrônicas no mês"
                       type="gradient-green"
                       :sub-title="cmSignatureCount"
@@ -72,7 +72,7 @@
         </div>
 
         <div class="col-xl-3 col-md-6">
-          <stats-card ots="assinaturas-andamento"
+          <stats-card class="assinaturas-andamento"
                       title="Assinaturas Eletrônicas em andamento no mês"
                       type="gradient-orange"
                       :sub-title="cmInProgressSinatureCount"
@@ -125,8 +125,7 @@ export default {
       },
       steps: [
         {
-          // ots = onboarding-tour-step
-          target: "[ots=\"painel\"]",
+          target: ".painel",
           header: {
             title: "Painel",
           },
@@ -136,7 +135,7 @@ export default {
           content: `No painel você acessa informações gerais sobre o uso do Educa Legal.`
         },
         {
-          target: "[ots=\"documentos-gerados\"]",
+          target: ".documentos-gerados",
           header: {
             title: "Documentos gerados",
           },
@@ -146,25 +145,25 @@ export default {
           content: `Aqui você vê quantos documentos sua escola criou no mês.`
         },
         {
-          target: "[ots=\"documentos-gerados-mes-anterior\"]",
+          target: ".documentos-gerados-mes-anterior",
           content: `Você compara também com os documentos gerados no mês anterior.`
         },
         {
-          target: "[ots=\"documentos-andamento\"]",
+          target: ".documentos-andamento",
           header: {
             title: "Documentos em andamento",
           },
           content: `São os documentos que ainda estão sendo preenchidos.`
         },
         {
-          target: "[ots=\"assinaturas\"]",
+          target: ".assinaturas",
           header: {
             title: "Assinaturas eletrônicas",
           },
           content: `Aqui você vê quantos documentos sua escola enviou para assinatura eletrônica.`
         },
         {
-          target: "[ots=\"assinaturas-andamento\"]",
+          target: ".assinaturas-andamento",
           header: {
             title: "Assinaturas em andamento",
           },
