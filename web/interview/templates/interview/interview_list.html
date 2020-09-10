@@ -86,6 +86,7 @@
                     win.focus();
                 },
                 error: function (data, status) {
+                    alert(data["responseJSON"]["message"]);
                     console.log(data);
                     console.log(status);
                 },

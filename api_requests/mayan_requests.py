@@ -8,7 +8,6 @@ from requests.exceptions import RequestException
 import sys
 
 # sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
-# from element_mayan_client import MayanClient
 from api.third_party.mayan_client import MayanClient
 
 # https://ged-educalegal.educalegal.com.br (Educa Legal)
