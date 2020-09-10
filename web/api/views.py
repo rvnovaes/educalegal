@@ -1,9 +1,11 @@
 import logging
 
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 
+from api.third_party.mayan_client import MayanClient
 from billing.models import Plan
 from document.models import Document, Envelope, Signer
 from document.views import query_documents_by_args
@@ -31,6 +33,13 @@ class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
 
+    def create(self, request, *args, **kwargs):
+        status_code, message = self.verify_ged_settings()
+        if status_code != status.HTTP_200_OK:
+            return JsonResponse({"message": message}, status=status_code)
+        else:
+            return super(DocumentViewSet, self).create(request, *args, **kwargs)
+
     def partial_update(self, request, *args, **kwargs):
         doc_uuid = kwargs["doc_uuid"]
         # doc_uuid = request.data["doc_uuid"]
@@ -41,6 +50,56 @@ class DocumentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+    def verify_ged_settings(self):
+        try:
+            tenant_id = self.request.data['tenant']
+            tenant = Tenant.objects.get(pk=tenant_id)
+        except Tenant.DoesNotExist:
+            message = 'A instância com ID = {} não foi encontrado.'.format(tenant_id)
+            return status.HTTP_404_NOT_FOUND, message
+        except Exception as e:
+            message = str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return status.HTTP_400_BAD_REQUEST, message
+        else:
+            if tenant.has_ged():
+                mc = MayanClient(tenant.tenantgeddata.url, tenant.tenantgeddata.token)
+
+                try:
+                    interview_id = self.request.data['interview']
+                    interview = Interview.objects.get(pk=interview_id)
+                except Interview.DoesNotExist:
+                    message = 'A entrevista com ID = {} não foi encontrada.'.format({interview_id})
+                    return status.HTTP_404_NOT_FOUND, message
+                except Exception as e:
+                    message = str(type(e).__name__) + " : " + str(e)
+                    logger.error(message)
+                    return status.HTTP_400_BAD_REQUEST, message
+
+                document_type_id = interview.document_type_id
+
+                # verifica se existe no ged o tipo de documento da entrevista selecionada
+                try:
+                    document_type_data = mc.document_type_read(document_type_id)
+                except Exception as e:
+                    message = str(type(e).__name__) + " : " + str(e)
+                    logger.error(message)
+                    return status.HTTP_400_BAD_REQUEST, message
+                else:
+                    if 'detail' in document_type_data:
+                        if document_type_data['detail'] == 'Invalid token.':
+                            message = 'O token do usuário do Mayan está inválido ou não existe.'
+                            return status.HTTP_404_NOT_FOUND, message
+
+                        # json_encode($response, JSON_UNESCAPED_UNICODE);
+                        if (document_type_data['detail'] == 'Not found.') or \
+                                (document_type_data['detail'] == 'N\u00e3o encontrado.'):
+                            message = 'Não existe o tipo de documento com ID = {} cadastrado no Mayan.'.format(
+                                document_type_id)
+
+                            return status.HTTP_404_NOT_FOUND, message
+        return status.HTTP_200_OK, 'Configuração do GED OK'
 
 
 class EnvelopeViewSet(viewsets.ModelViewSet):
