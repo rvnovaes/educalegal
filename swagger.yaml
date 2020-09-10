@@ -789,7 +789,7 @@ paths:
   '/v2/documents/validate/{interview_id}':
     post:
       operationId: v2_documents_validate_create
-      description: 'Valida o documento recebido como json no request.body. para posterior geração em lote ou via API.'
+      description: 'Valida o documento recebido como json no request.body para posterior geração em lote ou via API.'
       parameters: []
       responses:
         '200':
