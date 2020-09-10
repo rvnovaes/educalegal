@@ -774,7 +774,7 @@ def generate_document(request, **kwargs):
 
         if success:
             return Response({
-                "status_code": 200,
+                "status_code": 201,
                 "response_data": 'Documento gerado com sucesso'
             })
         else:
