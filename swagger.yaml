@@ -792,10 +792,10 @@ paths:
       description: 'Valida o documento recebido como json no request.body. para posterior geração em lote ou via API.'
       parameters: []
       responses:
-        '201':
+        '200':
           description: |
             Retorna dicionário com status_code 200 e dados do documento.
-            {"status_code": 201, "response_data": <"dados do documento e da validação no Mongo">}
+            {"status_code": 200, "response_data": <"dados do documento e da validação no Mongo">}
       tags:
         - v2
     parameters:
