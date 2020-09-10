@@ -60,14 +60,6 @@ code: |
     school_registration_url = educalegal_url + '/school/school/'
     invalid_school
 
-  if plan_data['use_ged']:
-    if 'detail' in document_type_data:
-      if document_type_data['detail'] == 'Invalid token.':
-        invalid_ged_token
-
-      if (document_type_data['detail'] == 'Not found.') or (document_type_data['detail'] == 'N\u00e3o encontrado.'):
-        invalid_document_type
-
   valid_data = True
 ---
 code: |
@@ -119,19 +111,6 @@ code: |
     log("tenant_ged_data: {tenant_ged_data}".format(tenant_ged_data=tenant_ged_data))
     if el_log_to_console:
       log("tenant_ged_data: {tenant_ged_data}".format(tenant_ged_data=tenant_ged_data), "console")
----
-code: |
-    mc = MayanClient(tenant_ged_url, tenant_ged_token)
-    # o tipo do documento esta sendo verificado logo apos a criacao do mc client
-    # para que o docassemble execute a criacao do mc client desse bloco de codigo
-    # senao ele tenta executar a criacao do mc client do element-mayan-create-document.yml
-    # e bagunca a ordem da entrevista
-    # a outra opcao seria trocar o nome da variavel mc
-    log("Chamando mc.document_type_read")
-    document_type_data = mc.document_type_read(interview_document_type)
-    log("document_type_data: {document_type_data}".format(document_type_data=document_type_data))
-    if el_log_to_console:
-      log("document_type_data: {document_type_data}".format(document_type_data=document_type_data), "console")
 ---
 code: |
     tenant_ged_url = tenant_ged_data['url']
@@ -218,7 +197,6 @@ code: |
 modules:
   - .module_base_domain
   - .module_educalegal_client
-  - .module_mayan_client
 ---
 include:
   - element-tenant-school-interview-error-screens.yml
