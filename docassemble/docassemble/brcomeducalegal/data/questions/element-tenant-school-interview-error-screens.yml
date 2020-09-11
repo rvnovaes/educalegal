@@ -54,9 +54,19 @@ buttons:
   - Sair: exit
 ---
 event: buy_esignature
-question: Quer enviar o seu documento com assinatura eletrônica?
+question: Quer enviar o seu documento para a assinatura eletrônica?
 subquestion: |
-  Entre em <a href="https://www.educalegal.com.br/contato/" target="_blank">contato</a> com a nossa equipe e adquira um plano de assinatura.
+  Plano contratado: ${ plan_data['name'] }.
+
+  O seu plano não possui a funcionalidade de envio para assinatura eletrônica.
+  Entre em <a href="https://www.educalegal.com.br/contato/" target="_blank">contato</a> com a nossa equipe e adquira um plano com assinatura.
+buttons:
+  - Sair: exit
+---
+event: configure_esignature
+question: Quer enviar o seu documento para a assinatura eletrônica?
+subquestion: |
+  Entre em <a href="https://www.educalegal.com.br/contato/" target="_blank">contato</a> com a nossa equipe para configurar o envio de assinatura eletrônica pela plataforma.
 buttons:
   - Sair: exit
 ---

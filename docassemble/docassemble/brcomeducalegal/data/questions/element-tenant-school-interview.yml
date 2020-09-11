@@ -125,8 +125,12 @@ code: |
 code: |
     # Se não tiver esignature_app cadastrado, volta None e entra em invalid_esignature
     if plan_data['use_esignature']:
+      log("tenant_data['esignature_app']", 'console')
+      log(tenant_data['esignature_app'], 'console')
       if not tenant_data['esignature_app']:
-        buy_esignature
+        configure_esignature
+    else:
+      buy_esignature
 
     tenant_esignature_provider = tenant_data['esignature_app']['provider']
     tenant_client_id = tenant_data['esignature_app']['client_id']
