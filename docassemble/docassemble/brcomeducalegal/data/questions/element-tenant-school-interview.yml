@@ -123,22 +123,6 @@ code: |
       log("tenant_ged_token: {tenant_ged_token}".format(tenant_ged_token=tenant_ged_token), "console")
 ---
 code: |
-    # Se não tiver esignature_app cadastrado, volta None e entra em invalid_esignature
-    if plan_data['use_esignature']:
-      log("tenant_data['esignature_app']", 'console')
-      log(tenant_data['esignature_app'], 'console')
-      if not tenant_data['esignature_app']:
-        configure_esignature
-    else:
-      buy_esignature
-
-    tenant_esignature_provider = tenant_data['esignature_app']['provider']
-    tenant_client_id = tenant_data['esignature_app']['client_id']
-    tenant_impersonated_user_guid = tenant_data['esignature_app']['impersonated_user_guid']
-    tenant_test_mode = tenant_data['esignature_app']['test_mode']
-    tenant_private_key = tenant_data['esignature_app']['private_key']
----
-code: |
     elc = EducaLegalClient(educalegal_url, ut)
     log("Chamando elc.tenants_school_names_school_data")
     school_names_list, school_units_dict, school_data_dict  = elc.tenants_school_names_school_data(tid)
