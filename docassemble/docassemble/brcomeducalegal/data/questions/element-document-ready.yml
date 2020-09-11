@@ -55,8 +55,7 @@ code: |
   button_list = list()
   button_list.append(el_button)
   button_list.append(email_button)
-  if plan_use_esignature:
-    button_list.append(esignature_button)
+  button_list.append(esignature_button)
 ---
 event: all_done
 back button: False
