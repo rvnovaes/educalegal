@@ -57,7 +57,8 @@ event: buy_esignature
 question: Quer enviar o seu documento para a assinatura eletrônica?
 subquestion: |
   Plano contratado: ${ plan_data['name'] }.
-  O seu plano não possui a funcionalidade de envio para assinatura eletrônica.  
+
+  O seu plano não possui a funcionalidade de envio para assinatura eletrônica.
   Entre em <a href="https://www.educalegal.com.br/contato/" target="_blank">contato</a> com a nossa equipe e adquira um plano com assinatura.
 buttons:
   - Sair: exit
