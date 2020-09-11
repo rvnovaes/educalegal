@@ -118,9 +118,9 @@ export default {
           win.focus();
         }
       }
-      catch (error){
+      catch (e){
         await Swal.fire({
-          title: error.response.data['message'],
+          title: e.response.data['message'],
           icon: "error",
           customClass: {
             confirmButton: "btn btn-info btn-fill",
