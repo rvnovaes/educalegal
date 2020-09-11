@@ -28,12 +28,16 @@ class MayanClient:
             )
         except Exception as e:
             message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
-            logging.exception(message)
+            logging.error(message)
             return 0, message, 0
         else:
             if 'id' in response.json():
+                logging.info('passou_mayan_1')
+                logging.info(response.status_code, response.json(), response.json()['id'])
                 return response.status_code, response.json(), response.json()['id']
             else:
+                logging.info('passou_mayan_2')
+                logging.info(response.status_code, response.json())
                 return response.status_code, response.json(), 0
 
     # Este método foi escrito deste modo para retornar uma mensagem num formato que o Docassemble pode interpretar
