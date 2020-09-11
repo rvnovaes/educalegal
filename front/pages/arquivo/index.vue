@@ -31,7 +31,7 @@
                               @on-open="focus"
                               @on-close="blur"
                               :config="{allowInput: true, mode: 'range'}"
-                              class="form-control datepicker"
+                              class="form-control datepicker filtro-data"
                               v-model="createdDateRange">
                   </flat-pickr>
                 </base-input>
@@ -39,7 +39,7 @@
               <div class="col-4">
                 <base-input label="Modelo de Documento">
                   <el-select multiple
-                             class="select-primary"
+                             class="select-primary filtro-modelo"
                              placeholder="Modelo"
                              v-model="selectedInterviews">
                     <el-option
@@ -52,11 +52,10 @@
                   </el-select>
                 </base-input>
               </div>
-
               <div class="col-2">
                 <base-input label="Escola">
                   <el-select multiple
-                             class="select-primary"
+                             class="select-primary filtro-escola"
                              placeholder="Escola"
                              v-model="selectedSchools">
                     <el-option
@@ -68,13 +67,11 @@
                     </el-option>
                   </el-select>
                 </base-input>
-
               </div>
-
               <div class="col-2">
                 <base-input label="Status">
                   <el-select multiple
-                             class="select-primary"
+                             class="select-primary filtro-status"
                              placeholder="Status"
                              v-model="selectedStatuses">
                     <el-option
@@ -87,11 +84,10 @@
                   </el-select>
                 </base-input>
               </div>
-
               <div class="col-2">
                 <base-input label="Paginação">
                   <el-select
-                    class="select-primary pagination-select"
+                    class="select-primary pagination-select paginacao"
                     v-model="pagination.perPage"
                     placeholder="Per page"
                   >
@@ -106,23 +102,16 @@
                   </el-select>
                 </base-input>
               </div>
-
-
             </div>
-
-            <div class="col-12 d-flex justify-content-end  flex-wrap filter-buttons "
-            >
-
+            <div class="col-12 d-flex justify-content-end  flex-wrap filter-buttons">
               <div id="filter-buttons">
-                <base-button @click="applyFilters" type="primary">
+                <base-button @click="applyFilters" type="primary" class="botao-buscar">
                   <i class="fa fa-search"></i> Buscar
                 </base-button>
-                <base-button @click="cleanFilters" type="warning">
+                <base-button @click="cleanFilters" type="warning" class="botao-limpar">
                   <i class="fa fa-sync"></i> Limpar
                 </base-button>
               </div>
-
-
             </div>
             <el-table :data="paginatedData"
                       row-key="id"
@@ -134,6 +123,7 @@
                 v-for="column in tableColumns"
                 :key="column.label"
                 v-bind="column"
+                :class-name="column.tour"
               >
               </el-table-column>
               <el-table-column min-width="80px" align="right" label="Detalhes">
@@ -173,7 +163,7 @@
             slot="footer"
             class="col-12 d-flex justify-content-center justify-content-sm-between flex-wrap"
           >
-            <div class="">
+            <div class="total-documentos">
               <p class="card-category">
                 Mostrando {{ from + 1 }} a {{ to }} de {{ total }} documentos
 
@@ -239,37 +229,43 @@ export default {
           prop: "created_date",
           label: "Criação",
           minWidth: 100,
-          sortable: false
+          sortable: false,
+          tour: "criacao-documento"
         },
         {
           prop: "name",
           label: "Documento",
           minWidth: 220,
-          sortable: false
+          sortable: false,
+          tour: "nome-documento"
         },
         {
           prop: "interview_name",
           label: "Modelo",
           minWidth: 240,
-          sortable: false
+          sortable: false,
+          tour: "modelo-documento"
         },
         {
           prop: "school_name",
           label: "Escola",
           minWidth: 140,
-          sortable: false
+          sortable: false,
+          tour: "escola-documento"
         },
         {
           prop: "status",
           label: "Status",
           minWidth: 120,
-          sortable: false
+          sortable: false,
+          tour: "status-documento"
         },
         {
           prop: "altered_date",
           label: "Alteração",
           minWidth: 100,
-          sortable: false
+          sortable: false,
+          tour: "alteracao-documento"
         },
       ],
       selects: {
@@ -311,7 +307,7 @@ export default {
           header: {
             title: "Arquivo",
           },
-          content: `No arquivo você acessa e pesquisa todos os documentos já gerados por sua escola`,
+          content: `No arquivo você acessa e pesquisa todos os documentos já gerados por sua escola. Continue o tour para conhecer os filtros que você pode utilizar. Você pode usar uma combinação de vários filtros. Após definir os filtros, clique no botão buscar. Se quiser limpar os filtros definidos e começar tudo de novo, clique em limnpar.`,
           params: {
             placement: "right",
             enableScrolling: false
@@ -319,43 +315,142 @@ export default {
         },
         //Aqui tivemos que usar o target como classe, pq so conseguimos passar para a coluna (que e outro componente) a classe
         {
-          target: ".nome-entrevista",
-          content: `Esse é o nome pelo qual o tipo de documento ou contrato é identificado na plataforma. Sempre use esse nome ao se referir ao documento. A busca procura por palavras no nome.`,
+          target: ".filtro-data",
+          content: `Aqui você filtra por data de criação do documento. Você pode selecionar um período clicando em duas datas distintas ou apenas um dia, clicando duas vezes no mesmo dia. Sempre que definir um filtro, você pode clicar em buscar para recuperar os documentos de acordo com os critérios informados.`,
           params: {
             placement: "bottom",
             enableScrolling: false
           }
         },
         {
-          target: ".descricao-entrevista",
-          content: `Aqui você encontra informações úteis sobre quando e como usar o documento. A pesquisa desta página também procura por palavras na descrição. `,
+          target: ".filtro-modelo",
+          content: `Você pode filtrar por um ou vários modelos de documentos ao mesmo tempo. Lembre-se que os filtros são cumulativos, ou seja, você pode filtrar por data E modelo E escola E status ao mesmo tempo.`,
           params: {
             placement: "bottom",
             enableScrolling: false
           }
         },
         {
-          target: ".versao-entrevista",
-          content: `Estamos sempre trabalhando em atualizações dos documentos em virtude de novas leis e de melhores práticas jurídicas e de gestão.`,
+          target: ".filtro-escola",
+          content: `Você pode filtrar por uma ou mais escolas ao mesmo tempo. Lembre-se que sempre que houver alteração dos filtros você deve clicar em buscar para aplicá-los.`,
           params: {
             placement: "bottom",
             enableScrolling: false
           }
         },
         {
-          target: ".disponibilizacao-entrevista",
-          content: `Essa é a data na qual a versão do documento foi disponibilizada para uso na plataforma.`,
+          target: ".filtro-status",
+          content: `Filtra os documentos por status. O primeiro status do documento é "criado". Depois disso, pode ser enviado para o GED, enviado por e-mail ou ainda para assinatura eletrônica.`,
           params: {
             placement: "bottom",
             enableScrolling: false
           }
         },
+
         {
-          target: ".edit",
-          content: `Clique nesse botão para criar o documento.`,
+          target: ".paginacao",
+          content: `Defina quantos documentos você quer exibir ao mesmo tempo na página. No rodapé da página você consegue ver o número de documentos recuperados de acordo com os critérios de filtro e navegar entre as páginas.`,
+          params: {
+            placement: "bottom",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".total-documentos",
+          content: `Aqui você vê quantos documentos foram recuperados de acordo com os filtros que você definiu.`,
           params: {
             placement: "top",
-            highlight: false,
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".pagination-no-border",
+          content: `Estes números e setas permitem navegar entre as páginas de documentos recuperados.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".botao-buscar",
+          content: `Após definir os filtros, clique nesse botão para aplicá-los e recuperar os documentos de acordo com os critérios fornecidos. Se não tiver informado nenhum filtro, todos os documentos serão recuperdados.`,
+          params: {
+            placement: "left",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".botao-limpar",
+          content: `Esse botão limpa todos os filtros informados e busca todos os documentos.`,
+          params: {
+            placement: "bottom",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".criacao-documento",
+          content: `Essa é a data na qual o documento foi criado na plataforma.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".nome-documento",
+          content: `Essa é o nome do arquivo do documento criado.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".modelo-documento",
+          content: `Esse é o modelo do documento criado.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".escola-documento",
+          content: `Nome da escola que consta do documento gerado.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".status-documento",
+          content: `Status atual do documento.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".alteracao-documento",
+          content: `Data da última alteração de status do documento.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+
+        {
+          target: ".edit",
+          content: `Clique neste botão para ver os detalhes e baixar o documento.`,
+          params: {
+            placement: "left",
             enableScrolling: false
           }
         },
