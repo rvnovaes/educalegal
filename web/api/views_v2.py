@@ -5,13 +5,6 @@ import pytz
 import pandas as pd
 
 from dateutil.relativedelta import relativedelta
-from django.utils import timezone
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
-from django.http import FileResponse
-from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -36,6 +29,14 @@ from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
 from validator_collection import checkers
+
+from django.http import JsonResponse
+from django.utils import timezone
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.http import FileResponse
+from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 
 from api.third_party.mayan_client import MayanClient
 from document.models import Document, DocumentFileKind, BulkDocumentKind
@@ -319,13 +320,12 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 raise ValidationError(message)
         else:
             request.data["tenant"] = tenant_id
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
+
+        status_code, message = self.verify_ged_settings()
+        if status_code != status.HTTP_200_OK:
+            return JsonResponse({"message": message}, status=status_code)
+        else:
+            return super(DocumentViewSet, self).create(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
         """
@@ -414,6 +414,57 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 message = "Somente usuários administradores podem excluir documentos."
                 logger.info(message)
                 raise PermissionDenied(message)
+
+    def verify_ged_settings(self):
+        try:
+            tenant_id = self.request.data['tenant']
+            tenant = Tenant.objects.get(pk=tenant_id)
+        except Tenant.DoesNotExist:
+            message = 'A instância com ID = {} não foi encontrado.'.format(tenant_id)
+            return status.HTTP_404_NOT_FOUND, message
+        except Exception as e:
+            message = str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return status.HTTP_400_BAD_REQUEST, message
+        else:
+            if tenant.has_ged():
+                mc = MayanClient(tenant.tenantgeddata.url, tenant.tenantgeddata.token)
+
+                try:
+                    interview_id = self.request.data['interview']
+                    interview = Interview.objects.get(pk=interview_id)
+                except Interview.DoesNotExist:
+                    message = 'A entrevista com ID = {} não foi encontrada.'.format({interview_id})
+                    return status.HTTP_404_NOT_FOUND, message
+                except Exception as e:
+                    message = str(type(e).__name__) + " : " + str(e)
+                    logger.error(message)
+                    return status.HTTP_400_BAD_REQUEST, message
+
+                document_type_id = interview.document_type_id
+
+                # verifica se existe no ged o tipo de documento da entrevista selecionada
+                try:
+                    document_type_data = mc.document_type_read(document_type_id)
+                except Exception as e:
+                    message = str(type(e).__name__) + " : " + str(e)
+                    logger.error(message)
+                    return status.HTTP_400_BAD_REQUEST, message
+                else:
+                    if 'detail' in document_type_data:
+                        if document_type_data['detail'] == 'Invalid token.':
+                            message = 'O token do usuário do GED está inválido ou não existe.'
+                            return status.HTTP_404_NOT_FOUND, message
+
+                        # json_encode($response, JSON_UNESCAPED_UNICODE);
+                        if (document_type_data['detail'] == 'Not found.') or \
+                                (document_type_data['detail'] == 'N\u00e3o encontrado.'):
+                            message = 'Não existe o tipo de documento com ID = {} cadastrado no GED.'.format(
+                                document_type_id)
+
+                            return status.HTTP_404_NOT_FOUND, message
+
+        return status.HTTP_200_OK, 'Configuração do GED OK'
 
 
 def validate_tenant_plan_ged(tenant):
@@ -911,6 +962,7 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
             message = "O usuário não tem autorização para acessar estes dados."
             logger.info(message)
             raise PermissionDenied(message)
+
 
 class UserView(APIView):
     def get(self, request):

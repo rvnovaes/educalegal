@@ -39,6 +39,7 @@
 <script>
 import {Table, TableColumn} from "element-ui";
 import interviewSearchMixin from "@/components/tables/PaginatedTables/interviewSearchMixin";
+import Swal from "sweetalert2";
 
 
 export default {
@@ -107,13 +108,26 @@ export default {
         tenant: urlParams.get("tid"),
         interview: urlParams.get("intid")
       };
-      const res = await this.$axios.post("/v2/documents/", payload);
-      console.log(res);
-      if (res.status === 201) {
-        const doc_uuid = res.data.doc_uuid;
-        const destination_link = row.interview_link  + "&doc_uuid=" + doc_uuid;
-        let win = window.open(destination_link, "_blank");
-        win.focus();
+      try {
+        const res = await this.$axios.post("/v2/documents/", payload);
+        console.log(res);
+        if (res.status === 201) {
+          const doc_uuid = res.data.doc_uuid;
+          const destination_link = row.interview_link  + "&doc_uuid=" + doc_uuid;
+          let win = window.open(destination_link, "_blank");
+          win.focus();
+        }
+      }
+      catch (error){
+        await Swal.fire({
+          title: error.response.data['message'],
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
       }
     },
   }
