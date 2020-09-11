@@ -287,18 +287,18 @@ def save_in_ged(data, absolute_path, tenant):
     # se o cliente nao tem ged, nao envia para o ged
     mc = MayanClient(tenant.tenantgeddata.url, tenant.tenantgeddata.token)
 
-    # salva o pdf no ged
+    # salva o arquivo no ged
     try:
         status_code, response, ged_id = mc.document_create(data, absolute_path)
     except Exception as e:
-        message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(e)
-        logging.exception(message)
+        message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(e)
+        logging.error(message)
 
         return 0, message, 0
     else:
         if status_code != 201:
-            message = 'Não foi possível inserir o pdf no GED. Erro: ' + str(status_code) + ' - ' + response
-            logging.exception(message)
+            message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + response
+            logging.error(message)
 
             return status_code, response, 0
         else:
@@ -306,7 +306,7 @@ def save_in_ged(data, absolute_path, tenant):
                 ged_document_data = mc.document_read(ged_id)
             except Exception as e:
                 message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
-                logging.exception(message)
+                logging.error(message)
                 return 0, message, 0
 
             return status_code, ged_document_data, ged_id
