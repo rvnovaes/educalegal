@@ -289,30 +289,22 @@ def save_in_ged(data, absolute_path, tenant):
 
     # salva o arquivo no ged
     try:
-        logging.info('passou_aqui_paim_1')
         status_code, response, ged_id = mc.document_create(data, absolute_path)
     except Exception as e:
-        logging.info('passou_aqui_paim_2')
-        logging.info(e)
         message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(e)
         logging.error(message)
 
         return 0, message, 0
     else:
         if status_code != 201:
-            logging.info('passou_aqui_paim_3')
-            logging.info(response)
             message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + response
             logging.error(message)
 
             return status_code, response, 0
         else:
-            logging.info('passou_aqui_paim_4')
             try:
                 ged_document_data = mc.document_read(ged_id)
             except Exception as e:
-                logging.info('passou_aqui_paim_5')
-                logging.info(e)
                 message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
                 logging.error(message)
                 return 0, message, 0
@@ -692,7 +684,6 @@ def save_document_file(document, data, params):
             if status_code == 201:
                 save_document_data(related_document, has_ged, ged_data, relative_file_path, document)
             else:
-                logging.info('passou_aqui_paim_10')
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
