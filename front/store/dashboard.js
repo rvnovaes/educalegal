@@ -41,7 +41,6 @@ export const actions = {
   async fetchDashBoardData({commit}) {
     commit("toggleLoading", true);
     const res = await this.$axios.get("/v2/dashboard/");
-    console.log(res)
     if (res.status === 200) {
       commit("setDashboardData", res.data);
       commit("toggleLoading", false);

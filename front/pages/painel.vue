@@ -94,91 +94,29 @@
             </template>
           </stats-card>
         </div>
-
       </div>
     </base-header>
-    <v-tour name="painelTour" :steps="steps" :options="tourOptions"></v-tour>
+    <v-tour name="pageTour" :steps="painelSteps" :options="tourOptions"></v-tour>
   </div>
 </template>
 <script>
 import RouteBreadCrumb from "@/components/argon-core/Breadcrumb/RouteBreadcrumb";
 import StatsCard from "@/components/argon-core/Cards/StatsCard";
 import Card from "@/components/argon-core/Cards/Card";
+import schoolAlertMixin from "@/components/pages/schoolAlertMixin"
+import tourStepsMixin from "@/components/tourSteps/tourStepsMixin"
 
 export default {
   layout: "DashboardLayout",
+  mixins: [schoolAlertMixin, tourStepsMixin],
   components: {
     RouteBreadCrumb,
     StatsCard,
     Card
   },
-  data() {
-    return {
-      tourOptions: {
-        useKeyboardNavigation: true,
-        labels: {
-          buttonSkip: "Dispensar",
-          buttonPrevious: "Anterior",
-          buttonNext: "Próximo",
-          buttonStop: "Fim"
-        }
-      },
-      steps: [
-        {
-          target: ".painel",
-          header: {
-            title: "Painel",
-          },
-          params: {
-            placement: "right"
-          },
-          content: `No painel você acessa informações gerais sobre o uso do Educa Legal.`
-        },
-        {
-          target: ".documentos-gerados",
-          header: {
-            title: "Documentos gerados",
-          },
-          params: {
-            placement: "right"
-          },
-          content: `Aqui você vê quantos documentos sua escola criou no mês.`
-        },
-        {
-          target: ".documentos-gerados-mes-anterior",
-          content: `Você compara também com os documentos gerados no mês anterior.`
-        },
-        {
-          target: ".documentos-andamento",
-          header: {
-            title: "Documentos em andamento",
-          },
-          content: `São os documentos que ainda estão sendo preenchidos.`
-        },
-        {
-          target: ".assinaturas",
-          header: {
-            title: "Assinaturas eletrônicas",
-          },
-          content: `Aqui você vê quantos documentos sua escola enviou para assinatura eletrônica.`
-        },
-        {
-          target: ".assinaturas-andamento",
-          header: {
-            title: "Assinaturas em andamento",
-          },
-          content: `Representam os documentos que foram enviados para os destinatários mais ainda não contam com a assinatura de todos. `
-        }
-      ]
-    };
-  },
+  name: "painel",
   mounted() {
     this.$store.dispatch("dashboard/fetchDashBoardData");
-  },
-  methods:{
-    tour (){
-      this.$tours["painelTour"].start();
-    }
   },
   computed: {
     totalDocsCount() {
