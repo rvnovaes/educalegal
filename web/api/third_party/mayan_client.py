@@ -28,7 +28,7 @@ class MayanClient:
             )
         except Exception as e:
             message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
-            logging.exception(message)
+            logging.error(message)
             return 0, message, 0
         else:
             if 'id' in response.json():
