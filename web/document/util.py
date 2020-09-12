@@ -249,17 +249,6 @@ def _create_address_obj(document, person_list_name, index):
     document[person_list_name]["gathered"] = True
 
 
-# @login_required
-# def redirect_send_email(request, doc_uuid):
-#     status_code, message = send_email(doc_uuid)
-#
-#     if status_code == 202:
-#         messages.success(request, message)
-#     else:
-#         messages.error(request, message)
-#     return redirect('document:document-detail', doc_uuid)
-
-
 def send_email(doc_uuid):
     try:
         document = Document.objects.get(doc_uuid=doc_uuid)
@@ -319,17 +308,6 @@ def send_email(doc_uuid):
             return 404, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
     return status_code, message
-
-
-# @login_required
-# def redirect_send_to_esignature(request, doc_uuid):
-#     status_code, message = send_to_esignature(doc_uuid)
-#
-#     if status_code == 202:
-#         messages.success(request, message)
-#     else:
-#         messages.error(request, message)
-#     return redirect('document:document-detail', doc_uuid)
 
 
 def send_to_esignature(doc_uuid):
