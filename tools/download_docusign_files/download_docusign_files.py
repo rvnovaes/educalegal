@@ -1,7 +1,11 @@
+import logging
+import os
 import pandas as pd
+import urllib.request
+
+from pathlib import Path
 
 from api.third_party.docusign_client import DocuSignClient
-from .util import save_file_from_url
 
 
 # ------- ATENÇÃO - DADOS DE PRODUCAO DA BAHEMA -------
@@ -35,31 +39,33 @@ ujq3AoGASzqMNbXVH1k96HDYbvvEVWoDYDAIsSNHAjfEM8cUF0MrXfKT01f6pDNc
 NUib6dhVqcVsbB3DSXX9nqsqjlAlUiKOUF9WedRSTTnuTw+mYyI=
 -----END RSA PRIVATE KEY-----'''
 
-filename = 'bahema_docusign.csv'
-envelope_id = 'b01b1b76-8b9e-47bb-806a-7cc32be98d4d'
-# envelope_list = pd.read_csv(filename).to_dict(orient='records')
 
-dsc = DocuSignClient(client_id, impersonated_user, False, private_key)
+def download_docusign_files():
+    filename = 'bahema_docusign.csv'
+    envelope_id = 'b01b1b76-8b9e-47bb-806a-7cc32be98d4d'
+    # envelope_list = pd.read_csv(filename).to_dict(orient='records')
 
-log_file = open("log.txt", "w")
+    dsc = DocuSignClient(client_id, impersonated_user, False, private_key)
 
-status_code, response = dsc.list_envelope_attachments(envelope_id)
+    log_file = open("log.txt", "w")
 
-if status_code == 200:
-    attachments = response['attachments']
-    for attachment in attachments:
-        status_code, response = dsc.get_envelope_attachment(envelope_id, attachment['attachmentId'])
+    status_code, response = dsc.list_envelope_documents(envelope_id)
 
-        if status_code == 200:
-            absolute_path = save_file_from_url(response['url'], response['filename'])
-        else:
-            # imprime log com arquivos nao baixados
-            log_file.write(envelope_id)
-else:
-    # imprime log com arquivos nao baixados
-    log_file.write(envelope_id)
+    if status_code == 200:
+        documents = response['envelopeDocuments']
+        for document in documents:
+            status_code, url = dsc.get_envelope_document(envelope_id, document['documentId'])
 
-log_file.close()
+            if status_code == 200:
+                absolute_path = save_file_from_url(url, document['name'])
+            else:
+                # imprime log com arquivos nao baixados
+                log_file.write(envelope_id)
+    else:
+        # imprime log com arquivos nao baixados
+        log_file.write(envelope_id)
+
+    log_file.close()
 
 # for envelope in envelope_list:
 #     status_code, response = dsc.list_envelope_attachments(envelope['envelope_id'])
@@ -68,3 +74,29 @@ log_file.close()
 #         attachments = response['attachments']
 #         for attachment in attachments:
 #             status_code, response = dsc.get_envelope_attachment(envelope['envelope_id'], attachment['attachmentId'])
+
+
+def save_file_from_url(url, filename):
+    # salva o arquivo na pasta do projeto em .../docusign
+    current_path = os.path.dirname(__file__)
+
+    fullpath = os.path.join(current_path, 'docusign')
+
+    # cria diretorio e subdiretorio, caso nao exista
+    Path(fullpath).mkdir(parents=True, exist_ok=True)
+
+    absolute_path = os.path.join(fullpath, filename)
+
+    # baixa o arquivo no diretorio criado
+    try:
+        urllib.request.urlretrieve(url, absolute_path)
+    except Exception as e:
+        message = 'Não foi possível salvar o arquivo no sistema de arquivos. Erro: ' + str(e)
+        logging.exception(message)
+        return message
+
+    return absolute_path
+
+
+if __name__ == "__main__":
+    download_docusign_files()

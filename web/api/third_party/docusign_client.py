@@ -74,8 +74,9 @@ class DocuSignClient:
             self.aud = "account.docusign.com"
             self.base_uri = "https://account.docusign.com"
 
-        self.get_token()
-        self.get_user_info()
+        # iasmini
+        # self.get_token()
+        # self.get_user_info()
 
         self.event_notification = {
             "url": webhook_url,
@@ -292,24 +293,28 @@ class DocuSignClient:
             logger.error(message)
             return 0, message
 
-    def list_envelope_attachments(self, envelope_id):
-        """Retorna a lista de anexos do envelope"""
+    def list_envelope_documents(self, envelope_id):
+        """Retorna a lista de documentos do envelope"""
+        self.get_token()
+        self.get_user_info()
         try:
-            envelope_attachments = requests.get(
-            self.extended_base_uri + "/envelopes/" + envelope_id + '/attachments', headers=self.authorization_header
+            envelope_documents = requests.get(
+                self.extended_base_uri + "/envelopes/" + envelope_id + '/documents', headers=self.authorization_header
             )
         except Exception as e:
             message = str(type(e).__name__) + " : " + str(e)
             logger.error(message)
             return 0, message
         else:
-            return envelope_attachments.status_code, envelope_attachments.json()
+            return envelope_documents.status_code, envelope_documents.json()
 
-    def get_envelope_attachment(self, envelope_id, attachment_id):
-        """Retorna a URL do anexo"""
+    def get_envelope_document(self, envelope_id, document_id):
+        """Retorna a URL do documento"""
+        self.get_token()
+        self.get_user_info()
         try:
-            envelope_attachment = requests.get(
-                self.extended_base_uri + "/envelopes/" + envelope_id + '/attachments/' + attachment_id,
+            envelope_document = requests.get(
+                self.extended_base_uri + "/envelopes/" + envelope_id + '/documents/' + document_id,
                 headers=self.authorization_header
             )
         except Exception as e:
@@ -317,10 +322,10 @@ class DocuSignClient:
             logger.error(message)
             return 0, message
         else:
-            if envelope_attachment.status_code == 200:
-                return envelope_attachment.status_code, envelope_attachment.url
+            if envelope_document.status_code == 200:
+                return envelope_document.status_code, envelope_document.url
             else:
-                return envelope_attachment.status_code, envelope_attachment.json()['message']
+                return envelope_document.status_code, envelope_document.json()['message']
 
 
 def make_document_base64(document_path):
