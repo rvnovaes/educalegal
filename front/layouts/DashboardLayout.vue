@@ -132,7 +132,9 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch("tenant/fetchTenantGedData", this.$auth.user.tenant);
+    if (this.$auth.user.tenan_use_ged){
+      this.$store.dispatch("tenant/fetchTenantGedData", this.$auth.user.tenant);
+    }
     this.initScrollbar();
   },
   computed:
