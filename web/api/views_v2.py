@@ -196,17 +196,15 @@ def create_tenant(request):
 
 # Document Views #######################################################################################################
 class DocumentViewSet(viewsets.ModelViewSet):
-    queryset = Document.objects.all()
     serializer_class = DocumentSerializer
 
     def get_queryset(self):
         user = self.request.user
         if not user.is_superuser:
             tenant = self.request.user.tenant
-            queryset = self.queryset.filter(tenant=tenant)
-            return queryset
+            return Document.objects.filter(tenant=tenant)
         else:
-            return self.queryset
+            return Document.objects.all()
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -226,10 +224,10 @@ class DocumentViewSet(viewsets.ModelViewSet):
         identifier = kwargs["identifier"]
         # Pode ser passada a id ou o doc_uuid.
         if checkers.is_integer(identifier, coerce_value=True):
-            instance = get_object_or_404(self.queryset, pk=identifier, tenant=tenant_id)
+            instance = get_object_or_404(self.get_queryset(), pk=identifier, tenant=tenant_id)
         elif checkers.is_uuid(identifier):
             instance = get_object_or_404(
-                self.queryset, doc_uuid=identifier, tenant=tenant_id
+                self.get_queryset(), doc_uuid=identifier, tenant=tenant_id
             )
         else:
             message = "O doc_uuid ou o id do documento não é um valor válido."
@@ -256,7 +254,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         )  # TODO parametro de onlyParent
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
-        queryset = self.queryset.filter(parent=None)
+        queryset = self.get_queryset().filter(parent=None)
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
