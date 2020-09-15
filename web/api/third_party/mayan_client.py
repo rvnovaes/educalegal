@@ -1,3 +1,4 @@
+import io
 import logging
 import requests
 import time
@@ -18,23 +19,30 @@ class MayanClient:
         )
         self.session.headers.update(headers)
 
-    def document_create(self, data, absolute_path):
-        # envia documento para o ged
-        file = open(absolute_path, mode="rb")
-        final_url = self.api_base_url + "/api/documents/"
+    def document_create(self, data, url):
         try:
-            response = self.session.post(
-                final_url, data=data, files={"file": file}
-            )
+            response = requests.get(url)
+            file = io.BytesIO(response.content)
         except Exception as e:
-            message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
+            message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
             logging.error(message)
-            return 0, message, 0
+            return 400, message, 0
         else:
-            if 'id' in response.json():
-                return response.status_code, response.json(), response.json()['id']
+            # envia documento para o ged
+            final_url = self.api_base_url + "/api/documents/"
+            try:
+                response = self.session.post(
+                    final_url, data=data, files={"file": file}
+                )
+            except Exception as e:
+                message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
+                logging.error(message)
+                return 400, message, 0
             else:
-                return response.status_code, response.json(), 0
+                if 'id' in response.json():
+                    return response.status_code, response.json(), response.json()['id']
+                else:
+                    return response.status_code, response.json(), 0
 
     # Este método foi escrito deste modo para retornar uma mensagem num formato que o Docassemble pode interpretar
     # Não deve ser usado com chamados puros de API, apenas no contexto do Docassemble
