@@ -92,23 +92,21 @@
       <!--  TODO Testar bloqueio de CORS para download em ambiente real. Em localhost ele bloqueia  -->
       <!-- pdf -->
       <base-button v-if="currentDocument.relative_file_path" @click="downloadDocument(currentDocument.relative_file_path,
-      currentDocument.name)" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
+      currentDocument.name, 'pdf')" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
       </base-button>
       <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
-      currentDocument.name)" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
+      currentDocument.name, 'pdf')" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
       </base-button>
 
       <!-- docx -->
-      <base-button v-if="currentDocument.relative_file_path" @click="downloadDocument(currentDocument.relative_file_path,
-      currentDocument.name)" type="primary"><i class="ni ni-cloud-download-95"></i>Word
-      </base-button>
-      <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
-      currentDocument.name)" type="primary"><i class="ni ni-cloud-download-95"></i>Word
+      <base-button v-if="currentDocument.docx_file" @click="downloadDocument(currentDocument.docx_file.url,
+      currentDocument.docx_file.name, 'docx')" type="primary"><i class="ni ni-cloud-download-95"></i>Word
       </base-button>
 
       <!-- assinatura eletronica -->
       <base-button v-if="currentDocument.submit_to_esignature == false" @click="back()" type="success"><i
-        class="ni ni-sound-wave"></i>Enviar para assinatura</base-button>
+        class="ni ni-sound-wave"></i>Enviar para assinatura
+      </base-button>
 
       <!-- email -->
       <base-button @click="back()" type="info"><i class="ni ni-email-83"></i>Enviar por e-mail</base-button>
@@ -152,10 +150,19 @@ export default {
         path: "/arquivo"
       });
     },
-    async downloadDocument(ged_link, documentName) {
+    async downloadDocument(fileURL, documentName, fileKind) {
+      console.log(fileURL)
+      console.log(documentName)
+      console.log(fileKind)
       try {
-        const res = await this.$axios.get(ged_link, {responseType: "blob"});
-        const blob = new Blob([res.data], {type: "application/pdf"});
+        const res = await this.$axios.get(fileURL, {responseType: "blob"});
+        let blob = undefined
+        if (fileKind === "pdf") {
+          blob = new Blob([res.data], {type: "application/pdf"});
+        } else {
+          blob = new Blob([res.data], {type: "application/msword"});
+        }
+        console.log(blob)
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = documentName;

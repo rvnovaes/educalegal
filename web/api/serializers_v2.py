@@ -108,7 +108,9 @@ class SignerSerializer(serializers.ModelSerializer):
 class DocumentDetailSerializer(serializers.ModelSerializer):
     interview_name = serializers.SerializerMethodField()
     school_name = serializers.SerializerMethodField()
+    docx_file = serializers.SerializerMethodField()
     signers = serializers.SerializerMethodField()
+
     envelope = EnvelopeSerializer()
 
     class Meta:
@@ -121,6 +123,14 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
 
     def get_school_name(self, obj):
         return obj.school.name if obj.school else ""
+
+    def get_docx_file(self, obj):
+        docx_file = obj.get_docx_file()
+        docx_file_data = {
+            "url": docx_file.relative_file_path.url if docx_file.relative_file_path else docx_file.ged_link,
+            "name": docx_file.name
+        }
+        return docx_file_data
 
     def get_signers(self, obj):
         try:
