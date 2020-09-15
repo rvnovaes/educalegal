@@ -206,11 +206,10 @@ flatpickr.setDefaults({
 import flatPickr from "vue-flatpickr-component";
 import "flatpickr/dist/flatpickr.css";
 import HourGlassSpinner from "@/components/widgets/HourGlassSpinner";
-import schoolAlertMixin from "@/components/pages/schoolAlertMixin"
 import tourStepsMixin from "@/components/tourSteps/tourStepsMixin";
 
 export default {
-  mixins: [documentPaginationMixin, schoolAlertMixin, tourStepsMixin],
+  mixins: [documentPaginationMixin, tourStepsMixin],
   layout: "DashboardLayout",
   components: {
     HourGlassSpinner,
@@ -222,6 +221,9 @@ export default {
     [TableColumn.name]: TableColumn
   },
   name: "documents-table",
+  mounted() {
+    this.$store.dispatch("schools/fetchAllSchools");
+  },
   data() {
     return {
       propsToSearch: ["name", "interview_name", "school_name", "status"],

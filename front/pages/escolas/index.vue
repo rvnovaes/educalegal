@@ -26,17 +26,19 @@
 <script>
 import EscolasTable from "~/components/tables/RegularTables/EscolasTable";
 import {Table, TableColumn, Option} from "element-ui";
-import schoolAlertMixin from "@/components/pages/schoolAlertMixin";
 import tourStepsMixin from "@/components/tourSteps/tourStepsMixin";
 
 export default {
   layout: "DashboardLayout",
-  mixins: [schoolAlertMixin, tourStepsMixin],
+  mixins: [tourStepsMixin],
   components: {
     EscolasTable,
     [Option.name]: Option,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn
+  },
+  mounted() {
+    this.$store.dispatch("schools/fetchAllSchools");
   },
   methods: {
     handleNew() {

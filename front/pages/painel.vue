@@ -103,12 +103,11 @@
 import RouteBreadCrumb from "@/components/argon-core/Breadcrumb/RouteBreadcrumb";
 import StatsCard from "@/components/argon-core/Cards/StatsCard";
 import Card from "@/components/argon-core/Cards/Card";
-import schoolAlertMixin from "@/components/pages/schoolAlertMixin"
-import tourStepsMixin from "@/components/tourSteps/tourStepsMixin"
+import tourStepsMixin from "@/components/tourSteps/tourStepsMixin";
 
 export default {
   layout: "DashboardLayout",
-  mixins: [schoolAlertMixin, tourStepsMixin],
+  mixins: [tourStepsMixin],
   components: {
     RouteBreadCrumb,
     StatsCard,
@@ -117,6 +116,7 @@ export default {
   name: "painel",
   mounted() {
     this.$store.dispatch("dashboard/fetchDashBoardData");
+    this.$store.dispatch("schools/fetchAllSchools");
   },
   computed: {
     totalDocsCount() {

@@ -285,10 +285,6 @@ export default {
           }
         },
       ],
-
-
-
-
       // Escolas - / escolas/index
       escolaSteps: [
         {
@@ -296,9 +292,68 @@ export default {
           header: {
             title: "Escolas",
           },
-          content: `Todos os documentos e contratos gerados se referem a uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui.`,
+          content: `Todos os documentos e contratos gerados se referem a uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui e são automaticamente usados no preenchimento dos contratos.`,
           params: {
             placement: "right",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".botao-editar-escola",
+          content: `Aqui você pode editar os dados de uma escola.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".botao-apagar-escola",
+          content: `Você pode apagar uma escola apenas se ainda não tiver criado nenhum documento para ela.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".botao-nova-escola",
+          header: {
+            title: "Nova escola",
+          },
+          content: `Todos os documentos e contratos gerados se referem a uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui.`,
+          params: {
+            placement: "left",
+            enableScrolling: false
+          }
+        },
+      ],
+
+
+      // Escolas Form - /escolas/criar
+      escolaDetalhesSteps: [
+        {
+          target: ".criar-escolas",
+          header: {
+            title: "Criar nova escola",
+          },
+          content: `Todos os documentos e contratos gerados se referem a uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui e são automaticamente usados no preenchimento dos contratos.`,
+          params: {
+            placement: "right",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".botao-editar-escola",
+          content: `Aqui você pode editar os dados de uma escola.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".botao-apagar-escola",
+          content: `Você pode apagar uma escola apenas se ainda não tiver criado nenhum documento para ela.`,
+          params: {
+            placement: "top",
             enableScrolling: false
           }
         },

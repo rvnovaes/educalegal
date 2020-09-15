@@ -30,18 +30,20 @@
 import {Table, TableColumn, Option} from "element-ui";
 import EntrevistasTable from "@/components/tables/RegularTables/EntrevistasTable";
 import HourGlassSpinner from "@/components/widgets/HourGlassSpinner";
-import schoolAlertMixin from "@/components/pages/schoolAlertMixin"
 import tourStepsMixin from "@/components/tourSteps/tourStepsMixin";
 
 export default {
   layout: "DashboardLayout",
-  mixins: [schoolAlertMixin, tourStepsMixin],
+  mixins: [tourStepsMixin],
   components: {
     EntrevistasTable,
     HourGlassSpinner,
     [Option.name]: Option,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn
+  },
+  mounted() {
+    this.$store.dispatch("schools/fetchAllSchools");
   },
   computed: {
     loading() {
