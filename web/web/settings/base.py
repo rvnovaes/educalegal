@@ -261,12 +261,11 @@ AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_S3_OBJECT_PARAMETERS = {
     "CacheControl": "max-age=86400",
 }
-AWS_DEFAULT_ACL = "public-read"
+AWS_DEFAULT_ACL = None
 STATICFILES_STORAGE = 'web.storage_backends.StaticStorage'
-# STATIC_ROOT = "static/"
-# MEDIA_ROOT = "media/"
 DEFAULT_FILE_STORAGE = 'web.storage_backends.MediaStorage'
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 # Adding a new Currency
 BRL = moneyed.add_currency(

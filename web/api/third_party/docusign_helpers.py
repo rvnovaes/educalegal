@@ -222,7 +222,8 @@ def docusign_webhook_listener(request):
                     for pdf in envelope_data["pdf_documents"]:
                         try:
                             post_data["label"] = pdf["filename"]
-                            status_code, ged_data, ged_id = save_in_ged(post_data, pdf["full_filename"], document.tenant)
+                            status_code, ged_data, ged_id = save_in_ged(post_data, '', pdf["full_filename"],
+                                                                        document.tenant)
                         except Exception as e:
                             message = str(e)
                             logging.exception(message)
@@ -243,7 +244,8 @@ def docusign_webhook_listener(request):
                                     bulk_generation=document.bulk_generation,
                                     file_kind=pdf["file_kind"],
                                 )
-                                save_document_data(related_document, has_ged, ged_data, relative_file_path, document)
+                                save_document_data(related_document, '', pdf["full_filename"], has_ged, ged_data,
+                                                   relative_file_path, document)
                             else:
                                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                     str(status_code), ged_data)
@@ -265,7 +267,8 @@ def docusign_webhook_listener(request):
                             bulk_generation=document.bulk_generation,
                             file_kind=pdf["file_kind"],
                         )
-                        save_document_data(related_document, has_ged, None, relative_file_path, document)
+                        save_document_data(related_document, '', pdf["full_filename"], has_ged, None,
+                                           relative_file_path, document)
             except Exception as e:
                 message = str(e)
                 logger.exception(message)

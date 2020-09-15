@@ -35,7 +35,6 @@ AWS_STATIC_LOCATION = "static"
 STATIC_URL = "{}/{}/".format(AWS_S3_ENDPOINT_URL, AWS_STATIC_LOCATION)
 AWS_MEDIA_LOCATION = "media"
 MEDIA_URL = "{}/{}/".format(AWS_S3_ENDPOINT_URL, AWS_MEDIA_LOCATION)
-# MEDIA_ROOT = "media/"
 
 # MongoDB
 MONGO_DB = "educalegal"

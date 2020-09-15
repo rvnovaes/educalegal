@@ -19,30 +19,52 @@ class MayanClient:
         )
         self.session.headers.update(headers)
 
-    def document_create(self, data, url):
+    def document_create(self, data, url, absolute_path):
+        """Salva o arquivo no GED
+        :param data: dados do arquivo
+        :type value: dict
+        :param url: URL da qual o arquivo será baixado
+        :type value: str
+        :param absolute_path: caminho no disco onde o arquivo foi salvo. É usado quando a URL não foi fornecida.
+        :type value: str
+        :return: status_code
+        :rtype: int
+        :return: response.json()
+        :rtype: dict
+        :return: id do documento no GED
+        :rtype: int
+        """
+        if url:
+            try:
+                response = requests.get(url)
+                file = io.BytesIO(response.content)
+            except Exception as e:
+                message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
+                logging.error(message)
+                return 400, message, 0
+        else:
+            try:
+                file = open(absolute_path, mode="rb")
+            except Exception as e:
+                message = 'Erro ao abrir o arquivo. Erro: {e}'.format(e=e)
+                logging.error(message)
+                return 400, message, 0
+
+        # envia documento para o ged
+        final_url = self.api_base_url + "/api/documents/"
         try:
-            response = requests.get(url)
-            file = io.BytesIO(response.content)
+            response = self.session.post(
+                final_url, data=data, files={"file": file}
+            )
         except Exception as e:
-            message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
+            message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
             logging.error(message)
             return 400, message, 0
         else:
-            # envia documento para o ged
-            final_url = self.api_base_url + "/api/documents/"
-            try:
-                response = self.session.post(
-                    final_url, data=data, files={"file": file}
-                )
-            except Exception as e:
-                message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
-                logging.error(message)
-                return 400, message, 0
+            if 'id' in response.json():
+                return response.status_code, response.json(), response.json()['id']
             else:
-                if 'id' in response.json():
-                    return response.status_code, response.json(), response.json()['id']
-                else:
-                    return response.status_code, response.json(), 0
+                return response.status_code, response.json(), 0
 
     # Este método foi escrito deste modo para retornar uma mensagem num formato que o Docassemble pode interpretar
     # Não deve ser usado com chamados puros de API, apenas no contexto do Docassemble

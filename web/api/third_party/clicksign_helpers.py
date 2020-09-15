@@ -2,12 +2,12 @@ import hashlib
 import hmac
 import json
 import logging
-import os
-import urllib.request
 
-from pathlib import Path
+from os.path import basename
+from urllib.parse import urlsplit
+from urllib.request import urlretrieve, urlcleanup
 
-from django.conf import settings
+from django.core.files import File
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -16,7 +16,7 @@ from api.views_v2 import save_in_ged
 from document.models import Document, Envelope, Signer, DocumentStatus, DocumentFileKind
 from document.views import save_document_data
 from interview.models import Interview
-from tenant.models import Tenant, TenantGedData, ESignatureAppProvider
+from tenant.models import Tenant, ESignatureAppProvider
 
 
 envelope_statuses = {
@@ -154,11 +154,9 @@ def webhook_listener(request):
                                  'ID do ocumento {doc_id}'.format(event=data['event']['name'], doc_id=document.id))
                     return HttpResponse(status=400, reason='Falta a chave signed_file_url')
 
-                relative_path = "clicksign/" + str(envelope_number)
-                fullpath, filename = pdf_file_saver(
-                    data['document']['downloads']['signed_file_url'], envelope_number, document.name)
-
-                relative_file_path = os.path.join(relative_path, filename)
+                relative_path = 'documents/' + tenant.name + '/' + document.name[:15] + '/'
+                document_url = data['document']['downloads']['signed_file_url']
+                save_file_in_cloud(document_url, relative_path, document)
 
                 has_ged = tenant.has_ged()
                 if has_ged:
@@ -175,7 +173,7 @@ def webhook_listener(request):
                     try:
                         # salva documento no ged
                         post_data["label"] = filename
-                        status_code, ged_data, ged_id = save_in_ged(post_data, fullpath, document.tenant)
+                        status_code, ged_data, ged_id = save_in_ged(post_data, document_url, '', document.tenant)
                     except Exception as e:
                         message = str(e)
                         logging.exception(message)
@@ -196,8 +194,8 @@ def webhook_listener(request):
                                 bulk_generation=document.bulk_generation,
                                 file_kind=DocumentFileKind.PDF_SIGNED.value,
                             )
-
-                            save_document_data(related_document, has_ged, ged_data, relative_path, document)
+                            save_document_data(related_document, document_url, '', relative_path, has_ged, ged_data,
+                                               document)
                         else:
                             message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                 str(status_code), ged_data)
@@ -215,7 +213,7 @@ def webhook_listener(request):
                         bulk_generation=document.bulk_generation,
                         file_kind=DocumentFileKind.PDF_SIGNED.value,
                     )
-                    save_document_data(related_document, has_ged, None, relative_path, document)
+                    save_document_data(related_document, document_url, '', relative_path, has_ged, None, document)
 
             # atualiza o status do documento
             document.status = document_status
@@ -302,18 +300,15 @@ def webhook_listener(request):
     return HttpResponse(status=200, reason="Success!")
 
 
-def pdf_file_saver(url, relative_path, document_name):
-    # salva o pdf em media/clicksign
-    envelope_dir = os.path.join(settings.BASE_DIR, "media", relative_path)
-    # cria diretorio e subdiretorio, caso nao exista
-    Path(envelope_dir).mkdir(parents=True, exist_ok=True)
-
-    # variável para salvar o nome dos pdfs no signer
-    filename_no_extension = str(document_name.split(".pdf")[0])
-    filename = filename_no_extension + '-assinado.pdf'
-    fullpath = os.path.join(envelope_dir, filename)
-
-    # baixa o pdf no diretorio criado
-    urllib.request.urlretrieve(url, fullpath)
-
-    return fullpath, filename
+def save_file_in_cloud(url, relative_path, document):
+    try:
+        # salva como arquivo temporario
+        temp_file, _ = urlretrieve(url)
+        # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
+        document.file.save(relative_path + basename(urlsplit(url).path), File(open(temp_file, 'rb')))
+    except Exception as e:
+        message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
+        logging.error(message)
+    finally:
+        # apaga arquivo temporario
+        urlcleanup()
