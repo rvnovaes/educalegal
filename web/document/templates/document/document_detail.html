@@ -47,7 +47,7 @@
                     <a target="_blank" href="{{ docx_file.ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
                 {% endif %}
             {% endif %}
-            {% if not document.submit_to_esignature and document.tenant.plan.use_esignature %}
+            {% if not document.submit_to_esignature and document.tenant.plan.use_esignature and document.tenant.esignature_app %}
                 <a href="{% url 'document:send-to-esignature' document.doc_uuid %}"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>
             {% endif %}
             <a href="{% url 'document:send-email' document.doc_uuid %}"><button type="button" class="btn btn-info">Enviar por email</button></a>

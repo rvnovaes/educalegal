@@ -1,3 +1,5 @@
+# install tkinter
+# sudo apt-get install python3-tk
 import requests
 import configparser
 import PySimpleGUI as sg
