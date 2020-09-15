@@ -130,8 +130,7 @@ class Document(TenantAwareModel):
         help_text="UUID do documento. UUID = Universally Unique ID.",
         verbose_name="UUID",
     )
-    relative_file_path = models.FileField(max_length=255, blank=True, verbose_name="Caminho relativo do arquivo")
-    file = models.FileField(storage=MediaStorage(), blank=True)
+    cloud_file = models.FileField(max_length=255, storage=MediaStorage(), blank=True, verbose_name='Arquivo na nuvem')
     description = models.TextField(default="", blank=True, verbose_name="Descrição")
     interview = models.ForeignKey(
         Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"

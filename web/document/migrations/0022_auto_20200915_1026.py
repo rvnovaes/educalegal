@@ -13,8 +13,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='document',
-            name='file',
-            field=models.FileField(blank=True, storage=web.storage_backends.MediaStorage(), upload_to=''),
+            name='cloud_file',
+            field=models.FileField(blank=True, max_length=255, storage=web.storage_backends.MediaStorage(), upload_to='', verbose_name='Arquivo na nuvem'),
+        ),
+        migrations.RemoveField(
+            model_name='document',
+            name='relative_file_path',
         ),
         migrations.AlterField(
             model_name='document',

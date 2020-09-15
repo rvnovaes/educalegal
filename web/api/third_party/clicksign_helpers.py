@@ -305,7 +305,7 @@ def save_file_in_cloud(url, relative_path, document):
         # salva como arquivo temporario
         temp_file, _ = urlretrieve(url)
         # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
-        document.file.save(relative_path + basename(urlsplit(url).path), File(open(temp_file, 'rb')))
+        document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(temp_file, 'rb')))
     except Exception as e:
         message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
         logging.error(message)
