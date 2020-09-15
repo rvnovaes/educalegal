@@ -27,9 +27,17 @@ DATABASES = {
 }
 # No password validation
 AUTH_PASSWORD_VALIDATORS = []
-# Static Files
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+# Static e media files
+# https://www.digitalocean.com/community/questions/getting-signaturedoesnotmatch-with-digitalocean-spaces
+AWS_STORAGE_BUCKET_NAME = "educalegal-test"
+AWS_S3_ENDPOINT_URL = "https://educalegal-test.sfo2.digitaloceanspaces.com/"
+AWS_STATIC_LOCATION = "static"
+STATIC_URL = "{}/{}/".format(AWS_S3_ENDPOINT_URL, AWS_STATIC_LOCATION)
+# STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+AWS_MEDIA_LOCATION = "media"
+MEDIA_URL = "{}/{}/".format(AWS_S3_ENDPOINT_URL, AWS_MEDIA_LOCATION)
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 # MongoDB
 MONGO_DB = "educalegal"

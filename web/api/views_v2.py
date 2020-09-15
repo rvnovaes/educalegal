@@ -45,7 +45,7 @@ from document.views import validate_data_mongo, generate_document_from_mongo
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
-from util.util import save_file_from_url
+from util.util import save_file_from_url_in_spaces
 from users.models import CustomUser
 from util.file_import import is_metadata_valid, is_content_valid
 from util.mongo_util import create_dynamic_document_class
@@ -847,8 +847,9 @@ def save_document_file(document, data, params):
 
     # salva o pdf no sistema de arquivos
     data['name'] = params['pdf_filename']
-    relative_path = 'docassemble/' + params['pdf_filename'][:15]
-    absolute_path, relative_file_path = save_file_from_url(params['pdf_url'], relative_path, params['pdf_filename'])
+    relative_path = 'documents/' + document.tenant.name + '/' + params['pdf_filename'][:15] + '/'
+    absolute_path, relative_file_path = save_file_from_url_in_spaces(
+        params['pdf_url'], document, relative_path, params['pdf_filename'])
     document.file_kind = DocumentFileKind.PDF.value
 
     if has_ged:
@@ -869,8 +870,9 @@ def save_document_file(document, data, params):
 
     # salva o docx no sistema de arquivos
     data['name'] = params['docx_filename']
-    relative_path = 'docassemble/' + params['docx_filename'][:15]
-    absolute_path, relative_file_path = save_file_from_url(params['docx_url'], relative_path, params['docx_filename'])
+    relative_path = 'documents/' + document.tenant.name + '/' + params['docx_filename'][:15]
+    absolute_path, relative_file_path = save_file_from_url_in_spaces(
+        params['docx_url'], document, relative_path, params['docx_filename'])
 
     # salva o docx como documento relacionado. copia do pai algumas propriedades
     related_document = Document(

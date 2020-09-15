@@ -3,12 +3,12 @@ import uuid
 from enum import Enum
 
 from django.db import models
-# from django.contrib.postgres.fields import JSONField
 from django.db.models import JSONField
 
 from tenant.models import TenantAwareModel
 from interview.models import Interview
 from school.models import School
+from web.storage_backends import MediaStorage
 
 
 class DocumentStatus(Enum):
@@ -131,6 +131,7 @@ class Document(TenantAwareModel):
         verbose_name="UUID",
     )
     relative_file_path = models.FileField(max_length=255, blank=True, verbose_name="Caminho relativo do arquivo")
+    file = models.FileField(storage=MediaStorage(), blank=True)
     description = models.TextField(default="", blank=True, verbose_name="Descrição")
     interview = models.ForeignKey(
         Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"
