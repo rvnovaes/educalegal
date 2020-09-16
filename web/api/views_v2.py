@@ -361,7 +361,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
             logger.info(
                 "Atualizando o documento {doc_uuid}".format(doc_uuid=str(doc_uuid))
             )
-            serializer = self.serializer_class(
+            serializer = DocumentDetailSerializer(
                 instance, data=request.data, partial=True, context={"request": request}
             )
             serializer.is_valid(raise_exception=True)
