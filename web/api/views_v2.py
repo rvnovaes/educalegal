@@ -492,7 +492,7 @@ def validate_tenant_plan_ged(tenant):
         return ged_url, tenant_ged_token
 
 
-def save_in_ged(data, url, absolute_path, tenant):
+def save_in_ged(data, url, file, tenant):
     """Salva o arquivo no GED"""
 
     # se o cliente nao tem ged, nao envia para o ged
@@ -500,7 +500,7 @@ def save_in_ged(data, url, absolute_path, tenant):
 
     # salva o arquivo no ged
     try:
-        status_code, response, ged_id = mc.document_create(data, url, absolute_path)
+        status_code, response, ged_id = mc.document_create(data, url, file)
     except Exception as e:
         message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(e)
         logging.error(message)
@@ -847,30 +847,30 @@ def save_document_file(document, data, params):
     # salva o pdf no sistema de arquivos
     data['name'] = params['pdf_filename']
     data['label'] = data['name']
-    relative_path = 'documents/' + document.tenant.name + '/' + params['pdf_filename'][:15] + '/'
+    relative_path = 'docs/' + document.tenant.name + '/' + params['pdf_filename'][:15] + '/'
 
     document.file_kind = DocumentFileKind.PDF.value
 
     if has_ged:
         try:
-            status_code, ged_data, ged_id = save_in_ged(data, params['pdf_url'], '', document.tenant)
+            status_code, ged_data, ged_id = save_in_ged(data, params['pdf_url'], None, document.tenant)
         except Exception as e:
             message = str(e)
             logging.exception(message)
         else:
             if status_code == 201:
-                save_document_data(document, params['pdf_url'], '', relative_path, has_ged, ged_data, None)
+                save_document_data(document, params['pdf_url'], None, relative_path, has_ged, ged_data, None)
             else:
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
     else:
-        save_document_data(document, params['pdf_url'], '', relative_path, has_ged, None, None)
+        save_document_data(document, params['pdf_url'], None, relative_path, has_ged, None, None)
 
     # salva o docx no sistema de arquivos
     data['name'] = params['docx_filename']
     data['label'] = data['name']
-    relative_path = 'documents/' + document.tenant.name + '/' + params['docx_filename'][:15] + '/'
+    relative_path = 'docs/' + document.tenant.name + '/' + params['docx_filename'][:15] + '/'
 
     # salva o docx como documento relacionado. copia do pai algumas propriedades
     related_document = Document(
@@ -887,19 +887,19 @@ def save_document_file(document, data, params):
     status_code = 0
     if has_ged:
         try:
-            status_code, ged_data, ged_id = save_in_ged(data, params['docx_url'], '', document.tenant)
+            status_code, ged_data, ged_id = save_in_ged(data, params['docx_url'], None, document.tenant)
         except Exception as e:
             message = str(e)
             logging.exception(message)
         else:
             if status_code == 201:
-                save_document_data(related_document, params['docx_url'], '', relative_path, has_ged, ged_data, document)
+                save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data, document)
             else:
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
     else:
-        save_document_data(related_document, params['docx_url'], '', relative_path, has_ged, None, document)
+        save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None, document)
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet

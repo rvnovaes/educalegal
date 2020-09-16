@@ -104,7 +104,7 @@ def docusign_xml_parser(data):
     return envelope_data, envelope_data_translated, recipient_statuses
 
 
-def docusign_pdf_files_saver(data, envelope_dir):
+def docusign_pdf_files_parser(data):
     pdf_documents = list()
     xml = xmltodict.parse(data)["DocuSignEnvelopeInformation"]
     # Loop through the DocumentPDFs element to create a variable with the name of the document
@@ -137,17 +137,17 @@ def docusign_pdf_files_saver(data, envelope_dir):
         else:
             filename = pdf["DocumentType"] + "_" + pdf["Name"]
             description = filename
+            file_kind = DocumentFileKind.PDF
 
-        full_filename = os.path.join(envelope_dir, filename)
         pdf_file_data = dict()
         pdf_file_data["file_kind"] = file_kind
         pdf_file_data["filename"] = filename
         pdf_file_data["description"] = description
-        pdf_file_data["full_filename"] = full_filename
+        pdf_file_data["file"] = base64.b64decode(pdf["PDFBytes"])
         pdf_documents.append(pdf_file_data)
 
-        with open(full_filename, "wb") as pdf_file:
-            pdf_file.write(base64.b64decode(pdf["PDFBytes"]))
+        # with open(full_filename, "wb") as pdf_file:
+        #     pdf_file.write(base64.b64decode(pdf["PDFBytes"]))
 
     return pdf_documents
 
@@ -161,19 +161,17 @@ def docusign_webhook_listener(request):
     try:
         # Parses XML data and returns a dictionary and formated messages
         envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
-        relative_path = "docusign/" + str(envelope_data["envelope_id"])
         # Store the XML file on disk
-        envelope_dir = os.path.join(settings.BASE_DIR, "media/", relative_path)
-        Path(envelope_dir).mkdir(parents=True, exist_ok=True)
+        # envelope_dir = os.path.join(settings.BASE_DIR, "media/", relative_path)
+        # Path(envelope_dir).mkdir(parents=True, exist_ok=True)
 
-        filename = (
-            envelope_data["envelope_time_generated"].strftime("%Y%m%d_%H%M%S") + ".xml"
-        )  # substitute _ for : for windows-land
-        filepath = os.path.join(envelope_dir, filename)
-        relative_file_path = os.path.join(relative_path, filename)
+        # filename = (
+        #     envelope_data["envelope_time_generated"].strftime("%Y%m%d_%H%M%S") + ".xml"
+        # )  # substitute _ for : for windows-land
+        # filepath = os.path.join(envelope_dir, filename)
 
-        with open(filepath, "wb") as xml_file:
-            xml_file.write(data)
+        # with open(filepath, "wb") as xml_file:
+        #     xml_file.write(data)
     except Exception as e:
         message = str(e)
         logger.exception(message)
@@ -203,9 +201,9 @@ def docusign_webhook_listener(request):
         # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
         if envelope_status == "completed":
             try:
-                (envelope_data["pdf_documents"]) = docusign_pdf_files_saver(data, envelope_dir)
-                logger.debug(envelope_data)
+                (envelope_data["pdf_documents"]) = docusign_pdf_files_parser(data)
 
+                relative_path = 'docs/' + tenant.name + '/' + document.name[:15] + '/'
                 has_ged = tenant.has_ged()
                 if has_ged:
                     # Get document related interview data to post to GED
@@ -222,8 +220,7 @@ def docusign_webhook_listener(request):
                     for pdf in envelope_data["pdf_documents"]:
                         try:
                             post_data["label"] = pdf["filename"]
-                            status_code, ged_data, ged_id = save_in_ged(post_data, '', pdf["full_filename"],
-                                                                        document.tenant)
+                            status_code, ged_data, ged_id = save_in_ged(post_data, None, pdf["file"], document.tenant)
                         except Exception as e:
                             message = str(e)
                             logging.exception(message)
@@ -244,8 +241,8 @@ def docusign_webhook_listener(request):
                                     bulk_generation=document.bulk_generation,
                                     file_kind=pdf["file_kind"],
                                 )
-                                save_document_data(related_document, '', pdf["full_filename"], has_ged, ged_data,
-                                                   relative_file_path, document)
+                                save_document_data(related_document, None, pdf["file"], has_ged, ged_data,
+                                                   relative_path, document)
                             else:
                                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                     str(status_code), ged_data)
@@ -267,8 +264,7 @@ def docusign_webhook_listener(request):
                             bulk_generation=document.bulk_generation,
                             file_kind=pdf["file_kind"],
                         )
-                        save_document_data(related_document, '', pdf["full_filename"], has_ged, None,
-                                           relative_file_path, document)
+                        save_document_data(related_document, None, pdf["file"], relative_path, has_ged, None, document)
             except Exception as e:
                 message = str(e)
                 logger.exception(message)

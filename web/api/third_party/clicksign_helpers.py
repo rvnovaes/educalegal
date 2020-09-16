@@ -154,7 +154,7 @@ def webhook_listener(request):
                                  'ID do ocumento {doc_id}'.format(event=data['event']['name'], doc_id=document.id))
                     return HttpResponse(status=400, reason='Falta a chave signed_file_url')
 
-                relative_path = 'documents/' + tenant.name + '/' + document.name[:15] + '/'
+                relative_path = 'docs/' + tenant.name + '/' + document.name[:15] + '/'
                 document_url = data['document']['downloads']['signed_file_url']
                 save_file_in_cloud(document_url, relative_path, document)
 
@@ -173,7 +173,7 @@ def webhook_listener(request):
                     try:
                         # salva documento no ged
                         post_data["label"] = filename
-                        status_code, ged_data, ged_id = save_in_ged(post_data, document_url, '', document.tenant)
+                        status_code, ged_data, ged_id = save_in_ged(post_data, document_url, None, document.tenant)
                     except Exception as e:
                         message = str(e)
                         logging.exception(message)
@@ -194,7 +194,7 @@ def webhook_listener(request):
                                 bulk_generation=document.bulk_generation,
                                 file_kind=DocumentFileKind.PDF_SIGNED.value,
                             )
-                            save_document_data(related_document, document_url, '', relative_path, has_ged, ged_data,
+                            save_document_data(related_document, document_url, None, relative_path, has_ged, ged_data,
                                                document)
                         else:
                             message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
@@ -213,7 +213,7 @@ def webhook_listener(request):
                         bulk_generation=document.bulk_generation,
                         file_kind=DocumentFileKind.PDF_SIGNED.value,
                     )
-                    save_document_data(related_document, document_url, '', relative_path, has_ged, None, document)
+                    save_document_data(related_document, document_url, None, relative_path, has_ged, None, document)
 
             # atualiza o status do documento
             document.status = document_status
