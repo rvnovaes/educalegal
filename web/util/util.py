@@ -32,6 +32,6 @@ def save_file_from_url_in_disk(url, relative_path, filename):
     except Exception as e:
         message = 'Não foi possível salvar o arquivo no sistema de arquivos. Erro: ' + str(e)
         logging.exception(message)
-        return message
+        return message, ''
 
     return absolute_path, relative_file_path
