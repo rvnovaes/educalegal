@@ -33,15 +33,15 @@
     <br/>
     <div class="text-center">
         {% if not document.parent %}
-            {% if document.relative_file_path %}
-                <a target="_blank" href="{{ document.relative_file_path.url }}"><button type="button" class="btn btn-danger">PDF</button></a>
+            {% if document.cloud_file %}
+                <a target="_blank" href="{{ document.cloud_file.url }}"><button type="button" class="btn btn-danger">PDF</button></a>
             {% else %}
                 {% if document.ged_link %}
                     <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
                 {% endif %}
             {% endif %}
-            {% if docx_file.relative_file_path %}
-                <a target="_blank" href="{{ docx_file.relative_file_path.url }}"><button type="button" class="btn btn-primary">Word</button></a>
+            {% if docx_file.cloud_file %}
+                <a target="_blank" href="{{ docx_file.cloud_file.url }}"><button type="button" class="btn btn-primary">Word</button></a>
             {% else %}
                 {% if docx_file.ged_link %}
                     <a target="_blank" href="{{ docx_file.ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
@@ -52,8 +52,8 @@
             {% endif %}
             <a href="{% url 'document:send-email' document.doc_uuid %}"><button type="button" class="btn btn-info">Enviar por email</button></a>
         {% else %}
-            {% if document.relative_file_path %}
-                <a target="_blank" href="{{ document.relative_file_path.url }}"><button type="button" class="btn btn-primary">Download</button></a>
+            {% if document.cloud_file %}
+                <a target="_blank" href="{{ document.cloud_file.url }}"><button type="button" class="btn btn-primary">Download</button></a>
             {% else %}
                 {% if document.ged_link %}
                     <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-primary">Download</button></a>

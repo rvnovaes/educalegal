@@ -4,7 +4,12 @@ import logging
 import pytz
 import pandas as pd
 
+from allauth.utils import build_absolute_uri
+from allauth.account.adapter import get_adapter
+from allauth.account.forms import default_token_generator
+from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
 from dateutil.relativedelta import relativedelta
+from drf_yasg.renderers import SwaggerUIRenderer, OpenAPIRenderer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -23,11 +28,6 @@ from rest_framework.exceptions import (
     NotFound,
     APIException,
 )
-from drf_yasg.renderers import SwaggerUIRenderer, OpenAPIRenderer
-from allauth.utils import build_absolute_uri
-from allauth.account.adapter import get_adapter
-from allauth.account.forms import default_token_generator
-from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
 from validator_collection import checkers
 
 from django.http import JsonResponse
@@ -45,7 +45,6 @@ from document.views import validate_data_mongo, generate_document_from_mongo
 from interview.models import Interview
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
-from util.util import save_file_from_url
 from users.models import CustomUser
 from util.file_import import is_metadata_valid, is_content_valid
 from util.mongo_util import create_dynamic_document_class
@@ -348,7 +347,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         else:
             tenant_id = request.user.tenant.id
             instance = get_object_or_404(
-                self.queryset, doc_uuid=doc_uuid, tenant=tenant_id
+                self.get_queryset(), doc_uuid=doc_uuid, tenant=tenant_id
             )
 
             if "tenant" in request.data:
@@ -360,7 +359,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
             logger.info(
                 "Atualizando o documento {doc_uuid}".format(doc_uuid=str(doc_uuid))
             )
-            serializer = self.serializer_class(
+            serializer = DocumentDetailSerializer(
                 instance, data=request.data, partial=True, context={"request": request}
             )
             serializer.is_valid(raise_exception=True)
@@ -404,7 +403,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
             if user.is_staff:
                 tenant_id = request.user.tenant.id
                 instance = get_object_or_404(
-                    self.queryset, doc_uuid=doc_uuid, tenant=tenant_id
+                    self.get_queryset(), doc_uuid=doc_uuid, tenant=tenant_id
                 )
                 self.perform_destroy(instance)
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -491,15 +490,17 @@ def validate_tenant_plan_ged(tenant):
         return ged_url, tenant_ged_token
 
 
-def save_in_ged(data, absolute_path, tenant):
+def save_in_ged(data, url, file, tenant):
     """Salva o arquivo no GED"""
 
     # se o cliente nao tem ged, nao envia para o ged
     mc = MayanClient(tenant.tenantgeddata.url, tenant.tenantgeddata.token)
 
+    logging.info('docusign_ged1')
+
     # salva o arquivo no ged
     try:
-        status_code, response, ged_id = mc.document_create(data, absolute_path)
+        status_code, response, ged_id = mc.document_create(data, url, file)
     except Exception as e:
         message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(e)
         logging.error(message)
@@ -512,12 +513,19 @@ def save_in_ged(data, absolute_path, tenant):
 
             return status_code, response, 0
         else:
-            try:
-                ged_document_data = mc.document_read(ged_id)
-            except Exception as e:
-                message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
+            if ged_id == 0:
+                message = 'O arquivo foi inserido no GED, mas retornou ID = 0. Erro: ' + str(status_code) + ' - ' + \
+                          response
                 logging.error(message)
-                return 0, message, 0
+
+                return status_code, message, 0
+            else:
+                try:
+                    ged_document_data = mc.document_read(ged_id)
+                except Exception as e:
+                    message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
+                    logging.error(message)
+                    return 0, message, 0
 
             return status_code, ged_document_data, ged_id
 
@@ -845,30 +853,33 @@ def save_document_file(document, data, params):
 
     # salva o pdf no sistema de arquivos
     data['name'] = params['pdf_filename']
-    relative_path = 'docassemble/' + params['pdf_filename'][:15]
-    absolute_path, relative_file_path = save_file_from_url(params['pdf_url'], relative_path, params['pdf_filename'])
+    data['label'] = data['name']
+    relative_path = 'docs/' + document.tenant.name + '/' + params['pdf_filename'][:15] + '/'
+
     document.file_kind = DocumentFileKind.PDF.value
 
     if has_ged:
         try:
-            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, document.tenant)
+            status_code, ged_data, ged_id = save_in_ged(data, params['pdf_url'], None, document.tenant)
         except Exception as e:
             message = str(e)
             logging.exception(message)
         else:
             if status_code == 201:
-                save_document_data(document, has_ged, ged_data, relative_file_path, None)
+                save_document_data(document, params['pdf_url'], None, relative_path, has_ged, ged_data,
+                                   params['pdf_filename'], None)
             else:
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
     else:
-        save_document_data(document, has_ged, None, relative_file_path, None)
+        save_document_data(document, params['pdf_url'], None, relative_path, has_ged, None, params['pdf_filename'],
+                           None)
 
     # salva o docx no sistema de arquivos
     data['name'] = params['docx_filename']
-    relative_path = 'docassemble/' + params['docx_filename'][:15]
-    absolute_path, relative_file_path = save_file_from_url(params['docx_url'], relative_path, params['docx_filename'])
+    data['label'] = data['name']
+    relative_path = 'docs/' + document.tenant.name + '/' + params['docx_filename'][:15] + '/'
 
     # salva o docx como documento relacionado. copia do pai algumas propriedades
     related_document = Document(
@@ -885,19 +896,21 @@ def save_document_file(document, data, params):
     status_code = 0
     if has_ged:
         try:
-            status_code, ged_data, ged_id = save_in_ged(data, absolute_path, document.tenant)
+            status_code, ged_data, ged_id = save_in_ged(data, params['docx_url'], None, document.tenant)
         except Exception as e:
             message = str(e)
             logging.exception(message)
         else:
             if status_code == 201:
-                save_document_data(related_document, has_ged, ged_data, relative_file_path, document)
+                save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data,
+                                   params['docx_filename'], document)
             else:
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
     else:
-        save_document_data(related_document, has_ged, None, relative_file_path, document)
+        save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None,
+                           params['docx_filename'], document)
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
