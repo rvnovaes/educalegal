@@ -1,15 +1,11 @@
 import base64
 import dateparser
 import logging
-import os
 import xmltodict
-
-from pathlib import Path
 
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from django.conf import settings
 
 from api.views_v2 import save_in_ged
 from document.models import Document, Envelope, Signer, DocumentStatus, DocumentFileKind

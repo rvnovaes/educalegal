@@ -347,7 +347,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         else:
             tenant_id = request.user.tenant.id
             instance = get_object_or_404(
-                self.queryset, doc_uuid=doc_uuid, tenant=tenant_id
+                self.get_queryset(), doc_uuid=doc_uuid, tenant=tenant_id
             )
 
             if "tenant" in request.data:
@@ -403,7 +403,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
             if user.is_staff:
                 tenant_id = request.user.tenant.id
                 instance = get_object_or_404(
-                    self.queryset, doc_uuid=doc_uuid, tenant=tenant_id
+                    self.get_queryset(), doc_uuid=doc_uuid, tenant=tenant_id
                 )
                 self.perform_destroy(instance)
                 return Response(status=status.HTTP_204_NO_CONTENT)
