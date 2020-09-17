@@ -654,9 +654,13 @@ def save_document_data(document, url, file, relative_path, has_ged, ged_data, pa
             urlcleanup()
     else:
         try:
+            logging.info('docusign_nuvem1')
+            logging.info(file)
             # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
             document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(file, 'rb')))
         except Exception as e:
+            logging.info('docusign_nuvem2')
+            logging.info(e)
             message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
             logging.error(message)
 

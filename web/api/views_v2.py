@@ -498,6 +498,9 @@ def save_in_ged(data, url, file, tenant):
     # se o cliente nao tem ged, nao envia para o ged
     mc = MayanClient(tenant.tenantgeddata.url, tenant.tenantgeddata.token)
 
+    logging.info('docusign_ged1')
+    logging.info(file)
+
     # salva o arquivo no ged
     try:
         status_code, response, ged_id = mc.document_create(data, url, file)

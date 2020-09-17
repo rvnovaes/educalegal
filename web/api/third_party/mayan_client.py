@@ -50,6 +50,9 @@ class MayanClient:
             try:
                 response = requests.get(url)
                 file = io.BytesIO(response.content)
+
+                logging.info('clicksign_ged1')
+                logging.info(file)
             except Exception as e:
                 message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
                 logging.error(message)

@@ -40,7 +40,7 @@
                     <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
                 {% endif %}
             {% endif %}
-            {% if docx_file.file %}
+            {% if docx_file.cloud_file %}
                 <a target="_blank" href="{{ docx_file.cloud_file.url }}"><button type="button" class="btn btn-primary">Word</button></a>
             {% else %}
                 {% if docx_file.ged_link %}
