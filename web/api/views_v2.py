@@ -519,7 +519,7 @@ def save_in_ged(data, url, file, tenant):
                 logging.error(message)
 
                 return status_code, message, 0
-            else:                
+            else:
                 try:
                     ged_document_data = mc.document_read(ged_id)
                 except Exception as e:
