@@ -1,3 +1,5 @@
+import Swal from "sweetalert2";
+
 export const state = () => ({
   schools: [],
 });
@@ -68,7 +70,21 @@ export const actions = {
   async fetchAllSchools({commit}) {
     const res = await this.$axios.get("/v2/schools");
     if (res.status === 200) {
-      commit("setSchools", res.data.results);
+      const schools = res.data.results
+      commit("setSchools", schools);
+      if (schools.length === 0) {
+        await Swal.fire({
+          title: "Bem-vindo ao Educa Legal!",
+          text: "Para começar a usar a plataforma, você deve cadastrar sua primeira escola. Os dados da escola cadastrada serão usados na geração dos contratos e documentos.",
+          icon: "success",
+          customClass: {
+            confirmButton: "btn btn-success btn-fill",
+          },
+          confirmButtonText: "Entendido. Leve-me leve até lá!",
+          buttonsStyling: false
+        });
+        await this.$router.push({path: "/escolas/criar"});
+      }
     }
   },
   async deleteSchool({commit}, school) {
