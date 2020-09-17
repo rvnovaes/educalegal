@@ -50,8 +50,8 @@ class MayanClient:
             try:
                 response = requests.get(url)
                 file = io.BytesIO(response.content)
-
                 logging.info('clicksign_ged1')
+                logging.info(type(file))
             except Exception as e:
                 message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
                 logging.error(message)
@@ -59,10 +59,13 @@ class MayanClient:
         else:
             try:
                 logging.info('docusign_ged1-1')
+                file = io.BytesIO(file_data)
+                logging.info(type(file))
+
                 # file = open(file_data, 'rb')
                 # logging.info(type(file))
-                file = open(file_data, 'rb')
-                logging.info('docusign_ged1-2')
+                # file = open(file_data, 'rb')
+                # logging.info('docusign_ged1-2')
                 # logging.info(type(file))
 
                 # logging.info('clicksign_nuvem1-3')

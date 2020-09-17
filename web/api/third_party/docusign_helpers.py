@@ -2,6 +2,8 @@ import dateparser
 import logging
 import xmltodict
 
+from base64 import b64decode
+
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -138,7 +140,7 @@ def docusign_pdf_files_parser(data):
         pdf_file_data["file_kind"] = file_kind
         pdf_file_data["filename"] = filename
         pdf_file_data["description"] = description
-        pdf_file_data["file"] = pdf["PDFBytes"]
+        pdf_file_data["file"] = b64decode(pdf["PDFBytes"])
         pdf_documents.append(pdf_file_data)
 
         # with open(full_filename, "wb") as pdf_file:
