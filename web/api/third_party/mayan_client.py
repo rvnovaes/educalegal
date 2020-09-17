@@ -58,9 +58,22 @@ class MayanClient:
                 return 400, message, 0
         else:
             try:
-                file = io.BytesIO(file)
-
                 logging.info('docusign_ged1-1')
+                file = open(file, 'rb')
+                logging.info(type(file))
+                file = io.BytesIO(file)
+                logging.info('docusign_ged1-2')
+                logging.info(type(file))
+
+                # logging.info('clicksign_nuvem1-3')
+                # logging.info(type(File(open(file, 'rb'))))
+
+                # slx-318: converte str para bytes pra enviar para o mayan
+
+                # logging.info(ContentFile(b64decode(file)))
+                # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
+                # document.cloud_file.save(relative_path + filename, File(open(file, 'rb')))
+
             except Exception as e:
                 logging.info('docusign_ged1-2')
                 message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
