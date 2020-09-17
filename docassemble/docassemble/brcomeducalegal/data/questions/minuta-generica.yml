@@ -53,6 +53,12 @@ code: |
         item.name.text
       if plan_use_esignature:
         valid_extraparts_table
+    if has_witnesses:
+      witnesses.target_number = 2
+      for item in witnesses:
+        item.name.text
+      if plan_use_esignature:
+        valid_extraparts_table
     has_attachment
     el_patch_document
     document_ready_screen
@@ -134,16 +140,42 @@ fields:
 ---
 section: Parte
 progress: 20
-question: Dados do(a) ${word(ordinal(i)) } ${ parts_denomination }
+question: |
+  Dados do(a) ${word(ordinal(i)) } ${ parts_denomination }
 fields:
-  - "Nome:": parts[i].name.text
-    required: true
-    datatype: text
-    help: 'Nome da pessoa fisica ou jurídica, conforme consta no CPF ou CNPJ.'
+  - "Tipo:": parts[i].person_type
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - 'Nome/Razão social:': parts[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("parts[i].person_type")
+  - "CPF:": parts[i].cpf
+    validate: validate_cpf
+    show if:
+      variable: parts[i].person_type
+      is: individual
+  - "CNPJ:": parts[i].cnpj
+    validate: validate_cnpj
+    show if:
+      variable: parts[i].person_type
+      is: organization
   - "E-mail:": parts[i].email
-    required: true
-    help: ${ help_email_msg }
     datatype: email
+    help: ${ help_email_msg }
+    required: False
+    js show if: |
+       val("parts[i].person_type") != null
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzM').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
 ---
 section: Parte
 field: valid_parts_table
@@ -186,14 +218,39 @@ section: Contraparte
 progress: 50
 question: Dados do(a) ${word(ordinal(i)) } ${ counterparts_denomination }
 fields:
-  - "Nome:": counterparts[i].name.text
-    required: true
-    datatype: text
-    help: 'Nome da pessoa fisica ou jurídica, conforme consta no CPF ou CNPJ.'
+  - "Tipo:": counterparts[i].person_type
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - 'Nome/Razão social:': counterparts[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("counterparts[i].person_type")
+  - "CPF:": counterparts[i].cpf
+    validate: validate_cpf
+    show if:
+      variable: counterparts[i].person_type
+      is: individual
+  - "CNPJ:": counterparts[i].cnpj
+    validate: validate_cnpj
+    show if:
+      variable: counterparts[i].person_type
+      is: organization
   - "E-mail:": counterparts[i].email
-    required: true
-    help: ${ help_email_msg }
     datatype: email
+    help: ${ help_email_msg }
+    required: False
+    js show if: |
+       val("counterparts[i].person_type") != null
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzM').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
 ---
 section: Contraparte
 field: valid_counterparts_table
@@ -242,14 +299,39 @@ section: Parte Extra
 progress: 80
 question: Dados do(a) ${word(ordinal(i)) } ${ extraparts_denomination }
 fields:
-  - "Nome:": extraparts[i].name.text
-    required: true
-    datatype: text
-    help: 'Nome da pessoa fisica ou jurídica, conforme consta no CPF ou CNPJ.'
+  - "Tipo:": extraparts[i].person_type
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+  - 'Nome/Razão social:': extraparts[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("extraparts[i].person_type")
+  - "CPF:": extraparts[i].cpf
+    validate: validate_cpf
+    show if:
+      variable: extraparts[i].person_type
+      is: individual
+  - "CNPJ:": extraparts[i].cnpj
+    validate: validate_cnpj
+    show if:
+      variable: extraparts[i].person_type
+      is: organization
   - "E-mail:": extraparts[i].email
-    required: true
-    help: ${ help_email_msg }
     datatype: email
+    help: ${ help_email_msg }
+    required: False
+    js show if: |
+       val("extraparts[i].person_type") != null
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzM').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
 ---
 section: Parte Extra
 field: valid_extraparts_table
@@ -264,6 +346,65 @@ buttons:
 ---
 table: extraparts.table
 rows: extraparts
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Testemunhas
+progress: 85
+question: |
+  Há testemunhas?
+yesno: has_witnesses
+---
+objects:
+  - witnesses: DAList.using(object_type=Person, ask_number=True)
+---
+section: Testemunhas
+progress: 90
+question: Testemunhas
+fields:
+  - Número de pessoas: witnesses.target_number
+    required: true
+    datatype: integer
+    default: 1
+    max: 2
+---
+section: Testemunhas
+progress: 95
+question: Dados da ${word(ordinal(i)) } testemunha
+fields:
+  - 'Nome da ${word(ordinal(i)) } Testemunha:': witnesses[i].name.text
+    validate: validate_person_full_name
+  - "CPF:": witnesses[i].cpf
+    validate: validate_cpf
+  - "E-mail:": witnesses[i].email
+    datatype: email
+    help: ${ help_email_msg }
+    required: False
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#d2l0bmVzc2VzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+section: Testemunhas
+field: valid_witnesses_table
+question: |
+  ${ witnesses_denomination }:
+subquestion: |
+  Confira os e-mails das testemunhas abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ witnesses.table }
+buttons:
+  Continuar: continue
+---
+table: witnesses.table
+rows: witnesses
 columns:
   - Name: |
       row_item.name.text
@@ -335,6 +476,22 @@ code: |
               ]
               recipients.append(new_recipient)
 
+  if has_witnesses:
+        for item in witnesses:
+            if item.email:
+                new_recipient = dict()
+                new_recipient['name'] = item.name.text
+                new_recipient['email'] = item.email
+                new_recipient['group'] = 'signers'
+                new_recipient['routingOrder'] = 1
+                new_recipient['tabs'] = [
+                    {
+                        'type': 'signHere',
+                        'anchorString': generate_anchor('signHere', item.email)
+                    },
+                ]
+                recipients.append(new_recipient)
+
   document_name = custom_file_name + '.pdf'
 ---
 ga id: |
@@ -370,7 +527,7 @@ code: |
   generated_file.set_attributes(private=False)
   generated_file.set_attributes(private=False)
 
-  # dados do documento que serao salvos no educa legal
+  # dados do documento que serao salvos no educa legal---
   data = {
      "name": custom_file_name + '.pdf',
      "description": interview_description,
@@ -387,8 +544,6 @@ code: |
       "trigger": "docassemble",
       "pdf_url": generated_file.url_for(external=True),
       "pdf_filename": custom_file_name + '.pdf',
-      "docx_url": generated_file.url_for(external=True),
-      "docx_filename": custom_file_name + '.docx',
       "tenant_id": tid,
       "doc_uuid": doc_uuid,
   }
@@ -400,4 +555,3 @@ code: |
   else:
     log("Erro ao atualizar o documento")
   log("{doc_uuid} - {data}".format(doc_uuid=doc_uuid, data=el_patch_document))
-
