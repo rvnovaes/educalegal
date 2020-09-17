@@ -557,35 +557,3 @@ code: |
   else:
     log("Erro ao atualizar o documento")
   log("{doc_uuid} - {data}".format(doc_uuid=doc_uuid, data=el_patch_document))
-
-
-  data = {
-     "name": custom_file_name + '.pdf',
-     "description": interview_description,
-     "status": "criado",
-     "school": school_id,
-     "document_type": interview_document_type,
-     "parent": None,
-     "recipients": json.dumps(recipients),
-     "document_data": json.dumps(all_variables())
-  }
-
-  # external=True - acrescenta na url o protocolo and hostname (https://hostname)
-  params = {
-      "trigger": "docassemble",
-      "pdf_url": generated_file.url_for(external=True),
-      "pdf_filename": custom_file_name + '.pdf',
-      "docx_url": generated_file.url_for(external=True),
-      "docx_filename": custom_file_name + '.docx',
-      "tenant_id": tid,
-      "doc_uuid": doc_uuid,
-  }
-
-  # atualiza no educa legal dados do documento gerado
-  status_code, el_patch_document = elc.patch_document(data, params)
-  if status_code == 200:
-    log("Atualizado o documento")
-  else:
-    log("Erro ao atualizar o documento")
-  log("{doc_uuid} - {data}".format(doc_uuid=doc_uuid, data=el_patch_document))
-
