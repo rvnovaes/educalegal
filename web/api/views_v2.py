@@ -866,13 +866,15 @@ def save_document_file(document, data, params):
             logging.exception(message)
         else:
             if status_code == 201:
-                save_document_data(document, params['pdf_url'], None, relative_path, has_ged, ged_data, None)
+                save_document_data(document, params['pdf_url'], None, relative_path, has_ged, ged_data,
+                                   params['pdf_filename'], None)
             else:
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
     else:
-        save_document_data(document, params['pdf_url'], None, relative_path, has_ged, None, None)
+        save_document_data(document, params['pdf_url'], None, relative_path, has_ged, None, params['pdf_filename'],
+                           None)
 
     # salva o docx no sistema de arquivos
     data['name'] = params['docx_filename']
@@ -900,13 +902,15 @@ def save_document_file(document, data, params):
             logging.exception(message)
         else:
             if status_code == 201:
-                save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data, document)
+                save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data,
+                                   params['docx_filename'], document)
             else:
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
     else:
-        save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None, document)
+        save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None,
+                           params['docx_filename'], document)
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet

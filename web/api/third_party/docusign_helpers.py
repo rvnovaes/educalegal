@@ -250,7 +250,7 @@ def docusign_webhook_listener(request):
                                     file_kind=pdf["file_kind"],
                                 )
                                 save_document_data(related_document, None, pdf["file"], relative_path, has_ged,
-                                                   ged_data, document)
+                                                   ged_data, pdf["filename"], document)
                             else:
                                 logging.info('docusign_13')
                                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
@@ -274,7 +274,8 @@ def docusign_webhook_listener(request):
                             bulk_generation=document.bulk_generation,
                             file_kind=pdf["file_kind"],
                         )
-                        save_document_data(related_document, None, pdf["file"], relative_path, has_ged, None, document)
+                        save_document_data(related_document, None, pdf["file"], relative_path, has_ged, None,
+                                           pdf["filename"], document)
                         logging.info('docusign_15')
             except Exception as e:
                 logging.info('docusign_16')

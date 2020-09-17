@@ -213,7 +213,7 @@ def webhook_listener(request):
                                 file_kind=DocumentFileKind.PDF_SIGNED.value,
                             )
                             save_document_data(related_document, document_url, None, relative_path, has_ged, ged_data,
-                                               document)
+                                               filename, document)
                             logging.info('clicksign_13')
                         else:
                             logging.info('clicksign_14')
@@ -234,7 +234,8 @@ def webhook_listener(request):
                         bulk_generation=document.bulk_generation,
                         file_kind=DocumentFileKind.PDF_SIGNED.value,
                     )
-                    save_document_data(related_document, document_url, None, relative_path, has_ged, None, document)
+                    save_document_data(related_document, document_url, None, relative_path, has_ged, None, filename,
+                                       document)
 
             logging.info('clicksign_16')
             # atualiza o status do documento

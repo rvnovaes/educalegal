@@ -5,9 +5,7 @@ import uuid
 
 from celery import chain
 from mongoengine.errors import ValidationError
-from os.path import basename
 from rest_framework import generics
-from urllib.parse import urlsplit
 from urllib.request import urlretrieve, urlcleanup
 
 from django.contrib import messages
@@ -634,7 +632,7 @@ def query_documents_by_args(pk=None, **kwargs):
     return data
 
 
-def save_document_data(document, url, file, relative_path, has_ged, ged_data, parent=None):
+def save_document_data(document, url, file, relative_path, has_ged, ged_data, filename, parent=None):
     if has_ged:
         document.ged_id = ged_data['id']
         document.ged_link = ged_data['latest_version']['document_url'] + 'download/'
@@ -645,7 +643,7 @@ def save_document_data(document, url, file, relative_path, has_ged, ged_data, pa
             # salva como arquivo temporario
             temp_file, _ = urlretrieve(url)
             # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
-            document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(temp_file, 'rb')))
+            document.cloud_file.save(relative_path + filename, File(open(temp_file, 'rb')))
         except Exception as e:
             message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
             logging.error(message)
@@ -656,7 +654,7 @@ def save_document_data(document, url, file, relative_path, has_ged, ged_data, pa
         try:
             logging.info('docusign_nuvem1')
             # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
-            document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(file, 'rb')))
+            document.cloud_file.save(relative_path + filename, File(open(file, 'rb')))
         except Exception as e:
             logging.info('docusign_nuvem2')
             logging.info(e)
