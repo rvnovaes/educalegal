@@ -1,0 +1,403 @@
+---
+metadata:
+  title: Enviar documento para assinatura eletrônica
+---
+sections:
+  - Minuta
+  - Parte
+  - Contraparte
+  - Parte extra
+  - Anexos
+  - Conclusão
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+  - element-custom-file-name.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+  - .module_normalize_ascii
+  - .module_educalegal_client
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    instructions
+    name_document
+    parts_denomination
+    for item in parts:
+      item.name.text
+    if plan_use_esignature:
+      valid_parts_table
+    counterparts_denomination
+    for item in counterparts:
+      item.name.text
+    if plan_use_esignature:
+      valid_counterparts_table
+    if has_extraparts:
+      extraparts_denomination
+      for item in extraparts:
+        item.name.text
+      if plan_use_esignature:
+        valid_extraparts_table
+    has_attachment
+    el_patch_document
+    document_ready_screen
+---
+code: |
+  content_document = "minuta-generica.docx"
+  generic_file_with_logo = overlay_pdf(generic_document, logo_page)
+  generated_file_signature = pdf_concatenate(generic_file_with_logo, signature_page, uploaded_file, filename=custom_file_name)
+  generated_file = generated_file_signature
+---
+attachment:
+  variable name: signature_page
+  docx template file: include-signature-page.docx
+---
+attachment:
+  variable name: logo_page
+  docx template file: timbrado-educalegal.docx
+---
+objects:
+  - minuta_generica_correct: DAStaticFile.using(filename='example-minuta-generica-pages-correct.pdf')
+---
+ga id: |
+  code: ga_id_begin
+section: Minuta
+field: instructions
+progress: 5
+question: |
+  ##Instruções:
+subquestion: |
+  1) Nessa entrevista, você deverá nomear os tipos de partes do documento, a exemplo:
+
+  * Parte: *Locador*
+
+  * Contraparte: *Locatário*
+
+  * Se houver parte extra: *Fiador (opcional)*
+
+  2) O arquivo a ser anexado nesta entrevista não deverá conter campos para assinatura ao final, pois esta será feita de forma eletrônica.
+
+  3) O arquivo deverá estar no formato PDF.
+buttons:
+  Continuar: continue
+right: |
+  <center><h5>Minuta sem campos de data e assinatura</h5>
+  [FILE example-minuta-generica-pages-incorrect.png]
+  <center>[Clique para visualizar](${ minuta_generica_correct.url_for() })</center>
+---
+section: Minuta
+progress: 5
+question: |
+  Insira a minuta que deseja enviar para assinatura eletrônica.
+fields:
+  - "Nome do documento:": name_document
+    help: "Ex.: Contrato de prestação de serviços, Contrato de locação de imóvel"
+    required: true
+  - "Inserir minuta:": generic_document
+    required: true
+    datatype: files
+    help: "Formato válido: PDF"
+    accept: |
+      "application/pdf"
+---
+objects:
+  - parts: DAList.using(object_type=Person, ask_number=True)
+---
+section: Parte
+progress: 10
+question: Parte
+subquestion:  |
+fields:
+  - Denominação: parts_denomination
+    required: true
+    hint: ex. contratante, locador
+  - Número de pessoas com esta denominação: parts.target_number
+    required: true
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Parte
+progress: 20
+question: Dados do(a) ${word(ordinal(i)) } ${ parts_denomination }
+fields:
+  - "Nome:": parts[i].name.text
+    required: true
+    datatype: text
+    help: 'Nome da pessoa fisica ou jurídica, conforme consta no CPF ou CNPJ.'
+  - "E-mail:": parts[i].email
+    required: true
+    help: ${ help_email_msg }
+    datatype: email
+---
+section: Parte
+field: valid_parts_table
+question: |
+  ${ parts_denomination }:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ parts.table }
+buttons:
+  Continuar: continue
+---
+table: parts.table
+rows: parts
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+objects:
+  - counterparts: DAList.using(object_type=Person, ask_number=True)
+---
+section: Contraparte
+progress: 40
+question: Contraparte
+fields:
+  - Denominação: counterparts_denomination
+    hint: ex. contratada, locatário
+    required: true
+  - Número de pessoas com esta denominação: counterparts.target_number
+    required: true
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Contraparte
+progress: 50
+question: Dados do(a) ${word(ordinal(i)) } ${ counterparts_denomination }
+fields:
+  - "Nome:": counterparts[i].name.text
+    required: true
+    datatype: text
+    help: 'Nome da pessoa fisica ou jurídica, conforme consta no CPF ou CNPJ.'
+  - "E-mail:": counterparts[i].email
+    required: true
+    help: ${ help_email_msg }
+    datatype: email
+---
+section: Contraparte
+field: valid_counterparts_table
+question: |
+  ${ counterparts_denomination }:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ counterparts.table }
+buttons:
+  Continuar: continue
+---
+table: counterparts.table
+rows: counterparts
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Parte Extra
+progress: 60
+question: |
+  O documento possui alguma parte extra? Exemplo: fiador.
+yesno: has_extraparts
+---
+objects:
+  - extraparts: DAList.using(object_type=Person, ask_number=True)
+---
+section: Parte Extra
+progress: 70
+question: Parte extra
+fields:
+  - Denominação: extraparts_denomination
+    required: true
+    hint: ex. fiador
+  - Número de pessoas: extraparts.target_number
+    required: true
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Parte Extra
+progress: 80
+question: Dados do(a) ${word(ordinal(i)) } ${ extraparts_denomination }
+fields:
+  - "Nome:": extraparts[i].name.text
+    required: true
+    datatype: text
+    help: 'Nome da pessoa fisica ou jurídica, conforme consta no CPF ou CNPJ.'
+  - "E-mail:": extraparts[i].email
+    required: true
+    help: ${ help_email_msg }
+    datatype: email
+---
+section: Parte Extra
+field: valid_extraparts_table
+question: |
+  ${ extraparts_denomination }:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ extraparts.table }
+buttons:
+  Continuar: continue
+---
+table: extraparts.table
+rows: extraparts
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Anexos
+progress: 90
+question: |
+  Anexos
+fields:
+  - 'Deseja inserir algum arquivo anexo? :': has_attachment
+    datatype: yesnoradio
+  - 'Anexo (Formatos válidos: PDF) :': uploaded_file
+    accept: |
+      "application/pdf"
+    datatype: files
+    show if:
+      variable: has_attachment
+      is: True
+---
+code: |
+  recipients = list()
+  for item in parts:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  for item in counterparts:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  if has_extraparts:
+      for item in extraparts:
+          if item.email:
+              new_recipient = dict()
+              new_recipient['name'] = item.name.text
+              new_recipient['email'] = item.email
+              new_recipient['group'] = 'signers'
+              new_recipient['routingOrder'] = 1
+              new_recipient['tabs'] = [
+                  {
+                      'type': 'signHere',
+                      'anchorString': generate_anchor('signHere', item.email)
+                  },
+              ]
+              recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+---
+ga id: |
+  code: ga_id_end
+event: document_ready_screen
+section: Conclusão
+progress: 100
+back button: False
+question: |
+  Seu documento foi gerado com sucesso!
+subquestion: |
+  Nome do documento:
+  ${ generated_file.filename }
+  [PDF](${ generated_file.url_for() })
+action buttons:
+  code: |
+    button_list
+---
+code: |
+  button_list = list()
+  button_list.append(el_button)
+---
+code: |
+  el_button = {'action': educalegal_url + '/document/document/' + doc_uuid,
+                'label': 'Ver detalhes',
+                'color': 'success',
+                'icon': 'check'}
+---
+code: |
+  import json
+
+  # private=False - para que o arquivo fique acessivel fora do docassemble
+  generated_file.set_attributes(private=False)
+  generated_file.set_attributes(private=False)
+
+  # dados do documento que serao salvos no educa legal
+  data = {
+     "name": custom_file_name + '.pdf',
+     "description": interview_description,
+     "status": "criado",
+     "school": school_id,
+     "document_type": interview_document_type,
+     "parent": None,
+     "recipients": json.dumps(recipients),
+     "document_data": json.dumps(all_variables())
+  }
+
+  # external=True - acrescenta na url o protocolo and hostname (https://hostname)
+  params = {
+      "trigger": "docassemble",
+      "pdf_url": generated_file.url_for(external=True),
+      "pdf_filename": custom_file_name + '.pdf',
+      "docx_url": generated_file.url_for(external=True),
+      "docx_filename": custom_file_name + '.docx',
+      "tenant_id": tid,
+      "doc_uuid": doc_uuid,
+  }
+
+  # atualiza no educa legal dados do documento gerado
+  status_code, el_patch_document = elc.patch_document(data, params)
+  if status_code == 200:
+    log("Atualizado o documento")
+  else:
+    log("Erro ao atualizar o documento")
+  log("{doc_uuid} - {data}".format(doc_uuid=doc_uuid, data=el_patch_document))
+
