@@ -3,7 +3,7 @@ from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
-from docassemble.base.util import log
+# from docassemble.base.util import log
 
 
 class EducaLegalClient:
@@ -67,8 +67,8 @@ class EducaLegalClient:
         try:
             response = self.session.patch(final_url, data=data, params=params)
         except Exception as e:
-            log("e", "console")
-            log(e, "console")
+            # log("e", "console")
+            # log(e, "console")
             return None, str(e)
         else:
             return response.status_code, response.json()

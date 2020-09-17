@@ -19,13 +19,13 @@ class MayanClient:
         )
         self.session.headers.update(headers)
 
-    def document_create(self, data, url, file):
+    def document_create(self, data, url, file_data):
         """Salva o arquivo no GED
         :param data: dados do arquivo
         :type: dict
         :param url: URL da qual o arquivo será baixado
         :type: str
-        :param file: caminho no disco onde o arquivo foi salvo. É usado quando a URL não foi fornecida.
+        :param file_data: arquivo recebido da Docusign. É usado quando a URL não foi fornecida.
         :type: str
         :return: status_code
         :rtype: int
@@ -59,11 +59,11 @@ class MayanClient:
         else:
             try:
                 logging.info('docusign_ged1-1')
-                file = open(file, 'rb')
-                logging.info(type(file))
-                file = io.BytesIO(file)
+                # file = open(file_data, 'rb')
+                # logging.info(type(file))
+                file = open(file_data, 'rb')
                 logging.info('docusign_ged1-2')
-                logging.info(type(file))
+                # logging.info(type(file))
 
                 # logging.info('clicksign_nuvem1-3')
                 # logging.info(type(File(open(file, 'rb'))))
@@ -75,7 +75,7 @@ class MayanClient:
                 # document.cloud_file.save(relative_path + filename, File(open(file, 'rb')))
 
             except Exception as e:
-                logging.info('docusign_ged1-2')
+                logging.info('docusign_ged1-3')
                 message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
                 logging.error(message)
                 return 400, message, 0
@@ -90,22 +90,22 @@ class MayanClient:
         # envia documento para o ged
         final_url = self.api_base_url + "/api/documents/"
         try:
-            logging.info('docusign_ged1-3')
+            logging.info('docusign_ged1-4')
             response = self.session.post(
                 final_url, data=data, files={"file": file}
             )
         except Exception as e:
-            logging.info('docusign_ged1-4')
+            logging.info('docusign_ged1-5')
             message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
             logging.error(message)
             return 400, message, 0
         else:
             if 'id' in response.json():
-                logging.info('docusign_ged1-5')
+                logging.info('docusign_ged1-6')
                 logging.info(response.json()['id'])
                 return response.status_code, response.json(), response.json()['id']
             else:
-                logging.info('docusign_ged1-6')
+                logging.info('docusign_ged1-7')
                 return response.status_code, response.json(), 0
 
     # Este método foi escrito deste modo para retornar uma mensagem num formato que o Docassemble pode interpretar
