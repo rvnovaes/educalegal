@@ -252,6 +252,7 @@ export default {
                 confirmButton: "btn btn-success btn-fill",
               }
             });
+            this.back();
           });
       } catch (e) {
         await Swal.fire({
