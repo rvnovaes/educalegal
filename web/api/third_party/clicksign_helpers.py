@@ -3,11 +3,6 @@ import hmac
 import json
 import logging
 
-from os.path import basename
-from urllib.parse import urlsplit
-from urllib.request import urlretrieve, urlcleanup
-
-from django.core.files import File
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -106,11 +101,9 @@ def webhook_listener(request):
         # converte json para dict
         data = json.loads(request.body)
 
-        logging.info('clicksign_1')
         # localiza o documento pelo uuid
         envelope_number = data['document']['key']
         try:
-            logging.info('clicksign_2')
             document = Document.objects.get(envelope_number=envelope_number)
         except Document.DoesNotExist:
             # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test,
@@ -119,12 +112,9 @@ def webhook_listener(request):
                 envelope_number=envelope_number)
             logging.debug(message)
             return HttpResponse(status=400, reason=message)
-            logging.info('clicksign_3')
         except Exception as e:
-            logging.info('clicksign_4')
             message = str(e)
             logging.error(message)
-            logging.info(message)
             return HttpResponse(status=400, reason=message)
         else:
             # verifica se o webhook foi enviado pela Clicksign e que os dados nao estao comprometidos
@@ -143,12 +133,10 @@ def webhook_listener(request):
                 document_status = DocumentStatus.NAO_ENCONTRADO.value
                 envelope_status = DocumentStatus.NAO_ENCONTRADO.value
 
-            logging.info('clicksign_5')
             filename = ''
             tenant = Tenant.objects.get(pk=document.tenant.pk)
             # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
             if envelope_status == "finalizado":
-                logging.info('clicksign_6')
                 # ao finalizar as assinaturas do documento estou recebendo um request.body sem a url do pdf assinado
                 # resposta do suporte da clicksign: Quando o evento auto_close é disparado pela primeira vez, alguns
                 # processos ainda são feitos internamente para que o documento assinado esteja pronto.
@@ -160,7 +148,6 @@ def webhook_listener(request):
                                  'ID do ocumento {doc_id}'.format(event=data['event']['name'], doc_id=document.id))
                     return HttpResponse(status=400, reason='Falta a chave signed_file_url')
 
-                logging.info('clicksign_7')
                 relative_path = 'docs/' + tenant.name + '/' + document.name[:15] + '/'
                 document_url = data['document']['downloads']['signed_file_url']
 
@@ -168,12 +155,8 @@ def webhook_listener(request):
                 filename_no_extension = str(document.name.split(".pdf")[0])
                 filename = filename_no_extension + '-assinado.pdf'
 
-                # salva na nuvem o pdf assinado
-                # save_file_in_cloud(document_url, relative_path, document)
-
                 has_ged = tenant.has_ged()
                 if has_ged:
-                    logging.info('clicksign_8')
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
                     document_description = interview.description if interview.description else ''
@@ -187,20 +170,16 @@ def webhook_listener(request):
                     try:
                         # salva documento no ged
                         post_data["label"] = filename
-                        logging.info('clicksign_9')
                         status_code, ged_data, ged_id = save_in_ged(post_data, document_url, None, document.tenant)
                     except Exception as e:
-                        logging.info('clicksign_10')
                         message = str(e)
                         logging.error(message)
                         return HttpResponse(status=400, reason=message)
                     else:
-                        logging.info('clicksign_11')
                         logging.debug("Posting document to GED: " + filename)
                         logging.debug(ged_data)
 
                         if status_code == 201:
-                            logging.info('clicksign_12')
                             # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                             # propriedades
                             related_document = Document(
@@ -214,15 +193,12 @@ def webhook_listener(request):
                             )
                             save_document_data(related_document, document_url, None, relative_path, has_ged, ged_data,
                                                filename, document)
-                            logging.info('clicksign_13')
                         else:
-                            logging.info('clicksign_14')
                             message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                 str(status_code), ged_data)
                             logging.error(message)
                             return HttpResponse(status=400, reason=message)
                 else:
-                    logging.info('clicksign_15')
                     # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                     # propriedades
                     related_document = Document(
@@ -237,7 +213,6 @@ def webhook_listener(request):
                     save_document_data(related_document, document_url, None, relative_path, has_ged, None, filename,
                                        document)
 
-            logging.info('clicksign_16')
             # atualiza o status do documento
             document.status = document_status
             document.save(update_fields=['status'])
@@ -247,10 +222,8 @@ def webhook_listener(request):
 
             # se o envelope já existe atualiza o status, caso contrário, cria o envelope
             try:
-                logging.info('clicksign_17')
                 envelope = Envelope.objects.get(identifier=envelope_number)
             except Envelope.DoesNotExist:
-                logging.info('clicksign_18')
                 envelope = Envelope(
                     identifier=envelope_number,
                     status=envelope_status,
@@ -267,7 +240,6 @@ def webhook_listener(request):
                 document.envelope_number = envelope.identifier
                 document.save(update_fields=['envelope', 'envelope_number'])
             else:
-                logging.info('clicksign_19')
                 envelope.status = envelope_status
                 envelope.status_update_date = data['document']['updated_at']
                 envelope.save(update_fields=['status', 'status_update_date'])
@@ -282,7 +254,6 @@ def webhook_listener(request):
                 recipient_status = 'recusado'
 
             if recipient_status:
-                logging.info('clicksign_20')
                 for recipient in data['document']['signers']:
                     try:
                         # se já tem o status para o email e para o documento, não salva outro igual
@@ -302,7 +273,6 @@ def webhook_listener(request):
                                     create_signer = True
 
                         if create_signer:
-                            logging.info('clicksign_21')
                             try:
                                 signer = Signer(
                                     name=recipient['name'],
@@ -317,33 +287,11 @@ def webhook_listener(request):
 
                                 signer.save()
                             except Exception as e:
-                                logging.info('clicksign_22')
                                 message = 'Não foi possível salvar o Signer: ' + str(e)
                                 logging.error(message)
     except Exception as e:
-        logging.info('clicksign_23')
         message = str(type(e).__name__) + " : " + str(e)
         logging.error('Exceção webhook clicksign')
         logging.error(message)
 
     return HttpResponse(status=200, reason="Success!")
-
-
-# def save_file_in_cloud(url, relative_path, document):
-#     try:
-#         # salva como arquivo temporario
-#         temp_file, _ = urlretrieve(url)
-#
-#         logging.info('clicksign_cloud1')
-#         logging.info(url)
-#         logging.info('clicksign_cloud2')
-#         logging.info(relative_path + basename(urlsplit(url).path))
-#
-#         # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
-#         document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(temp_file, 'rb')))
-#     except Exception as e:
-#         message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
-#         logging.error(message)
-#     finally:
-#         # apaga arquivo temporario
-#         urlcleanup()

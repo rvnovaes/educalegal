@@ -643,12 +643,6 @@ def save_document_data(document, url, file_data, relative_path, has_ged, ged_dat
         try:
             # salva como arquivo temporario
             temp_file, _ = urlretrieve(url)
-            logging.info('clicksign_nuvem1-1')
-            logging.info(type(temp_file))
-            logging.info('clicksign_nuvem1-2')
-            logging.info(type(open(temp_file, 'rb')))
-            logging.info('clicksign_nuvem1-3')
-            logging.info(type(File(open(temp_file, 'rb'))))
             # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
             document.cloud_file.save(relative_path + filename, File(open(temp_file, 'rb')))
         except Exception as e:
@@ -659,28 +653,9 @@ def save_document_data(document, url, file_data, relative_path, has_ged, ged_dat
             urlcleanup()
     else:
         try:
-            logging.info('docusign_nuvem1')
             file = ContentFile(file_data, name=filename)
-            logging.info(type(file))
-            logging.info('docusign_iasmini1')
             document.cloud_file.save(relative_path + filename, file)
-
-            # logging.info('docusign_nuvem1-2')
-            #
-            # # f = open("D:\\myfiles\welcome.txt", "r")
-            # # with
-            # #     filename
-            # logging.info(type(open(file, 'rb')))
-            # logging.info('clicksign_nuvem1-3')
-            # logging.info(type(File(open(file, 'rb'))))
-            #
-            #
-            # # logging.info(ContentFile(b64decode(file)))
-            # # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
-            # document.cloud_file.save(relative_path + filename, File(open(file, 'rb')))
         except Exception as e:
-            logging.info('docusign_nuvem2')
-            logging.info(e)
             message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
             logging.error(message)
 
