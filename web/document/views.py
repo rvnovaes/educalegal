@@ -663,9 +663,15 @@ def save_document_data(document, url, file, relative_path, has_ged, ged_data, fi
             logging.info('docusign_nuvem1')
             logging.info(type(file))
             logging.info('docusign_nuvem1-2')
-            logging.info(ContentFile(b64decode(file)))
+
+            logging.info(type(open(file, 'rb')))
+            logging.info('clicksign_nuvem1-3')
+            logging.info(type(File(open(file, 'rb'))))
+
+
+            # logging.info(ContentFile(b64decode(file)))
             # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
-            document.cloud_file.save(relative_path + filename, ContentFile(b64decode(file)))
+            document.cloud_file.save(relative_path + filename, File(open(file, 'rb')))
         except Exception as e:
             logging.info('docusign_nuvem2')
             logging.info(e)
