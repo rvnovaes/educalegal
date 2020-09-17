@@ -87,12 +87,32 @@
       </tab-pane>
 
     </tabs>
-    <!--  TODO Testar bloqueio de CORS para download em ambiente real. Em localhost ele bloqueia  -->
-    <base-button @click="downloadDocument(currentDocument.ged_link, currentDocument.name)" type="primary"><i
-      class="ni ni-cloud-download-95"></i>Baixar
-    </base-button>
-    <base-button @click="back()" type="warning"><i class="ni ni-bold-left"></i>Voltar</base-button>
 
+    <div v-if="currentDocument.parent == null">
+      <!--  TODO Testar bloqueio de CORS para download em ambiente real. Em localhost ele bloqueia  -->
+      <!-- pdf -->
+      <base-button v-if="currentDocument.relative_file_path" @click="downloadDocument(currentDocument.relative_file_path,
+      currentDocument.name)" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
+      </base-button>
+      <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
+      currentDocument.name)" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
+      </base-button>
+
+      <!-- docx -->
+      <base-button v-if="currentDocument.relative_file_path" @click="downloadDocument(currentDocument.relative_file_path,
+      currentDocument.name)" type="primary"><i class="ni ni-cloud-download-95"></i>Word
+      </base-button>
+      <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
+      currentDocument.name)" type="primary"><i class="ni ni-cloud-download-95"></i>Word
+      </base-button>
+
+      <!-- assinatura eletronica -->
+      <base-button v-if="currentDocument.submit_to_esignature == false" @click="back()" type="success"><i
+        class="ni ni-sound-wave"></i>Enviar para assinatura</base-button>
+
+      <!-- email -->
+      <base-button @click="back()" type="info"><i class="ni ni-email-83"></i>Enviar por e-mail</base-button>
+    </div>
   </div>
 
 

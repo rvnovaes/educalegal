@@ -249,17 +249,6 @@ def _create_address_obj(document, person_list_name, index):
     document[person_list_name]["gathered"] = True
 
 
-@login_required
-def redirect_send_email(request, doc_uuid):
-    status_code, message = send_email(doc_uuid)
-
-    if status_code == 202:
-        messages.success(request, message)
-    else:
-        messages.error(request, message)
-    return redirect('document:document-detail', doc_uuid)
-
-
 def send_email(doc_uuid):
     try:
         document = Document.objects.get(doc_uuid=doc_uuid)
@@ -272,7 +261,6 @@ def send_email(doc_uuid):
         logger.error(message)
         return 0, message
     else:
-        status_code = 0
         if document.recipients:
             to_emails = document.recipients
             school_name = document.school.name if document.school.name else document.school.legal_name
@@ -298,9 +286,9 @@ def send_email(doc_uuid):
                 status_code, response_json = sendgrid_send_email(
                     to_emails, subject, html_content, category, file_path, file_name, file)
             except Exception as e:
-                message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
-                error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
-                raise
+                message = str(type(e).__name__) + " : " + str(e)
+                status_code = 400
+                return status_code, message
             else:
                 if status_code == 202:
                     document.send_email = True
@@ -314,26 +302,12 @@ def send_email(doc_uuid):
                     message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:{}'.format(
                         to_recipients))
                 else:
-                    message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
-                    error_message = message + "{} - {}".format(status_code, response_json)
-                    logger.debug(error_message)
-                    logger.error(error_message)
+                    message = response_json
+                    logger.error(message)
         else:
-
-            return 0, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
+            return 404, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
     return status_code, message
-
-
-@login_required
-def redirect_send_to_esignature(request, doc_uuid):
-    status_code, message = send_to_esignature(doc_uuid)
-
-    if status_code == 202:
-        messages.success(request, message)
-    else:
-        messages.error(request, message)
-    return redirect('document:document-detail', doc_uuid)
 
 
 def send_to_esignature(doc_uuid):
@@ -350,11 +324,25 @@ def send_to_esignature(doc_uuid):
     else:
         status_code = 0
         if document.recipients:
+            if document.tenant.plan.use_esignature:
+                if not document.tenant.esignature_app:
+                    message = 'Entre em contato com a nossa equipe para configurar o envio de assinatura eletrônica ' \
+                              'pela plataforma.'
+                    status_code = 400
+                    return status_code, message
+            else:
+                message = 'Plano contratado: {}. Entre em contato com a nossa equipe para adquirir um plano com ' \
+                          'assinatura eletrônica.'.format(document.tenant.plan.name)
+                status_code = 400
+                return status_code, message
+
             esignature_app = document.tenant.esignature_app
-            message = 'Não foi possível enviar para a assinatura eletrônica. Entre em contato com o suporte.'
 
             if not document.relative_file_path:
-                message = 'Não foi encontrado o caminho do arquivo. Entre em contato com o suporte.'
+                message = 'Não foi encontrado o caminho do arquivo para envio para a assinatura eletrônica. ' \
+                          'Entre em contato com o suporte.'
+                status_code = 400
+                return status_code, message
 
             file_path = os.path.join(settings.BASE_DIR, "media/", document.relative_file_path.path)
 
@@ -374,7 +362,9 @@ def send_to_esignature(doc_uuid):
                     status_code, response_json = dsc.send_to_docusign(
                         document.recipients, documents, email_subject="Documento para sua assinatura")
                 except Exception as e:
-                    logger.error(str(type(e).__name__) + " : " + str(e))
+                    message = str(type(e).__name__) + " : " + str(e)
+                    logger.error(message)
+                    return 400, message
                 else:
                     if status_code == 201:
                         document.submit_to_esignature = True
@@ -397,15 +387,18 @@ def send_to_esignature(doc_uuid):
                     # verifica se o signer ja foi enviado para a clicksign
                     success, recipients_sign = get_signer_key_by_email(document.recipients, document.tenant)
                     if not success:
+                        message = 'Não foi possível localizar o signatário por e-mail.'
+                        status_code = 400
                         return status_code, message
 
                     # cria os destinatarios
                     status_code, reason = csc.add_signer(recipients_sign)
                     if status_code != 201:
-                        return status_code, message
+                        return status_code, reason
 
                     # adiciona signer key no educa legal
                     if not post_signer_key(recipients_sign, esignature_app, document.tenant):
+                        message = 'Não foi possível salvar o signatário no sistema.'
                         return status_code, message
 
                     # adiciona os signatarios ao documento e envia por email para o primeiro signatario
