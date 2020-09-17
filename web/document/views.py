@@ -634,7 +634,7 @@ def query_documents_by_args(pk=None, **kwargs):
     return data
 
 
-def save_document_data(document, url, absolute_path, relative_path, has_ged, ged_data, parent=None):
+def save_document_data(document, url, file, relative_path, has_ged, ged_data, parent=None):
     if has_ged:
         document.ged_id = ged_data['id']
         document.ged_link = ged_data['latest_version']['document_url'] + 'download/'
@@ -655,7 +655,7 @@ def save_document_data(document, url, absolute_path, relative_path, has_ged, ged
     else:
         try:
             # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
-            document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(absolute_path, 'rb')))
+            document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(file, 'rb')))
         except Exception as e:
             message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
             logging.error(message)

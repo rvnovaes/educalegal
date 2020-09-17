@@ -19,14 +19,14 @@ class MayanClient:
         )
         self.session.headers.update(headers)
 
-    def document_create(self, data, url, absolute_path):
+    def document_create(self, data, url, file):
         """Salva o arquivo no GED
         :param data: dados do arquivo
-        :type value: dict
+        :type: dict
         :param url: URL da qual o arquivo será baixado
-        :type value: str
-        :param absolute_path: caminho no disco onde o arquivo foi salvo. É usado quando a URL não foi fornecida.
-        :type value: str
+        :type: str
+        :param file: caminho no disco onde o arquivo foi salvo. É usado quando a URL não foi fornecida.
+        :type: str
         :return: status_code
         :rtype: int
         :return: response.json()
@@ -34,6 +34,18 @@ class MayanClient:
         :return: id do documento no GED
         :rtype: int
         """
+        #
+        # if file:
+        #     f = file
+        #     data = f.read()
+        #     f.close()
+        # else:
+        #     data = None
+        #
+        # if data:
+        #     encoded = base64.b64encode(data).decode()
+        #     attachment = Attachment()
+
         if url:
             try:
                 response = requests.get(url)
@@ -42,13 +54,13 @@ class MayanClient:
                 message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
                 logging.error(message)
                 return 400, message, 0
-        else:
-            try:
-                file = open(absolute_path, mode="rb")
-            except Exception as e:
-                message = 'Erro ao abrir o arquivo. Erro: {e}'.format(e=e)
-                logging.error(message)
-                return 400, message, 0
+        # else:
+        #     try:
+        #         file = open(absolute_path, mode="rb")
+        #     except Exception as e:
+        #         message = 'Erro ao abrir o arquivo. Erro: {e}'.format(e=e)
+        #         logging.error(message)
+        #         return 400, message, 0
 
         # envia documento para o ged
         final_url = self.api_base_url + "/api/documents/"

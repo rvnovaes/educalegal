@@ -82,8 +82,6 @@ class DocumentSerializer(serializers.ModelSerializer):
             "altered_date",
             "status",
             "description",
-            "recipients",
-            "document_data",
         ]
 
     def get_interview_name(self, obj):

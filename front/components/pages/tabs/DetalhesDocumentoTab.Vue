@@ -91,7 +91,7 @@
     <div v-if="currentDocument.parent == null">
       <!--  TODO Testar bloqueio de CORS para download em ambiente real. Em localhost ele bloqueia  -->
       <!-- pdf -->
-      <base-button v-if="currentDocument.relative_file_path" @click="downloadDocument(currentDocument.relative_file_path,
+      <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.cloud_file,
       currentDocument.name)" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
       </base-button>
       <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
@@ -99,7 +99,7 @@
       </base-button>
 
       <!-- docx -->
-      <base-button v-if="currentDocument.relative_file_path" @click="downloadDocument(currentDocument.relative_file_path,
+      <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.cloud_file,
       currentDocument.name)" type="primary"><i class="ni ni-cloud-download-95"></i>Word
       </base-button>
       <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
