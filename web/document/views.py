@@ -3,13 +3,18 @@ import json
 import pandas as pd
 import uuid
 
-from mongoengine.errors import ValidationError
 from celery import chain
+from mongoengine.errors import ValidationError
+from os.path import basename
+from rest_framework import generics
+from urllib.parse import urlsplit
+from urllib.request import urlretrieve, urlcleanup
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
+from django.core.files import File
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -17,7 +22,6 @@ from django_tables2 import SingleTableView
 from django.shortcuts import render, HttpResponse
 from django.utils.safestring import mark_safe
 from django.views import View
-from rest_framework import generics
 
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
@@ -630,13 +634,36 @@ def query_documents_by_args(pk=None, **kwargs):
     return data
 
 
-def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
+def save_document_data(document, url, file, relative_path, has_ged, ged_data, parent=None):
     if has_ged:
         document.ged_id = ged_data['id']
         document.ged_link = ged_data['latest_version']['document_url'] + 'download/'
         document.ged_uuid = ged_data['uuid']
 
-    document.relative_file_path = relative_path
+    if url:
+        try:
+            # salva como arquivo temporario
+            temp_file, _ = urlretrieve(url)
+            # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
+            document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(temp_file, 'rb')))
+        except Exception as e:
+            message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
+            logging.error(message)
+        finally:
+            # apaga arquivo temporario
+            urlcleanup()
+    else:
+        try:
+            logging.info('docusign_nuvem1')
+            logging.info(file)
+            # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
+            document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(file, 'rb')))
+        except Exception as e:
+            logging.info('docusign_nuvem2')
+            logging.info(e)
+            message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
+            logging.error(message)
+
     document.status = DocumentStatus.INSERIDO_GED.value
 
     if parent:
@@ -656,11 +683,10 @@ def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
         try:
             if has_ged:
                 # salva dados do ged do documento no educa legal
-                document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'relative_file_path', 'status',
-                                             'file_kind'])
+                document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'status', 'file_kind'])
             else:
                 # salva dados do ged do documento no educa legal
-                document.save(update_fields=['relative_file_path', 'status', 'file_kind'])
+                document.save(update_fields=['status', 'file_kind'])
         except Exception as e:
             message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
             logging.exception(message)

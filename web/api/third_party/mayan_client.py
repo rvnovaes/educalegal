@@ -1,3 +1,4 @@
+import io
 import logging
 import requests
 import time
@@ -18,9 +19,53 @@ class MayanClient:
         )
         self.session.headers.update(headers)
 
-    def document_create(self, data, absolute_path):
+    def document_create(self, data, url, file):
+        """Salva o arquivo no GED
+        :param data: dados do arquivo
+        :type: dict
+        :param url: URL da qual o arquivo será baixado
+        :type: str
+        :param file: caminho no disco onde o arquivo foi salvo. É usado quando a URL não foi fornecida.
+        :type: str
+        :return: status_code
+        :rtype: int
+        :return: response.json()
+        :rtype: dict
+        :return: id do documento no GED
+        :rtype: int
+        """
+        #
+        # if file:
+        #     f = file
+        #     data = f.read()
+        #     f.close()
+        # else:
+        #     data = None
+        #
+        # if data:
+        #     encoded = base64.b64encode(data).decode()
+        #     attachment = Attachment()
+
+        if url:
+            try:
+                response = requests.get(url)
+                file = io.BytesIO(response.content)
+
+                logging.info('clicksign_ged1')
+                logging.info(file)
+            except Exception as e:
+                message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
+                logging.error(message)
+                return 400, message, 0
+        # else:
+        #     try:
+        #         file = open(absolute_path, mode="rb")
+        #     except Exception as e:
+        #         message = 'Erro ao abrir o arquivo. Erro: {e}'.format(e=e)
+        #         logging.error(message)
+        #         return 400, message, 0
+
         # envia documento para o ged
-        file = open(absolute_path, mode="rb")
         final_url = self.api_base_url + "/api/documents/"
         try:
             response = self.session.post(
@@ -29,7 +74,7 @@ class MayanClient:
         except Exception as e:
             message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
             logging.error(message)
-            return 0, message, 0
+            return 400, message, 0
         else:
             if 'id' in response.json():
                 return response.status_code, response.json(), response.json()['id']
