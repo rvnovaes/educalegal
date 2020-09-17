@@ -223,7 +223,7 @@ def docusign_webhook_listener(request):
                     pdf_filenames = list()
                     for pdf in envelope_data["pdf_documents"]:
                         try:
-                            logging.info('docusign_*')
+                            logging.info('docusign_9')
                             post_data["label"] = pdf["filename"]
                             status_code, ged_data, ged_id = save_in_ged(post_data, None, pdf["file"], document.tenant)
                         except Exception as e:

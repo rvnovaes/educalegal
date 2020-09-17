@@ -655,7 +655,6 @@ def save_document_data(document, url, file, relative_path, has_ged, ged_data, pa
     else:
         try:
             logging.info('docusign_nuvem1')
-            logging.info(file)
             # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
             document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(file, 'rb')))
         except Exception as e:

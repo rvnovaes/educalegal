@@ -513,12 +513,19 @@ def save_in_ged(data, url, file, tenant):
 
             return status_code, response, 0
         else:
-            try:
-                ged_document_data = mc.document_read(ged_id)
-            except Exception as e:
-                message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
+            if ged_id == 0:
+                message = 'O arquivo foi inserido no GED, mas retornou ID = 0. Erro: ' + str(status_code) + ' - ' + \
+                          response
                 logging.error(message)
-                return 0, message, 0
+
+                return status_code, message, 0
+            else:                
+                try:
+                    ged_document_data = mc.document_read(ged_id)
+                except Exception as e:
+                    message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
+                    logging.error(message)
+                    return 0, message, 0
 
             return status_code, ged_document_data, ged_id
 

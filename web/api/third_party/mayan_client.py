@@ -52,7 +52,6 @@ class MayanClient:
                 file = io.BytesIO(response.content)
 
                 logging.info('clicksign_ged1')
-                logging.info(file)
             except Exception as e:
                 message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
                 logging.error(message)
@@ -62,8 +61,8 @@ class MayanClient:
                 file = io.BytesIO(file)
 
                 logging.info('docusign_ged1-1')
-                logging.info(file)
             except Exception as e:
+                logging.info('docusign_ged1-2')
                 message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
                 logging.error(message)
                 return 400, message, 0
@@ -78,17 +77,22 @@ class MayanClient:
         # envia documento para o ged
         final_url = self.api_base_url + "/api/documents/"
         try:
+            logging.info('docusign_ged1-3')
             response = self.session.post(
                 final_url, data=data, files={"file": file}
             )
         except Exception as e:
+            logging.info('docusign_ged1-4')
             message = 'Não foi possível salvar o documento no GED. Erro: ' + str(e)
             logging.error(message)
             return 400, message, 0
         else:
             if 'id' in response.json():
+                logging.info('docusign_ged1-5')
+                logging.info(response.json()['id'])
                 return response.status_code, response.json(), response.json()['id']
             else:
+                logging.info('docusign_ged1-6')
                 return response.status_code, response.json(), 0
 
     # Este método foi escrito deste modo para retornar uma mensagem num formato que o Docassemble pode interpretar
