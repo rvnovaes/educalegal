@@ -329,7 +329,7 @@ def send_email(doc_uuid):
 def redirect_send_to_esignature(request, doc_uuid):
     status_code, message = send_to_esignature(doc_uuid)
 
-    if status_code == 202:
+    if status_code == 202 or status_code == 201:
         messages.success(request, message)
     else:
         messages.error(request, message)
@@ -349,7 +349,12 @@ def send_to_esignature(doc_uuid):
         return 0, message
     else:
         status_code = 0
+        message = ''
         if document.recipients:
+            if isinstance(document.recipients, str):
+                # converte string para dict
+                document.recipients = json.loads(document.recipients)
+
             if document.tenant.plan.use_esignature:
                 if not document.tenant.esignature_app:
                     message = 'Entre em contato com a nossa equipe para configurar o envio de assinatura eletrônica ' \
@@ -399,6 +404,13 @@ def send_to_esignature(doc_uuid):
                         document.envelope_number = response_json['envelopeId']
                         document.save(update_fields=['submit_to_esignature', 'status', 'envelope_number'])
 
+                        to_recipients = ''
+                        for recipient in document.recipients:
+                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+
+                        message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
+                                            'sucesso para os destinatários:{}'.format(to_recipients))
+
             elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.name:
                 csc = ClickSignClient(esignature_app.private_key, esignature_app.test_mode)
 
@@ -439,16 +451,17 @@ def send_to_esignature(doc_uuid):
                         document.submit_to_esignature = True
                         document.save(update_fields=['status', 'envelope_number', 'submit_to_esignature'])
 
-                        if isinstance(document.recipients, str):
-                            # converte string para dict
-                            document.recipients = json.loads(document.recipients)
-
                         to_recipients = ''
                         for recipient in document.recipients:
                             to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
 
                         message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
                                             'sucesso para os destinatários:{}'.format(to_recipients))
+                    else:
+                        return status_code, response_json
+                else:
+                    return status_code, response_json
+
         else:
             return 0, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
