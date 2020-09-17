@@ -1,6 +1,6 @@
 export default {
-  methods:{
-    tour (){
+  methods: {
+    tour() {
       this.$tours["pageTour"].start();
     }
   },
@@ -25,7 +25,7 @@ export default {
           params: {
             placement: "right"
           },
-          content: `No painel você acessa informações gerais sobre o uso do Educa Legal.`
+          content: `No painel você acessa informações gerais sobre o uso do Educa Legal. Você também pode usar as setas para navegar entre as dicas e esc para fechar.`
         },
         {
           target: ".documentos-gerados",
@@ -60,7 +60,7 @@ export default {
           header: {
             title: "Assinaturas em andamento",
           },
-          content: `Representam os documentos que foram enviados para os destinatários mais ainda não contam com a assinatura de todos. `
+          content: `Representam os documentos que foram enviados para os destinatários mais ainda não contam com a assinatura de todos. Lembre-se que você pode voltar à ajuda a qualquer momento.`
         }
       ],
       // Criar documentos - criar/index
@@ -70,7 +70,7 @@ export default {
           header: {
             title: "Criar documentos",
           },
-          content: `Nesta página você tem acesso a todos os modelos de documentos disponibilizados para sua escola.`,
+          content: `Nesta página você tem acesso a todos os modelos de documentos disponibilizados para sua escola. Você também pode usar as setas para navegar entre as dicas e esc para fechar.`,
           params: {
             placement: "right",
             enableScrolling: false
@@ -120,7 +120,7 @@ export default {
         },
         {
           target: ".edit",
-          content: `Clique nesse botão para criar um novo documento com base neste modelo.`,
+          content: `Clique nesse botão para criar um novo documento com base neste modelo.  Lembre-se que você pode voltar à ajuda a qualquer momento.`,
           params: {
             placement: "top",
             highlight: false,
@@ -267,7 +267,7 @@ export default {
         },
         {
           target: ".edit",
-          content: `Clique neste botão para ver os detalhes e baixar o documento.`,
+          content: `Clique neste botão para ver os detalhes e baixar o documento. Lembre-se que você pode voltar à ajuda a qualquer momento.`,
           params: {
             placement: "left",
             enableScrolling: true
@@ -356,56 +356,72 @@ export default {
         },
         {
           target: ".botao-apagar-escola",
-          content: `Você pode apagar uma escola apenas se ainda não houver criado nenhum documento para ela. Uma vez criados documentos, a escola fica cadastrada permanentemente.`,
+          content: `Você pode apagar uma escola apenas se ainda não houver criado nenhum documento para ela. Uma vez criados documentos, a escola fica cadastrada permanentemente. . Lembre-se que você pode voltar à ajuda a qualquer momento.`,
           params: {
             placement: "top",
             enableScrolling: false
           }
         },
       ],
-      // Escolas Form - /escolas/criar
+      // Escolas Form - /escolas/criar e /escolas/n onde n é o id da escola
       escolaDetalhesSteps: [
         {
-          target: ".criar-escolas",
-          header: {
-            title: "Criar nova escola",
-          },
-          content: `Todos os documentos e contratos gerados se referem a uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui e são automaticamente usados no preenchimento dos contratos.`,
-          params: {
-            placement: "right",
-            enableScrolling: false
-          }
-        },
-        {
-          target: ".botao-editar-escola",
-          content: `Aqui você pode editar os dados de uma escola.`,
+          target: ".escola-nome",
+          content: `Nome de fantasia da escola. Este nome é uma identificação usada no sistema e não é utilizada no preenchimento dos contratos e documentos`,
           params: {
             placement: "top",
             enableScrolling: false
           }
         },
         {
-          target: ".botao-apagar-escola",
-          content: `Você pode apagar uma escola apenas se ainda não tiver criado nenhum documento para ela.`,
+          target: ".escola-razao",
+          content: `A razão social deve ser exatamente como inscrita no cadastro do CNPJ. Ela será usada no preenchimento de todos os contratos e documentos`,
           params: {
             placement: "top",
             enableScrolling: false
           }
         },
         {
-          target: ".botao-nova-escola",
-          header: {
-            title: "Nova escola",
-          },
-          content: `Todos os documentos e contratos gerados se referem a uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui.`,
+          target: ".escola-cnpj",
+          content: `O CNPJ da escola. Caso se trate de pessoa Física, inserir o CPF.`,
           params: {
-            placement: "left",
+            placement: "top",
             enableScrolling: false
           }
         },
-      ],
-
-
+        {
+          target: ".escola-tipo",
+          content: `O tipo da pessoa da escola. Se você possui empresa regularmente constituída com CNPJ, escolha "Jurídica". Caso contrário, escolha pessoa Física.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".escola-email",
+          content: `E-mail da escola. O cadastro correto deste e-mail é fundamental. Por padrão, os documentos enviados por e-mail ou para assinatura eletrônica usam o endereço cadastrado neste campo.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".salvar-escola",
+          content: `Clique nesse botão para salvar as alterações ou em voltar para descartar.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+        {
+          target: ".voltar",
+          content: `Clique nesse botão para descartar as alterações e voltar para lista de escolas. Lembre-se que você pode voltar à ajuda a qualquer momento.`,
+          params: {
+            placement: "top",
+            enableScrolling: false
+          }
+        },
+      ]
     };
-  },
+  }
 };
