@@ -43,7 +43,7 @@ class School(TenantAwareModel):
     # when a CharField has both unique=True and blank=True set null=True is required to
     # avoid unique constraint violations when saving multiple objects with blank values
     cnpj = models.CharField(max_length=255, verbose_name="CNPJ/CPF")
-    logo = models.ImageField(verbose_name="Logo", blank=True)
+    logo = models.ImageField(verbose_name="Logo", blank=True, null=True)
     phone = models.CharField(max_length=255, verbose_name="Telefone")
     site = models.URLField(verbose_name="Site")
     email = models.EmailField(verbose_name="E-mail")
