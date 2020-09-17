@@ -57,6 +57,16 @@ class MayanClient:
                 message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
                 logging.error(message)
                 return 400, message, 0
+        else:
+            try:
+                file = io.BytesIO(file)
+
+                logging.info('docusign_ged1-1')
+                logging.info(file)
+            except Exception as e:
+                message = 'Erro ao salvar a url como arquivo temporário. Erro: {e}'.format(e=e)
+                logging.error(message)
+                return 400, message, 0
         # else:
         #     try:
         #         file = open(absolute_path, mode="rb")
