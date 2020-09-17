@@ -1,4 +1,3 @@
-import base64
 import dateparser
 import logging
 import xmltodict
@@ -139,7 +138,7 @@ def docusign_pdf_files_parser(data):
         pdf_file_data["file_kind"] = file_kind
         pdf_file_data["filename"] = filename
         pdf_file_data["description"] = description
-        pdf_file_data["file"] = base64.b64decode(pdf["PDFBytes"])
+        pdf_file_data["file"] = pdf["PDFBytes"]
         pdf_documents.append(pdf_file_data)
 
         # with open(full_filename, "wb") as pdf_file:
