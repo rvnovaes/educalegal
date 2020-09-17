@@ -19,13 +19,13 @@
           }">
         </sidebar-item>
 
-<!--        <sidebar-item-->
-<!--          :link="{-->
-<!--            name: 'Geração em Lote',-->
-<!--            icon: 'ni ni-ungroup text-orange',-->
-<!--            path: '/lote'-->
-<!--          }">-->
-<!--        </sidebar-item>-->
+        <!--        <sidebar-item-->
+        <!--          :link="{-->
+        <!--            name: 'Geração em Lote',-->
+        <!--            icon: 'ni ni-ungroup text-orange',-->
+        <!--            path: '/lote'-->
+        <!--          }">-->
+        <!--        </sidebar-item>-->
 
         <sidebar-item
           :link="{
@@ -43,13 +43,13 @@
           }">
         </sidebar-item>
 
-<!--        <sidebar-item-->
-<!--          :link="{-->
-<!--            name: 'Atendimento',-->
-<!--            icon: 'fa fa-user-tie text-red',-->
-<!--            path: '/atendimento'-->
-<!--          }">-->
-<!--        </sidebar-item>-->
+        <!--        <sidebar-item-->
+        <!--          :link="{-->
+        <!--            name: 'Atendimento',-->
+        <!--            icon: 'fa fa-user-tie text-red',-->
+        <!--            path: '/atendimento'-->
+        <!--          }">-->
+        <!--        </sidebar-item>-->
       </template>
 
       <template slot="links-after">
@@ -67,7 +67,7 @@
           <li class="nav-item">
             <a class="nav-link" href="https://atendimento.atlassian.net/servicedesk/customer/portal/2"
                target="_blank" rel="noopener">
-<!--              <i class="ni ni-bulb-61"></i>-->
+              <!--              <i class="ni ni-bulb-61"></i>-->
               <i class="fa fa-user-tie text-red"></i>
               <span class="nav-link-text">Atendimento Jurídico</span>
             </a>
@@ -94,54 +94,56 @@
   </div>
 </template>
 <script>
-  /* eslint-disable no-new */
-  import PerfectScrollbar from 'perfect-scrollbar';
-  import 'perfect-scrollbar/css/perfect-scrollbar.css';
+/* eslint-disable no-new */
+import PerfectScrollbar from "perfect-scrollbar";
+import "perfect-scrollbar/css/perfect-scrollbar.css";
 
-  function hasElement(className) {
-    return document.getElementsByClassName(className).length > 0;
+function hasElement(className) {
+  return document.getElementsByClassName(className).length > 0;
+}
+
+function initScrollbar(className) {
+  if (hasElement(className)) {
+    new PerfectScrollbar(`.${className}`);
+  } else {
+    // try to init it later in case this component is loaded async
+    setTimeout(() => {
+      initScrollbar(className);
+    }, 100);
   }
+}
 
-  function initScrollbar(className) {
-    if (hasElement(className)) {
-      new PerfectScrollbar(`.${className}`);
-    } else {
-      // try to init it later in case this component is loaded async
-      setTimeout(() => {
-        initScrollbar(className);
-      }, 100);
+import DashboardNavbar from "~/components/layouts/argon/DashboardNavbar.vue";
+import ContentFooter from "~/components/layouts/argon/ContentFooter.vue";
+import DashboardContent from "~/components/layouts/argon/Content.vue";
+
+export default {
+  components: {
+    DashboardNavbar,
+    ContentFooter,
+    DashboardContent,
+  },
+  methods: {
+    initScrollbar() {
+      let isWindows = navigator.platform.startsWith("Win");
+      if (isWindows) {
+        initScrollbar("scrollbar-inner");
+      }
     }
-  }
-
-  import DashboardNavbar from '~/components/layouts/argon/DashboardNavbar.vue';
-  import ContentFooter from '~/components/layouts/argon/ContentFooter.vue';
-  import DashboardContent from '~/components/layouts/argon/Content.vue';
-
-  export default {
-    components: {
-      DashboardNavbar,
-      ContentFooter,
-      DashboardContent,
+  },
+  mounted() {
+    if (this.$auth.user.tenan_use_ged){
+      this.$store.dispatch("tenant/fetchTenantGedData", this.$auth.user.tenant);
+    }
+    this.initScrollbar();
+  },
+  computed:
+    {
+      gedUrl() {
+        return this.$store.state.tenant.tenantGedData;
+      },
     },
-    methods: {
-      initScrollbar() {
-        let isWindows = navigator.platform.startsWith('Win');
-        if (isWindows) {
-          initScrollbar('scrollbar-inner');
-        }
-      }
-    },
-    mounted() {
-      this.$store.dispatch("tenant/fetchTenantGedData", this.$auth.user.tenant)
-      this.initScrollbar()
-    },
-    computed:
-      {
-        gedUrl() {
-          return this.$store.state.tenant.tenantGedData;
-        }
-      }
-  };
+};
 </script>
 <style lang="scss">
 </style>

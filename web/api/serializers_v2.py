@@ -181,6 +181,8 @@ class TenantGedDataSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     tenant_name = serializers.SerializerMethodField()
+    tenant_use_ged = serializers.SerializerMethodField()
+    schools_count = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
@@ -200,7 +202,15 @@ class UserSerializer(serializers.ModelSerializer):
             "groups",
             "user_permissions",
             "tenant_name",
+            "tenant_use_ged",
+            "schools_count"
         ]
 
     def get_tenant_name(self, obj):
         return obj.tenant.name if obj.tenant else ""
+
+    def get_tenant_use_ged(self, obj):
+        return obj.tenant.plan.use_ged if obj.tenant else ""
+
+    def get_schools_count(self, obj):
+        return School.objects.filter(tenant=obj.tenant).count()

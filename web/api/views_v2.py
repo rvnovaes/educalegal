@@ -195,17 +195,15 @@ def create_tenant(request):
 
 # Document Views #######################################################################################################
 class DocumentViewSet(viewsets.ModelViewSet):
-    queryset = Document.objects.all()
     serializer_class = DocumentSerializer
 
     def get_queryset(self):
         user = self.request.user
         if not user.is_superuser:
             tenant = self.request.user.tenant
-            queryset = self.queryset.filter(tenant=tenant)
-            return queryset
+            return Document.objects.filter(tenant=tenant)
         else:
-            return self.queryset
+            return Document.objects.all()
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -225,10 +223,10 @@ class DocumentViewSet(viewsets.ModelViewSet):
         identifier = kwargs["identifier"]
         # Pode ser passada a id ou o doc_uuid.
         if checkers.is_integer(identifier, coerce_value=True):
-            instance = get_object_or_404(self.queryset, pk=identifier, tenant=tenant_id)
+            instance = get_object_or_404(self.get_queryset(), pk=identifier, tenant=tenant_id)
         elif checkers.is_uuid(identifier):
             instance = get_object_or_404(
-                self.queryset, doc_uuid=identifier, tenant=tenant_id
+                self.get_queryset(), doc_uuid=identifier, tenant=tenant_id
             )
         else:
             message = "O doc_uuid ou o id do documento não é um valor válido."
@@ -255,7 +253,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         )  # TODO parametro de onlyParent
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
-        queryset = self.queryset.filter(parent=None)
+        queryset = self.get_queryset().filter(parent=None)
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
@@ -349,7 +347,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         else:
             tenant_id = request.user.tenant.id
             instance = get_object_or_404(
-                self.queryset, doc_uuid=doc_uuid, tenant=tenant_id
+                self.get_queryset(), doc_uuid=doc_uuid, tenant=tenant_id
             )
 
             if "tenant" in request.data:
@@ -405,7 +403,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
             if user.is_staff:
                 tenant_id = request.user.tenant.id
                 instance = get_object_or_404(
-                    self.queryset, doc_uuid=doc_uuid, tenant=tenant_id
+                    self.get_queryset(), doc_uuid=doc_uuid, tenant=tenant_id
                 )
                 self.perform_destroy(instance)
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -498,6 +496,8 @@ def save_in_ged(data, url, file, tenant):
     # se o cliente nao tem ged, nao envia para o ged
     mc = MayanClient(tenant.tenantgeddata.url, tenant.tenantgeddata.token)
 
+    logging.info('docusign_ged1')
+
     # salva o arquivo no ged
     try:
         status_code, response, ged_id = mc.document_create(data, url, file)
@@ -513,12 +513,19 @@ def save_in_ged(data, url, file, tenant):
 
             return status_code, response, 0
         else:
-            try:
-                ged_document_data = mc.document_read(ged_id)
-            except Exception as e:
-                message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
+            if ged_id == 0:
+                message = 'O arquivo foi inserido no GED, mas retornou ID = 0. Erro: ' + str(status_code) + ' - ' + \
+                          response
                 logging.error(message)
-                return 0, message, 0
+
+                return status_code, message, 0
+            else:
+                try:
+                    ged_document_data = mc.document_read(ged_id)
+                except Exception as e:
+                    message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
+                    logging.error(message)
+                    return 0, message, 0
 
             return status_code, ged_document_data, ged_id
 
@@ -859,13 +866,15 @@ def save_document_file(document, data, params):
             logging.exception(message)
         else:
             if status_code == 201:
-                save_document_data(document, params['pdf_url'], None, relative_path, has_ged, ged_data, None)
+                save_document_data(document, params['pdf_url'], None, relative_path, has_ged, ged_data,
+                                   params['pdf_filename'], None)
             else:
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
     else:
-        save_document_data(document, params['pdf_url'], None, relative_path, has_ged, None, None)
+        save_document_data(document, params['pdf_url'], None, relative_path, has_ged, None, params['pdf_filename'],
+                           None)
 
     # salva o docx no sistema de arquivos
     data['name'] = params['docx_filename']
@@ -893,13 +902,15 @@ def save_document_file(document, data, params):
             logging.exception(message)
         else:
             if status_code == 201:
-                save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data, document)
+                save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data,
+                                   params['docx_filename'], document)
             else:
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
     else:
-        save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None, document)
+        save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None,
+                           params['docx_filename'], document)
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet

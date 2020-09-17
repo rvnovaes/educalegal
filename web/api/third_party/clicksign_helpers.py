@@ -163,7 +163,13 @@ def webhook_listener(request):
                 logging.info('clicksign_7')
                 relative_path = 'docs/' + tenant.name + '/' + document.name[:15] + '/'
                 document_url = data['document']['downloads']['signed_file_url']
-                save_file_in_cloud(document_url, relative_path, document)
+
+                # inclui no nome do pdf informacao de assinado
+                filename_no_extension = str(document.name.split(".pdf")[0])
+                filename = filename_no_extension + '-assinado.pdf'
+
+                # salva na nuvem o pdf assinado
+                # save_file_in_cloud(document_url, relative_path, document)
 
                 has_ged = tenant.has_ged()
                 if has_ged:
@@ -207,7 +213,7 @@ def webhook_listener(request):
                                 file_kind=DocumentFileKind.PDF_SIGNED.value,
                             )
                             save_document_data(related_document, document_url, None, relative_path, has_ged, ged_data,
-                                               document)
+                                               filename, document)
                             logging.info('clicksign_13')
                         else:
                             logging.info('clicksign_14')
@@ -228,7 +234,8 @@ def webhook_listener(request):
                         bulk_generation=document.bulk_generation,
                         file_kind=DocumentFileKind.PDF_SIGNED.value,
                     )
-                    save_document_data(related_document, document_url, None, relative_path, has_ged, None, document)
+                    save_document_data(related_document, document_url, None, relative_path, has_ged, None, filename,
+                                       document)
 
             logging.info('clicksign_16')
             # atualiza o status do documento
@@ -322,15 +329,21 @@ def webhook_listener(request):
     return HttpResponse(status=200, reason="Success!")
 
 
-def save_file_in_cloud(url, relative_path, document):
-    try:
-        # salva como arquivo temporario
-        temp_file, _ = urlretrieve(url)
-        # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
-        document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(temp_file, 'rb')))
-    except Exception as e:
-        message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
-        logging.error(message)
-    finally:
-        # apaga arquivo temporario
-        urlcleanup()
+# def save_file_in_cloud(url, relative_path, document):
+#     try:
+#         # salva como arquivo temporario
+#         temp_file, _ = urlretrieve(url)
+#
+#         logging.info('clicksign_cloud1')
+#         logging.info(url)
+#         logging.info('clicksign_cloud2')
+#         logging.info(relative_path + basename(urlsplit(url).path))
+#
+#         # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
+#         document.cloud_file.save(relative_path + basename(urlsplit(url).path), File(open(temp_file, 'rb')))
+#     except Exception as e:
+#         message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
+#         logging.error(message)
+#     finally:
+#         # apaga arquivo temporario
+#         urlcleanup()

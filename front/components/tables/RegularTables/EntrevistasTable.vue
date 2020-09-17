@@ -17,7 +17,7 @@
       <el-table-column
         v-for="column in tableColumns"
         :key="column.label"
-        :class-name="column.ots"
+        :class-name="column.tour"
         v-bind="column"></el-table-column>
       <el-table-column min-width="100px" align="right" label="Ações">
         <div slot-scope="{$index, row}" class="d-flex">
@@ -58,28 +58,28 @@ export default {
           label: "Nome",
           minWidth: 240,
           sortable: false,
-          ots: "nome-entrevista"
+          tour: "nome-entrevista"
         },
         {
           prop: "description",
           label: "Descrição",
           minWidth: 220,
           sortable: false,
-          ots: "descricao-entrevista"
+          tour: "descricao-entrevista"
         },
         {
           prop: "version",
           label: "Versão",
           minWidth: 80,
           sortable: false,
-          ots: "versao-entrevista"
+          tour: "versao-entrevista"
         },
         {
           prop: "date_available",
           label: "Disponibilização",
           minWidth: 100,
           sortable: false,
-          ots: "disponibilizacao-entrevista"
+          tour: "disponibilizacao-entrevista"
         }
       ],
     };

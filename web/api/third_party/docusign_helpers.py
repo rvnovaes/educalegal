@@ -1,15 +1,10 @@
-import base64
 import dateparser
 import logging
-import os
 import xmltodict
-
-from pathlib import Path
 
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from django.conf import settings
 
 from api.views_v2 import save_in_ged
 from document.models import Document, Envelope, Signer, DocumentStatus, DocumentFileKind
@@ -143,7 +138,7 @@ def docusign_pdf_files_parser(data):
         pdf_file_data["file_kind"] = file_kind
         pdf_file_data["filename"] = filename
         pdf_file_data["description"] = description
-        pdf_file_data["file"] = base64.b64decode(pdf["PDFBytes"])
+        pdf_file_data["file"] = pdf["PDFBytes"]
         pdf_documents.append(pdf_file_data)
 
         # with open(full_filename, "wb") as pdf_file:
@@ -227,7 +222,7 @@ def docusign_webhook_listener(request):
                     pdf_filenames = list()
                     for pdf in envelope_data["pdf_documents"]:
                         try:
-                            logging.info('docusign_*')
+                            logging.info('docusign_9')
                             post_data["label"] = pdf["filename"]
                             status_code, ged_data, ged_id = save_in_ged(post_data, None, pdf["file"], document.tenant)
                         except Exception as e:
@@ -253,8 +248,8 @@ def docusign_webhook_listener(request):
                                     bulk_generation=document.bulk_generation,
                                     file_kind=pdf["file_kind"],
                                 )
-                                save_document_data(related_document, None, pdf["file"], has_ged, ged_data,
-                                                   relative_path, document)
+                                save_document_data(related_document, None, pdf["file"], relative_path, has_ged,
+                                                   ged_data, pdf["filename"], document)
                             else:
                                 logging.info('docusign_13')
                                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
@@ -278,7 +273,8 @@ def docusign_webhook_listener(request):
                             bulk_generation=document.bulk_generation,
                             file_kind=pdf["file_kind"],
                         )
-                        save_document_data(related_document, None, pdf["file"], relative_path, has_ged, None, document)
+                        save_document_data(related_document, None, pdf["file"], relative_path, has_ged, None,
+                                           pdf["filename"], document)
                         logging.info('docusign_15')
             except Exception as e:
                 logging.info('docusign_16')
