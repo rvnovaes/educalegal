@@ -19,7 +19,9 @@ from .views_v2 import (
     UserView,
     dashboard_data,
     recover_password,
-    reset_password
+    reset_password,
+    validate_document,
+    generate_document
 )
 
 from api.third_party.clicksign_helpers import webhook_listener
@@ -44,6 +46,8 @@ urlpatterns = [
     path("documents/", DocumentViewSet.as_view({"post": "create", "get": "list"})),
     path("documents/<str:identifier>", DocumentViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     path("documents/<str:identifier>/download", DocumentDownloadViewSet.as_view({"get": "retrieve", "delete": "destroy"})),
+    path("documents/validate/<int:interview_id>", validate_document),
+    path("documents/generate/<int:interview_id>", generate_document),
     path("dashboard/", dashboard_data),
     path("recover_password/", recover_password),
     path("reset_password/", reset_password),
