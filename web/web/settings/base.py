@@ -127,9 +127,6 @@ AUTH_USER_MODEL = "users.CustomUser"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
 # AllAuth --> https://wsvincent.com/django-login-with-email-not-username/
 
 AUTHENTICATION_BACKENDS = (
@@ -255,6 +252,20 @@ LOGGING = {
         },
     },
 }
+
+# Static e media files
+# https://www.digitalocean.com/docs/spaces/how-to/manage-access/
+AWS_ACCESS_KEY_ID = "AWNYACZSFSYOBCIOTFOP"
+AWS_SECRET_ACCESS_KEY = "k0GW8r3VnC9GzKD7S6RTdjCP2dVzN3bfOdthVfSCY/g"
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_OBJECT_PARAMETERS = {
+    "CacheControl": "max-age=86400",
+}
+AWS_DEFAULT_ACL = None
+STATICFILES_STORAGE = 'web.storage_backends.StaticStorage'
+DEFAULT_FILE_STORAGE = 'web.storage_backends.MediaStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 # Adding a new Currency
 BRL = moneyed.add_currency(

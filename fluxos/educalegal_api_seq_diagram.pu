@@ -53,7 +53,7 @@ end note
 EducaLegal -> Docassemble: returns Educa Legal document data
 deactivate Docassemble
 
-EducaLegal -> GED: PATCH mc.document_create(data, absolute_path)
+EducaLegal -> GED: PATCH mc.document_create(data, file)
 activate GED
 
 note right
@@ -89,7 +89,7 @@ deactivate Recipients
 ESignature -> EducaLegal: POST webhook_listener(final status + signed document + certificate)
 deactivate ESignature
 
-EducaLegal -> GED: POST mc.document_create(data, absolute_path)
+EducaLegal -> GED: POST mc.document_create(data, file)
 GED -> EducaLegal: dados do documento salvo
 GED -> EducaLegal: created_document_data(status, id, url, uuid)
 deactivate EducaLegal

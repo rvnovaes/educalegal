@@ -1,6 +1,6 @@
 import io
+import json
 import logging
-import os
 from datetime import datetime
 import requests
 
@@ -10,7 +10,6 @@ from api.third_party.docassemble_client import DocassembleClient, DocassembleAPI
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.db import IntegrityError
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
@@ -249,6 +248,17 @@ def _create_address_obj(document, person_list_name, index):
     document[person_list_name]["gathered"] = True
 
 
+@login_required
+def redirect_send_email(request, doc_uuid):
+    status_code, message = send_email(doc_uuid)
+
+    if status_code == 202:
+        messages.success(request, message)
+    else:
+        messages.error(request, message)
+    return redirect('document:document-detail', doc_uuid)
+
+
 def send_email(doc_uuid):
     try:
         document = Document.objects.get(doc_uuid=doc_uuid)
@@ -263,6 +273,11 @@ def send_email(doc_uuid):
     else:
         if document.recipients:
             to_emails = document.recipients
+
+            if isinstance(to_emails, str):
+                # converte string para dict
+                to_emails = json.loads(to_emails)
+
             school_name = document.school.name if document.school.name else document.school.legal_name
             interview_name = document.interview.name if document.interview.name else ''
             subject = "IMPORTANTE: " + school_name + " | " + interview_name
@@ -274,17 +289,17 @@ def send_email(doc_uuid):
 
             file = None
 
-            if document.relative_file_path:
-                file_path = os.path.join(settings.BASE_DIR, "media/", document.relative_file_path.path)
+            if document.cloud_file:
+                response = requests.get(document.cloud_file.url)
+                file = io.BytesIO(response.content)
             else:
-                file_path = ''
                 if document.tenant.plan.use_ged and document.ged_link:
                     response = requests.get(document.ged_link)
                     file = io.BytesIO(response.content)
 
             try:
                 status_code, response_json = sendgrid_send_email(
-                    to_emails, subject, html_content, category, file_path, file_name, file)
+                    to_emails, subject, html_content, category, file_name, file)
             except Exception as e:
                 message = str(type(e).__name__) + " : " + str(e)
                 status_code = 400
@@ -310,6 +325,17 @@ def send_email(doc_uuid):
     return status_code, message
 
 
+@login_required
+def redirect_send_to_esignature(request, doc_uuid):
+    status_code, message = send_to_esignature(doc_uuid)
+
+    if status_code == 202 or status_code == 201:
+        messages.success(request, message)
+    else:
+        messages.error(request, message)
+    return redirect('document:document-detail', doc_uuid)
+
+
 def send_to_esignature(doc_uuid):
     try:
         document = Document.objects.get(doc_uuid=doc_uuid)
@@ -323,7 +349,12 @@ def send_to_esignature(doc_uuid):
         return 0, message
     else:
         status_code = 0
+        message = ''
         if document.recipients:
+            if isinstance(document.recipients, str):
+                # converte string para dict
+                document.recipients = json.loads(document.recipients)
+
             if document.tenant.plan.use_esignature:
                 if not document.tenant.esignature_app:
                     message = 'Entre em contato com a nossa equipe para configurar o envio de assinatura eletrônica ' \
@@ -338,19 +369,20 @@ def send_to_esignature(doc_uuid):
 
             esignature_app = document.tenant.esignature_app
 
-            if not document.relative_file_path:
+            if not document.cloud_file:
                 message = 'Não foi encontrado o caminho do arquivo para envio para a assinatura eletrônica. ' \
                           'Entre em contato com o suporte.'
                 status_code = 400
                 return status_code, message
 
-            file_path = os.path.join(settings.BASE_DIR, "media/", document.relative_file_path.path)
+            response = requests.get(document.cloud_file.url)
+            file = io.BytesIO(response.content)
 
             documents = [
                 {
                     'name': document.name,
                     'fileExtension': 'pdf',
-                    'documentBase64': make_document_base64(file_path)
+                    'documentBase64': make_document_base64(file)
                 }
             ]
 
@@ -371,6 +403,13 @@ def send_to_esignature(doc_uuid):
                         document.status = DocumentStatus.ENVIADO_ASS_ELET.value
                         document.envelope_number = response_json['envelopeId']
                         document.save(update_fields=['submit_to_esignature', 'status', 'envelope_number'])
+
+                        to_recipients = ''
+                        for recipient in document.recipients:
+                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+
+                        message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
+                                            'sucesso para os destinatários:{}'.format(to_recipients))
 
             elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.name:
                 csc = ClickSignClient(esignature_app.private_key, esignature_app.test_mode)
@@ -418,6 +457,11 @@ def send_to_esignature(doc_uuid):
 
                         message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
                                             'sucesso para os destinatários:{}'.format(to_recipients))
+                    else:
+                        return status_code, response_json
+                else:
+                    return status_code, response_json
+
         else:
             return 0, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
@@ -427,6 +471,11 @@ def send_to_esignature(doc_uuid):
 def get_signer_key_by_email(recipients, tenant):
     # separa somente os destinatarios que assinam o documento
     recipients_sign = list()
+
+    if isinstance(recipients, str):
+        # converte string para dict
+        recipients = json.loads(recipients)
+
     for recipient in recipients:
         if recipient['group'] == 'signers':
             recipient['group'] = 'sign'
