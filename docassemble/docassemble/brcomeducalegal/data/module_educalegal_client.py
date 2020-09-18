@@ -23,6 +23,20 @@ class EducaLegalClient:
         response = self.session.get(final_url).json()
         return response
 
+    def document_types_list(self):
+        final_url = self.api_base_url + "/v2/interviews/document_types/"
+        response = self.session.get(final_url).json()
+        return response
+
+    def document_types_names_list(self):
+        document_types_list = self.document_types_list()
+        document_types_names_list = list()
+        for document_types in document_types_list:
+            document_types_names_dict = dict()
+            document_types_names_dict[document_types["id"]] = document_types["name"]
+            document_types_names_list.append(document_types_names_dict)
+        return document_types_names_list
+
     def plans_read(self, plan_id):
         final_url = self.api_base_url + "/v1/plans/{id}".format(id=plan_id)
         response = self.session.get(final_url).json()

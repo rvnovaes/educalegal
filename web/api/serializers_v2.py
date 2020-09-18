@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from billing.models import Plan
 from document.models import Document, Envelope, Signer
-from interview.models import Interview
+from interview.models import Interview, InterviewDocumentType
 from interview.util import get_interview_link as util_get_interview_link
 from school.models import School, SchoolUnit
 from tenant.models import Tenant, TenantGedData, ESignatureApp
@@ -44,6 +44,13 @@ class InterviewSerializer(serializers.ModelSerializer):
 
     def get_interview_link(self, obj):
         return util_get_interview_link(self.context["request"], obj.id)
+
+
+class DocumentTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InterviewDocumentType
+        ref_name = "Document Types v2"
+        fields = "__all__"
 
 
 class PlanSerializer(serializers.ModelSerializer):

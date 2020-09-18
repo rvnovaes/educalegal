@@ -126,7 +126,7 @@ code: |
     elc = EducaLegalClient(educalegal_url, ut)
     log("Chamando elc.tenants_school_names_school_data")
     school_names_list, school_units_dict, school_data_dict  = elc.tenants_school_names_school_data(tid)
-    log("Lista de nomes de esocolas" + str(school_names_list))
+    log("Lista de nomes de escolas" + str(school_names_list))
     if el_log_to_console:
       log("Lista de nomes de esocolas" + str(school_names_list), "console")
     log("Dicionário de unidades escolares" + str(school_units_dict))
@@ -142,6 +142,15 @@ code: |
     interview_language = interview_data['language']
     interview_custom_file_name_string = interview_data['custom_file_name']
     interview_is_freemium = interview_data['is_freemium']
+---
+code: |
+    elc = EducaLegalClient(educalegal_url, ut)
+    document_types_list = elc.document_types_list()
+    if el_log_to_console:
+      log("Lista dos tipos de documentos do Tenant" + str(document_types_list), "console")
+    document_types_names_list = elc.document_types_names_list()
+    if el_log_to_console:
+      log("Lista dos nomes dos tipos de documentos do Tenant" + str(document_types_names_list), "console")
 ---
 progress: 1
 section: Escola

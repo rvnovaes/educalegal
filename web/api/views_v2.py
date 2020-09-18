@@ -42,7 +42,7 @@ from api.third_party.mayan_client import MayanClient
 from document.models import Document, DocumentFileKind, BulkDocumentKind
 from document.views import save_document_data
 from document.views import validate_data_mongo, generate_document_from_mongo
-from interview.models import Interview
+from interview.models import Interview, InterviewDocumentType
 from school.models import School, SchoolUnit
 from tenant.models import Plan, Tenant, TenantGedData
 from users.models import CustomUser
@@ -53,6 +53,7 @@ from .serializers_v2 import (
     PlanSerializer,
     DocumentSerializer,
     DocumentDetailSerializer,
+    DocumentTypesSerializer,
     InterviewSerializer,
     SchoolSerializer,
     SchoolUnitSerializer,
@@ -86,6 +87,13 @@ class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = Interview.objects.all()
         queryset = queryset.order_by("name")
         return queryset
+
+
+class DocumentTypesViewSet(viewsets.ViewSet):
+    def list(self, request):
+        queryset = InterviewDocumentType.objects.all()
+        serializer = DocumentTypesSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class PlanViewSet(viewsets.ReadOnlyModelViewSet):

@@ -13,6 +13,7 @@ from .views_v2 import (
     create_tenant,
     DocumentViewSet,
     DocumentDownloadViewSet,
+    DocumentTypesViewSet,
     SchoolViewSet,
     SchoolUnitViewSet,
     TenantGedDataViewSet,
@@ -33,8 +34,10 @@ API_DESCRIPTION = (
 schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
+
     path("interviews/", InterviewViewSet.as_view({"get": "list"})),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
+    path("interviews/document_types/", DocumentTypesViewSet.as_view({"get": "list"})),
     path("plans/", PlanViewSet.as_view({"get": "list"})),
     path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
     path("tenants/", create_tenant),
