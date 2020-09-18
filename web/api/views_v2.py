@@ -40,6 +40,7 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from api.third_party.mayan_client import MayanClient
 from document.models import Document, DocumentFileKind, BulkDocumentKind
+from document.util import send_email as doc_send_email, send_to_esignature as doc_send_to_esignature
 from document.views import save_document_data
 from document.views import validate_data_mongo, generate_document_from_mongo
 from interview.models import Interview
@@ -1120,3 +1121,19 @@ def reset_password(request):
         # Mesmo assim a mensagem é a mesma para evitar informar se o user existe ou não
         message = "A chave de redefinição está expirada. Favor refazer o processo de redefinição de senha."
         return Response(message, status=status.HTTP_403_FORBIDDEN)
+
+
+@api_view(['GET'])
+# @permission_classes((AllowAny,))
+def send_email(request, doc_uuid):
+    status_code, message = doc_send_email(doc_uuid)
+
+    return Response({"status_code": status_code, "message": message})
+
+
+@api_view(['GET'])
+# @permission_classes((AllowAny,))
+def send_to_esignature(request, doc_uuid):
+    status_code, message = doc_send_to_esignature(doc_uuid)
+
+    return Response({"status_code": status_code, "message": message})

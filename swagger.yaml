@@ -789,13 +789,13 @@ paths:
   '/v2/documents/validate/{interview_id}':
     post:
       operationId: v2_documents_validate_create
-      description: 'Valida o documento recebido como json no request.body para posterior geração em lote ou via API.'
+      description: 'Valida o documento recebido como json no request.body. para posterior geração em lote ou via API.'
       parameters: []
       responses:
-        '200':
+        '201':
           description: |
             Retorna dicionário com status_code 200 e dados do documento.
-            {"status_code": 200, "response_data": <"dados do documento e da validação no Mongo">}
+            {"status_code": 201, "response_data": <"dados do documento e da validação no Mongo">}
       tags:
         - v2
     parameters:
@@ -989,6 +989,36 @@ paths:
         - v2
     parameters:
       - name: identifier
+        in: path
+        required: true
+        type: string
+  '/v2/documents/send_email/{doc_uuid}':
+    get:
+      operationId: v2_documents_send_email_read
+      description: 'Envia e-mail com o arquivo pelo uuid do documento para os destinatários informados no campo recipients do documento.'
+      parameters: []
+      responses:
+        '202':
+          description: 'O e-mail foi enviado com sucesso para os destinatários: <lista com nome e e-mail dos destinatários>.'
+      tags:
+        - v2
+    parameters:
+      - name: doc_uuid
+        in: path
+        required: true
+        type: string
+  '/v2/documents/send_to_esignature/{doc_uuid}':
+    get:
+      operationId: v2_documents_send_to_esignature_read
+      description: 'Envia o arquivo para assinatura eletrônica pelo uuid do documento para os destinatários informados no campo recipients do documento.'
+      parameters: []
+      responses:
+        '200':
+          description: 'Documento enviado para a assinatura eletrônica com sucesso com sucesso para os destinatários: <lista com nome e e-mail dos destinatários>.'
+      tags:
+        - v2
+    parameters:
+      - name: doc_uuid
         in: path
         required: true
         type: string
