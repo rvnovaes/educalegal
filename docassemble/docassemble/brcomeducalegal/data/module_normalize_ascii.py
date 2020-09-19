@@ -1,7 +1,7 @@
 from unicodedata import normalize
 
 
-def remover_acentos(txt):
+def normalize_ascii(txt):
 	return normalize('NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
 
 

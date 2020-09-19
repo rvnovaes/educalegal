@@ -2,7 +2,7 @@
   <div class="card">
     <div class="border-0 card-header">
       <div class="col-lg-12 col-5 text-right">
-        <base-button size="md" type="success" @click="handleNew">
+        <base-button size="md" type="success" @click="handleNew" class="botao-nova-escola">
           <i class="fa fa-plus-circle"></i> Nova Escola
         </base-button>
       </div>

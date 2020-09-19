@@ -31,7 +31,7 @@
                               @on-open="focus"
                               @on-close="blur"
                               :config="{allowInput: true, mode: 'range'}"
-                              class="form-control datepicker"
+                              class="form-control datepicker filtro-data"
                               v-model="createdDateRange">
                   </flat-pickr>
                 </base-input>
@@ -39,7 +39,7 @@
               <div class="col-4">
                 <base-input label="Modelo de Documento">
                   <el-select multiple
-                             class="select-primary"
+                             class="select-primary filtro-modelo"
                              placeholder="Modelo"
                              v-model="selectedInterviews">
                     <el-option
@@ -52,11 +52,10 @@
                   </el-select>
                 </base-input>
               </div>
-
               <div class="col-2">
                 <base-input label="Escola">
                   <el-select multiple
-                             class="select-primary"
+                             class="select-primary filtro-escola"
                              placeholder="Escola"
                              v-model="selectedSchools">
                     <el-option
@@ -68,13 +67,11 @@
                     </el-option>
                   </el-select>
                 </base-input>
-
               </div>
-
               <div class="col-2">
                 <base-input label="Status">
                   <el-select multiple
-                             class="select-primary"
+                             class="select-primary filtro-status"
                              placeholder="Status"
                              v-model="selectedStatuses">
                     <el-option
@@ -87,11 +84,10 @@
                   </el-select>
                 </base-input>
               </div>
-
               <div class="col-2">
                 <base-input label="Paginação">
                   <el-select
-                    class="select-primary pagination-select"
+                    class="select-primary pagination-select paginacao"
                     v-model="pagination.perPage"
                     placeholder="Per page"
                   >
@@ -106,23 +102,16 @@
                   </el-select>
                 </base-input>
               </div>
-
-
             </div>
-
-            <div class="col-12 d-flex justify-content-end  flex-wrap filter-buttons "
-            >
-
+            <div class="col-12 d-flex justify-content-end  flex-wrap filter-buttons">
               <div id="filter-buttons">
-                <base-button @click="applyFilters" type="primary">
+                <base-button @click="applyFilters" type="primary" class="botao-buscar">
                   <i class="fa fa-search"></i> Buscar
                 </base-button>
-                <base-button @click="cleanFilters" type="warning">
+                <base-button @click="cleanFilters" type="warning" class="botao-limpar">
                   <i class="fa fa-sync"></i> Limpar
                 </base-button>
               </div>
-
-
             </div>
             <el-table :data="paginatedData"
                       row-key="id"
@@ -134,6 +123,7 @@
                 v-for="column in tableColumns"
                 :key="column.label"
                 v-bind="column"
+                :class-name="column.tour"
               >
               </el-table-column>
               <el-table-column min-width="80px" align="right" label="Detalhes">
@@ -173,7 +163,7 @@
             slot="footer"
             class="col-12 d-flex justify-content-center justify-content-sm-between flex-wrap"
           >
-            <div class="">
+            <div class="total-documentos">
               <p class="card-category">
                 Mostrando {{ from + 1 }} a {{ to }} de {{ total }} documentos
 
@@ -195,7 +185,7 @@
         </card>
       </div>
     </div>
-    <v-tour name="arquivoTour" :steps="steps" :options="tourOptions"></v-tour>
+    <v-tour name="pageTour" :steps="arquivoSteps" :options="tourOptions"></v-tour>
   </div>
 </template>
 <script>
@@ -214,12 +204,12 @@ flatpickr.setDefaults({
   }
 );
 import flatPickr from "vue-flatpickr-component";
-
 import "flatpickr/dist/flatpickr.css";
 import HourGlassSpinner from "@/components/widgets/HourGlassSpinner";
+import tourStepsMixin from "@/components/tourSteps/tourStepsMixin";
 
 export default {
-  mixins: [documentPaginationMixin],
+  mixins: [documentPaginationMixin, tourStepsMixin],
   layout: "DashboardLayout",
   components: {
     HourGlassSpinner,
@@ -231,6 +221,9 @@ export default {
     [TableColumn.name]: TableColumn
   },
   name: "documents-table",
+  mounted() {
+    this.$store.dispatch("schools/fetchAllSchools");
+  },
   data() {
     return {
       propsToSearch: ["name", "interview_name", "school_name", "status"],
@@ -239,37 +232,43 @@ export default {
           prop: "created_date",
           label: "Criação",
           minWidth: 100,
-          sortable: false
+          sortable: false,
+          tour: "criacao-documento"
         },
         {
           prop: "name",
           label: "Documento",
           minWidth: 220,
-          sortable: false
+          sortable: false,
+          tour: "nome-documento"
         },
         {
           prop: "interview_name",
           label: "Modelo",
           minWidth: 240,
-          sortable: false
+          sortable: false,
+          tour: "modelo-documento"
         },
         {
           prop: "school_name",
           label: "Escola",
           minWidth: 140,
-          sortable: false
+          sortable: false,
+          tour: "escola-documento"
         },
         {
           prop: "status",
           label: "Status",
           minWidth: 120,
-          sortable: false
+          sortable: false,
+          tour: "status-documento"
         },
         {
           prop: "altered_date",
           label: "Alteração",
           minWidth: 100,
-          sortable: false
+          sortable: false,
+          tour: "alteracao-documento"
         },
       ],
       selects: {
@@ -295,71 +294,6 @@ export default {
       selectedStatuses: [],
       selectedInterviews: [],
       selectedSchools: [],
-      tourOptions: {
-        useKeyboardNavigation: true,
-        debug: true,
-        labels: {
-          buttonSkip: "Dispensar",
-          buttonPrevious: "Anterior",
-          buttonNext: "Próximo",
-          buttonStop: "Fim"
-        }
-      },
-      steps: [
-        {
-          target: ".arquivo",
-          header: {
-            title: "Arquivo",
-          },
-          content: `No arquivo você acessa e pesquisa todos os documentos já gerados por sua escola`,
-          params: {
-            placement: "right",
-            enableScrolling: false
-          }
-        },
-        //Aqui tivemos que usar o target como classe, pq so conseguimos passar para a coluna (que e outro componente) a classe
-        {
-          target: ".nome-entrevista",
-          content: `Esse é o nome pelo qual o tipo de documento ou contrato é identificado na plataforma. Sempre use esse nome ao se referir ao documento. A busca procura por palavras no nome.`,
-          params: {
-            placement: "bottom",
-            enableScrolling: false
-          }
-        },
-        {
-          target: ".descricao-entrevista",
-          content: `Aqui você encontra informações úteis sobre quando e como usar o documento. A pesquisa desta página também procura por palavras na descrição. `,
-          params: {
-            placement: "bottom",
-            enableScrolling: false
-          }
-        },
-        {
-          target: ".versao-entrevista",
-          content: `Estamos sempre trabalhando em atualizações dos documentos em virtude de novas leis e de melhores práticas jurídicas e de gestão.`,
-          params: {
-            placement: "bottom",
-            enableScrolling: false
-          }
-        },
-        {
-          target: ".disponibilizacao-entrevista",
-          content: `Essa é a data na qual a versão do documento foi disponibilizada para uso na plataforma.`,
-          params: {
-            placement: "bottom",
-            enableScrolling: false
-          }
-        },
-        {
-          target: ".edit",
-          content: `Clique nesse botão para criar o documento.`,
-          params: {
-            placement: "top",
-            highlight: false,
-            enableScrolling: false
-          }
-        },
-      ]
     };
   },
   computed: {
@@ -518,9 +452,6 @@ export default {
       this.createdDateRange = null;
       this.applyFilters();
     },
-    tour() {
-      this.$tours["arquivoTour"].start();
-    }
   },
 }
 ;

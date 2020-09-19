@@ -328,7 +328,6 @@ class DocuSignClient:
                 return envelope_document.status_code, envelope_document.json()['message']
 
 
-def make_document_base64(document_path):
+def make_document_base64(document):
     """Converts your document from document_path to a base64 string, as used by Docusign"""
-    with open(document_path, "rb") as document:
-        return base64.b64encode(document.read()).decode("utf-8")
+    return base64.b64encode(document.read()).decode("utf-8")
