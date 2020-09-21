@@ -61,6 +61,11 @@ class EducaLegalClient:
             school_units_dict[school["name"]] = school["school_units"]
         return school_names_list, school_units_dict, school_data_dict
 
+    def witnesses_list(self, tid):
+        final_url = self.api_base_url + "/v2/tenants/{id}/witnesses/".format(id=tid)
+        response = self.session.get(final_url).json()
+        return response
+
     def patch_document(self, data, params):
         final_url = self.api_base_url + "/v2/documents/{}".format(params['doc_uuid'])
 
