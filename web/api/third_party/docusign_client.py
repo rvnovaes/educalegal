@@ -1,11 +1,13 @@
 # DocuSign Integration for Docassemble
-import base64
 import logging
 import json
 import jwt
 import re
 import requests
 import time
+
+from base64 import b64encode
+from os import path
 
 __all__ = ["DocuSignClient", "make_document_base64"]
 
@@ -74,9 +76,8 @@ class DocuSignClient:
             self.aud = "account.docusign.com"
             self.base_uri = "https://account.docusign.com"
 
-        # iasmini
-        # self.get_token()
-        # self.get_user_info()
+        self.get_token()
+        self.get_user_info()
 
         self.event_notification = {
             "url": webhook_url,
@@ -145,6 +146,7 @@ class DocuSignClient:
         )
         self.token = json.loads(request_for_token.text)["access_token"]
 
+
     def get_user_info(self):
         self.authorization_header = {"Authorization": "Bearer " + self.token}
         request_for_user = requests.get(
@@ -162,8 +164,6 @@ class DocuSignClient:
         # If it outputs '/restapi/v2/accounts/' authentication is not working.
         # If it outputs 'https://server.address/restapi/v2/accounts/client-id' then it is working.
 
-        # self.get_token()
-        # self.get_user_info()
         return self.extended_base_uri
 
     def send_to_docusign(
@@ -277,9 +277,6 @@ class DocuSignClient:
         for key in kwargs:
             request_json[key] = kwargs[key]
 
-        # Send off envelope request and return the results
-        # self.get_token()
-        # self.get_user_info()
         try:
             envelope = requests.post(
                 self.extended_base_uri + "/envelopes",
@@ -295,8 +292,7 @@ class DocuSignClient:
 
     def list_envelope_documents(self, envelope_id):
         """Retorna a lista de documentos do envelope"""
-        self.get_token()
-        self.get_user_info()
+
         try:
             envelope_documents = requests.get(
                 self.extended_base_uri + "/envelopes/" + envelope_id + '/documents', headers=self.authorization_header
@@ -310,8 +306,7 @@ class DocuSignClient:
 
     def get_envelope_document(self, envelope_id, document_id):
         """Retorna a URL do documento"""
-        self.get_token()
-        self.get_user_info()
+
         try:
             envelope_document = requests.get(
                 self.extended_base_uri + "/envelopes/" + envelope_id + '/documents/' + document_id,
@@ -320,14 +315,38 @@ class DocuSignClient:
         except Exception as e:
             message = str(type(e).__name__) + " : " + str(e)
             logger.error(message)
-            return 0, message
+            return 400, message
         else:
             if envelope_document.status_code == 200:
-                return envelope_document.status_code, envelope_document.url
+                return envelope_document.status_code, envelope_document
             else:
                 return envelope_document.status_code, envelope_document.json()['message']
+
+    def download_envelope_document(self, envelope_id, document_id, filepath, filename):
+        """Baixa o documento no diretório indicado"""
+
+        try:
+            status_code, document = self.get_envelope_document(envelope_id, document_id)
+        except Exception as e:
+            message = str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return 400, message
+        else:
+            if status_code == 200:
+                try:
+                    with open(path.join(filepath, filename), 'wb') as f:
+                        f.write(document.content)
+                except Exception as e:
+                    message = str(type(e).__name__) + " : " + str(e)
+                    logger.error(message)
+                    return 400, message
+
+            if isinstance(document, str):
+                return status_code, document
+            else:
+                return status_code, document.reason
 
 
 def make_document_base64(document):
     """Converts your document from document_path to a base64 string, as used by Docusign"""
-    return base64.b64encode(document.read()).decode("utf-8")
+    return b64encode(document.read()).decode("utf-8")
