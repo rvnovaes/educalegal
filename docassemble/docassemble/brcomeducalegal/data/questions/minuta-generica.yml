@@ -18,7 +18,6 @@ include:
   - element-signature.yml
   - element-school-email-reviewed.yml
   - element-default-messages.yml
-  - element-custom-file-name.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -36,22 +35,38 @@ code: |
     else:
       selected_school = school_names_list[0]
     interview_document_type_choice
-    parts_denomination
-    for item in parts:
+    part_types.target_number = 1
+    for item in part_types:
       item.name.text
-    if plan_use_esignature:
-      valid_parts_table
-    counterparts_denomination
-    for item in counterparts:
-      item.name.text
-    if plan_use_esignature:
-      valid_counterparts_table
-    if has_extraparts:
-      extraparts_denomination
-      for item in extraparts:
+    reviewed_school_email_answer
+    if school_party_type == part_types[0].name.text:
+      parts.target_number = 1
+      parts[0].person_type = "organization"
+      parts[0].name.text = school_legal_name
+      parts[0].cnpj = school_cnpj
+      parts[0].email = school_email
+    elif school_party_type == part_types[0].counterpart_name:
+      counterparts.target_number = 1
+      counterparts[0].person_type = "organization"
+      counterparts[0].name.text = school_legal_name
+      counterparts[0].cnpj = school_cnpj
+      counterparts[0].email = school_email
+    elif school_party_type == part_types[0].extrapart_name:
+      extraparts.target_number = 1
+      extraparts[0].person_type = "organization"
+      extraparts[0].name.text = school_legal_name
+      extraparts[0].cnpj = school_cnpj
+      extraparts[0].email = school_email
+    if not school_party_type == part_types[0].name.text:
+      for item in parts:
         item.name.text
-      if plan_use_esignature:
-        valid_extraparts_table
+    elif not school_party_type == part_types[0].counterpart_name:
+      for item in counterparts:
+        item.name.text
+    elif not school_party_type == part_types[0].extrapart_name:
+      if part_types[0].has_extraparts:
+        for item in extraparts:
+          item.name.text
     if has_witnesses:
       witnesses.target_number = 2
       for item in witnesses:
@@ -67,10 +82,17 @@ code: |
   interview_document_type = interview_document_type_choice
 ---
 code: |
-  if has_attachment:
-    generated_file_signature = pdf_concatenate(generic_document, signature_page, uploaded_file, filename=custom_file_name)
-  else:
+  custom_file_name = today(format = 'YYYYMMdd') + '-' + format_time(last_access_time(), format='hhmmss') + '-' + interview_custom_file_name_string + '.pdf'
+---
+code: |
+  if signature_provider == 'DOCUSING':
     generated_file_signature = pdf_concatenate(generic_document, signature_page, filename=custom_file_name)
+  else:
+    generated_file_signature = pdf_concatenate(generic_document, filename=custom_file_name)
+  if has_attachment:
+    generated_file_attachment = pdf_concatenate(generated_file_signature, uploaded_file, filename=custom_file_name)
+  else:
+    generated_file_attachment = pdf_concatenate(generic_document, signature_page, filename=custom_file_name)
   generated_file = generated_file_signature
 ---
 attachment:
@@ -91,17 +113,66 @@ fields:
     datatype: files
 ---
 objects:
+  - part_types: DAList.using(object_type=Person, ask_number=True)
+---
+section: Parte
+progress: 5
+question: Parte
+subquestion:  |
+fields:
+  - Número de Tipo de Pessoas: part_types.target_number
+    required: true
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 5
+section: Partes
+question: Tipos de Partes
+fields:
+  - "Denominação da Parte:": part_types[i].name.text
+    required: True
+    help: "Ex: Contratante(s), Locador(es) "
+  - "Denominação da Contraparte:": part_types[i].counterpart_name
+    required: True
+    help: "Ex: Contratada(s), Locatária(s)"
+  - "Haverá parte extra (Ex: Fiador):": part_types[i].has_extraparts
+    help: "Por exemplo, fiador"
+    datatype: yesnoradio
+  - "Denominação da Extra parte:": part_types[i].extrapart_name
+    required: True
+    default: "Fiador(es)"
+    js show if: |
+      val("part_types[i].has_extraparts")
+---
+code: |
+  school_party_type_list = list()
+  if part_types[0].has_extraparts:
+    school_party_type_list.append(part_types[0].name.text)
+    school_party_type_list.append(part_types[0].counterpart_name)
+    school_party_type_list.append(part_types[0].extrapart_name)
+  else:
+    school_party_type_list.append(part_types[0].name.text)
+    school_party_type_list.append(part_types[0].counterpart_name)
+---
+section: Escola
+question: |
+  Qual o tipo da parte é a escola?
+fields:
+  - "Tipo:": school_party_type
+    required: True
+    datatype: dropdown
+    code: |
+      school_party_type_list
+---
+objects:
   - parts: DAList.using(object_type=Person, ask_number=True)
 ---
 section: Parte
 progress: 10
 question: Parte
-subquestion:  |
 fields:
-  - Denominação: parts_denomination
-    required: true
-    hint: ex. contratante, locador
-  - Número de pessoas com esta denominação: parts.target_number
+  - Número de Pessoas: parts.target_number
     required: true
     datatype: integer
     default: 1
@@ -110,7 +181,7 @@ fields:
 section: Parte
 progress: 20
 question: |
-  Dados do(a) ${word(ordinal(i)) } ${ parts_denomination }
+  Dados do(a) ${word(ordinal(i)) } ${ part_types[0].name.text }
 fields:
   - "Tipo:": parts[i].person_type
     datatype: radio
@@ -122,6 +193,12 @@ fields:
     help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("parts[i].person_type")
+  - "E-mail:": parts[i].email
+    datatype: email
+    help: ${ help_email_msg }
+    required: True
+    js show if: |
+       val("parts[i].person_type") != null
   - "CPF:": parts[i].cpf
     required: False
     validate: validate_cpf
@@ -134,40 +211,13 @@ fields:
     show if:
       variable: parts[i].person_type
       is: organization
-  - "E-mail:": parts[i].email
-    datatype: email
-    help: ${ help_email_msg }
-    required: False
-    js show if: |
-       val("parts[i].person_type") != null
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzM').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWkXzM').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
----
-section: Parte
-field: valid_parts_table
-question: |
-  ${ parts_denomination }:
-subquestion: |
-  Confira os e-mails dos destinatários abaixo, pois estes serão usados
-  no envio para a assinatura eletrônica.
-  ${ parts.table }
-buttons:
-  Continuar: continue
----
-table: parts.table
-rows: parts
-columns:
-  - Name: |
-      row_item.name.text
-  - E-mail: |
-      row_item.email
-edit:
-  - email
 ---
 objects:
   - counterparts: DAList.using(object_type=Person, ask_number=True)
@@ -176,10 +226,7 @@ section: Contraparte
 progress: 40
 question: Contraparte
 fields:
-  - Denominação: counterparts_denomination
-    hint: ex. contratada, locatário
-    required: true
-  - Número de pessoas com esta denominação: counterparts.target_number
+  - Número de Pessoas: counterparts.target_number
     required: true
     datatype: integer
     default: 1
@@ -187,13 +234,20 @@ fields:
 ---
 section: Contraparte
 progress: 50
-question: Dados do(a) ${word(ordinal(i)) } ${ counterparts_denomination }
+question: |
+  Dados do(a) ${word(ordinal(i)) } ${ part_types[i].counterpart_name }
 fields:
   - "Tipo:": counterparts[i].person_type
     datatype: radio
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
+  - "E-mail:": counterparts[i].email
+    datatype: email
+    help: ${ help_email_msg }
+    required: False
+    js show if: |
+       val("counterparts[i].person_type") != null
   - 'Nome/Razão social:': counterparts[i].name.text
     validate: validate_person_full_name
     help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
@@ -211,46 +265,13 @@ fields:
     show if:
       variable: counterparts[i].person_type
       is: organization
-  - "E-mail:": counterparts[i].email
-    datatype: email
-    help: ${ help_email_msg }
-    required: False
-    js show if: |
-       val("counterparts[i].person_type") != null
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzM').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXz').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
----
-section: Contraparte
-field: valid_counterparts_table
-question: |
-  ${ counterparts_denomination }:
-subquestion: |
-  Confira os e-mails dos destinatários abaixo, pois estes serão usados
-  no envio para a assinatura eletrônica.
-  ${ counterparts.table }
-buttons:
-  Continuar: continue
----
-table: counterparts.table
-rows: counterparts
-columns:
-  - Name: |
-      row_item.name.text
-  - E-mail: |
-      row_item.email
-edit:
-  - email
----
-section: Parte Extra
-progress: 60
-question: |
-  O documento possui alguma parte extra? Exemplo: fiador.
-yesno: has_extraparts
 ---
 objects:
   - extraparts: DAList.using(object_type=Person, ask_number=True)
@@ -259,10 +280,7 @@ section: Parte Extra
 progress: 70
 question: Parte extra
 fields:
-  - Denominação: extraparts_denomination
-    required: true
-    hint: ex. fiador
-  - Número de pessoas: extraparts.target_number
+  - Número de ${ part_types[i].extrapart_name }: extraparts.target_number
     required: true
     datatype: integer
     default: 1
@@ -270,7 +288,8 @@ fields:
 ---
 section: Parte Extra
 progress: 80
-question: Dados do(a) ${word(ordinal(i)) } ${ extraparts_denomination }
+question: |
+  Dados do(a) ${word(ordinal(i)) } ${ part_types[i].extrapart_name }
 fields:
   - "Tipo:": extraparts[i].person_type
     datatype: radio
@@ -282,6 +301,12 @@ fields:
     help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
       val("extraparts[i].person_type")
+  - "E-mail:": extraparts[i].email
+    datatype: email
+    help: ${ help_email_msg }
+    required: True
+    js show if: |
+       val("extraparts[i].person_type") != null
   - "CPF:": extraparts[i].cpf
     required: False
     validate: validate_cpf
@@ -294,40 +319,13 @@ fields:
     show if:
       variable: extraparts[i].person_type
       is: organization
-  - "E-mail:": extraparts[i].email
-    datatype: email
-    help: ${ help_email_msg }
-    required: False
-    js show if: |
-       val("extraparts[i].person_type") != null
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzM').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkzM').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
----
-section: Parte Extra
-field: valid_extraparts_table
-question: |
-  ${ extraparts_denomination }:
-subquestion: |
-  Confira os e-mails dos destinatários abaixo, pois estes serão usados
-  no envio para a assinatura eletrônica.
-  ${ extraparts.table }
-buttons:
-  Continuar: continue
----
-table: extraparts.table
-rows: extraparts
-columns:
-  - Name: |
-      row_item.name.text
-  - E-mail: |
-      row_item.email
-edit:
-  - email
 ---
 section: Testemunhas
 progress: 85
@@ -355,12 +353,12 @@ fields:
   - 'Nome da ${word(ordinal(i)) } Testemunha:': witnesses[i].name.text
     validate: validate_person_full_name
   - "CPF:": witnesses[i].cpf
-    required: False
+    required: True
     validate: validate_cpf
   - "E-mail:": witnesses[i].email
     datatype: email
     help: ${ help_email_msg }
-    required: False
+    required: True
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
@@ -368,31 +366,17 @@ script: |
       });
   </script>
 ---
-section: Testemunhas
-field: valid_witnesses_table
-question: |
-  ${ witnesses_denomination }:
-subquestion: |
-  Confira os e-mails das testemunhas abaixo, pois estes serão usados
-  no envio para a assinatura eletrônica.
-  ${ witnesses.table }
-buttons:
-  Continuar: continue
----
-table: witnesses.table
-rows: witnesses
-columns:
-  - Name: |
-      row_item.name.text
-  - E-mail: |
-      row_item.email
-edit:
-  - email
----
 section: Anexos
 progress: 90
 question: |
-  Anexos ${ interview_document_type }
+  Anexos:
+  - Lista tipos de documentos: ${ document_types_names_list }
+
+  - Opção escolhida: ${ interview_document_type_choice }
+
+  - Id Tipo de Documento: ${ interview_document_type }
+
+  - Nome do arquivo: ${ custom_file_name }
 fields:
   - 'Deseja inserir algum arquivo anexo? :': has_attachment
     datatype: yesnoradio
@@ -468,7 +452,6 @@ code: |
                 ]
                 recipients.append(new_recipient)
 
-  document_name = custom_file_name + '.pdf'
 ---
 ga id: |
   code: ga_id_end
@@ -478,6 +461,9 @@ progress: 100
 back button: False
 question: |
   Seu documento foi gerado com sucesso!
+
+  - Generated file: ${ generated_file }
+
 subquestion: |
   Nome do documento:
   ${ generated_file.filename }
@@ -498,9 +484,16 @@ code: |
 code: |
   import json
 
+  log("generated_file", "console")
+  log(generated_file, "console")
+
+  log("import json", "console")
+
   # private=False - para que o arquivo fique acessivel fora do docassemble
   generated_file.set_attributes(private=False)
-  generated_file.set_attributes(private=False)
+
+  log("generated_file", "console")
+  log(generated_file, "console")
 
   # dados do documento que serao salvos no educa legal---
   data = {
@@ -514,6 +507,9 @@ code: |
      "document_data": json.dumps(all_variables())
   }
 
+  log("dados data", "console")
+  log(data, "console")
+
   # external=True - acrescenta na url o protocolo and hostname (https://hostname)
   params = {
       "trigger": "docassemble",
@@ -522,9 +518,18 @@ code: |
       "tenant_id": tid,
       "doc_uuid": doc_uuid,
   }
+  log("params:", "console")
+  log(params, "console")
 
   # atualiza no educa legal dados do documento gerado
   status_code, el_patch_document = elc.patch_document(data, params)
+
+  log("status_code:", "console")
+  log(status_code, "console")
+
+  log("el_patch_document:", "console")
+  log(el_patch_document, "console")
+
   if status_code == 200:
     log("Atualizado o documento")
   else:

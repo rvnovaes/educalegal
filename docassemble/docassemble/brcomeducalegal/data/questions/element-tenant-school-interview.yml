@@ -93,6 +93,10 @@ code: |
     log("tenant_data: {tenant_data}".format(tenant_data=tenant_data))
     if el_log_to_console:
       log("tenant_data: {tenant_data}".format(tenant_data=tenant_data), "console")
+    signature_provider = tenant_data['esignature_app']['provider']
+    if el_log_to_console:
+      log("signature_provider", "console")
+      log(signature_provider, "console")
 ---
 code: |
     elc = EducaLegalClient(educalegal_url, ut)
