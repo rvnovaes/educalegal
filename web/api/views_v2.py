@@ -1123,17 +1123,21 @@ def reset_password(request):
         return Response(message, status=status.HTTP_403_FORBIDDEN)
 
 
-@api_view(['GET'])
-# @permission_classes((AllowAny,))
-def send_email(request, doc_uuid):
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def send_email(request):
+    doc_uuid = request.data.get("doc_uuid")
     status_code, message = doc_send_email(doc_uuid)
 
     return Response({"status_code": status_code, "message": message})
 
 
-@api_view(['GET'])
-# @permission_classes((AllowAny,))
-def send_to_esignature(request, doc_uuid):
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def send_to_esignature(request):
+    doc_uuid = request.data.get("doc_uuid")
     status_code, message = doc_send_to_esignature(doc_uuid)
 
     return Response({"status_code": status_code, "message": message})
