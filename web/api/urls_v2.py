@@ -13,6 +13,7 @@ from .views_v2 import (
     create_tenant,
     DocumentViewSet,
     DocumentDownloadViewSet,
+    DocumentCloudDownloadViewSet,
     DocumentTypesViewSet,
     SchoolViewSet,
     SchoolUnitViewSet,
@@ -21,7 +22,11 @@ from .views_v2 import (
     WitnessViewSet,
     dashboard_data,
     recover_password,
-    reset_password
+    reset_password,
+    validate_document,
+    generate_document,
+    send_email,
+    send_to_esignature
 )
 
 from api.third_party.clicksign_helpers import webhook_listener
@@ -35,7 +40,6 @@ API_DESCRIPTION = (
 schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
-
     path("interviews/", InterviewViewSet.as_view({"get": "list"})),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
     path("interviews/document_types/", DocumentTypesViewSet.as_view({"get": "list"})),
@@ -47,7 +51,12 @@ urlpatterns = [
     path("tenants/<int:pk>/ged_data", TenantGedDataViewSet.as_view({"get": "retrieve"})),
     path("documents/", DocumentViewSet.as_view({"post": "create", "get": "list"})),
     path("documents/<str:identifier>", DocumentViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
-    path("documents/<str:identifier>/download", DocumentDownloadViewSet.as_view({"get": "retrieve", "delete": "destroy"})),
+    path("documents/<str:identifier>/download/", DocumentDownloadViewSet.as_view({"get": "retrieve", "delete": "destroy"})),
+    path("documents/<str:identifier>/cloud_download/", DocumentCloudDownloadViewSet.as_view({"get": "retrieve"})),
+    path("documents/validate/<int:interview_id>", validate_document),
+    path("documents/generate/<int:interview_id>", generate_document),
+    path("documents/send_email/", send_email),
+    path("documents/send_to_esignature/", send_to_esignature),
     path("dashboard/", dashboard_data),
     path("recover_password/", recover_password),
     path("reset_password/", reset_password),

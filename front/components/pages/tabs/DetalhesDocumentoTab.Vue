@@ -91,27 +91,26 @@
     <div v-if="currentDocument.parent == null">
       <!--  TODO Testar bloqueio de CORS para download em ambiente real. Em localhost ele bloqueia  -->
       <!-- pdf -->
-      <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.cloud_file,
-      currentDocument.name)" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
+      <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.doc_uuid,
+      currentDocument.name, 'pdf')" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
       </base-button>
       <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
-      currentDocument.name)" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
+      currentDocument.name, 'pdf')" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
       </base-button>
 
       <!-- docx -->
-      <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.cloud_file,
-      currentDocument.name)" type="primary"><i class="ni ni-cloud-download-95"></i>Word
-      </base-button>
-      <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
-      currentDocument.name)" type="primary"><i class="ni ni-cloud-download-95"></i>Word
+      <base-button v-if="currentDocument.docx_file" @click="downloadDocument(currentDocument.docx_file.doc_uuid,
+      currentDocument.docx_file.name, 'docx')" type="primary"><i class="ni ni-cloud-download-95"></i>Word
       </base-button>
 
       <!-- assinatura eletronica -->
-      <base-button v-if="currentDocument.submit_to_esignature == false" @click="back()" type="success"><i
-        class="ni ni-sound-wave"></i>Enviar para assinatura</base-button>
+      <base-button v-if="currentDocument.submit_to_esignature === false" @click="send_to_esignature(currentDocument.doc_uuid)"
+                   :type="esignatureButtonType"><i class="ni ni-sound-wave"></i>Enviar para assinatura
+      </base-button>
 
       <!-- email -->
-      <base-button @click="back()" type="info"><i class="ni ni-email-83"></i>Enviar por e-mail</base-button>
+      <base-button @click="send_email(currentDocument.doc_uuid)" :type="emailButtonType"><i class="ni ni-email-83"
+      ></i>Enviar por e-mail</base-button>
     </div>
   </div>
 
@@ -126,7 +125,10 @@ export default {
   props: ["currentDocument"],
   components: {},
   data() {
-    return {};
+    return {
+      emailButtonType: "success",
+      esignatureButtonType: "success"
+    };
   },
   methods: {
     cardType(status) {
@@ -147,15 +149,75 @@ export default {
       }
 
     },
-    back() {
-      this.$router.push({
-        path: "/arquivo"
-      });
-    },
-    async downloadDocument(ged_link, documentName) {
+    async send_email(doc_uuid) {
+      this.emailButtonType = "secondary"
       try {
-        const res = await this.$axios.get(ged_link, {responseType: "blob"});
-        const blob = new Blob([res.data], {type: "application/pdf"});
+        const res = await this.$axios.post("/v2/documents/send_email/", {doc_uuid: doc_uuid});
+        if (res.status === 202) {
+          this.emailButtonType = "success"
+          await Swal.fire({
+            title: "O e-mail foi enviado com sucesso!",
+            text: res.data,
+            icon: "success",
+            customClass: {
+              confirmButton: "btn btn-success btn-fill",
+            },
+          })
+        }
+      } catch (e) {
+        this.emailButtonType = "success"
+        await Swal.fire({
+          title: "Houve erro ao enviar o e-mail.",
+          text: e.response.data,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
+      }
+    },
+    async send_to_esignature(doc_uuid) {
+      this.esignatureButtonType = "secondary"
+      try {
+        const res = await this.$axios.post("/v2/documents/send_to_esignature/", {doc_uuid: doc_uuid});
+        // o docusign retorna 201 e o clicksign retorna 202
+        if (res.status === 201 || res.status === 202) {
+          this.esignatureButtonType = "success"
+          await Swal.fire({
+            title: "O documento foi enviado para a assinatura eletrônica com sucesso!",
+            text: res.data,
+            icon: "success",
+            customClass: {
+              confirmButton: "btn btn-success btn-fill",
+            },
+          })
+        }
+      } catch (e) {
+        this.esignatureButtonType = "success"
+        await Swal.fire({
+          title: "Houve erro ao enviar para a assinatura eletrônica.",
+          text: e.response.data,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
+      }
+    },
+    async downloadDocument(doc_uuid, documentName, fileKind) {
+      try {
+        const url = '/v2/documents/' + doc_uuid + '/cloud_download/'
+        const res = await this.$axios.get(url, {responseType: "blob"});
+        let blob = undefined
+        if (fileKind === "pdf") {
+          blob = new Blob([res.data], {type: "application/pdf"});
+        } else {
+          blob = new Blob([res.data], {type: "application/msword"});
+        }
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = documentName;

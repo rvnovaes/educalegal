@@ -30,6 +30,7 @@ from rest_framework.exceptions import (
 )
 from validator_collection import checkers
 
+from django.core.files.storage import default_storage
 from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Q
@@ -40,6 +41,7 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from api.third_party.mayan_client import MayanClient
 from document.models import Document, DocumentFileKind, BulkDocumentKind
+from document.util import send_email as doc_send_email, send_to_esignature as doc_send_to_esignature
 from document.views import save_document_data
 from document.views import validate_data_mongo, generate_document_from_mongo
 from interview.models import Interview, InterviewDocumentType
@@ -678,6 +680,44 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class DocumentCloudDownloadViewSet(viewsets.ModelViewSet):
+    queryset = Document.objects.all()
+    # Este parametro é obrigatório em um ModelViewSet, embora não seja usado no presente exemplo
+    serializer_class = DocumentSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+
+        """
+        Baixa o documento do GED.
+
+        Download requer como parâmetro doc_uuid (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+
+        400 BAD REQUEST: Se o campo doc_uuid não for válido:
+            => "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+        404 NOT FOUND: Se o documento (doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente
+            (tenant) ao qual o usuário da requisição está vinculado.
+
+        :param request: HttpRequest
+        :return: O arquivo do documento no cloud
+        """
+        doc_uuid = kwargs["identifier"]
+        tenant = request.user.tenant
+
+        if not checkers.is_uuid(doc_uuid):
+            message = "O doc_uuid não é um uuid válido. O uuid deve ter o formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+            logger.info(message)
+            raise ValidationError(message)
+        elif checkers.is_uuid(doc_uuid):
+            document = get_object_or_404(self.queryset, doc_uuid=doc_uuid, tenant=tenant.id)
+
+        file = default_storage.open(document.cloud_file.name, 'rb')
+        file_content = file.read()
+        f = io.BytesIO(file_content)
+
+        return FileResponse(f, as_attachment=True, filename=document.name)
+
+
 # Clients should authenticate by passing the token key in the "Authorization"
 # HTTP header, prepended with the string "Token ".  For example:
 # Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
@@ -1149,3 +1189,21 @@ def reset_password(request):
         # Mesmo assim a mensagem é a mesma para evitar informar se o user existe ou não
         message = "A chave de redefinição está expirada. Favor refazer o processo de redefinição de senha."
         return Response(message, status=status.HTTP_403_FORBIDDEN)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def send_email(request):
+    doc_uuid = request.data.get("doc_uuid")
+    status_code, message = doc_send_email(doc_uuid)
+
+    return Response(message, status=status_code)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def send_to_esignature(request):
+    doc_uuid = request.data.get("doc_uuid")
+    status_code, message = doc_send_to_esignature(doc_uuid)
+
+    return Response(message, status=status_code)
