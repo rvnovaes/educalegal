@@ -265,11 +265,11 @@ def send_email(doc_uuid):
     except Document.DoesNotExist:
         message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
         logger.error(message)
-        return 0, message
+        return 404, message
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
-        return 0, message
+        return 500, message
     else:
         if document.recipients:
             to_emails = document.recipients
@@ -302,7 +302,7 @@ def send_email(doc_uuid):
                     to_emails, subject, html_content, category, file_name, file)
             except Exception as e:
                 message = str(type(e).__name__) + " : " + str(e)
-                status_code = 400
+                status_code = 500
                 return status_code, message
             else:
                 if status_code == 202:
@@ -342,13 +342,13 @@ def send_to_esignature(doc_uuid):
     except Document.DoesNotExist:
         message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
         logger.error(message)
-        return 0, message
+        return 404, message
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
-        return 0, message
+        return 500, message
     else:
-        status_code = 0
+        status_code = 500
         message = ''
         if document.recipients:
             if isinstance(document.recipients, str):
@@ -463,7 +463,7 @@ def send_to_esignature(doc_uuid):
                     return status_code, response_json
 
         else:
-            return 0, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
+            return 404, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
     return status_code, message
 

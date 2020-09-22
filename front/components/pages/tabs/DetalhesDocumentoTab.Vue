@@ -104,12 +104,13 @@
       </base-button>
 
       <!-- assinatura eletronica -->
-      <base-button v-if="currentDocument.submit_to_esignature == false" @click="back()" type="success"><i
-        class="ni ni-sound-wave"></i>Enviar para assinatura
+      <base-button v-if="currentDocument.submit_to_esignature === false" @click="send_to_esignature()"
+                   :type="esignatureButtonType"><i class="ni ni-sound-wave"></i>Enviar para assinatura
       </base-button>
 
       <!-- email -->
-      <base-button @click="back()" type="info"><i class="ni ni-email-83"></i>Enviar por e-mail</base-button>
+      <base-button @click="send_email(currentDocument.doc_uuid)" :type="emailButtonType"><i class="ni ni-email-83"
+      ></i>Enviar por e-mail</base-button>
     </div>
   </div>
 
@@ -124,7 +125,10 @@ export default {
   props: ["currentDocument"],
   components: {},
   data() {
-    return {};
+    return {
+      emailButtonType: "info",
+      esignatureButtonType: "success"
+    };
   },
   methods: {
     cardType(status) {
@@ -145,10 +149,67 @@ export default {
       }
 
     },
-    back() {
-      this.$router.push({
-        path: "/arquivo"
-      });
+    async send_email(doc_uuid) {
+      this.emailButtonType = "secondary"
+      try {
+        const res = await this.$axios.post("/v2/documents/send_email/", {doc_uuid: doc_uuid});
+        console.log(res);
+        if (res.status === 202) {
+          this.emailButtonType = "info"
+          await Swal.fire({
+            title: "O e-mail foi enviado com sucesso!",
+            text: res.data,
+            icon: "success",
+            customClass: {
+              confirmButton: "btn btn-success btn-fill",
+            },
+          })
+        }
+      } catch (e) {
+        console.log(e);
+        this.emailButtonType = "info"
+        await Swal.fire({
+          title: "Houve erro ao enviar o e-mail.",
+          text: e.response.data,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
+      }
+    },
+    async send_to_esignature(doc_uuid) {
+      this.esignatureButtonType = "secondary"
+      try {
+        const res = await this.$axios.post("/v2/documents/send_to_esignature/", {doc_uuid: doc_uuid});
+        console.log(res);
+        if (res.status === 202) {
+          this.esignatureButtonType = "success"
+          await Swal.fire({
+            title: "O documento foi enviado para a assinatura eletrônica com sucesso!",
+            text: res.data,
+            icon: "success",
+            customClass: {
+              confirmButton: "btn btn-success btn-fill",
+            },
+          })
+        }
+      } catch (e) {
+        console.log(e);
+        this.esignatureButtonType = "success"
+        await Swal.fire({
+          title: "Houve erro ao enviar para a assinatura eletrônica.",
+          text: e.response.data,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
+      }
     },
     async downloadDocument(fileURL, documentName, fileKind) {
       console.log(fileURL)
