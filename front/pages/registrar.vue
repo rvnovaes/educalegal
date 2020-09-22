@@ -157,9 +157,6 @@ export default {
             password: this.model.password
           }
       });
-      this.$toasted.global.defaultSuccess({
-        msg: "Usuário autenticado com sucesso"
-      });
       await this.$router.push({path: "/painel"});
       }
     }

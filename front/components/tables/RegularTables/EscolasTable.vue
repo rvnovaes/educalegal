@@ -14,12 +14,13 @@
       <el-table-column
         v-for="column in tableColumns"
         :key="column.label"
+        :class-name="column.tour"
         v-bind="column"></el-table-column>
       <el-table-column min-width="100px" align="right" label="Ações">
         <div slot-scope="{$index, row}" class="d-flex">
           <base-button
             @click.native="handleEdit($index, row)"
-            class="edit"
+            class="edit botao-editar-escola"
             type="primary"
             size="sm"
             icon
@@ -28,7 +29,7 @@
           </base-button>
           <base-button
             @click.native="handleDelete($index, row)"
-            class="remove btn-link"
+            class="remove btn-link botao-apagar-escola"
             type="danger"
             size="sm"
             icon
@@ -57,40 +58,45 @@ export default {
           prop: "name",
           label: "Nome",
           minWidth: 140,
-          sortable: true
+          sortable: true,
+          tour: "escola-nome"
         },
         {
           prop: "phone",
           label: "Telefone",
           minWidth: 100,
-          sortable: true
+          sortable: true,
+          tour: "escola-telefone"
         },
         {
           prop: "email",
           label: "E-mail",
           minWidth: 220,
-          sortable: true
+          sortable: true,
+          tour: "escola-email"
         },
         {
           prop: "site",
           label: "Site",
           minWidth: 220,
-          sortable: true
+          sortable: true,
+          tour: "escola-site"
         },
         {
           prop: "city",
           label: "Cidade",
           minWidth: 120,
-          sortable: true
+          sortable: true,
+          tour: "escola-cidade"
         },
         {
           prop: "state",
           label: "UF",
           minWidth: 60,
-          sortable: true
+          sortable: true,
+          tour: "escola-estado"
         },
       ],
-
       currentPage: 1
     };
   },

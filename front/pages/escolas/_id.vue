@@ -3,10 +3,7 @@
     <base-header class="pb-6">
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-7">
-          <h6 class="h2 text-white d-inline-block mb-0">{{$route.name}}</h6>
-          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
-            <route-breadcrumb/>
-          </nav>
+          <h6 class="h2 text-white d-inline-block mb-0">Editar</h6>
         </div>
       </div>
     </base-header>
@@ -14,33 +11,38 @@
       <div class="row">
         <div class="col">
           <div class="card-wrapper">
-            <editar-escola-form :school="school">
-            </editar-escola-form>
+            <escola-form :school="school">
+            </escola-form>
           </div>
         </div>
       </div>
     </div>
+    <v-tour name="pageTour" :steps="escolaDetalhesSteps" :options="tourOptions"></v-tour>
   </div>
+
 </template>
 
 <script>
-  import EditarEscolaForm from "@/components/pages/forms/EditarEscolaForm";
+import EscolaForm from "@/components/pages/forms/EscolaForm";
+import tourStepsMixin from "@/components/tourSteps/tourStepsMixin";
 
-  export default {
-    name: 'escola-edicao',
-    layout: 'DashboardLayout',
-    components: {
-      EditarEscolaForm,
-    },
-    data() {
-      return {
-        id: this.$route.params.id
-      }
-    },
-    computed: {
-      school () {
-        return this.$store.getters["schools/getSchool"](this.id)
-      }
+export default {
+  name: "escola-editar",
+  layout: "DashboardLayout",
+  mixins: [tourStepsMixin],
+  components: {
+    EscolaForm,
+  },
+  // passa para o form a escola recuperada a partir no numero em this.$route.params.id
+  data() {
+    return {
+      id: this.$route.params.id
+    };
+  },
+  computed: {
+    school() {
+      return this.$store.getters["schools/getSchool"](this.id);
     }
   }
+};
 </script>

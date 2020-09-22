@@ -6,10 +6,20 @@ export const state = () => ({
 
 export const mutations = {
   addSchool(state, school) {
+    console.log(school);
     state.schools.push(school);
   },
-  setSchools(state, schools) {
-    state.schools = schools;
+  addSchools(state, schools) {
+    // itera sobre um array de escolas. Se o id da escola for encontrado no state.schools, ignora.
+    // se nao for encontrado, adiciona a escola ao array
+    // se isso nao for feito, na action fetchAllSchools, que invoca essa mutation, a lista de escolas
+    // vai sendo acrescida de elementos repetidos que aparecerao, por isso mesmo, repetidos na listagem
+    schools.forEach(function (item, index) {
+      let currentSchool = state.schools.find(school => school.id === item.id);
+      if (currentSchool == null) {
+        state.schools.push(item);
+      }
+    });
   },
   deleteSchool(state, school) {
     const i = state.schools.map(school => school.id).indexOf(school.id);
@@ -62,16 +72,22 @@ export const mutations = {
 export const getters = {
   // https://vuex.vuejs.org/guide/getters.html#method-style-access
   getSchool: (state) => (id) => {
-    return state.schools.find(school => school.id === Number(id));
+    let school = state.schools.find(school => school.id === Number(id));
+    // console.log("VUEX: ")
+    // console.log(school)
+    if (school.id === 0){
+      delete school.id
+    }
+    return school
+
   },
 };
-
 export const actions = {
   async fetchAllSchools({commit}) {
     const res = await this.$axios.get("/v2/schools");
     if (res.status === 200) {
-      const schools = res.data.results
-      commit("setSchools", schools);
+      const schools = res.data.results;
+      commit("addSchools", schools);
       if (schools.length === 0) {
         await Swal.fire({
           title: "Bem-vindo ao Educa Legal!",
@@ -92,13 +108,15 @@ export const actions = {
     if (res.status === 204) {
       commit("deleteSchool", school);
     }
-    return res
+    return res;
   },
   async createSchool({commit}, school) {
-    const res = await this.$axios.post(`/v2/schools/`, school);
-    if (res.status === 200) {
-      console.log(res);
-      commit("addSchool", school);
-    }
+    // Quando EscolaForm esta na operacao de criar, ele adiciona uma escola vazia, com id 0 que recebeu de escolas / index
+    // Essa escola provisoria deve ser removida da lista de escolas do vuex
+    commit("deleteSchool", school)
+    // Depois de removida a escola, sera feito a criaca da escola no back
+    // O botao que salva a nova escola e chama essa action redireciona depois para a lista de escolas
+    // que recarrega todas as escolas de novo do banco, incluindo a recem criada
+    await this.$axios.post(`/v2/schools/`, school);
   }
 };
