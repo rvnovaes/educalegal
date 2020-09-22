@@ -2,12 +2,12 @@ version: '3.7'
 
 services:
   educalegal:
-    command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
+    command:  gunicorn web.wsgi:application --bind 0.0.0.0:8008 --workers=4 --timeout=300
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.test
       - EL_ENV=test
     ports:
-      - "8008:8000"
+      - "8008:8008"
   educalegal_celery:
     environment:
       - DEBUG=1
