@@ -127,8 +127,9 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
     def get_docx_file(self, obj):
         docx_file = obj.get_docx_file()
         docx_file_data = {
-            "url": docx_file.cloud_file.url if docx_file.cloud_file else docx_file.ged_link,
-            "name": docx_file.name
+            "url": docx_file.ged_link,
+            "name": docx_file.name,
+            "doc_uuid": docx_file.doc_uuid
         }
         return docx_file_data
 

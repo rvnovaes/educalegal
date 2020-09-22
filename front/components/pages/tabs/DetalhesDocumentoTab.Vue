@@ -91,7 +91,7 @@
     <div v-if="currentDocument.parent == null">
       <!--  TODO Testar bloqueio de CORS para download em ambiente real. Em localhost ele bloqueia  -->
       <!-- pdf -->
-      <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.cloud_file,
+      <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.doc_uuid,
       currentDocument.name, 'pdf')" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
       </base-button>
       <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
@@ -99,7 +99,7 @@
       </base-button>
 
       <!-- docx -->
-      <base-button v-if="currentDocument.docx_file" @click="downloadDocument(currentDocument.docx_file.url,
+      <base-button v-if="currentDocument.docx_file" @click="downloadDocument(currentDocument.docx_file.doc_uuid,
       currentDocument.docx_file.name, 'docx')" type="primary"><i class="ni ni-cloud-download-95"></i>Word
       </base-button>
 
@@ -208,19 +208,16 @@ export default {
         });
       }
     },
-    async downloadDocument(fileURL, documentName, fileKind) {
-      console.log(fileURL)
-      console.log(documentName)
-      console.log(fileKind)
+    async downloadDocument(doc_uuid, documentName, fileKind) {
       try {
-        const res = await this.$axios.get(fileURL, {responseType: "blob"});
+        const url = '/v2/documents/' + doc_uuid + '/cloud_download/'
+        const res = await this.$axios.get(url, {responseType: "blob"});
         let blob = undefined
         if (fileKind === "pdf") {
           blob = new Blob([res.data], {type: "application/pdf"});
         } else {
           blob = new Blob([res.data], {type: "application/msword"});
         }
-        console.log(blob)
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = documentName;
