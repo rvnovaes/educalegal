@@ -1355,6 +1355,116 @@ paths:
         in: path
         required: true
         type: string
+  '/v2/schools/{spk}/witness':
+    get:
+      operationId: v2_schools_witness_list
+      description: >-
+        Retorna a lista de testemunhas pelo id da escola.
+      parameters:
+        - name: page
+          in: query
+          description: 'N° da página que irá retornar.'
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/Witness v2'
+      tags:
+        - v2
+    post:
+      operationId: v2_schools_witness_create
+      description: >-
+        Cria uma nova testemunha na escola.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Witness v2'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Witness v2'
+      tags:
+        - v2
+    parameters:
+      - name: spk
+        in: path
+        required: true
+        type: string
+  '/v2/schools/{spk}/witnesses/{id}':
+    get:
+      operationId: v2_schools_witnesses_read
+      description: >-
+        Retorna a testemunha pelo seu id e pelo id da escola.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Witness v2'
+      tags:
+        - v2
+    patch:
+      operationId: v2_schools_witnesses_partial_update
+      description: >-
+        Atualiza os dados da testemunha da escola.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Witness v2'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Witness v2'
+      tags:
+        - v2
+    delete:
+      operationId: v2_schools_witnesses_delete
+      description: >-
+        Apaga a testemunha da escola.
+        Só permite excluir testemunha vinculada ao tenant referente ao token
+        informado.
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - v2
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this Testemunha.
+        required: true
+        type: integer
+      - name: spk
+        in: path
+        required: true
+        type: string
   /v2/tenants/:
     get:
       operationId: v2_tenants_list
@@ -2151,6 +2261,38 @@ definitions:
         title: Envelope
         type: integer
         x-nullable: true
+  Witness v2:
+    required:
+      - name
+      - email
+      - school
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Nome
+        type: string
+        maxLength: 255
+        minLength: 1
+      email:
+        title: E-mail
+        type: string
+        format: email
+        maxLength: 254
+        minLength: 1
+      cpf:
+        title: CPF
+        type: string
+        maxLength: 255
+      tenant:
+        title: Tenant
+        type: integer
+      school:
+        title: Escola
+        type: integer
   Interview v2:
     required:
       - name

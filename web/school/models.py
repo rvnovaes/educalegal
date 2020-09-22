@@ -90,13 +90,12 @@ class School(TenantAwareModel):
 
 
 class SchoolUnit(TenantAwareModel):
-    name = models.CharField(max_length=255, blank=True, verbose_name="Nome")
+    name = models.CharField(max_length=255, verbose_name="Nome")
     school = models.ForeignKey(
         School,
-        null=True,
         on_delete=models.CASCADE,
         related_name="school_units",
-        verbose_name="Unidade Escolar",
+        verbose_name="Escola",
     )
 
     def __str__(self):
@@ -109,3 +108,27 @@ class SchoolUnit(TenantAwareModel):
         ordering = ["name"]
         verbose_name = "Unidade Escolar"
         verbose_name_plural = "Unidades Escolares"
+
+
+class Witness(TenantAwareModel):
+    name = models.CharField(max_length=255, verbose_name="Nome")
+    email = models.EmailField(verbose_name="E-mail")
+    cpf = models.CharField(max_length=255, blank=True, verbose_name="CPF")
+
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name="witnesses",
+        verbose_name="Escola",
+    )
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("school:witness-detail", kwargs={"pk": self.pk})
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Testemunha"
+        verbose_name_plural = "Testemunhas"

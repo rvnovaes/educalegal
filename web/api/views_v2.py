@@ -44,8 +44,8 @@ from document.models import Document, DocumentFileKind, BulkDocumentKind
 from document.util import send_email as doc_send_email, send_to_esignature as doc_send_to_esignature
 from document.views import save_document_data
 from document.views import validate_data_mongo, generate_document_from_mongo
-from interview.models import Interview
-from school.models import School, SchoolUnit
+from interview.models import Interview, InterviewDocumentType
+from school.models import School, SchoolUnit, Witness
 from tenant.models import Plan, Tenant, TenantGedData
 from users.models import CustomUser
 from util.file_import import is_metadata_valid, is_content_valid
@@ -55,12 +55,14 @@ from .serializers_v2 import (
     PlanSerializer,
     DocumentSerializer,
     DocumentDetailSerializer,
+    DocumentTypesSerializer,
     InterviewSerializer,
     SchoolSerializer,
     SchoolUnitSerializer,
     TenantSerializer,
     TenantGedDataSerializer,
     UserSerializer,
+    WitnessSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -88,6 +90,13 @@ class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = Interview.objects.all()
         queryset = queryset.order_by("name")
         return queryset
+
+
+class DocumentTypesViewSet(viewsets.ViewSet):
+    def list(self, request):
+        queryset = InterviewDocumentType.objects.all()
+        serializer = DocumentTypesSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class PlanViewSet(viewsets.ReadOnlyModelViewSet):
@@ -628,7 +637,7 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
 
         :param request: HttpRequest
         :param identifier: id ou doc_uui do documento no Educa Legal
-        :return: O arquivo do documento no GED
+        :return: O arquivo from school.models import School, SchoolUnitdo documento no GED
         """
 
         doc_uuid = kwargs["identifier"]
@@ -994,6 +1003,26 @@ class SchoolUnitViewSet(viewsets.ModelViewSet):
             # queryset just for schema generation metadata
             # https://github.com/axnsan12/drf-yasg/issues/333
             return SchoolUnit.objects.none()
+        school_pk = self.kwargs["spk"]
+        tenant = self.request.user.tenant
+        queryset = self.queryset.filter(school_id=school_pk, tenant=tenant)
+        return queryset
+
+
+class WitnessViewSet(viewsets.ModelViewSet):
+    """
+    Permite criar, alterar, listar e apagar as testemunhas das escolas.
+    Só permite excluir testemunha vinculada ao tenant referente ao token informado.
+    """
+
+    queryset = Witness.objects.all()
+    serializer_class = WitnessSerializer
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            # https://github.com/axnsan12/drf-yasg/issues/333
+            return Witness.objects.none()
         school_pk = self.kwargs["spk"]
         tenant = self.request.user.tenant
         queryset = self.queryset.filter(school_id=school_pk, tenant=tenant)
