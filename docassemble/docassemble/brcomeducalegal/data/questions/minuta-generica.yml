@@ -18,6 +18,7 @@ include:
   - element-signature.yml
   - element-school-email-reviewed.yml
   - element-default-messages.yml
+  - element-witness.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -67,12 +68,7 @@ code: |
       if part_types[0].has_extraparts:
         for item in extraparts:
           item.name.text
-    if has_witnesses:
-      witnesses.target_number = 2
-      for item in witnesses:
-        item.name.text
-      if plan_use_esignature:
-        valid_extraparts_table
+    has_witnesses
     has_attachment
     el_patch_document
     document_ready_screen
@@ -326,45 +322,6 @@ script: |
     $(document).ready(function(){
         $('#X2ZpZWxXzI').mask('000.000.000-00', {reverse: true});
         $('#X2ZpZWxkzM').mask('00.000.000/0000-00', {reverse: true});
-      });
-  </script>
----
-section: Testemunhas
-progress: 85
-question: |
-  Há testemunhas?
-yesno: has_witnesses
----
-objects:
-  - witnesses: DAList.using(object_type=Person, ask_number=True)
----
-section: Testemunhas
-progress: 90
-question: Testemunhas
-fields:
-  - Número de pessoas: witnesses.target_number
-    required: true
-    datatype: integer
-    default: 1
-    max: 2
----
-section: Testemunhas
-progress: 95
-question: Dados da ${word(ordinal(i)) } testemunha
-fields:
-  - 'Nome da ${word(ordinal(i)) } Testemunha:': witnesses[i].name.text
-    validate: validate_person_full_name
-  - "CPF:": witnesses[i].cpf
-    required: True
-    validate: validate_cpf
-  - "E-mail:": witnesses[i].email
-    datatype: email
-    help: ${ help_email_msg }
-    required: True
-script: |
-  <script type="text/javascript">
-    $(document).ready(function(){
-        $('#d2l0bmVzc2VzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
       });
   </script>
 ---
