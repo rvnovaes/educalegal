@@ -3,7 +3,7 @@ from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
 
-from docassemble.base.util import log
+# from docassemble.base.util import log
 
 
 class EducaLegalClient:
@@ -75,14 +75,19 @@ class EducaLegalClient:
             school_units_dict[school["name"]] = school["school_units"]
         return school_names_list, school_units_dict, school_data_dict
 
+    def witnesses_list(self, tid):
+        final_url = self.api_base_url + "/v2/tenants/{id}/witnesses/".format(id=tid)
+        response = self.session.get(final_url).json()
+        return response
+
     def patch_document(self, data, params):
         final_url = self.api_base_url + "/v2/documents/{}".format(params['doc_uuid'])
 
         try:
             response = self.session.patch(final_url, data=data, params=params)
         except Exception as e:
-            log("e", "console")
-            log(e, "console")
+            # log("e", "console")
+            # log(e, "console")
             return None, str(e)
         else:
             return response.status_code, response.json()

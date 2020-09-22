@@ -3,8 +3,8 @@ import json
 import pandas as pd
 import uuid
 
-from base64 import b64decode
 from celery import chain
+from django.core.files.base import ContentFile
 from mongoengine.errors import ValidationError
 from rest_framework import generics
 from urllib.request import urlretrieve, urlcleanup
@@ -14,7 +14,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
 from django.core.files import File
-from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -634,7 +633,7 @@ def query_documents_by_args(pk=None, **kwargs):
     return data
 
 
-def save_document_data(document, url, file, relative_path, has_ged, ged_data, filename, parent=None):
+def save_document_data(document, url, file_data, relative_path, has_ged, ged_data, filename, parent=None):
     if has_ged:
         document.ged_id = ged_data['id']
         document.ged_link = ged_data['latest_version']['document_url'] + 'download/'
@@ -644,12 +643,6 @@ def save_document_data(document, url, file, relative_path, has_ged, ged_data, fi
         try:
             # salva como arquivo temporario
             temp_file, _ = urlretrieve(url)
-            logging.info('clicksign_nuvem1-1')
-            logging.info(type(temp_file))
-            logging.info('clicksign_nuvem1-2')
-            logging.info(type(open(temp_file, 'rb')))
-            logging.info('clicksign_nuvem1-3')
-            logging.info(type(File(open(temp_file, 'rb'))))
             # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
             document.cloud_file.save(relative_path + filename, File(open(temp_file, 'rb')))
         except Exception as e:
@@ -660,21 +653,9 @@ def save_document_data(document, url, file, relative_path, has_ged, ged_data, fi
             urlcleanup()
     else:
         try:
-            logging.info('docusign_nuvem1')
-            logging.info(type(file))
-            logging.info('docusign_nuvem1-2')
-
-            logging.info(type(open(file, 'rb')))
-            logging.info('clicksign_nuvem1-3')
-            logging.info(type(File(open(file, 'rb'))))
-
-
-            # logging.info(ContentFile(b64decode(file)))
-            # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
-            document.cloud_file.save(relative_path + filename, File(open(file, 'rb')))
+            file = ContentFile(file_data, name=filename)
+            document.cloud_file.save(relative_path + filename, file)
         except Exception as e:
-            logging.info('docusign_nuvem2')
-            logging.info(e)
             message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
             logging.error(message)
 

@@ -2,6 +2,8 @@ import dateparser
 import logging
 import xmltodict
 
+from base64 import b64decode
+
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -121,16 +123,16 @@ def docusign_pdf_files_parser(data):
     for pdf in xml["DocumentPDFs"]["DocumentPDF"]:
         if pdf["DocumentType"] == "CONTENT":
             file_kind = DocumentFileKind.PDF_SIGNED.value
-            filename = main_filename_no_extension + "_assinado.pdf"
+            filename = main_filename_no_extension + "-assinado.pdf"
             description = main_filename_no_extension + ".pdf completo."
         elif pdf["DocumentType"] == "SUMMARY":
             file_kind = DocumentFileKind.PDF_CERTIFIED.value
-            filename = main_filename_no_extension + "_certificado.pdf"
+            filename = main_filename_no_extension + "-certificado.pdf"
             description = (
                 main_filename_no_extension + ".pdf certificado de assinaturas."
             )
         else:
-            filename = pdf["DocumentType"] + "_" + pdf["Name"]
+            filename = pdf["DocumentType"] + "-" + pdf["Name"]
             description = filename
             file_kind = DocumentFileKind.PDF
 
@@ -138,11 +140,8 @@ def docusign_pdf_files_parser(data):
         pdf_file_data["file_kind"] = file_kind
         pdf_file_data["filename"] = filename
         pdf_file_data["description"] = description
-        pdf_file_data["file"] = pdf["PDFBytes"]
+        pdf_file_data["file"] = b64decode(pdf["PDFBytes"])
         pdf_documents.append(pdf_file_data)
-
-        # with open(full_filename, "wb") as pdf_file:
-        #     pdf_file.write(base64.b64decode(pdf["PDFBytes"]))
 
     return pdf_documents
 
@@ -154,43 +153,25 @@ def docusign_webhook_listener(request):
     logger.debug(request.content_type)
     data = request.body  # This is the entire incoming POST content in Django
     try:
-        logging.info('docusign_1')
         # Parses XML data and returns a dictionary and formated messages
         envelope_data, envelope_data_translated, recipient_statuses = docusign_xml_parser(data)
-        # Store the XML file on disk
-        # envelope_dir = os.path.join(settings.BASE_DIR, "media/", relative_path)
-        # Path(envelope_dir).mkdir(parents=True, exist_ok=True)
-
-        # filename = (
-        #     envelope_data["envelope_time_generated"].strftime("%Y%m%d_%H%M%S") + ".xml"
-        # )  # substitute _ for : for windows-land
-        # filepath = os.path.join(envelope_dir, filename)
-
-        # with open(filepath, "wb") as xml_file:
-        #     xml_file.write(data)
     except Exception as e:
-        logging.info('docusign_2')
         message = str(e)
         logger.exception(message)
         return HttpResponse(message)
 
     try:
-        logging.info('docusign_3')
         document = Document.objects.get(envelope_number=envelope_data["envelope_id"])
     except Document.DoesNotExist:
-        logging.info('docusign_4')
         message = 'O documento do envelope {envelope_number} não existe.'.format(
             envelope_number=envelope_data["envelope_id"])
         logger.debug(message)
         return HttpResponse(message)
     except Exception as e:
-        logging.info('docusign_5')
         message = str(e)
         logger.exception(message)
-        logging.info(message)
         return HttpResponse(message)
     else:
-        logging.info('docusign_6')
         # quando envia pelo localhost o webhook do docusign vai voltar a resposta para o test, por isso, não irá
         # encontrar o documento no banco
         envelope_status = str(envelope_data["envelope_status"]).lower()
@@ -202,13 +183,11 @@ def docusign_webhook_listener(request):
         # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
         if envelope_status == "completed":
             try:
-                logging.info('docusign_7')
                 (envelope_data["pdf_documents"]) = docusign_pdf_files_parser(data)
 
                 relative_path = 'docs/' + tenant.name + '/' + document.name[:15] + '/'
                 has_ged = tenant.has_ged()
                 if has_ged:
-                    logging.info('docusign_8')
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
                     document_description = interview.description if interview.description else ''
@@ -222,21 +201,17 @@ def docusign_webhook_listener(request):
                     pdf_filenames = list()
                     for pdf in envelope_data["pdf_documents"]:
                         try:
-                            logging.info('docusign_9')
                             post_data["label"] = pdf["filename"]
                             status_code, ged_data, ged_id = save_in_ged(post_data, None, pdf["file"], document.tenant)
                         except Exception as e:
-                            logging.info('docusign_10')
                             message = str(e)
                             logging.exception(message)
                             return HttpResponse(message)
                         else:
-                            logging.info('docusign_11')
                             logger.debug("Posting document to GED: " + pdf["filename"])
                             pdf_filenames.append(pdf["filename"])
 
                             if status_code == 201:
-                                logging.info('docusign_12')
                                 # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                                 # propriedades
                                 related_document = Document(
@@ -251,7 +226,6 @@ def docusign_webhook_listener(request):
                                 save_document_data(related_document, None, pdf["file"], relative_path, has_ged,
                                                    ged_data, pdf["filename"], document)
                             else:
-                                logging.info('docusign_13')
                                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                     str(status_code), ged_data)
                                 logging.error(message)
@@ -261,7 +235,6 @@ def docusign_webhook_listener(request):
                     pdf_filenames = chr(10).join(pdf_filenames)
                 else:
                     for pdf in envelope_data["pdf_documents"]:
-                        logging.info('docusign_14')
                         # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                         # propriedades
                         related_document = Document(
@@ -275,12 +248,9 @@ def docusign_webhook_listener(request):
                         )
                         save_document_data(related_document, None, pdf["file"], relative_path, has_ged, None,
                                            pdf["filename"], document)
-                        logging.info('docusign_15')
             except Exception as e:
-                logging.info('docusign_16')
                 message = str(e)
                 logger.exception(message)
-                logging.info(message)
                 return HttpResponse(message)
 
         if envelope_status in envelope_statuses.keys():
@@ -293,10 +263,8 @@ def docusign_webhook_listener(request):
 
         # se o envelope já existe atualiza o status, caso contrário, cria o envelope
         try:
-            logging.info('docusign_17')
             envelope = Envelope.objects.get(identifier=envelope_data["envelope_id"])
         except Envelope.DoesNotExist:
-            logging.info('docusign_18')
             envelope = Envelope(
                 identifier=envelope_data['envelope_id'],
                 status=envelope_data_translated['envelope_status'],
@@ -313,14 +281,12 @@ def docusign_webhook_listener(request):
             document.envelope_number = envelope.identifier
             document.save(update_fields=['envelope', 'envelope_number'])
         else:
-            logging.info('docusign_19')
             envelope.status = envelope_data_translated['envelope_status']
             envelope.status_update_date = envelope_data['envelope_time_generated']
             envelope.save(update_fields=['status', 'status_update_date'])
 
         for recipient_status in recipient_statuses:
             try:
-                logging.info('docusign_20')
                 # se já tem o status para o email e para o documento, não salva outro igual
                 # só cria outro se o status do recipient mudou
                 signer = Signer.objects.get(
@@ -328,7 +294,6 @@ def docusign_webhook_listener(request):
                     email=recipient_status['Email'],
                     status=recipient_status['Status'])
             except Signer.DoesNotExist:
-                logging.info('docusign_21')
                 try:
                     signer = Signer(
                         name=recipient_status['UserName'],
@@ -343,10 +308,7 @@ def docusign_webhook_listener(request):
 
                     signer.save()
                 except Exception as e:
-                    logging.info('docusign_22')
                     message = 'Não foi possível salvar o Signer: ' + str(e)
-                    logging.info(message)
                     logger.exception(message)
 
-    logging.info('docusign_23')
     return HttpResponse("Success!")

@@ -43,7 +43,7 @@ from document.models import Document, DocumentFileKind, BulkDocumentKind
 from document.views import save_document_data
 from document.views import validate_data_mongo, generate_document_from_mongo
 from interview.models import Interview, InterviewDocumentType
-from school.models import School, SchoolUnit
+from school.models import School, SchoolUnit, Witness
 from tenant.models import Plan, Tenant, TenantGedData
 from users.models import CustomUser
 from util.file_import import is_metadata_valid, is_content_valid
@@ -60,6 +60,7 @@ from .serializers_v2 import (
     TenantSerializer,
     TenantGedDataSerializer,
     UserSerializer,
+    WitnessSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -504,8 +505,6 @@ def save_in_ged(data, url, file, tenant):
     # se o cliente nao tem ged, nao envia para o ged
     mc = MayanClient(tenant.tenantgeddata.url, tenant.tenantgeddata.token)
 
-    logging.info('docusign_ged1')
-
     # salva o arquivo no ged
     try:
         status_code, response, ged_id = mc.document_create(data, url, file)
@@ -636,7 +635,7 @@ class DocumentDownloadViewSet(viewsets.ModelViewSet):
 
         :param request: HttpRequest
         :param identifier: id ou doc_uui do documento no Educa Legal
-        :return: O arquivo do documento no GED
+        :return: O arquivo from school.models import School, SchoolUnitdo documento no GED
         """
 
         doc_uuid = kwargs["identifier"]
@@ -964,6 +963,26 @@ class SchoolUnitViewSet(viewsets.ModelViewSet):
             # queryset just for schema generation metadata
             # https://github.com/axnsan12/drf-yasg/issues/333
             return SchoolUnit.objects.none()
+        school_pk = self.kwargs["spk"]
+        tenant = self.request.user.tenant
+        queryset = self.queryset.filter(school_id=school_pk, tenant=tenant)
+        return queryset
+
+
+class WitnessViewSet(viewsets.ModelViewSet):
+    """
+    Permite criar, alterar, listar e apagar as testemunhas das escolas.
+    Só permite excluir testemunha vinculada ao tenant referente ao token informado.
+    """
+
+    queryset = Witness.objects.all()
+    serializer_class = WitnessSerializer
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            # https://github.com/axnsan12/drf-yasg/issues/333
+            return Witness.objects.none()
         school_pk = self.kwargs["spk"]
         tenant = self.request.user.tenant
         queryset = self.queryset.filter(school_id=school_pk, tenant=tenant)
