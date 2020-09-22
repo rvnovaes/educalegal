@@ -329,6 +329,7 @@ def send_email(doc_uuid):
 def redirect_send_to_esignature(request, doc_uuid):
     status_code, message = send_to_esignature(doc_uuid)
 
+    # o docusign retorna 201 e o clicksign retorna 202
     if status_code == 202 or status_code == 201:
         messages.success(request, message)
     else:
@@ -406,7 +407,7 @@ def send_to_esignature(doc_uuid):
 
                         to_recipients = ''
                         for recipient in document.recipients:
-                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+                            to_recipients += recipient['name'] + ' - ' + recipient['email']
 
                         message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
                                             'sucesso para os destinatários:{}'.format(to_recipients))

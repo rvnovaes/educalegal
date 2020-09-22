@@ -1136,7 +1136,6 @@ def send_email(request):
 @permission_classes([permissions.IsAuthenticated])
 def send_to_esignature(request):
     doc_uuid = request.data.get("doc_uuid")
-    doc_uuid = '06864c5f-1d65-4cf3-9a9d-4f8f6c94044a'
     status_code, message = doc_send_to_esignature(doc_uuid)
 
     return Response(message, status=status_code)

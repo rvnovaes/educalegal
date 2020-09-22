@@ -104,7 +104,7 @@
       </base-button>
 
       <!-- assinatura eletronica -->
-      <base-button v-if="currentDocument.submit_to_esignature === false" @click="send_to_esignature()"
+      <base-button v-if="currentDocument.submit_to_esignature === false" @click="send_to_esignature(currentDocument.doc_uuid)"
                    :type="esignatureButtonType"><i class="ni ni-sound-wave"></i>Enviar para assinatura
       </base-button>
 
@@ -126,7 +126,7 @@ export default {
   components: {},
   data() {
     return {
-      emailButtonType: "info",
+      emailButtonType: "success",
       esignatureButtonType: "success"
     };
   },
@@ -153,9 +153,8 @@ export default {
       this.emailButtonType = "secondary"
       try {
         const res = await this.$axios.post("/v2/documents/send_email/", {doc_uuid: doc_uuid});
-        console.log(res);
         if (res.status === 202) {
-          this.emailButtonType = "info"
+          this.emailButtonType = "success"
           await Swal.fire({
             title: "O e-mail foi enviado com sucesso!",
             text: res.data,
@@ -166,8 +165,7 @@ export default {
           })
         }
       } catch (e) {
-        console.log(e);
-        this.emailButtonType = "info"
+        this.emailButtonType = "success"
         await Swal.fire({
           title: "Houve erro ao enviar o e-mail.",
           text: e.response.data,
@@ -184,8 +182,8 @@ export default {
       this.esignatureButtonType = "secondary"
       try {
         const res = await this.$axios.post("/v2/documents/send_to_esignature/", {doc_uuid: doc_uuid});
-        console.log(res);
-        if (res.status === 202) {
+        // o docusign retorna 201 e o clicksign retorna 202
+        if (res.status === 201 || res.status === 202) {
           this.esignatureButtonType = "success"
           await Swal.fire({
             title: "O documento foi enviado para a assinatura eletrônica com sucesso!",
@@ -197,7 +195,6 @@ export default {
           })
         }
       } catch (e) {
-        console.log(e);
         this.esignatureButtonType = "success"
         await Swal.fire({
           title: "Houve erro ao enviar para a assinatura eletrônica.",
