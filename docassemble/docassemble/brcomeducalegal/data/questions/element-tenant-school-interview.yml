@@ -71,6 +71,7 @@ code: |
     educalegal_url = 'https://test.educalegal.com.br'
   else:
     educalegal_url = 'http://educalegal:8008'
+    educalegal_front_url = 'http://educalegal:3000'
 ---
 code: |
     elc = EducaLegalClient(educalegal_url, ut)
