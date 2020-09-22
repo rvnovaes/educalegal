@@ -55,7 +55,7 @@ urlpatterns = [
     path("schools/<int:pk>", SchoolViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     path("schools/<int:spk>/school_units", SchoolUnitViewSet.as_view({"post": "create", "get": "list"})),
     path("schools/<int:spk>/school_units/<int:pk>", SchoolUnitViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
-    path("schools/<int:spk>/witness", WitnessViewSet.as_view({"post": "create", "get": "list"})),
+    path("schools/<int:spk>/witnesses", WitnessViewSet.as_view({"post": "create", "get": "list"})),
     path("schools/<int:spk>/witnesses/<int:pk>",
          WitnessViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
 
