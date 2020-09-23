@@ -2,7 +2,14 @@ build:
 	docker-compose build educalegal
 
 build_all_educalegal:
+ifeq ($(e), prod)
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build educalegal educalegal_celery educalegal_front educalegal_flower
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml build educalegal educalegal_celery educalegal_front educalegal_flower
+else
 	docker-compose build educalegal educalegal_celery educalegal_front educalegal_flower
+endif
+
 # parametros
 # e=prod - conecta como producao
 # e=nodebug - conecta sem modo de debug (-d: detached mode)

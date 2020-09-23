@@ -82,6 +82,11 @@ class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
     pagination.PageNumberPagination.page_size = 150
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            # https://github.com/axnsan12/drf-yasg/issues/333
+            return Interview.objects.none()
+
         user = self.request.user
         if not user.is_superuser:
             tenant = self.request.user.tenant
@@ -109,6 +114,10 @@ class PlanViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PlanSerializer
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            # https://github.com/axnsan12/drf-yasg/issues/333
+            return Plan.objects.none()
         user = self.request.user
         if not user.is_superuser:
             tenant = self.request.user.tenant
@@ -968,6 +977,10 @@ class SchoolViewSet(viewsets.ModelViewSet):
     serializer_class = SchoolSerializer
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            # https://github.com/axnsan12/drf-yasg/issues/333
+            return School.objects.none()
         user = self.request.user
         if not user.is_superuser:
             tenant = self.request.user.tenant
@@ -1034,6 +1047,10 @@ class TenantGedDataViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TenantGedDataSerializer
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            # queryset just for schema generation metadata
+            # https://github.com/axnsan12/drf-+/issues/333
+            return TenantGedData.objects.none()
         user_tenant = self.request.user.tenant
         tenant = Tenant.objects.get(pk=self.kwargs.get("pk"))
         if user_tenant == tenant:

@@ -17,8 +17,8 @@ django-allauth~=0.42.0
 django-tables2~=2.3.1
 django-filter~=2.3.0
 # Store files on Digital Ocean Spaces
-django-storages~=1.10
-boto3~=1.14.57
+django-storages~=1.10.1
+boto3~=1.15.3
 # Production server
 gunicorn~=20.0.4
 # Misc
@@ -28,7 +28,7 @@ Pillow~=7.2.0
 pyyaml~=5.3.1
 django-bootstrap4~=2.2.0
 # Debug
-django-debug-toolbar~=2.2
+django-debug-toolbar~=3.1
 # API Debugging
 django-silk~=4.1.0
 # Read csv
@@ -43,7 +43,7 @@ mongoengine~=0.20.0
 
 # Used to in docusign requests
 PyJWT~=1.7.1
-cryptography~=3.1
+cryptography~=3.1.1
 
 # Validations
 validator-collection~=1.4.2
@@ -53,7 +53,7 @@ celery~=4.4.7
 django-celery-results~=1.2.1
 future~=0.18.2
 # Tests
-pytest~=6.0.1
+pytest~=6.0.2
 # https://github.com/izimobil/django-rest-framework-datatables
 djangorestframework-datatables~=0.5.2
 PySimpleGUI~=4.29.0
@@ -67,5 +67,5 @@ dateparser~=0.7.6
 # graphene-django~=2.12.1
 # https://dateutil.readthedocs.io/en/latest/
 python-dateutil~=2.8.1
-sendgrid~=6.4.6
+sendgrid~=6.4.7
 pytz~=2020.1

@@ -1,13 +1,17 @@
 version: '3.7'
 
 services:
+  educalegal_front:
+    build:
+      args:
+        BUILD_BACKEND_URL: "https://api-test.educalegal.com.br"
   educalegal:
     command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.test
       - EL_ENV=test
     ports:
-      - "8008:8000"
+      - "8000:8000"
   educalegal_celery:
     environment:
       - DEBUG=1
