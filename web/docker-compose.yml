@@ -5,10 +5,11 @@ services:
     image: rvnovaes/educalegal-front:0.3
     container_name: educalegal_front
     restart: unless-stopped
+    command: ["yarn", "start", ""]
     build:
       context: ../front
-#      args:
-#        BACKEND_URL: "http://educalegal:8008"
+      args:
+        BUILD_BACKEND_URL: "http://educalegal:8008"
     depends_on:
       - educalegal
     ports:
