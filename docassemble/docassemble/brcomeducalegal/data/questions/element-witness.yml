@@ -1,7 +1,3 @@
-code: |
-  witnesses.target_number = 2
-  for item in witnesses:
-    item.name.text
 ---
 section: Testemunhas
 progress: 95
@@ -9,55 +5,10 @@ question: |
   Há testemunhas?
 yesno: has_witnesses
 ---
-objects:
-  - witnesses: DAList.using(object_type=Person, ask_number=True)
----
-section: Testemunhas
-progress: 95
-question: Testemunhas
-fields:
-  - Número de pessoas: witnesses.target_number
-    required: true
-    datatype: integer
-    default: 1
-    max: 2
----
-section: Testemunhas
-progress: 95
-question: Dados da ${word(ordinal(i)) } testemunha
-fields:
-  - 'Nome da ${word(ordinal(i)) } Testemunha:': witnesses[i].name.text
-    validate: validate_person_full_name
-  - "E-mail:": witnesses[i].email
-    datatype: email
-    help: ${ help_email_msg }
-    required: True
-  - "CPF:": witnesses[i].cpf
-    required: False
-    validate: validate_cpf
-script: |
-  <script type="text/javascript">
-    $(document).ready(function(){
-        $('#d2l0bmVzc2VzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
-      });
-  </script>
----
 question: |
-  Editar e-mail:
+  Lista de Testemunhas ${ witnesses_data_list }:
 fields:
-  - "E-mail:": school_email
-    help: ${ help_email_msg }
+  - "Teste:": teeste
     required: True
     datatype: email
----
-question: |
-  Testemunhas da Escola:
-subquestion: |
-  Confira o email das testemunhas daescola, pois este será usado
-  no envio do documento para a assinatura eletrônica ou por e-mail.
-review:
-  - Editar: school_email
-    button: |
-      ${ school_email }
-field: reviewed_school_email_answer
 ---

@@ -35,6 +35,8 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    if has_witnesses:
+      teeste
     interview_document_type_choice
     part_types.target_number = 1
     for item in part_types:
@@ -68,7 +70,6 @@ code: |
       if part_types[0].has_extraparts:
         for item in extraparts:
           item.name.text
-    has_witnesses
     has_attachment
     el_patch_document
     document_ready_screen
@@ -101,6 +102,8 @@ section: Minuta
 progress: 5
 question: |
   Insira a minuta que deseja enviar para assinatura eletrônica.
+subquestion:  |
+  ${ selected_school }
 fields:
   - "Tipo do documento:": interview_document_type_choice
     datatype: dropdown
