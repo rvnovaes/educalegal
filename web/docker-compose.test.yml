@@ -1,6 +1,10 @@
 version: '3.7'
 
 services:
+  educalegal_front:
+    build:
+      args:
+        BUILD_BACKEND_URL: "https://api-test.educalegal.com.br"
   educalegal:
     command:  gunicorn web.wsgi:application --bind 0.0.0.0:8008 --workers=4 --timeout=300
     environment:
