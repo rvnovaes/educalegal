@@ -18,7 +18,6 @@ include:
   - element-signature.yml
   - element-school-email-reviewed.yml
   - element-default-messages.yml
-  - element-witness.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -35,41 +34,30 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
-    if has_witnesses:
-      teeste
     interview_document_type_choice
     part_types.target_number = 1
     for item in part_types:
       item.name.text
-    if school_party_type == part_types[0].name.text:
-      parts.target_number = 1
-      parts[0].person_type = "organization"
-      parts[0].name.text = school_legal_name
-      parts[0].cnpj = school_cnpj
-      parts[0].email = school_email
-    elif school_party_type == part_types[0].counterpart_name:
-      counterparts.target_number = 1
-      counterparts[0].person_type = "organization"
-      counterparts[0].name.text = school_legal_name
-      counterparts[0].cnpj = school_cnpj
-      counterparts[0].email = school_email
-    elif school_party_type == part_types[0].extrapart_name:
-      extraparts.target_number = 1
-      extraparts[0].person_type = "organization"
-      extraparts[0].name.text = school_legal_name
-      extraparts[0].cnpj = school_cnpj
-      extraparts[0].email = school_email
-    reviewed_school_email_answer
-    if not school_party_type == part_types[0].name.text:
-      for item in parts:
-        item.name.text
-    elif not school_party_type == part_types[0].counterpart_name:
+    school_party_type
+    school_party_type_selected
+    if school_party_type_selected == part_types[0].name.text:
+      counterparts.target_number
       for item in counterparts:
         item.name.text
-    elif not school_party_type == part_types[0].extrapart_name:
       if part_types[0].has_extraparts:
         for item in extraparts:
           item.name.text
+    elif school_party_type_selected == part_types[0].counterpart_name:
+      for item in parts:
+        item.name.text
+      if part_types[0].has_extraparts:
+        for item in extraparts:
+          item.name.text
+    elif school_party_type_selected == part_types[0].extrapart_name:
+      for item in parts:
+        item.name.text
+      for item in counterparts:
+        item.name.text
     has_attachment
     el_patch_document
     document_ready_screen
@@ -94,6 +82,26 @@ code: |
     generated_file_attachment = generated_file_signature
   generated_file = generated_file_attachment
 ---
+code: |
+  school_party_type_selected= school_party_type
+  if school_party_type_selected == part_types[0].name.text:
+    parts.target_number = 1
+    parts[0].person_type = "organization"
+    parts[0].name.text = school_legal_name
+    parts[0].cnpj = school_cnpj
+    parts[0].email = school_email
+  elif school_party_type_selected == part_types[0].counterpart_name:
+    counterparts.target_number = 1
+    counterparts[0].person_type = "organization"
+    counterparts[0].name.text = school_legal_name
+    counterparts[0].cnpj = school_cnpj
+    counterparts[0].email = school_email
+  elif school_party_type_selected == part_types[0].extrapart_name:
+    extraparts.target_number = 1
+    extraparts[0].person_type = "organization"
+    extraparts[0].name.text = school_legal_name
+    extraparts[0].cnpj = school_cnpj
+    extraparts[0].email = school_email
 attachment:
   variable name: signature_page
   docx template file: include-signature-page.docx
@@ -102,8 +110,6 @@ section: Minuta
 progress: 5
 question: |
   Insira a minuta que deseja enviar para assinatura eletrônica.
-subquestion:  |
-  ${ selected_school }
 fields:
   - "Tipo do documento:": interview_document_type_choice
     datatype: dropdown
@@ -119,7 +125,6 @@ objects:
 section: Parte
 progress: 5
 question: Parte
-subquestion:  |
 fields:
   - Número de Tipo de Pessoas: part_types.target_number
     required: true
@@ -171,7 +176,7 @@ objects:
 ---
 section: Parte
 progress: 10
-question: Dados da outra parte
+question: ${ part_types[0].name.text }
 fields:
   - Número de Pessoas: parts.target_number
     required: true
@@ -225,7 +230,7 @@ objects:
 ---
 section: Contraparte
 progress: 40
-question: Dados da outra parte
+question: ${ part_types[0].counterpart_name }
 fields:
   - Número de Pessoas: counterparts.target_number
     required: true
@@ -279,9 +284,9 @@ objects:
 ---
 section: Parte Extra
 progress: 70
-question: Parte extra
+question: ${ part_types[0].extrapart_name }
 fields:
-  - Número de ${ part_types[i].extrapart_name }: extraparts.target_number
+  - Número de Pessoas: extraparts.target_number
     required: true
     datatype: integer
     default: 1
@@ -324,7 +329,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkzM').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzQ').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 ---
@@ -332,13 +337,6 @@ section: Anexos
 progress: 90
 question: |
   Anexos:
-  - Lista tipos de documentos: ${ document_types_names_list }
-
-  - Opção escolhida: ${ interview_document_type_choice }
-
-  - Id Tipo de Documento: ${ interview_document_type }
-
-  - Nome do arquivo: ${ custom_file_name }
 fields:
   - 'Deseja inserir algum arquivo anexo? :': has_attachment
     datatype: yesnoradio
@@ -382,7 +380,7 @@ code: |
           ]
           recipients.append(new_recipient)
 
-  if has_extraparts:
+  if part_types[0].has_extraparts:
       for item in extraparts:
           if item.email:
               new_recipient = dict()
@@ -397,23 +395,6 @@ code: |
                   },
               ]
               recipients.append(new_recipient)
-
-  if has_witnesses:
-        for item in witnesses:
-            if item.email:
-                new_recipient = dict()
-                new_recipient['name'] = item.name.text
-                new_recipient['email'] = item.email
-                new_recipient['group'] = 'signers'
-                new_recipient['routingOrder'] = 1
-                new_recipient['tabs'] = [
-                    {
-                        'type': 'signHere',
-                        'anchorString': generate_anchor('signHere', item.email)
-                    },
-                ]
-                recipients.append(new_recipient)
-
 ---
 ga id: |
   code: ga_id_end
