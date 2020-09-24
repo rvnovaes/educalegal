@@ -208,8 +208,15 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://educalegal:3000",
     "http://localhost:8001",
-    "https://test.educalegal.com.br"
+    "http://127.0.0.1:8001",
+    "http://educalegal:8001",
+    "http://localhost:8008",
+    "http://127.0.0.1:8008",
+    "http://educalegal:8008",
+    "https://test.educalegal.com.br",
+    "https://app.educalegal.com.br",
 ]
 
 # CORS_ALLOW_CREDENTIALS = True
