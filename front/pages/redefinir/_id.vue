@@ -100,7 +100,7 @@ export default {
                   key: this.key});
           if (res.status === 200) {
             await Swal.fire({
-              title: "Solicitação de recuperação de senha!",
+              title: "Redefinição de senha!",
               text: res.data,
               icon: "success",
               customClass: {
@@ -112,8 +112,8 @@ export default {
           }
         } catch (e) {
           await Swal.fire({
-            title: "Erro ao comunicar com o servidor!",
-            text: e,
+            title: "Erro ao redefinir a senha!",
+            text: e.response.data,
             icon: "error",
             customClass: {
               confirmButton: "btn btn-info btn-fill",
