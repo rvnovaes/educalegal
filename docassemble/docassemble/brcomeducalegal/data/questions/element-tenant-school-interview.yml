@@ -157,6 +157,12 @@ code: |
     if el_log_to_console:
       log("Lista dos nomes dos tipos de documentos do Tenant" + str(document_types_names_list), "console")
 ---
+code: |
+  elc = EducaLegalClient(educalegal_url, ut)
+  witnesses_data_list = elc.witnesses_list(school_data_dict[selected_school]['id'])
+  if el_log_to_console:
+    log("Lista de testemunhas das escolas" + str(witnesses_data_list), "console")
+---
 progress: 1
 section: Escola
 question: Escolha a escola

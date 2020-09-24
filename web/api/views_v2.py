@@ -992,7 +992,7 @@ class SchoolViewSet(viewsets.ModelViewSet):
         school_documents = Document.objects.filter(school=school)
         if school_documents:
             return Response(
-                "Não é possível excluir esta escola. Ela possui documentos gerados.",
+                "Não é possível excluir esta escola porque ela possui documentos gerados.",
                 status=status.HTTP_200_OK,
             )
         else:

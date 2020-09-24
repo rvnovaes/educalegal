@@ -1,0 +1,105 @@
+---
+progress: 95
+question: |
+  Enviar o documento para assinatura de 02 testemunhas?
+yesno: has_witnesses
+---
+objects:
+  - witnesses: DAList.using(object_type=Individual, ask_number=True)
+---
+progress: 95
+question: Testemunhas
+fields:
+  - Número de Testemunhas: witnesses.target_number
+    required: true
+    datatype: integer
+    default: 2
+    max: 2
+---
+code: |
+  witnesses.target_number = 2
+  if len(witnesses_data_list['results']) == 0:
+    valid_witnesses_table
+  elif len(witnesses_data_list['results']) == 1:
+    witnesses[0].name.first = witnesses_data_list['results'][0]['name']
+    witnesses[0].email = witnesses_data_list['results'][0]['email']
+    witnesses[0].cpf = witnesses_data_list['results'][0]['cpf']
+  else:
+    witnesses[0].name.first = witnesses_data_list['results'][0]['name']
+    witnesses[0].email = witnesses_data_list['results'][0]['email']
+    witnesses[0].cpf = witnesses_data_list['results'][0]['cpf']
+    witnesses[1].name.first = witnesses_data_list['results'][1]['name']
+    witnesses[1].email = witnesses_data_list['results'][1]['email']
+    witnesses[1].cpf = witnesses_data_list['results'][1]['cpf']
+---
+field: valid_witnesses_table
+progress: 95
+question: |
+  Dados das Testemunhas
+subquestion: |
+  Confira os e-mails das testemunhas abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica ou e-mail.
+  ${ witnesses.table }
+buttons:
+  Continuar: continue
+---
+table: witnesses.table
+rows: witnesses
+columns:
+  - Nome: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+  - CPF: |
+      row_item.cpf
+edit:
+  - name.first
+  - email
+  - cpf
+---
+progress: 95
+question: |
+  Dados da 1ª testemunha:
+fields:
+  - "Nome:": witnesses[0].name.first
+    required: True
+    validate: validate_person_full_name
+  - "E-mail:": witnesses[0].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: True
+  - "CPF:": witnesses[0].cpf
+    required: True
+    validate: validate_cpf
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#d2l0bmVzc2VzWzBdLmNwZg').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+progress: 95
+question: |
+  % if len(witnesses_data_list['results']) == 1:
+    Você possui uma testemunha cadastrada no nosso sistema. Gentileza, inserir os Dados da 2ª testemunha:
+  % else:
+    Dados da 2ª testemunha:
+  % endif
+fields:
+  - "Nome:": witnesses[1].name.first
+    required: True
+    validate: validate_person_full_name
+  - "E-mail:": witnesses[1].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: True
+  - "CPF:": witnesses[1].cpf
+    required: True
+    validate: validate_cpf
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#d2l0bmVzc2VzWzFdLmNwZg').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---

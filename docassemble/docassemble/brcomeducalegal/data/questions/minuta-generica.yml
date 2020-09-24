@@ -18,6 +18,7 @@ include:
   - element-signature.yml
   - element-school-email-reviewed.yml
   - element-default-messages.yml
+  - element-school-witness.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -59,6 +60,8 @@ code: |
       for item in counterparts:
         item.name.text
     has_attachment
+    if has_witnesses:
+      valid_witnesses_table
     el_patch_document
     document_ready_screen
 ---
@@ -387,6 +390,22 @@ code: |
               new_recipient['email'] = item.email
               new_recipient['group'] = 'signers'
               new_recipient['routingOrder'] = 1
+              new_recipient['tabs'] = [
+                  {
+                      'type': 'signHere',
+                      'anchorString': generate_anchor('signHere', item.email)
+                  },
+              ]
+              recipients.append(new_recipient)
+
+  if has_witnesses:
+      for item in witnesses:
+          if item.email:
+              new_recipient = dict()
+              new_recipient['name'] = item.name.first
+              new_recipient['email'] = item.email
+              new_recipient['group'] = 'signers'
+              new_recipient['routingOrder'] = 2
               new_recipient['tabs'] = [
                   {
                       'type': 'signHere',
