@@ -1,0 +1,20 @@
+upstream api_test {
+  server 127.0.0.1:8000;
+}
+
+server {
+    server_name api-test.educalegal.com.br;
+    client_max_body_size 4G;
+
+    access_log /var/log/el_api_test/test_nginx-access.log;
+    error_log /var/log/el_api_test/test_nginx-error.log;
+
+    location /static/ {
+        proxy_pass http://api_test;
+    }
+    location / {
+        include proxy_params;
+        proxy_redirect off;
+        proxy_pass http://api_test;
+    }
+}

@@ -6,6 +6,6 @@ RUN apt-get update && \
     apt-get install -y vim \
     postgresql-client && \
     mkdir /code
-COPY . /code/
+COPY . /code
 WORKDIR /code
 RUN pip install -r requirements.txt
