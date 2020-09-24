@@ -21,7 +21,7 @@
 
             <div class="card-body px-lg-5 py-lg-5">
               <div class="text-center text-muted mb-4">
-                <small>Digite seu e-mail e sua senha</small>
+                <small>Digite duas vezes sua nova senha:</small>
               </div>
               <validation-observer v-slot="{handleSubmit}" ref="formValidator">
                 <form role="form" @submit.prevent="handleSubmit(onSubmit)">
