@@ -122,7 +122,7 @@ export default {
   },
   methods: {
     async onSubmit() {
-      const res = await this.$axios.post("/v2/tenants/", {
+      const res = await this.$axios.post("/v2/create_tenant/", {
         full_name: this.model.fullName,
         tenant_name: this.model.tenantName,
         phone: this.model.phone,

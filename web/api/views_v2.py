@@ -13,14 +13,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import pagination
-from rest_framework import permissions
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import authentication_classes
 from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, renderer_classes, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, renderer_classes, permission_classes, authentication_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import (
     ValidationError,
     PermissionDenied,
@@ -137,7 +135,8 @@ class TenantViewSet(viewsets.ModelViewSet):
 
 
 @api_view(["POST"])
-@permission_classes((AllowAny,))
+@authentication_classes([])
+@permission_classes([AllowAny])
 def create_tenant(request):
     full_name = request.data.get("full_name").strip()
     tenant_name = request.data.get("tenant_name").strip()
@@ -731,7 +730,7 @@ class DocumentCloudDownloadViewSet(viewsets.ModelViewSet):
 # Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def validate_document(request, **kwargs):
     """
     Validate document received in request.body.
@@ -848,7 +847,7 @@ def validate_document(request, **kwargs):
 # Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def generate_document(request, **kwargs):
     """
     Validate and generate document received in request.body.
@@ -1129,7 +1128,8 @@ def dashboard_data(request):
 
 
 @api_view(["POST"])
-@permission_classes((AllowAny,))
+@authentication_classes([])
+@permission_classes([AllowAny])
 def recover_password(request):
     email = request.data.get("email")
     try:
@@ -1171,7 +1171,8 @@ def recover_password(request):
 
 
 @api_view(["POST"])
-@permission_classes((AllowAny,))
+@authentication_classes([])
+@permission_classes([AllowAny])
 def reset_password(request):
     password = request.data.get("password")
     key = request.data.get("key")
@@ -1213,7 +1214,7 @@ def reset_password(request):
 
 
 @api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def send_email(request):
     doc_uuid = request.data.get("doc_uuid")
     status_code, message = doc_send_email(doc_uuid)
@@ -1222,7 +1223,7 @@ def send_email(request):
 
 
 @api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def send_to_esignature(request):
     doc_uuid = request.data.get("doc_uuid")
     status_code, message = doc_send_to_esignature(doc_uuid)

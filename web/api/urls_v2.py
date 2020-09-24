@@ -88,7 +88,7 @@ schema_view = get_schema_view(
     patterns=public_endpoints)
 
 private_endpoints = [
-    path("tenants/", create_tenant),
+    path("create_tenant/", create_tenant),
     path("dashboard/", dashboard_data),
     path("recover_password/", recover_password),
     path("reset_password/", reset_password),
@@ -114,7 +114,6 @@ private_endpoints = [
     url(
         r"^docs/redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     ),
-
 ]
 
 urlpatterns = public_endpoints + private_endpoints
