@@ -79,7 +79,7 @@
                       icon="fa fa-signature">
 
             <template slot="footer">
-              <div v-if="inProgressDocDelta >= 0">
+              <div v-if="inProgressSignatureDelta >= 0">
                 <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> {{
                     inProgressSignatureDelta
                   }} %</span><span
