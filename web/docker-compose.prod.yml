@@ -1,6 +1,15 @@
 version: '3.7'
 
 services:
+  web_server:
+    container_name: web_server
+    build:
+      context: nginx_dockerfile_prod
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
   educalegal_front:
     build:
       args:

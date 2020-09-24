@@ -4,7 +4,6 @@ import logging
 import pytz
 import pandas as pd
 
-from allauth.utils import build_absolute_uri
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
@@ -1144,7 +1143,7 @@ def recover_password(request):
         user.save()
         # send the password reset email
         path = "/redefinir/" + user_pk_to_url_str(user) + "-" + temp_key
-        url = build_absolute_uri(request, path)
+        url = "https://" + current_site.domain + path
         context = {
             "current_site": current_site,
             "user": user,
@@ -1155,6 +1154,11 @@ def recover_password(request):
         get_adapter(request).send_mail(
             "account/email/password_reset_key", email, context
         )
+
+        log_message = "Houve tentativa de recuperação de senha com e-mail {email}".format(
+            email=email
+        )
+        logger.info(log_message)
 
     except CustomUser.DoesNotExist:
         log_message = "Houve tentativa de recuperação de senha com e-mail inválido {email}".format(
