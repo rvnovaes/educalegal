@@ -98,9 +98,10 @@
             }
           })
           } catch (e) {
+          console.log(e);
           await Swal.fire({
             title: "Usuário ou senha inválidos!",
-            text: e,
+            html: "Para redefinir sua senha, clique em <strong>Esqueceu a Senha?</strong>",
             icon: "error",
             customClass: {
               confirmButton: "btn btn-info btn-fill",
