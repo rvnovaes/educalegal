@@ -1,0 +1,73 @@
+---
+progress: 95
+question: |
+  Enviar para 02 testemunhas assinarem?
+yesno: has_witnesses
+---
+objects:
+  - witnesses: DAList.using(object_type=Individual, ask_number=True)
+---
+progress: 95
+question: Testemunhas
+fields:
+  - Número de Testemunhas: witnesses.target_number
+    required: true
+    datatype: integer
+    default: 2
+    max: 2
+---
+code: |
+  witnesses.target_number = 2
+  witnesses[0].name.first = witnesses_data_list['results'][0]['name']
+  witnesses[0].email = witnesses_data_list['results'][0]['email']
+  witnesses[0].cpf = witnesses_data_list['results'][0]['cpf']
+  witnesses[1].name.first = witnesses_data_list['results'][1]['name']
+  witnesses[1].email = witnesses_data_list['results'][1]['email']
+  witnesses[1].cpf = witnesses_data_list['results'][1]['cpf']
+---
+field: valid_witnesses_table
+progress: 95
+question: |
+  Confira os e-mails das testemunhas abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica ou e-mail
+subquestion: |
+  ${ witnesses.table }
+buttons:
+  Continuar: continue
+---
+table: witnesses.table
+rows: witnesses
+columns:
+  - Nome: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+  - CPF: |
+      row_item.cpf
+edit:
+  - name.first
+  - email
+  - cpf
+---
+progress: 95
+question: |
+  Editar dados da 1ª testemunha:
+fields:
+  - "Nome:": witnesses[0].name.first
+    required: True
+  - "E-mail:": witnesses[0].email
+    required: True
+  - "CPF:": witnesses[0].cpf
+    required: True
+---
+progress: 95
+question: |
+  Editar dados da 2ª testemunha:
+fields:
+  - "Nome:": witnesses[1].name.first
+    required: True
+  - "E-mail:": witnesses[1].email
+    required: True
+  - "CPF:": witnesses[1].cpf
+    required: True
+---

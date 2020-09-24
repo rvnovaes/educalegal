@@ -78,7 +78,7 @@ class EducaLegalClient:
         return school_names_list, school_units_dict, school_data_dict, school_witnesses_dict
 
     def witnesses_list(self, school_id):
-        final_url = self.api_base_url + "/v2/schools/{id}/witnesses/".format(id=school_id)
+        final_url = self.api_base_url + "/v2/schools/{id}/witnesses".format(id=school_id)
         response = self.session.get(final_url).json()
         return response
 
