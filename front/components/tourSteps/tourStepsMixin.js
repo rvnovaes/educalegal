@@ -25,7 +25,7 @@ export default {
           params: {
             placement: "right"
           },
-          content: `No painel você acessa informações gerais sobre o uso do Educa Legal. Você também pode usar as setas para navegar entre as dicas e esc para fechar.`
+          content: `No painel você acessa informações gerais sobre o uso do Educa Legal. Você também pode usar as setas para navegar entre as dicas e ESC para fechar.`
         },
         {
           target: ".documentos-gerados",
@@ -70,7 +70,7 @@ export default {
           header: {
             title: "Criar documentos",
           },
-          content: `Nesta página você tem acesso a todos os modelos de documentos disponibilizados para sua escola. Você também pode usar as setas para navegar entre as dicas e esc para fechar.`,
+          content: `Nesta página você tem acesso a todos os modelos de documentos disponibilizados para sua escola. Você também pode usar as setas para navegar entre as dicas e ESC para fechar.`,
           params: {
             placement: "right",
             enableScrolling: false
@@ -137,7 +137,7 @@ export default {
           header: {
             title: "Arquivo",
           },
-          content: `No arquivo você acessa e pesquisa todos os documentos já gerados por sua escola. Continue o tour para conhecer os filtros que você pode utilizar. Você pode usar uma combinação de vários filtros. Após definir os filtros, clique no botão buscar. Se quiser limpar os filtros definidos e começar tudo de novo, clique em limpar.`,
+          content: `No arquivo você acessa e pesquisa todos os documentos já gerados por sua escola. Continue o tour para conhecer os filtros que você pode utilizar. Pode ser usada uma combinação de vários filtros. Após definir os filtros, clique no botão buscar. Se quiser limpar os filtros definidos e começar tudo de novo, clique em limpar.`,
           params: {
             placement: "right",
             enableScrolling: false
@@ -146,7 +146,7 @@ export default {
         //Aqui tivemos que usar o target como classe, pq so conseguimos passar para a coluna (que e outro componente) a classe
         {
           target: ".filtro-data",
-          content: `Aqui você filtra por data de criação do documento. Você pode selecionar um período clicando em duas datas distintas ou apenas um dia, clicando duas vezes no mesmo dia. Sempre que definir um filtro, você pode clicar em buscar para recuperar os documentos de acordo com os critérios informados.`,
+          content: `Aqui você filtra por data de criação do documento. Você pode selecionar um período clicando em duas datas distintas ou apenas um dia, clicando duas vezes no mesmo dia. Após definir os filtros, clique no botão buscar para recuperar os documentos de acordo com os critérios informados.`,
           params: {
             placement: "bottom",
             enableScrolling: false
@@ -178,7 +178,7 @@ export default {
         },
         {
           target: ".paginacao",
-          content: `Defina quantos documentos você quer exibir ao mesmo tempo na página. No rodapé da página você consegue ver o número de documentos recuperados de acordo com os critérios de filtro e navegar entre as páginas.`,
+          content: `Defina quantos documentos você quer exibir ao mesmo tempo na página. No rodapé da página você consegue ver o número de documentos recuperados de acordo com os critérios de filtro e pode navegar entre as páginas.`,
           params: {
             placement: "bottom",
             enableScrolling: false
@@ -281,7 +281,7 @@ export default {
           header: {
             title: "Escolas",
           },
-          content: `Todos os documentos e contratos gerados se referem a uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui e são automaticamente usados no preenchimento dos contratos.`,
+          content: `Todos os documentos e contratos gerados se referem à uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui e são automaticamente usados no preenchimento dos contratos.`,
           params: {
             placement: "right",
             enableScrolling: false
@@ -313,7 +313,7 @@ export default {
         },
         {
           target: ".escola-site",
-          content: `Endereço do site da escola.`,
+          content: `Endereço do site da escola. Ex.: https://minhaescola.com.br`,
           params: {
             placement: "top",
             enableScrolling: false
@@ -340,7 +340,7 @@ export default {
           header: {
             title: "Nova escola",
           },
-          content: `Todos os documentos e contratos gerados se referem a uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui. Você pode cadastrar quantas escolas quiser.`,
+          content: `Todos os documentos e contratos gerados se referem à uma escola. Dados tais como razão social, CNPJ, endereço, e-mail, entre outros, são cadastrados aqui. Você pode cadastrar quantas escolas quiser.`,
           params: {
             placement: "left",
             enableScrolling: false
@@ -356,7 +356,7 @@ export default {
         },
         {
           target: ".botao-apagar-escola",
-          content: `Você pode apagar uma escola apenas se ainda não houver criado nenhum documento para ela. Uma vez criados documentos, a escola fica cadastrada permanentemente. . Lembre-se que você pode voltar à ajuda a qualquer momento.`,
+          content: `Você pode apagar uma escola apenas se ainda não houver criado nenhum documento para ela. Uma vez criados documentos, a escola fica cadastrada permanentemente. Lembre-se que você pode voltar à ajuda a qualquer momento.`,
           params: {
             placement: "top",
             enableScrolling: false
@@ -367,7 +367,7 @@ export default {
       escolaDetalhesSteps: [
         {
           target: ".escola-nome",
-          content: `Nome de fantasia da escola. Este nome é uma identificação usada no sistema e não é utilizada no preenchimento dos contratos e documentos`,
+          content: `Nome fantasia da escola. Este nome é uma identificação usada no sistema e não é utilizada no preenchimento dos contratos e documentos`,
           params: {
             placement: "top",
             enableScrolling: false
@@ -375,7 +375,7 @@ export default {
         },
         {
           target: ".escola-razao",
-          content: `A razão social deve ser exatamente como inscrita no cadastro do CNPJ. Ela será usada no preenchimento de todos os contratos e documentos`,
+          content: `A razão social deve ser exatamente como inscrita no cadastro do CNPJ. Ela será usada no preenchimento de contratos e documentos`,
           params: {
             placement: "top",
             enableScrolling: false
@@ -383,7 +383,7 @@ export default {
         },
         {
           target: ".escola-cnpj",
-          content: `O CNPJ da escola. Caso se trate de pessoa Física, inserir o CPF.`,
+          content: `CNPJ da escola. Caso se trate de pessoa física, inserir o CPF.`,
           params: {
             placement: "top",
             enableScrolling: false
@@ -407,7 +407,7 @@ export default {
         },
         {
           target: ".salvar-escola",
-          content: `Clique nesse botão para salvar as alterações ou em voltar para descartar.`,
+          content: `Clique nesse botão para salvar as alterações ou em Voltar para descartar.`,
           params: {
             placement: "top",
             enableScrolling: false
