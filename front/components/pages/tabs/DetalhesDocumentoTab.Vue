@@ -157,7 +157,7 @@ export default {
           this.emailButtonType = "success"
           await Swal.fire({
             title: "O e-mail foi enviado com sucesso!",
-            text: res.data,
+            html: res.data,
             icon: "success",
             customClass: {
               confirmButton: "btn btn-success btn-fill",
@@ -187,7 +187,7 @@ export default {
           this.esignatureButtonType = "success"
           await Swal.fire({
             title: "O documento foi enviado para a assinatura eletrônica com sucesso!",
-            text: res.data,
+            html: res.data,
             icon: "success",
             customClass: {
               confirmButton: "btn btn-success btn-fill",
