@@ -476,20 +476,19 @@ code: |
   ]
   recipients.append(new_recipient)
 
-  if has_witnesses:
-      for item in witnesses:
-          if item.email:
-              new_recipient = dict()
-              new_recipient['name'] = item.name.first
-              new_recipient['email'] = item.email
-              new_recipient['group'] = 'signers'
-              new_recipient['routingOrder'] = 2
-              new_recipient['tabs'] = [
-                  {
-                      'type': 'signHere',
-                      'anchorString': generate_anchor('signHere', item.email)
-                  },
-              ]
-              recipients.append(new_recipient)
+  for item in witnesses:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.first
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 2
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'

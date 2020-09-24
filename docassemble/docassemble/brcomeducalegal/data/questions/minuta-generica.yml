@@ -35,8 +35,6 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
-    if has_witnesses:
-      valid_witnesses_table
     interview_document_type_choice
     part_types.target_number = 1
     for item in part_types:
@@ -62,6 +60,8 @@ code: |
       for item in counterparts:
         item.name.text
     has_attachment
+    if has_witnesses:
+      valid_witnesses_table
     el_patch_document
     document_ready_screen
 ---
