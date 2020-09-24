@@ -19,8 +19,8 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.test
       - EL_ENV=test
-    ports:
-      - "8000:8000"
+    expose:
+      - 8000
   educalegal_celery:
     environment:
       - DEBUG=1
