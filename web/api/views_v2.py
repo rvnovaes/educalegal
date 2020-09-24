@@ -1155,6 +1155,11 @@ def recover_password(request):
             "account/email/password_reset_key", email, context
         )
 
+        log_message = "Houve tentativa de recuperação de senha com e-mail {email}".format(
+            email=email
+        )
+        logger.info(log_message)
+
     except CustomUser.DoesNotExist:
         log_message = "Houve tentativa de recuperação de senha com e-mail inválido {email}".format(
             email=email
