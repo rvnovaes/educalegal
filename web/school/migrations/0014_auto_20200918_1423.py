@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255, verbose_name='Nome')),
                 ('email', models.EmailField(max_length=254, verbose_name='E-mail')),
-                ('cpf', models.CharField(blank=True, max_length=255, verbose_name='CPF')),
+                ('cpf', models.CharField(max_length=255, verbose_name='CPF')),
                 ('school', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='witnesses', to='school.school', verbose_name='Escola')),
                 ('tenant', models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='tenant.tenant')),
             ],
