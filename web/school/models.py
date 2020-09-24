@@ -113,7 +113,7 @@ class SchoolUnit(TenantAwareModel):
 class Witness(TenantAwareModel):
     name = models.CharField(max_length=255, verbose_name="Nome")
     email = models.EmailField(verbose_name="E-mail")
-    cpf = models.CharField(max_length=255, blank=True, verbose_name="CPF")
+    cpf = models.CharField(max_length=255, verbose_name="CPF")
 
     school = models.ForeignKey(
         School,
