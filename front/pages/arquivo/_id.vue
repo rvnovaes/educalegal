@@ -33,6 +33,7 @@
 <script>
 import DetalhesDocumentoTab from "@/components/pages/tabs/DetalhesDocumentoTab.Vue";
 import HourGlassSpinner from "@/components/widgets/HourGlassSpinner";
+import Swal from "sweetalert2";
 
 export default {
   name: "detalhes-documento",
@@ -56,10 +57,25 @@ export default {
   },
   methods: {
     async fetchDocumentDetails(doc_uuid) {
+      try {
       const res = await this.$axios.get("/v2/documents/" + doc_uuid);
       console.log(res);
       if (res.status === 200) {
         this.currentDocument = res.data
+      }
+    } catch (e) {
+        console.log(e);
+        await Swal.fire({
+          title: "Houve um erro na recuperação do document! Favor entrar em contato com nosso suporte.",
+          text: e.response.data,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
+        await this.$router.push({path: "/arquivo"});
       }
     }
   }

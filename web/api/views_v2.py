@@ -28,6 +28,7 @@ from rest_framework.exceptions import (
 from validator_collection import checkers
 
 from django.core.files.storage import default_storage
+from django.core.exceptions import MultipleObjectsReturned
 from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Q
@@ -75,7 +76,7 @@ class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = InterviewSerializer
     # Como o page size padrao esta definido no base.py como 50, precisamos sobrescrever esse default aqui
-    #https://stackoverflow.com/questions/35432985/django-rest-framework-override-page-size-in-viewset
+    # https://stackoverflow.com/questions/35432985/django-rest-framework-override-page-size-in-viewset
     pagination.PageNumberPagination.page_size = 150
 
     def get_queryset(self):
@@ -236,23 +237,40 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
         404 NOT FOUND: Se o documento (id ou doc_uuid) não existir ou se o documento requisitado não pertencer ao cliente
         (tenant) ao qual o usuário da requisição está vinculado.
-        """
-        tenant_id = request.user.tenant.id
-        identifier = kwargs["identifier"]
-        # Pode ser passada a id ou o doc_uuid.
-        if checkers.is_integer(identifier, coerce_value=True):
-            instance = get_object_or_404(self.get_queryset(), pk=identifier, tenant=tenant_id)
-        elif checkers.is_uuid(identifier):
-            instance = get_object_or_404(
-                self.get_queryset(), doc_uuid=identifier, tenant=tenant_id
-            )
-        else:
-            message = "O doc_uuid ou o id do documento não é um valor válido."
-            logger.info(message)
-            raise ValidationError(message)
 
-        serializer = DocumentDetailSerializer(instance)
-        return Response(serializer.data)
+        500 INTERNAL SERVER ERROR: Se for retornado mais de um documento com o mesmo uuid.
+            => "Mais de um documento foi recuperado com o mesmo uuid (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+
+        500 INTERNAL SERVER ERROR: Erro inespecífico.
+            "Ocorreu uma exceção ao recuperar o documento (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
+        """
+        try:
+            tenant_id = request.user.tenant.id
+            identifier = kwargs["identifier"]
+            # Pode ser passada a id ou o doc_uuid.
+            if checkers.is_integer(identifier, coerce_value=True):
+                instance = get_object_or_404(self.get_queryset(), pk=identifier, tenant=tenant_id)
+            elif checkers.is_uuid(identifier):
+                instance = get_object_or_404(
+                    self.get_queryset(), doc_uuid=identifier, tenant=tenant_id
+                )
+            else:
+                message = "O doc_uuid ou o id do documento não é um valor válido."
+                logger.info(message)
+                raise ValidationError(message)
+
+            serializer = DocumentDetailSerializer(instance)
+            return Response(serializer.data)
+        except MultipleObjectsReturned as e:
+            error_message = "Mais de um documento foi recuperado com o mesmo uuid ({doc_uuid}): ".format(
+                doc_uuid=identifier) + str(e)
+            logger.error(error_message)
+            return Response(error_message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            error_message = "Ocorreu uma exceção ao recuperar o documento ({doc_uuid}): ".format(
+                doc_uuid=identifier) + str(e)
+            logger.error(error_message)
+            return Response(error_message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def list(self, request, *args, **kwargs):
         """
@@ -809,7 +827,7 @@ def validate_document(request, **kwargs):
             "status_code": 422,
             "error": "O tipo de documento informado ID = {id} não está na lista dos que permitem geração via API: "
                      "{document_types}".format(id=interview.document_type.id, document_types=BulkDocumentKind.choices())
-            })
+        })
 
     try:
         # valida os dados recebidos de forma automatica no mongo
@@ -1092,7 +1110,7 @@ def dashboard_data(request):
     cm_docs = total_docs.filter(created_date__gte=begin_of_month)
     # Last Month Documents
     lm_docs = total_docs.filter(created_date__gte=begin_last_month,
-                                                            created_date__lt=begin_of_month)
+                                created_date__lt=begin_of_month)
     # Se usa GED, consideramos finalizado somente depois do envio para o GED. Portanto, excluimos da contagem
     # também os documentos criados
     if use_ged:
