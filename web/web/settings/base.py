@@ -215,7 +215,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:8008",
     "http://127.0.0.1:8008",
     "http://educalegal:8008",
-    "https://test.educalegal.com.br",
+    "https://apptest.educalegal.com.br",
     "https://app.educalegal.com.br",
 ]
 
