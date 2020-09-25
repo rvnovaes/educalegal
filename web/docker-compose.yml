@@ -32,7 +32,7 @@ services:
       - EL_ENV=development
       - SENDGRID_API_KEY=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
     depends_on:
-      - educalegal_rabbitmq
+      - educalegal_celery
       - mongo
   educalegal_celery:
     image: rvnovaes/educalegal:2.0
