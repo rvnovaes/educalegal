@@ -66,10 +66,10 @@ code: |
   el_environment = get_config('el environment')
   el_log_to_console = get_config('el log to console')
   if el_environment == 'production':
-    educalegal_url = 'https://api-app.educalegal.com.br'
+    educalegal_url = 'https://apiapp.educalegal.com.br'
     educalegal_front_url = 'https://app.educalegal.com.br'
   elif el_environment == 'test':
-    educalegal_url = 'https://api-test.educalegal.com.br'
+    educalegal_url = 'https://apitest.educalegal.com.br'
     educalegal_front_url = 'https://test.educalegal.com.br'
   else:
     educalegal_url = 'http://educalegal:8008'
