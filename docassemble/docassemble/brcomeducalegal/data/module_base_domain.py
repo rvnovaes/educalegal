@@ -7,12 +7,12 @@ def get_base_domain(referring_url):
     :parameter
     referring_url(string): Url thar referred the interview.
     E.g.:
-    https://app.educalegal.com.br/interview/interview?name=debug
+    https://api-app.educalegal.com.br/interview/interview?name=debug
 
     :returns
     string: The scheme and domain without the url
     E.g:
-    https://app.educalegal.com.br
+    https://api-app.educalegal.com.br
     """
     data = urlparse(referring_url)
     return data.scheme + "://" + data.netloc

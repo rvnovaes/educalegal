@@ -1,6 +1,6 @@
 import requests
 
-webhook_url = 'https://app.educalegal.com.br/v1/docusign/webhook'
+webhook_url = 'https://api-app.educalegal.com.br/v1/docusign/webhook'
 webhook_url_localhost = 'http://localhost:8000/api/docusign/webhook'
 headers = {'Authorization': "Token 	359efadb736eba60f0c705719a28093be699ea3f",
            "Content-Type": "text/xml; charset=UTF-8"}

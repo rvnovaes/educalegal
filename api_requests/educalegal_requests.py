@@ -8,7 +8,7 @@ from api.third_party.clicksign_client import ClickSignClient
 # token_csc = "4806d373-89b8-4dcc-aa04-87dc8f1a31ea"
 # csc = ClickSignClient(token_csc, False)
 ##### app.educalegal.com.br #####
-# api_base_url = "https://app.educalegal.com.br"
+# api_base_url = "https://api-app.educalegal.com.br"
 # token = "9fa535d8bcfb4ce6410a59d46c61368334c96ddc"
 
 
@@ -19,7 +19,7 @@ csc = ClickSignClient(token_csc, True)
 api_base_url = "http://localhost:8001"
 token = "9fa535d8bcfb4ce6410a59d46c61368334c96ddc"
 ##### app.educalegal.com.br #####
-# api_base_url = "https://app.educalegal.com.br"
+# api_base_url = "https://api-app.educalegal.com.br"
 # token = "dbc67c03a50a11f974276fdb08a5820ecda6249b"
 elc = EducaLegalClient(api_base_url, token)
 

@@ -66,9 +66,11 @@ code: |
   el_environment = get_config('el environment')
   el_log_to_console = get_config('el log to console')
   if el_environment == 'production':
-    educalegal_url = 'https://app.educalegal.com.br'
+    educalegal_url = 'https://api-app.educalegal.com.br'
+    educalegal_front_url = 'https://app.educalegal.com.br'
   elif el_environment == 'test':
-    educalegal_url = 'https://test.educalegal.com.br'
+    educalegal_url = 'https://api-test.educalegal.com.br'
+    educalegal_front_url = 'https://test.educalegal.com.br'
   else:
     educalegal_url = 'http://educalegal:8008'
     educalegal_front_url = 'http://educalegal:3000'
@@ -94,10 +96,11 @@ code: |
     log("tenant_data: {tenant_data}".format(tenant_data=tenant_data))
     if el_log_to_console:
       log("tenant_data: {tenant_data}".format(tenant_data=tenant_data), "console")
-    signature_provider = tenant_data['esignature_app']['provider']
-    if el_log_to_console:
-      log("signature_provider", "console")
-      log(signature_provider, "console")
+    if tenant_data['esignature_app']:
+      signature_provider = tenant_data['esignature_app']['provider']
+      if el_log_to_console:
+        log("signature_provider", "console")
+        log(signature_provider, "console")
 ---
 code: |
     elc = EducaLegalClient(educalegal_url, ut)
@@ -129,9 +132,9 @@ code: |
 ---
 code: |
     elc = EducaLegalClient(educalegal_url, ut)
-    log("Chamando elc.tenants_school_names_school_data")
+    log("Chamando elc.tenants_school_names_school_data", "console")
     school_names_list, school_units_dict, school_data_dict, school_witnesses_dict = elc.tenants_school_names_school_data(tid)
-    log("Lista de nomes de escolas" + str(school_names_list))
+    log("Lista de nomes de escolas" + str(school_names_list), "console")
     if el_log_to_console:
       log("Lista de nomes de esocolas" + str(school_names_list), "console")
     log("Dicionário de unidades escolares" + str(school_units_dict))
