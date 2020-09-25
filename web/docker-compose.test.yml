@@ -10,6 +10,11 @@ services:
     ports:
     - "80:80"
     - "443:443"
+   # Armazenando os certificados na maquina local para nao ter que gera-los novamente todas as vezes que o container for refeito
+    volumes:
+      - type: bind
+        source: ./media/letsencrypt
+        target: /etc/letsencrypt/live
     depends_on:
       - educalegal
       - educalegal_front
