@@ -70,7 +70,7 @@ code: |
     educalegal_front_url = 'https://app.educalegal.com.br'
   elif el_environment == 'test':
     educalegal_url = 'https://apitest.educalegal.com.br'
-    educalegal_front_url = 'https://test.educalegal.com.br'
+    educalegal_front_url = 'https://apptest.educalegal.com.br'
   else:
     educalegal_url = 'http://educalegal:8008'
     educalegal_front_url = 'http://educalegal:3000'
