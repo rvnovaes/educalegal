@@ -23,7 +23,7 @@
             <div class="col-12 d-flex  justify-content-sm-between flex-wrap"
             >
 
-              <div class="col2">
+              <div class="col-2">
 
                 <base-input label="Data de criação"
                             addon-left-icon="ni ni-calendar-grid-58">
