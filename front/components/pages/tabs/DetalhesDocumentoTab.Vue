@@ -11,10 +11,10 @@
             <span class="font-weight-bold">Nome do arquivo: </span>{{ currentDocument.name }}
           </li>
           <li class="list-group-item">
-            <span class="font-weight-bold">Data de criação: </span>{{ currentDocument.created_date }}
+            <span class="font-weight-bold">Data de criação: </span>{{ currentDocument.created_date | formatDateTime}}
           </li>
           <li class="list-group-item">
-            <span class="font-weight-bold">Data de alteração: </span>{{ currentDocument.altered_date }}
+            <span class="font-weight-bold">Data de alteração: </span>{{ currentDocument.altered_date | formatDateTime}}
           </li>
           <li class="list-group-item">
             <span class="font-weight-bold">Status: </span>{{ currentDocument.status }}
@@ -41,13 +41,13 @@
             <span class="font-weight-bold">Provedor: </span>{{ currentDocument.envelope.signing_provider }}
           </li>
           <li class="list-group-item">
-            <span class="font-weight-bold">Data de Criação: </span>{{ currentDocument.envelope.envelope_created_date }}
+            <span class="font-weight-bold">Data de Criação: </span>{{ currentDocument.envelope.envelope_created_date | formatDateTime}}
           </li>
           <li class="list-group-item">
-            <span class="font-weight-bold">Data de Alteração: </span>{{ currentDocument.envelope.status_update_date }}
+            <span class="font-weight-bold">Data de Alteração: </span>{{ currentDocument.envelope.status_update_date | formatDateTime}}
           </li>
           <li class="list-group-item">
-            <span class="font-weight-bold">Data do Envio: </span>{{ currentDocument.envelope.sent_date }}
+            <span class="font-weight-bold">Data do Envio: </span>{{ currentDocument.envelope.sent_date | formatDateTime}}
           </li>
           <li class="list-group-item">
             <span class="font-weight-bold">Status: </span>{{ currentDocument.envelope.status }}
@@ -70,11 +70,9 @@
             <ul class="list-group list-group-flush">
               <li class="list-group-item card-title"><span class="font-weight-bold">Nome: </span>{{ signer.name }}</li>
               <li class="list-group-item"><span class="font-weight-bold">E-mail: </span>{{ signer.email }}</li>
-              <li class="list-group-item"><span class="font-weight-bold">Data de Criação: </span>{{
-                  signer.created_date
-                }}
+              <li class="list-group-item"><span class="font-weight-bold">Data de Criação: </span>{{ signer.created_date | formatDateTime}}
               </li>
-              <li class="list-group-item"><span class="font-weight-bold">Data do Envio: </span>{{ signer.sent_date }}
+              <li class="list-group-item"><span class="font-weight-bold">Data do Envio: </span>{{ signer.sent_date | formatDateTime}}
               </li>
               <li class="list-group-item"><span class="font-weight-bold">Tipo: </span>{{ signer.type }}</li>
               <li v-if="signer.pdf_filenames" class="list-group-item">

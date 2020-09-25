@@ -66,7 +66,7 @@ export default {
     } catch (e) {
         console.log(e);
         await Swal.fire({
-          title: "Houve um erro na recuperação do document! Favor entrar em contato com nosso suporte.",
+          title: "Houve um erro na recuperação do documento! Favor entrar em contato com nosso suporte.",
           text: e.response.data,
           icon: "error",
           customClass: {
