@@ -16,7 +16,7 @@ services:
   educalegal_front:
     build:
       args:
-        BUILD_BACKEND_URL: "https://api-test.educalegal.com.br"
+        BUILD_BACKEND_URL: "https://apitest.educalegal.com.br"
     expose:
       - 3000
   educalegal:
