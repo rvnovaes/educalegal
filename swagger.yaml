@@ -17,7 +17,7 @@ info:
   license:
     name: Proprietary. All rights reserved.
   version: v1
-host: 'test.educalegal.com.br'
+host: 'apptest.educalegal.com.br'
 schemes:
   - https
 basePath: /
