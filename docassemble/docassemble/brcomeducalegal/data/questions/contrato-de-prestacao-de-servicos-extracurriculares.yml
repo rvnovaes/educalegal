@@ -372,6 +372,11 @@ fields:
     choices:
       - à vista: à vista
       - parcelado: parcelado
+  - 'Valor da parcela única:': single_installment_value
+    datatype: currency
+    hint: 0000,00
+    js show if: |
+      val("method_payment") == "à vista"
   - 'Data do vencimento da parcela única:': single_installment_date
     datatype: date
     js show if: |
@@ -405,32 +410,30 @@ fields:
     datatype: date
     js show if: |
       val("method_payment") == "parcelado"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzQ').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzEw').mask('000000000000000.00', {reverse: true});
+      });
+  </script>
 ---
 code: |
-    from datetime import datetime
-    from dateutil.relativedelta import relativedelta
-
-    # converte data string para date
-    if isinstance(installments_date, str):
-        installments_date = datetime.strptime(installments_date, '%d/%m/%Y').date()
-
-    # converte data string para date
-    installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
-
     if method_payment == 'parcelado':
       if has_input_value:
         input_date_format = format_date(input_date, format='dd/MM/yyyy')
       installments_list = list()
       installments_date_day = format_date(installments_date, format='dd')
+      installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
       for v in range(0, quantity_installments):
         installments = dict()
-        installments_due = installments_date + relativedelta(months=+v)
+        installments_due = installments_date.plus(months=v)
         installments_due = format_date(installments_due, format='dd/MM/yyyy')
         installments['installments_due'] = installments_due
         installments['installments_value'] = installments_value
         installments_list.append(installments)
-
-      installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
     else:
       single_installment_date_format = format_date(single_installment_date, format='dd/MM/yyyy')
 ---
