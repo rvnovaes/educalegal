@@ -289,7 +289,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         )  # TODO parametro de onlyParent
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
-        queryset = self.get_queryset().filter(parent=None)
+        queryset = self.get_queryset().filter(parent=None).exclude(status="rascunho")
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
