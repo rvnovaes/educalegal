@@ -116,7 +116,6 @@
       </div>
       <div v-if="currentDocument.parent">
         <!-- pdf -->
-<!--        row justify-content-center align-items-center-->
         <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.doc_uuid,
         currentDocument.name, 'pdf')" type="info"><i class="ni ni-cloud-download-95"></i>Download
         </base-button>
