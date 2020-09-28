@@ -68,10 +68,8 @@
         <div class="card-deck">
           <card v-for="signer in currentDocument.signers"
                 :key="signer.id"
-                :headerClasses="['text-white', 'rounded-bottom', cardType(signer.status)]"
-          >
+                :headerClasses="['text-white', 'rounded-bottom', cardType(signer.status)]">
             <span slot="header"> {{ signer.status | capitalize }} </span>
-
 
             <ul class="list-group list-group-flush">
               <li class="list-group-item card-title"><span class="font-weight-bold">Nome: </span>{{ signer.name }}</li>
@@ -88,13 +86,12 @@
           </card>
         </div>
       </tab-pane>
-
     </tabs>
 
-    <div v-if="currentDocument.parent == null">
-      <!--  TODO Testar bloqueio de CORS para download em ambiente real. Em localhost ele bloqueia  -->
-      <!-- pdf -->
-      <div v-if="currentDocument.status !== 'rascunho'">
+    <div v-if="currentDocument.status !== 'rascunho'" class="row justify-content-center align-items-center">
+      <div v-if="currentDocument.parent == null">
+        <!--  TODO Testar bloqueio de CORS para download em ambiente real. Em localhost ele bloqueia  -->
+        <!-- pdf -->
         <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.doc_uuid,
         currentDocument.name, 'pdf')" type="danger"><i class="ni ni-cloud-download-95"></i>PDF
         </base-button>
@@ -103,7 +100,7 @@
         </base-button>
         <!-- docx -->
         <base-button v-if="currentDocument.docx_file" @click="downloadDocument(currentDocument.docx_file.doc_uuid,
-      currentDocument.docx_file.name, 'docx')" type="primary"><i class="ni ni-cloud-download-95"></i>Word
+        currentDocument.docx_file.name, 'docx')" type="primary"><i class="ni ni-cloud-download-95"></i>Word
         </base-button>
 
         <!-- assinatura eletronica -->
@@ -115,6 +112,16 @@
         <!-- email -->
         <base-button @click="send_email(currentDocument.doc_uuid)" :type="emailButtonType"><i class="ni ni-email-83"
         ></i>Enviar por e-mail
+        </base-button>
+      </div>
+      <div v-if="currentDocument.parent">
+        <!-- pdf -->
+<!--        row justify-content-center align-items-center-->
+        <base-button v-if="currentDocument.cloud_file" @click="downloadDocument(currentDocument.doc_uuid,
+        currentDocument.name, 'pdf')" type="info"><i class="ni ni-cloud-download-95"></i>Download
+        </base-button>
+        <base-button v-else-if=currentDocument.ged_link @click="downloadDocument(currentDocument.ged_link,
+        currentDocument.name, 'pdf')" type="info"><i class="ni ni-cloud-download-95"></i>Download
         </base-button>
       </div>
     </div>
