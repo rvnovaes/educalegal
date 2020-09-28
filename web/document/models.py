@@ -143,7 +143,7 @@ class Document(TenantAwareModel):
         null=True,
         blank=True,
         on_delete=models.CASCADE,
-        related_name='related_document')
+        related_name='related_documents')
 
     document_data = JSONField(null=True, verbose_name="Dados do Documento")
     recipients = JSONField(blank=True, default=dict, verbose_name="Destinatários do e-mail/assinatura eletrônica")
@@ -190,11 +190,11 @@ class Document(TenantAwareModel):
             return self.name
 
     def get_docx_file(self):
-        if self.related_document.exists():
+        if self.related_documents.exists():
             return Document.objects.filter(parent=self, file_kind=DocumentFileKind.DOCX.value).last()
 
     def get_related_documents(self):
-        if self.related_document.exists():
+        if self.related_documents.exists():
             try:
                 related_documents = Document.objects.filter(parent=self)
             except Document.DoesNotExist:

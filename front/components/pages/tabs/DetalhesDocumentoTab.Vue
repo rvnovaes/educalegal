@@ -25,6 +25,12 @@
           <li class="list-group-item">
             <span class="font-weight-bold">Doc UUID: </span>{{ currentDocument.doc_uuid }}
           </li>
+          <li v-if="currentDocument.related_documents" class="list-group-item">
+            <span class="font-weight-bold">Documentos Relacionados:</span>
+            <ul v-for="related_document in currentDocument.related_documents">
+              <li><a v-bind:href="'/arquivo/' + related_document.doc_uuid">{{ related_document.name }}</a></li>
+            </ul>
+          </li>
         </ul>
 
       </tab-pane>
@@ -79,7 +85,6 @@
                 <p class="card-text">PDFs: {{ signer.pdf_filenames|linebreaks }}</p>
               </li>
             </ul>
-
           </card>
         </div>
       </tab-pane>
