@@ -1,3 +1,23 @@
+// https://tahazsh.com/vuebyte-reset-module-state
+const getDefaultState = () => {
+  return {
+    "totalDocsCount": null,
+    "cmDocsCount": null,
+    "lmDocsCount": null,
+    "cmInProgressDocsCount": null,
+    "lmInProgressDocsCount": null,
+    "cmSignatureCount": null,
+    "lmSignatureCount": null,
+    "cmInProgressSignatureCount": null,
+    "lmInProgressSignatureCount": null,
+    loading: null,
+  }
+}
+
+// Entretanto, tivemos que repetir o estado na const state, pq que se chamassemos a funcao:
+// export const state = getDefaultState();
+// o vue ficava dando um warning de que state deve retornar um objeto
+
 export const state = () => ({
   "totalDocsCount": null,
   "cmDocsCount": null,
@@ -9,7 +29,6 @@ export const state = () => ({
   "cmInProgressSignatureCount": null,
   "lmInProgressSignatureCount": null,
   loading: null,
-
 });
 
 export const mutations = {
@@ -24,10 +43,12 @@ export const mutations = {
     state.cmInProgressSignatureCount = data.cm_in_progress_signature_count
     state.lmInProgressSignatureCount = data.lm_in_progress_signature_count
   },
-
   toggleLoading(state, value) {
     state.loading = value
   },
+  resetState (state) {
+    Object.assign(state, getDefaultState())
+  }
 };
 
 export const getters = {
@@ -46,5 +67,8 @@ export const actions = {
       commit("toggleLoading", false);
     }
   },
+  resetState({commit}){
+    commit("resetState")
+  }
 };
 

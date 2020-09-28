@@ -1,5 +1,16 @@
 import moment from 'moment';
 
+const getDefaultState = () => {
+  return {
+    documents: [],
+    createdDateOrdering: null,
+    count: 0,
+    loading: null,
+    statusFilter: [],
+    schoolFilter: []
+  }
+}
+
 export const state = () => ({
   documents: [],
   createdDateOrdering: null,
@@ -24,6 +35,9 @@ export const mutations = {
   },
   toggleLoading(state, value) {
     state.loading = value
+  },
+  resetState (state) {
+    Object.assign(state, getDefaultState())
   },
 };
 
@@ -69,8 +83,10 @@ export const actions = {
       commit("setDocumentCount", res.data.count);
       commit("toggleLoading", false);
     }
-
   },
+  resetState({commit}){
+    commit("resetState")
+  }
 };
 
 

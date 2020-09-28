@@ -134,7 +134,15 @@ export default {
       this.$sidebar.displaySidebar(false);
     },
     onLogout() {
+      // Limpa todos os estados do VUEX
+      // https://tahazsh.com/vuebyte-reset-module-state
+      this.$store.dispatch("dashboard/resetState");
+      this.$store.dispatch("documents/resetState");
+      this.$store.dispatch("interviews/resetState");
+      this.$store.dispatch("schools/resetState");
+      this.$store.dispatch("tenant/resetState");
       this.$auth.logout();
+
       // Certifique-se que sai da aplicacao. TODO: Pq o redirect do nuxt auth não funciona?
       this.$router.push({path: "/"});
     },

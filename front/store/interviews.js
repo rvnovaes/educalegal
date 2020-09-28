@@ -1,3 +1,10 @@
+const getDefaultState = () => {
+  return {
+    interviews: [],
+    loading: null,
+  }
+}
+
 export const state = () => ({
   interviews: [],
   loading: null,
@@ -9,6 +16,9 @@ export const mutations = {
   },
   toggleLoading(state, value) {
     state.loading = value
+  },
+  resetState (state) {
+    Object.assign(state, getDefaultState())
   },
 };
 
@@ -29,5 +39,8 @@ export const actions = {
       commit("toggleLoading", false);
     }
   },
+  resetState({commit}){
+    commit("resetState")
+  }
 };
 

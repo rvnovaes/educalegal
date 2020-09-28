@@ -1,5 +1,16 @@
 import Swal from "sweetalert2";
 
+// https://tahazsh.com/vuebyte-reset-module-state
+const getDefaultState = () => {
+  return {
+    schools: []
+  }
+}
+
+// Entretanto, tivemos que repetir o estado na const state, pq que se chamassemos a funcao:
+// export const state = getDefaultState();
+// o vue ficava dando um warning de que state deve retornar um objeto
+
 export const state = () => ({
   schools: [],
 });
@@ -66,6 +77,9 @@ export const mutations = {
   },
   updateUF(state, payload) {
     state.schools.find(school => school.id === Number(payload.id)).state = payload.state;
+  },
+  resetState (state) {
+    Object.assign(state, getDefaultState())
   }
 };
 
@@ -79,7 +93,6 @@ export const getters = {
       delete school.id
     }
     return school
-
   },
 };
 export const actions = {
@@ -118,5 +131,8 @@ export const actions = {
     // O botao que salva a nova escola e chama essa action redireciona depois para a lista de escolas
     // que recarrega todas as escolas de novo do banco, incluindo a recem criada
     await this.$axios.post(`/v2/schools/`, school);
+  },
+  resetState({commit}){
+    commit("resetState")
   }
 };

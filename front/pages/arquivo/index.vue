@@ -284,7 +284,7 @@ export default {
           {value: "finalizado", label: "finalizado"},
           {value: "inserido no GED", label: "inserido no GED"},
           {value: "inválido", label: "inválido"},
-          {value: "rascunho", label: "rascunho"},
+          // {value: "rascunho", label: "rascunho"},
           {value: "rascunho - em lote", label: "rascunho - em lote"}
         ],
       },
