@@ -28,6 +28,8 @@ services:
       - PYTHONPACKAGES=docassemble-wrappers,num2words,validator-collection-br,retry-requests,sendgrid
     ports:
       - "80:80"
+    volumes:
+      - ./fonts/calibri:/usr/share/fonts/calibri
   ged:
     container_name: ged
     image: mayanedms/mayanedms:3.4.13
