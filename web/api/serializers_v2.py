@@ -117,6 +117,7 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
     school_name = serializers.SerializerMethodField()
     docx_file = serializers.SerializerMethodField()
     signers = serializers.SerializerMethodField()
+    related_documents = serializers.SerializerMethodField()
 
     envelope = EnvelopeSerializer()
 
@@ -180,6 +181,17 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
                 # signer_statuses.append(signer.status)
                 signer_serialized_list.append(SignerSerializer(signer).data)
             return signer_serialized_list
+
+    def get_related_documents(self, obj):
+        related_documents = Document.objects.filter(parent_id=obj.id)
+        related_documents = list(related_documents)
+        related_document_serialized_list = list()
+        for related_document in related_documents:
+            related_document_serialized_list.append(DocumentSerializer(related_document).data)
+        if len(related_document_serialized_list) > 0:
+            return related_document_serialized_list
+        else:
+            return None
 
 
 class SchoolSerializer(serializers.ModelSerializer):
