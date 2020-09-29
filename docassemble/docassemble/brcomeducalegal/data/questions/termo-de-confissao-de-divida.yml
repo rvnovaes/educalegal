@@ -17,12 +17,13 @@ include:
   - element-signature.yml
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
-  - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
 ---
 code:  |
   content_document = "termo-de-confissao-de-divida.docx"
@@ -36,6 +37,8 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
     inserirDadosGestor
     devedores.gather()
     if plan_use_esignature:
@@ -54,11 +57,8 @@ code: |
     state
     signature_local
     generated_file
-    el_document_patched_with_docassemble_data
-    if plan_use_ged:
-      el_document_patched_with_ged_data
+    el_patch_document
     document_ready_screen
-  all_done
 ---
 ga id: |
   code: ga_id_begin
@@ -117,11 +117,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome completo:": devedores[i].name.first
-    required: True
-    show if:
-      variable: devedores[i].person_type
-      is: individual
+  - 'Nome/Razão social:': devedores[i].name.first
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("devedores[i].person_type")
   - "CPF:": devedores[i].cpf
     validate: validate_cpf
     required: True
@@ -155,12 +155,6 @@ fields:
     show if:
       variable: devedores[i].person_type
       is: individual
-  - "Razão social:": devedores[i].name.first
-    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
-    required: True
-    show if:
-      variable: devedores[i].person_type
-      is: organization
   - "CNPJ:": devedores[i].cnpj
     validate: validate_cnpj
     required: True
@@ -177,7 +171,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
     });
   </script>
 ---
@@ -311,11 +305,11 @@ fields:
     choices:
       - Pessoa Física: individual
       - Pessoa Jurídica: organization
-  - "Nome completo:": fiadores[i].name.first
-    required: True
-    show if:
-      variable: fiadores[i].person_type
-      is: individual
+  - 'Nome/Razão social:': fiadores[i].name.first
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("fiadores[i].person_type")
   - "CPF:": fiadores[i].cpf
     validate: validate_cpf
     required: True
@@ -350,12 +344,6 @@ fields:
     show if:
       variable: fiadores[i].person_type
       is: individual
-  - "Razão social:": fiadores[i].name.first
-    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
-    required: True
-    show if:
-      variable: fiadores[i].person_type
-      is: organization
   - "CNPJ:": fiadores[i].cnpj
     validate: validate_cnpj
     required: True
@@ -372,7 +360,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
-        $('#X2ZpZWxkXzg').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
 ---
@@ -597,7 +585,7 @@ code: |
   new_recipient['name'] = school_legal_name
   new_recipient['email'] = school_email
   new_recipient['group'] = 'signers'
-  new_recipient['routingOrder'] = 1
+  new_recipient['routingOrder'] = 2
   new_recipient['tabs'] = [
       {
           'type': 'signHere',
@@ -637,22 +625,3 @@ code: |
           recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
-
-  documents = [
-      {
-          'name': document_name,
-          'fileExtension': 'pdf',
-          'documentBase64': make_document_base64(generated_file.pdf.path())
-      }
-  ]
----
-code: |
-  if plan_use_esignature:
-    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
-  else:
-    help_email_msg = "Digite um e-mail válido."
----
-code: |
-  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
-  email_category = interview_custom_file_name_string
-  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"

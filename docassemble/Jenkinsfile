@@ -217,6 +217,23 @@ pipeline {
                }
            }
        }
+       stage('test_ata-assembleia-geral-ordinaria.py') {
+           steps {
+               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    dir('docassemble/docassemble/selenium_tests/'){
+                        sh './jenkins_test_ata-assembleia-geral-ordinaria.sh'
+               }    }
+           }
+       }
+       stage('test_termo-de-retificacao-de-acordo-individual-de-trabalho-coronavirus.py') {
+           steps {
+               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                   dir('docassemble/docassemble/selenium_tests/'){
+                       sh './jenkins_test_termo-de-retificacao-de-acordo-individual-de-trabalho-coronavirus.sh'
+                   }
+               }
+           }
+       }
        stage('test_termo-de-rescisao-de-acordo-individual-de-trabalho.py') {
            steps {
                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {

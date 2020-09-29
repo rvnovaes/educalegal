@@ -1,12 +1,31 @@
 version: '3.7'
 
 services:
+  web_server:
+    container_name: web_server
+    build:
+      context: nginx_dockerfile_test
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+    - "80:80"
+    - "443:443"
+    depends_on:
+      - educalegal
+      - educalegal_front
+  educalegal_front:
+    build:
+      args:
+        BUILD_BACKEND_URL: "https://apitest.educalegal.com.br"
+    expose:
+      - 3000
   educalegal:
     command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.test
-    ports:
-      - "8000:8000"
+      - EL_ENV=test
+    expose:
+      - 8000
   educalegal_celery:
     environment:
       - DEBUG=1

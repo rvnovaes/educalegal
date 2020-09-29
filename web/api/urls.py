@@ -1,12 +1,17 @@
-from rest_framework.schemas import get_schema_view
-from django.urls import path
+from django.urls import path, include
+from django.conf.urls import url
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+
+from drf_yasg import openapi
 
 from .views import (
     DocumentViewSet,
-    EnvelopeLogViewSet,
+    EnvelopeViewSet,
+    ESignatureAppSignerKeyViewSet,
     InterviewViewSet,
     PlanViewSet,
-    SignerLogViewSet,
+    SignerViewSet,
     TenantDocumentViewSet,
     TenantInterviewViewSet,
     TenantSchoolViewSet,
@@ -14,21 +19,15 @@ from .views import (
     TenantGedDataViewSet
 )
 
-from .docusign_helpers import docusign_webhook_listener
+from api.third_party.clicksign_helpers import webhook_listener
+from api.third_party.docusign_helpers import docusign_webhook_listener
 
-API_TITLE = "Educa Legal API"
-API_DESCRIPTION = (
-    "API para Educa Legal - Plataforma Digital de Serviços Jurídicos para Escolas"
-)
-
-schema_view = get_schema_view(title=API_TITLE)
-
-urlpatterns = [
+public_endpoints = [
     path("plans/<int:pk>", PlanViewSet.as_view({"get": "retrieve"})),
-    path("documents/", DocumentViewSet.as_view({"post": "create", "patch": "partial_update"}),),
-    path("documents/<int:pk>", DocumentViewSet.as_view({"get": "retrieve"}),),
-    path("documents/<str:uuid>/envelope_logs/", EnvelopeLogViewSet.as_view({"post": "create"}),),
-    path("envelope_logs/<int:id>/signer_logs/", SignerLogViewSet.as_view({"post": "create"}),),
+    path("envelopes/", EnvelopeViewSet.as_view({"post": "create"}), ),
+    path("documents/", DocumentViewSet.as_view({"post": "create", "patch": "partial_update"}), ),
+    path("documents/<int:pk>", DocumentViewSet.as_view({"get": "retrieve"}), ),
+    path("documents/<int:id>/signers/", SignerViewSet.as_view({"post": "create"}), ),
     path("interviews/<int:pk>", InterviewViewSet.as_view({"get": "retrieve"})),
     path("tenants/", TenantViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>", TenantViewSet.as_view({"get": "retrieve"})),
@@ -37,9 +36,46 @@ urlpatterns = [
     path("tenants/<int:pk>/schools/", TenantSchoolViewSet.as_view({"get": "list"})),
     path("tenants/<int:pk>/schools/<int:spk>", TenantSchoolViewSet.as_view({"get": "retrieve"})),
     path("tenants/<int:pk>/ged/", TenantGedDataViewSet.as_view({"get": "retrieve"})),
-    path("docusign/webhook", docusign_webhook_listener),
+    path("esignature-app-signer-keys/<str:email>/<str:name>",
+         ESignatureAppSignerKeyViewSet.as_view({"get": "retrieve"})),
+    path("esignature-app-signer-keys/", ESignatureAppSignerKeyViewSet.as_view({"post": "create"}), ),
+    path("clicksign/webhook", webhook_listener),
+    path("docusign/webhook", docusign_webhook_listener)]
+
+
+# Apenas as URLS acima (public_endpoints) serao adicionadas ao swagger
+# A segunda lista de URLS (private_enpoints) esta disponivel mas nao e visualizada no swagger
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Educa Legal API",
+        default_version="V1",
+        description="API para Educa Legal - Plataforma Digital de Serviços Jurídicos para Escolas",
+        terms_of_service="https://www.educalegal.com.br/politica-de-privacidade/",
+        contact=openapi.Contact(email="sistemas@educalegal.com.br"),
+        license=openapi.License(name="Proprietária. Todos os direitos reservados."),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+    patterns=public_endpoints)
+
+private_endpoints = [
+
     path("schema/", schema_view),
-    # path("docs/", include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
-    # path("rest-auth/", include("rest_auth.urls")),
-    # path("rest-auth/registration/", include('rest_auth.registration.urls')),
+
+    path("api-auth/", include("rest_framework.urls")),
+    url(
+        r"^docs/swagger(?P<format>\.json|\.yaml)$",
+        schema_view.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    url(
+        r"^docs/swagger/$",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    url(
+        r"^docs/redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
+    ),
 ]
+
+urlpatterns = public_endpoints + private_endpoints

@@ -1,0 +1,62 @@
+import Badge from "~/components/argon-core/Badge.vue";
+import BaseAlert from "~/components/argon-core/BaseAlert";
+import BaseButton from "~/components/argon-core/BaseButton.vue";
+import BaseCheckbox from "~/components/argon-core/Inputs/BaseCheckbox.vue";
+import BaseDropdown from "~/components/argon-core/BaseDropdown.vue";
+import BaseHeader from "~/components/argon-core/BaseHeader";
+import BaseInput from "~/components/argon-core/Inputs/BaseInput.vue";
+import BaseNav from "~/components/argon-core/Navbar/BaseNav";
+import BasePagination from "~/components/argon-core/BasePagination";
+import BaseProgress from "~/components/argon-core/BaseProgress";
+import BaseRadio from "~/components/argon-core/Inputs/BaseRadio";
+import BaseSwitch from "~/components/argon-core/BaseSwitch.vue";
+import Card from "~/components/argon-core/Cards/Card.vue";
+import Modal from "~/components/argon-core/Modal.vue";
+import RouteBreadcrumb from "~/components/argon-core/Breadcrumb/RouteBreadcrumb";
+import StatsCard from "~/components/argon-core/Cards/StatsCard.vue";
+import Tab from "~/components/argon-core/Tabs/Tab.vue";
+import Tabs from "~/components/argon-core/Tabs/Tabs.vue";
+import {Input, Tooltip, Popover, Loading} from "element-ui";
+import {ValidationProvider, ValidationObserver} from "vee-validate";
+import {Select, Option} from "element-ui";
+import HourGlassSpinner from "@/components/widgets/HourGlassSpinner";
+import VueTour from "vue-tour";
+import 'vue-tour/dist/vue-tour.css';
+
+import Vue from "vue";
+import flatPickr from "vue-flatpickr-component";
+
+
+/**
+ * You can register global components here and use them as a plugin in your main Vue instance
+ */
+
+Vue.component(Badge.name, Badge);
+Vue.component(BaseAlert.name, BaseAlert);
+Vue.component(BaseButton.name, BaseButton);
+Vue.component(BaseCheckbox.name, BaseCheckbox);
+Vue.component(BaseHeader.name, BaseHeader);
+Vue.component(BaseInput.name, BaseInput);
+Vue.component(BaseDropdown.name, BaseDropdown);
+Vue.component(BaseNav.name, BaseNav);
+Vue.component(BasePagination.name, BasePagination);
+Vue.component(BaseProgress.name, BaseProgress);
+Vue.component(BaseRadio.name, BaseRadio);
+Vue.component(BaseSwitch.name, BaseSwitch);
+Vue.component(Card.name, Card);
+Vue.component(Modal.name, Modal);
+Vue.component(StatsCard.name, StatsCard);
+Vue.component(RouteBreadcrumb.name, RouteBreadcrumb);
+Vue.component(Input.name, Input);
+Vue.component(Tab.name, Tab)
+Vue.component(Tabs.name, Tabs)
+Vue.component("validation-provider", ValidationProvider);
+Vue.component("validation-observer", ValidationObserver);
+Vue.use(Tooltip);
+Vue.use(Popover);
+Vue.use(Select);
+Vue.use(Option);
+Vue.use(Loading);
+Vue.use(flatPickr);
+Vue.use(HourGlassSpinner);
+Vue.use(VueTour)

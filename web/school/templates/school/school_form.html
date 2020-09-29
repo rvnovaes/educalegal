@@ -14,13 +14,13 @@
             $('#id_cnpj').mask('00.000.000/0000-00', {reverse: true});
         });
 
-        $("#id_legal_type").change(function () {
-            var chosen_legal_type = $("#id_legal_type").val();
-            console.log(chosen_legal_type);
-            if (chosen_legal_type === "J") {
+        $("#id_legal_nature").change(function () {
+            var chosen_legal_nature = $("#id_legal_nature").val();
+            console.log(chosen_legal_nature);
+            if (chosen_legal_nature === "J") {
                 $('#id_cnpj').mask('00.000.000/0000-00', {reverse: true});
             }
-            if (chosen_legal_type === "F") {
+            if (chosen_legal_nature === "F") {
                 $('#id_cnpj').mask('000.000.000-00', {reverse: true});
             }
 

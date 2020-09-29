@@ -11,7 +11,7 @@ class TestContratodeLocaodeImvel(WebTest):
     # indica em qual ambiente o teste deve ser executado
     environment = list()
     if RUN_TESTS_AUTOTEST:
-        environment.append(("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
+        environment.append(("https://apptest.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
                             "Autotest_Contrato de locação de imóvel"),)
     if RUN_TESTS_PRODUCTION:
         environment.append(("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
@@ -42,6 +42,15 @@ class TestContratodeLocaodeImvel(WebTest):
             ).click()
         except NoSuchElementException:
             pass
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/a").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").clear()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("educalegal@gmail.com")
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element(
                 (By.XPATH, "//h1"),
@@ -94,7 +103,7 @@ class TestContratodeLocaodeImvel(WebTest):
             By.XPATH, "//form[@id='daform']/div[8]/div/div/input"
         ).send_keys("ADVOGADO júnior")
         self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[11]/div/div/input"
+            By.XPATH, "//form[@id='daform']/div[10]/div/div/input"
         ).send_keys("escola.educalegal@gmail.com")
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         self.wait.until(
@@ -167,7 +176,7 @@ class TestContratodeLocaodeImvel(WebTest):
             By.XPATH, "//form[@id='daform']/div[8]/div/div/input"
         ).send_keys("Empresária")
         self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[11]/div/div/input"
+            By.XPATH, "//form[@id='daform']/div[10]/div/div/input"
         ).send_keys("helena.gomes@educalegal.com.br")
         self.driver.find_element(By.XPATH, "//span[contains(.,'Continuar')]").click()
         self.wait.until(

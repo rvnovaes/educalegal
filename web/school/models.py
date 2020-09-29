@@ -5,7 +5,7 @@ from django.urls import reverse
 from tenant.models import TenantAwareModel
 
 
-class LegalType(Enum):
+class LegalNature(Enum):
     FISICA = "F"
     JURIDICA = "J"
 
@@ -33,17 +33,17 @@ class LegalType(Enum):
 class School(TenantAwareModel):
     legal_name = models.CharField(max_length=255, verbose_name="Razão social")
     name = models.CharField(max_length=255, blank=True, verbose_name="Nome Fantasia")
-    legal_type = models.CharField(
+    legal_nature = models.CharField(
         verbose_name="Tipo",
         max_length=1,
-        choices=((x.value, x.format(x.value)) for x in LegalType),
-        default=LegalType.JURIDICA,
+        choices=((x.value, x.format(x.value)) for x in LegalNature),
+        default=LegalNature.JURIDICA,
     )
     # https://docs.djangoproject.com/en/3.0/ref/models/fields/
     # when a CharField has both unique=True and blank=True set null=True is required to
     # avoid unique constraint violations when saving multiple objects with blank values
     cnpj = models.CharField(max_length=255, verbose_name="CNPJ/CPF")
-    logo = models.ImageField(verbose_name="Logo", blank=True)
+    logo = models.ImageField(verbose_name="Logo", blank=True, null=True)
     phone = models.CharField(max_length=255, verbose_name="Telefone")
     site = models.URLField(verbose_name="Site")
     email = models.EmailField(verbose_name="E-mail")
@@ -57,9 +57,15 @@ class School(TenantAwareModel):
     country = models.CharField(max_length=255, default="Brasil", verbose_name="País")
     letterhead = models.CharField(max_length=255, default="timbrado-padrao.docx", verbose_name="Timbrado")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação", blank=True)
+    esignature_folder = models.CharField(max_length=255, blank=True, verbose_name="Pasta para upload dos documentos")
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.esignature_folder = self.esignature_folder.replace('/', '')
+        self.esignature_folder = self.esignature_folder.replace('\\', '')
+        super(School, self).save(*args, **kwargs)
 
     @property
     def address(self):
@@ -84,13 +90,12 @@ class School(TenantAwareModel):
 
 
 class SchoolUnit(TenantAwareModel):
-    name = models.CharField(max_length=255, blank=True, verbose_name="Nome")
+    name = models.CharField(max_length=255, verbose_name="Nome")
     school = models.ForeignKey(
         School,
-        null=True,
         on_delete=models.CASCADE,
         related_name="school_units",
-        verbose_name="Unidade Escolar",
+        verbose_name="Escola",
     )
 
     def __str__(self):
@@ -103,3 +108,27 @@ class SchoolUnit(TenantAwareModel):
         ordering = ["name"]
         verbose_name = "Unidade Escolar"
         verbose_name_plural = "Unidades Escolares"
+
+
+class Witness(TenantAwareModel):
+    name = models.CharField(max_length=255, verbose_name="Nome")
+    email = models.EmailField(verbose_name="E-mail")
+    cpf = models.CharField(max_length=255, verbose_name="CPF")
+
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name="witnesses",
+        verbose_name="Escola",
+    )
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("school:witness-detail", kwargs={"pk": self.pk})
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Testemunha"
+        verbose_name_plural = "Testemunhas"

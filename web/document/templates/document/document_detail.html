@@ -21,17 +21,6 @@
                 {% endif %}
                 <li class="list-group-item">
                     <span class="font-weight-bold">Status: </span>{{ document.status }}</li>
-                {% if user.tenant.plan.use_esignature %}
-                    <li class="list-group-item">
-                        <span class="font-weight-bold">Envelope ID: </span>{{ document.envelope_id|default:"-" }}</li>
-                    <li class="list-group-item">
-                        <span class="font-weight-bold">Provedor: </span>{{ document.signing_provider|default:"-" }}</li>
-                {% endif %}
-                {% if user.tenant.plan.use_ged %}
-                    <li class="list-group-item">
-                        <span class="font-weight-bold">Link: </span><a href="{{ document.ged_link }}"
-                                                                       target="_blank">{{ document.ged_link }}</a></li>
-                {% endif %}
                 <li class="list-group-item">
                     <span class="font-weight-bold">Descrição: </span>{{ document.description|default:"-" }}</li>
                 <li class="list-group-item">
@@ -39,75 +28,120 @@
 
             </ul>
         </div>
+    </div>
 
-        {% if document.envelope_logs.all %}
-            <div class="card-header">
-                <h5>Detalhes do Envelope</h5>
-            </div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    {% for envelope_log in document.envelope_logs.all %}
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Data de criação: </span>{{ envelope_log.envelope_created_date|date:"d/m/Y H:i:s" }}
-                        </li>
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Data de alteração: </span>{{ envelope_log.status_update_date|date:"d/m/Y H:i:s"|default:"-" }}
-                        </li>
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Data do envio: </span>{{ envelope_log.sent_date|date:"d/m/Y H:i:s"|default:"-" }}
-                        </li>
-                        <li class="list-group-item">
-                            <span class="font-weight-bold">Status: </span>{{ envelope_log.status }}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
-        {% for envelope_log in document.envelope_logs.all %}
-            <div class="card-header">
-              <h5>Detalhes dos Destinatários</h5>
-            </div>
-            <br/>
-            <div class="card-deck ml-1 mr-1">
-              <div class="row">
-                {% for signer_log in signer_logs %}
-                  <div class="col-sm">
-                    <div class="card mb-3 border-{{ signer_log.status }}">
-                      <div class="card-header header-{{ signer_log.status }}">
-                        <b>{{ signer_log.status|title }}</b>
-                      </div>
-                      <div class="card-body">
-                        <h5 class="card-title">{{ signer_log.name }}</h5>
-                        <p class="card-text">E-mail: {{ signer_log.email }}</p>
-                        <p class="card-text">Importação: {{ signer_log.created_date|date:"d/m/Y H:i:s" }}</p>
-                        <p class="card-text">Envio: {{ signer_log.sent_date|date:"d/m/Y H:i:s"|default:"-" }}</p>
-                        <p class="card-text">Tipo: {{ signer_log.type }}</p>
-                        {% if signer_log.pdf_filenames %}
-                          <p class="card-text">PDFs: {{ signer_log.pdf_filenames|linebreaks }}</p>
-                        {% endif %}
-                      </div>
-                    </div>
-                  </div>
-                {% endfor %}
-              </div>
-            </div>
-        {% endfor %}
-
-        <br/>
-        {% if document.documents.all %}
-            <div class="card-header">
-                <h5>Documentos Relacionados</h5>
-            </div>
-            <br/>
-            <ul>
-                {% for related_document in document.documents.all %}
-                    <li><a href="{% url 'document:document-detail' pk=related_document.pk %}"
-                           target="_blank">{{ related_document.name }}</a></li>
-                {% endfor %}
-            </ul>
+    <br/>
+    <div class="text-center">
+        {% if not document.parent %}
+            {% if document.cloud_file %}
+                <a target="_blank" href="{{ document.cloud_file.url }}"><button type="button" class="btn btn-danger">PDF</button></a>
+            {% else %}
+                {% if document.ged_link %}
+                    <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-danger">PDF</button></a>
+                {% endif %}
+            {% endif %}
+            {% if docx_file.cloud_file %}
+                <a target="_blank" href="{{ docx_file.cloud_file.url }}"><button type="button" class="btn btn-primary">Word</button></a>
+            {% else %}
+                {% if docx_file.ged_link %}
+                    <a target="_blank" href="{{ docx_file.ged_link }}"><button type="button" class="btn btn-primary">Word</button></a>
+                {% endif %}
+            {% endif %}
+            {% if not document.submit_to_esignature and document.tenant.plan.use_esignature and document.tenant.esignature_app %}
+                <a href="{% url 'document:send-to-esignature' document.doc_uuid %}"><button type="button" class="btn btn-success">Enviar para assinatura</button></a>
+            {% endif %}
+            <a href="{% url 'document:send-email' document.doc_uuid %}"><button type="button" class="btn btn-info">Enviar por email</button></a>
+        {% else %}
+            {% if document.cloud_file %}
+                <a target="_blank" href="{{ document.cloud_file.url }}"><button type="button" class="btn btn-primary">Download</button></a>
+            {% else %}
+                {% if document.ged_link %}
+                    <a target="_blank" href="{{ document.ged_link }}"><button type="button" class="btn btn-primary">Download</button></a>
+                {% endif %}
+            {% endif %}
         {% endif %}
     </div>
+    <br/>
+
+    <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
+    {% include "snippets/messages.html" %}
+    <!-- -------------------------------------------------- Messages -------------------------------------------------- -->
+    {% if document.envelope and not document.parent %}
+        <div class="card">
+            {% with envelope=document.envelope %}
+                <div class="card-header">
+                    <h5>Detalhes do Envelope</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">ID: </span>{{ envelope.identifier }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Provedor: </span>{{ envelope.signing_provider }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Data de criação: </span>{{ envelope.envelope_created_date|date:"d/m/Y H:i:s" }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Data de alteração: </span>{{ envelope.status_update_date|date:"d/m/Y H:i:s"|default:"-" }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Data do envio: </span>{{ envelope.sent_date|date:"d/m/Y H:i:s"|default:"-" }}
+                        </li>
+                        <li class="list-group-item">
+                            <span class="font-weight-bold">Status: </span>{{ envelope.status }}
+                        </li>
+                    </ul>
+                </div>
+            {% endwith %}
+
+            {% if signers %}
+                <div class="card-header">
+                  <h5>Detalhes dos Destinatários</h5>
+                </div>
+                <br/>
+                <div class="card-deck ml-1 mr-1">
+                  <div class="row">
+                    {% for signer in signers %}
+                      <div class="col-sm">
+                        <div class="card mb-3 border-{{ signer.status }}">
+                          <div class="card-header header-{{ signer.status }}">
+                            <b>{{ signer.status|title }}</b>
+                          </div>
+                          <div class="card-body">
+                            <h5 class="card-title">{{ signer.name }}</h5>
+                            <p class="card-text">E-mail: {{ signer.email }}</p>
+                            <p class="card-text">Importação: {{ signer.created_date|date:"d/m/Y H:i:s" }}</p>
+                            <p class="card-text">Envio: {{ signer.sent_date|date:"d/m/Y H:i:s"|default:"-" }}</p>
+                            <p class="card-text">Tipo: {{ signer.type }}</p>
+                            {% if signer.pdf_filenames %}
+                              <p class="card-text">PDFs: {{ signer.pdf_filenames|linebreaks }}</p>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if related_documents %}
+      <div class="card">
+        <div class="card-header">
+            <h5>Documentos Relacionados</h5>
+        </div>
+        <br/>
+        <ul>
+            {% for related_document in related_documents %}
+                <li><a href="{% url 'document:document-detail' pk=related_document.pk %}"
+                       target="_blank">{{ related_document.name }}</a></li>
+            {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
 
     <script type="text/javascript">
         $.each({{ signer_statuses }}, function(index, signer_status) {

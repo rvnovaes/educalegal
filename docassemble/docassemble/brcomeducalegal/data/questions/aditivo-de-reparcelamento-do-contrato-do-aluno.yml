@@ -9,12 +9,13 @@ include:
   - element-signature.yml
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
-  - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
 ---
 sections:
   - Contratantes
@@ -36,6 +37,7 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
+    reviewed_school_email_answer
     contractors.gather()
     if plan_use_esignature:
       valid_contractors_table
@@ -57,11 +59,8 @@ code: |
         installments_list.append(installments)
     signature_local
     generated_file
-    el_document_patched_with_docassemble_data
-    if plan_use_ged:
-      el_document_patched_with_ged_data
+    el_patch_document
     document_ready_screen
-  all_done
 ---
 objects:
   - contractors: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
@@ -88,6 +87,7 @@ section: Contratantes
 question: Dados do(a) ${word(ordinal(i)) } Contratante
 fields:
   - 'Nome completo: ': contractors[i].name.text
+    validate: validate_person_full_name
     datatype: text
   - 'CPF: ': contractors[i].cpf
     datatype: text
@@ -318,23 +318,3 @@ code: |
   recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
-
-  documents = [
-      {
-          'name': document_name,
-          'fileExtension': 'pdf',
-          'documentBase64': make_document_base64(generated_file.pdf.path())
-      }
-  ]
----
-code: |
-  if plan_use_esignature:
-    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
-  else:
-    help_email_msg = "Digite um e-mail válido."
----
-code: |
-  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
-  email_category = interview_custom_file_name_string
-  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"
----

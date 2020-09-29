@@ -9,12 +9,13 @@ include:
   - element-signature.yml
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
-  - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
 ---
 sections:
   - Rescindentes
@@ -36,6 +37,7 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
+    reviewed_school_email_answer
     rescindentes.target_number = 1
     if plan_use_esignature:
       valid_rescindente_table
@@ -45,11 +47,8 @@ code: |
       item.name.text
     signature_local
     generated_file
-    el_document_patched_with_docassemble_data
-    if plan_use_ged:
-      el_document_patched_with_ged_data
+    el_patch_document
     document_ready_screen
-  all_done
 ---
 objects:
   - rescindentes: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
@@ -75,6 +74,7 @@ section: Rescindentes
 question: Dados do(a) Rescindente
 fields:
   - 'Nome completo: ': rescindentes[i].name.text
+    validate: validate_person_full_name
     datatype: text
   - 'CPF: ': rescindentes[i].cpf
     datatype: text
@@ -268,34 +268,8 @@ code: |
   new_recipient = dict()
   new_recipient['name'] = school_legal_name
   new_recipient['email'] = school_email
-  new_recipient['group'] = 'signers'
+  new_recipient['group'] = 'certifiedDeliveries'
   new_recipient['routingOrder'] = 2
-  new_recipient['tabs'] = [
-      {
-          'type': 'signHere',
-          'anchorString': generate_anchor('signHere', school_email)
-      },
-  ]
   recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
-
-  documents = [
-      {
-          'name': document_name,
-          'fileExtension': 'pdf',
-          'documentBase64': make_document_base64(generated_file.pdf.path())
-      }
-  ]
----
-code: |
-  if plan_use_esignature:
-    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
-  else:
-    help_email_msg = "Digite um e-mail válido."
----
-code: |
-  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
-  email_category = interview_custom_file_name_string
-  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"
----

@@ -10,7 +10,7 @@ class TestTermodeconfissaodedivida(WebTest):
     # indica em qual ambiente o teste deve ser executado
     environment = list()
     if RUN_TESTS_AUTOTEST:
-        environment.append(("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
+        environment.append(("https://apptest.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
                             "Autotest_Termo de confissão de dívida"),)
     if RUN_TESTS_PRODUCTION:
         environment.append(("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
@@ -41,6 +41,15 @@ class TestTermodeconfissaodedivida(WebTest):
             ).click()
         except NoSuchElementException:
             pass
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/a").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").clear()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("educalegal@gmail.com")
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element(
                 (By.XPATH, "//h1"), "Gestor do Contrato da Escola"
@@ -92,7 +101,7 @@ class TestTermodeconfissaodedivida(WebTest):
             By.XPATH, "//form[@id='daform']/div[8]/div/div/input"
         ).send_keys("Empresário")
         self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[11]/div/div/input"
+            By.XPATH, "//form[@id='daform']/div[10]/div/div/input"
         ).send_keys("josue.signatario@gmail.com")
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         self.wait.until(
@@ -123,16 +132,14 @@ class TestTermodeconfissaodedivida(WebTest):
         self.driver.find_element(
             By.XPATH, "//form[@id='daform']/div[2]/div/fieldset/label[2]"
         ).click()
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[9]/div/div/input"
-        ).send_keys("JOSUÉ SIGNATÁRIO LTDA")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/div/input").send_keys(
+            "JOSUÉ SIGNATÁRIO LTDA")
         for k in CNPJ:
             self.driver.find_element(
-                By.XPATH, "//form[@id='daform']/div[10]/div/div/input"
+                By.XPATH, "//form[@id=\'daform\']/div[9]/div/div/input"
             ).send_keys(k)
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[11]/div/div/input"
-        ).send_keys("josue.signatario@gmail.com")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[10]/div/div/input").send_keys(
+            "josue.signatario@gmail.com")
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element(
@@ -200,7 +207,7 @@ class TestTermodeconfissaodedivida(WebTest):
         ).click()
         self.driver.find_element(
             By.XPATH, "//form[@id='daform']/div[3]/div/div/input"
-        ).send_keys("Francisco")
+        ).send_keys("Francisco Chico")
         for k in CPF:
             self.driver.find_element(
                 By.XPATH, "//form[@id='daform']/div[4]/div/div/input"
@@ -215,12 +222,12 @@ class TestTermodeconfissaodedivida(WebTest):
             By.XPATH, "//form[@id='daform']/div[8]/div/div/input"
         ).send_keys("empresário")
         self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[11]/div/div/input"
+            By.XPATH, "//form[@id='daform']/div[10]/div/div/input"
         ).send_keys("fiador.educalegal@gmail.com")
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element(
-                (By.XPATH, "//h1"), "Endereço do(a) Francisco"
+                (By.XPATH, "//h1"), "Endereço do(a) Francisco Chico"
             )
         )
         self.driver.find_element(
@@ -246,16 +253,14 @@ class TestTermodeconfissaodedivida(WebTest):
         self.driver.find_element(
             By.XPATH, "//form[@id='daform']/div[2]/div/fieldset/label[2]"
         ).click()
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[9]/div/div/input"
-        ).send_keys("FRANCISCO LTDA")
+
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/div/input").send_keys("FRANCISCO LTDA")
         for k in CNPJ:
             self.driver.find_element(
-                By.XPATH, "//form[@id='daform']/div[10]/div/div/input"
+                By.XPATH, "//form[@id=\'daform\']/div[9]/div/div/input"
             ).send_keys(k)
-        self.driver.find_element(
-            By.XPATH, "//form[@id='daform']/div[11]/div/div/input"
-        ).send_keys("fiador.educalegal@gmail.com")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[10]/div/div/input").send_keys(
+            "fiador.educalegal@gmail.com")
         self.driver.find_element(By.XPATH, "//button[contains(.,'Continuar')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element(

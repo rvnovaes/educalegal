@@ -11,7 +11,7 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
     # indica em qual ambiente o teste deve ser executado
     environment = list()
     if RUN_TESTS_AUTOTEST:
-        environment.append(("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
+        environment.append(("https://apptest.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
                             "Autotest_Termo para mudança de regime para Home Office e Cessão do Direito Autoral"),)
     if RUN_TESTS_PRODUCTION:
         environment.append(("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
@@ -44,7 +44,15 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
             ).click()
         except NoSuchElementException:
             pass
-
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/a").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").clear()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("educalegal@gmail.com")
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Dados do(a) Empregado"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("Josué Signatario")
@@ -81,8 +89,9 @@ class TestTermoHomeOfficeDireitoAutoral(WebTest):
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
 
         self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"),
-                                                         "O regime de home office perdurará até a data:"))
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("2020-06-23")
+                                                         "O regime de home office perdurará até:"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys(
+            "até o final do ano letivo")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
 
         self.wait.until(

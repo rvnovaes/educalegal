@@ -10,12 +10,13 @@ include:
   - element-signature.yml
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
-  - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
 ---
 sections:
   - Contratada
@@ -33,6 +34,8 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
     contractor.name.text
     contractor.address.zip
     participants.gather()
@@ -44,11 +47,8 @@ code: |
     city
     signature_local
     generated_file
-    el_document_patched_with_docassemble_data
-    if plan_use_ged:
-      el_document_patched_with_ged_data
+    el_patch_document
     document_ready_screen
-  all_done
 ---
 objects:
   - contractor: Organization
@@ -154,6 +154,7 @@ question: |
   Dados do(a) ${ word(ordinal(i)) } participante
 fields:
   - "Nome Completo:": participants[i].name.first
+    validate: validate_person_full_name
     required: True
   - "CPF:": participants[i].cpf
     required: True
@@ -304,6 +305,10 @@ code: |
   hosting_days = time_interval_days.split(".")
   hosting_days = hosting_days[0]
 ---
+code: |
+  arrival_date_format = format_date(arrival_date, format='dd/MM/yyyy')
+  departure_date_format = format_date(departure_date, format='dd/MM/yyyy')
+---
 section: Cláusulas
 progress: 80
 question: |
@@ -401,35 +406,16 @@ code: |
           recipients.append(new_recipient)
 
   new_recipient = dict()
-  new_recipient['name'] = contractor.name.text
-  new_recipient['email'] = contractor.email
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
   new_recipient['group'] = 'signers'
   new_recipient['routingOrder'] = 2
   new_recipient['tabs'] = [
       {
           'type': 'signHere',
-          'anchorString': generate_anchor('signHere', contractor.email)
+          'anchorString': generate_anchor('signHere', school_email)
       },
   ]
   recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
-
-  documents = [
-      {
-          'name': document_name,
-          'fileExtension': 'pdf',
-          'documentBase64': make_document_base64(generated_file.pdf.path())
-      }
-  ]
----
-code: |
-  if plan_use_esignature:
-    help_email_msg = "O e-mail informado será utilizado no envio do documento para assinatura eletrônica."
-  else:
-    help_email_msg = "Digite um e-mail válido."
----
-code: |
-  email_subject = "IMPORTANTE: " + school_name + " | " + interview_label
-  email_category = interview_custom_file_name_string
-  email_html_content = "<h1>" + interview_label + "</h1><p>Leia, com atenção o documento em anexo.</p>"

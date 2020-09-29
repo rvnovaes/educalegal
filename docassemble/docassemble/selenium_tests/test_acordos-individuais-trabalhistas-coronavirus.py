@@ -11,7 +11,7 @@ class TestAcordosindividuaistrabalhistascoronavirus(WebTest):
     # indica em qual ambiente o teste deve ser executado
     environment = list()
     if RUN_TESTS_AUTOTEST:
-        environment.append(("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
+        environment.append(("https://apptest.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
                             "Autotest_Acordos Individuais Trabalhistas - Coronavirus"),)
     if RUN_TESTS_PRODUCTION:
         environment.append(("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
@@ -44,6 +44,14 @@ class TestAcordosindividuaistrabalhistascoronavirus(WebTest):
             ).click()
         except NoSuchElementException:
             pass
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/a").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").clear()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("educalegal@gmail.com")
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"),
                                                                                                   "Selecione documentos a serem gerados"))
@@ -80,15 +88,18 @@ class TestAcordosindividuaistrabalhistascoronavirus(WebTest):
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Trabalhador:"))
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"),
-                                                                                                  "O regime de home office perdurará até a data:"))
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("2020-06-23")
+                                                         "O regime de home office perdurará até:"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys(
+            "até o final do ano letivo")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Dados do acordo"))
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li/p/span/input").send_keys("20")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li/p/span/input").send_keys("1000")
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[2]/p/span/span[2]/input").send_keys(
-            "100")
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[3]/p/span/input").send_keys("90")
+            "2000")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[3]/p/span/span[2]/input").send_keys(
+            "454")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[4]/p/span/input").send_keys("90")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(EC.text_to_be_present_in_element((By.XPATH, "//h1"),
                                                                                                   "Cláusula de estabilidade de emprego conforme padrão definido por:"))

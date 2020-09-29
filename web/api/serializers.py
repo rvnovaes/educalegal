@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
 from billing.models import Plan
-from document.models import Document, EnvelopeLog, SignerLog
+from document.models import Document, Envelope, Signer
 from interview.models import Interview
 from school.models import School
-from tenant.models import Tenant, TenantGedData, ESignatureApp
+from tenant.models import Tenant, TenantGedData, ESignatureApp, ESignatureAppSignerKey
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -23,17 +23,17 @@ class DocumentSerializer(serializers.ModelSerializer):
         return obj.school.name if obj.school else ''
 
 
-class EnvelopeLogSerializer(serializers.ModelSerializer):
+class EnvelopeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EnvelopeLog
-        ref_name = "EnvelopeLog v1"
+        model = Envelope
+        ref_name = "Envelope v1"
         fields = "__all__"
 
 
-class SignerLogSerializer(serializers.ModelSerializer):
+class SignerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SignerLog
-        ref_name = "SignerLog v1"
+        model = Signer
+        ref_name = "Signer v1"
         fields = "__all__"
 
 
@@ -56,6 +56,7 @@ class SchoolSerializer(serializers.ModelSerializer):
     state = serializers.StringRelatedField()
     country = serializers.StringRelatedField()
     school_units = serializers.StringRelatedField(many=True)
+    witnesses = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = School
@@ -83,4 +84,11 @@ class TenantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tenant
         ref_name = "Tenant v1"
+        fields = "__all__"
+
+
+class ESignatureAppSignerKeySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ESignatureAppSignerKey
+        ref_name = "ESignatureAppSignerKey v1"
         fields = "__all__"

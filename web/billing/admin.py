@@ -6,7 +6,8 @@ from tenant.models import Tenant
 class TenantInline(admin.StackedInline):
     model = Tenant
     extra = 0
-    exclude = ['name', 'subdomain_prefix', 'eua_agreement', 'auto_enrolled', 'esignature_app']
+    exclude = ['name', 'subdomain_prefix', 'eua_agreement', 'auto_enrolled', 'esignature_app', 'phone',
+               'esignature_folder']
     can_delete = False
 
 

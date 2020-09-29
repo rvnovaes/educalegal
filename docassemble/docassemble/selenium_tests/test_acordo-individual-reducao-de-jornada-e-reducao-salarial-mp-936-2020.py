@@ -11,7 +11,7 @@ class TestAcordoIndividualReduodeJornadaeReduoSalarial(WebTest):
     # indica em qual ambiente o teste deve ser executado
     environment = list()
     if RUN_TESTS_AUTOTEST:
-        environment.append(("https://test.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
+        environment.append(("https://apptest.educalegal.com.br/", "autotest@educalegal.com.br", "Silex2109",
                             "Autotest_Acordo Individual de Trabalho - Redução de Jornada/Redução Salarial MP 936-2020"),)
     if RUN_TESTS_PRODUCTION:
         environment.append(("https://app.educalegal.com.br/", "maria.secretaria@educalegal.com.br", "silex@568",
@@ -44,6 +44,15 @@ class TestAcordoIndividualReduodeJornadaeReduoSalarial(WebTest):
             ).click()
         except NoSuchElementException:
             pass
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[3]/div/a").click()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").clear()
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("educalegal@gmail.com")
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.XPATH, "//h1"), "E-mail da Escola:"))
+        self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Dados do(a) Empregado"))
         self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/div/input").send_keys("Josué Signatario")
@@ -78,9 +87,12 @@ class TestAcordoIndividualReduodeJornadaeReduoSalarial(WebTest):
 
         self.wait.until(
             EC.text_to_be_present_in_element((By.XPATH, "//h1"), "Dados do acordo"))
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li/p/span/input").send_keys("25")
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[2]/p/span/span[2]/input").send_keys("1000")
-        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[3]/p/span/input").send_keys("2")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li/p/span/input").send_keys("1000")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[2]/p/span/span[2]/input").send_keys(
+            "2000")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[3]/p/span/span[2]/input").send_keys(
+            "454")
+        self.driver.find_element(By.XPATH, "//form[@id=\'daform\']/div[2]/ol/li[4]/p/span/input").send_keys("90")
         self.driver.find_element(By.XPATH, "//button[contains(.,\'Continuar\')]").click()
 
         self.wait.until(

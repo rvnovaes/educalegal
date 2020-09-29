@@ -53,35 +53,10 @@ subquestion: |
 buttons:
   - Sair: exit
 ---
-event: buy_esignature
-question: Quer enviar o seu documento com assinatura eletrônica?
-subquestion: |
-  Entre em <a href="https://www.educalegal.com.br/contato/" target="_blank">contato</a> com a nossa equipe e adquira um plano de assinatura.
-buttons:
-  - Sair: exit
----
 event: invalid_school
 question: Escolas
 subquestion: |
   A empresa não possui escolas cadastradas.
   [Clique aqui](${ school_registration_url }) para cadastrar uma escola.
-buttons:
-  - Sair: exit
----
-event: invalid_ged_token
-question: Token de GED inválido
-subquestion: |
-  O token do usuário do Mayan está inválido ou não existe.
-  Contate nosso suporte para ajuda.
-  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
-buttons:
-  - Sair: exit
----
-event: invalid_document_type
-question: Tipo de documento inválido
-subquestion: |
-  Não existe o tipo de documento com ID = ${ interview_document_type } cadastrado no Mayan.
-  Contate nosso suporte para ajuda.
-  Acesse o chat no <a href="https://www.educalegal.com.br" target="_blank">nosso site</a>.
 buttons:
   - Sair: exit

@@ -149,3 +149,4 @@ dmypy.json
 
 /web/.envrc
 /tools/upload_interviews/upload_interviews_config
+/web/static/silk/

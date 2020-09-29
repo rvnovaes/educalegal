@@ -1,9 +1,18 @@
 from django.db import models
 from billing.models import Plan
-
+from enum import Enum
 
 # For genenral informations about the structure we used here, see:
 # https://books.agiliq.com/projects/django-multi-tenant/en/latest/
+
+
+class ESignatureAppProvider(Enum):
+    CLICKSIGN = "ClickSign"
+    DOCUSIGN = "Docusign"
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
 
 
 class ESignatureApp(models.Model):
@@ -11,7 +20,10 @@ class ESignatureApp(models.Model):
         max_length=255, default="Educa Legal Development", verbose_name="Nome da Aplicação Cliente",
     )
     provider = models.CharField(
-        max_length=255, default="Docusign", verbose_name="Fornecedor",
+        max_length=255,
+        choices=ESignatureAppProvider.choices(),
+        default=ESignatureAppProvider.CLICKSIGN.value,
+        verbose_name="Fornecedor",
     )
     private_key = models.TextField(verbose_name="Private Key")
     client_id = models.CharField(
@@ -37,22 +49,25 @@ class ESignatureApp(models.Model):
 
 
 class Tenant(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    subdomain_prefix = models.CharField(
-        max_length=100, null=True, blank=True, unique=True
-    )
-    eua_agreement = models.BooleanField(
-        default=True, verbose_name="Concordo com os termos de uso"
-    )
+    name = models.CharField(max_length=255, unique=True, verbose_name='Nome')
+    subdomain_prefix = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    eua_agreement = models.BooleanField(default=True, verbose_name="Concordo com os termos de uso")
     plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="tenants", verbose_name="Plano", default=1)
-
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação")
-
     auto_enrolled = models.BooleanField(
         default=False, verbose_name="Autoinscrito"
     )
-
-    esignature_app = models.ForeignKey(ESignatureApp, null=True, blank=True, on_delete=models.PROTECT, default=1)
+    esignature_app = models.ForeignKey(
+        ESignatureApp,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        default=1,
+        verbose_name='App de assinatura eletrônica')
+    phone = models.CharField(max_length=50, blank=True, verbose_name="Telefone")
+    esignature_folder = models.CharField(max_length=255, blank=True, verbose_name="Pasta para upload dos documentos")
+    webhook_production = models.URLField(max_length=255, blank=True, verbose_name='Webhook de produção')
+    webhook_sandbox = models.URLField(max_length=255, blank=True, verbose_name='Webhook de homologação')
 
     class Meta:
         ordering = ["name"]
@@ -61,6 +76,25 @@ class Tenant(models.Model):
 
     def __str__(self):
         return self.name
+
+    def has_ged(self):
+        # verifica se cliente esta num plano com ged
+        if not self.plan.use_ged:
+            return False
+        else:
+            if self.tenantgeddata:
+                ged_url = self.tenantgeddata.url
+                ged_token = self.tenantgeddata.token
+
+                # verifica se o ged esta configurado
+                return ged_url != '' and ged_token != ''
+            else:
+                return False
+
+    def save(self, *args, **kwargs):
+        self.esignature_folder = self.esignature_folder.replace('/', '')
+        self.esignature_folder = self.esignature_folder.replace('\\', '')
+        super(Tenant, self).save(*args, **kwargs)
 
 
 class TenantAwareModel(models.Model):
@@ -117,3 +151,23 @@ class TenantGedData(models.Model):
 
     def __str__(self):
         return self.url
+
+
+class ESignatureAppSignerKey(TenantAwareModel):
+    email = models.EmailField(max_length=255, verbose_name="E-mail")
+    name = models.CharField(max_length=255, verbose_name="Nome")
+    key = models.CharField(max_length=255, verbose_name="Chave")
+    esignature_app = models.ForeignKey(
+        ESignatureApp,
+        on_delete=models.PROTECT,
+        default=3,
+        verbose_name='App de assinatura eletrônica')
+
+    class Meta:
+        ordering = ["email"]
+        verbose_name = "Chave do signatário para assinatura eletrônica"
+        verbose_name_plural = "Chaves do signatário para assinatura eletrônica"
+        unique_together = (('email', 'name', 'tenant', 'esignature_app'),)
+
+    def __str__(self):
+        return self.email + ' - ' + self.key
