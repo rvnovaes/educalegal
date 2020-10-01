@@ -40,8 +40,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from api.third_party.mayan_client import MayanClient
 from document.models import Document, DocumentFileKind, BulkDocumentKind
 from document.util import send_email as doc_send_email, send_to_esignature as doc_send_to_esignature
-from document.views import save_document_data
-from document.views import validate_data_mongo, generate_document_from_mongo
+from document.views import validate_data_mongo, generate_document_from_mongo, save_document_data, \
+    reached_document_limit as doc_reached_document_limit
 from interview.models import Interview, InterviewDocumentType
 from school.models import School, SchoolUnit, Witness
 from tenant.models import Plan, Tenant, TenantGedData
@@ -1247,3 +1247,18 @@ def send_to_esignature(request):
     status_code, message = doc_send_to_esignature(doc_uuid)
 
     return Response(message, status=status_code)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def reached_document_limit(request):
+    try:
+        reached_limit, document_limit = doc_reached_document_limit(request.user.tenant_id)
+        message = {"reached_limit": reached_limit,
+                   "document_limit": document_limit
+                   }
+        return Response(message, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        message = 'Não foi possível obter o limite de documentos. Erro: {}'.format(e)
+        return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

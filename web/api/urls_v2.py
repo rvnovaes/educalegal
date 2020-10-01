@@ -30,6 +30,7 @@ from .views_v2 import (
     reset_password,
     validate_document,
     generate_document,
+    reached_document_limit,
     send_email,
     send_to_esignature
 )
@@ -90,6 +91,7 @@ schema_view = get_schema_view(
 private_endpoints = [
     path("create_tenant/", create_tenant),
     path("dashboard/", dashboard_data),
+    path("create_documents/documents_limit", reached_document_limit),
     path("recover_password/", recover_password),
     path("reset_password/", reset_password),
     path("users/", UserView.as_view(), name="users"),

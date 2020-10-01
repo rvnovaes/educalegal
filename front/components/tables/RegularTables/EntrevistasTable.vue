@@ -96,7 +96,47 @@ export default {
   },
   methods: {
     handleNew(index, row) {
-      this.editRow(row);
+      this.reachedDocumentLimit().then((reachedLimit) => {
+        if (!reachedLimit) {
+          this.editRow(row);
+        }
+      });
+    },
+    reachedDocumentLimit: async function () {
+      try {
+        const res = await this.$axios.get("/v2/create_documents/documents_limit");
+        if (res.status === 200) {
+          const reachedLimit = res.data.reached_limit;
+          if (reachedLimit) {
+            await Swal.fire({
+              title: "Faça um upgrade do seu plano!",
+              html: "Foi atingido o limite mensal de geração de 10 documentos para o plano contratado.<br/><br/>" +
+                "Entre em contato conosco e faça um upgrade de seu plano.",
+              icon: "info",
+              showCloseButton: true,
+              confirmButtonText: 'Entrar em contato',
+              customClass: {
+                confirmButton: "btn btn-info",
+              },
+              buttonsStyling: false,
+            }).then(function () {
+              window.open('https://www.educalegal.com.br/contato/', '_blank');
+            })
+          }
+          return reachedLimit;
+        }
+      } catch (e) {
+        await Swal.fire({
+          title: "Erro ao obter o limite de documentos",
+          text: e,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          buttonsStyling: false
+        });
+      }
     },
     async editRow(row) {
       console.log(row);
