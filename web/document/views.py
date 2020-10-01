@@ -827,9 +827,15 @@ def reached_document_limit(tenant_id):
 
     # verifica se atingiu o limite de documentos
     tenant = Tenant.objects.get(pk=tenant_id)
-    document_count = Document.objects.filter(tenant=tenant,
-                                             created_date__month=today.month,
-                                             created_date__year=today.year).count()
+    documents = Document.objects.filter(tenant=tenant,
+                                        created_date__month=today.month,
+                                        created_date__year=today.year)
+
+    if tenant.has_ged():
+        document_count = documents.exclude(Q(status="rascunho") | Q(status="criado")).count()
+    else:
+        document_count = documents.exclude(status="rascunho").count()
+
     reached_document_limit = False
     if tenant.plan.document_limit:
         if document_count >= tenant.plan.document_limit:

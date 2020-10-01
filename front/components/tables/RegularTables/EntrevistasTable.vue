@@ -136,6 +136,7 @@ export default {
           confirmButtonText: "OK",
           buttonsStyling: false
         });
+        return true;
       }
     },
     async editRow(row) {
