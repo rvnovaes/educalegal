@@ -59,6 +59,11 @@ class School(TenantAwareModel):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação", blank=True)
     esignature_folder = models.CharField(max_length=255, blank=True, verbose_name="Pasta para upload dos documentos")
 
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Escola"
+        verbose_name_plural = "Escolas"
+
     def __str__(self):
         return self.name
 
@@ -83,11 +88,6 @@ class School(TenantAwareModel):
     def get_absolute_url(self):
         return reverse("school:school-detail", kwargs={"pk": self.pk})
 
-    class Meta:
-        ordering = ["name"]
-        verbose_name = "Escola"
-        verbose_name_plural = "Escolas"
-
 
 class SchoolUnit(TenantAwareModel):
     name = models.CharField(max_length=255, verbose_name="Nome")
@@ -98,16 +98,16 @@ class SchoolUnit(TenantAwareModel):
         verbose_name="Escola",
     )
 
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Unidade Escolar"
+        verbose_name_plural = "Unidades Escolares"
+
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse("school:school-unit-detail", kwargs={"pk": self.pk})
-
-    class Meta:
-        ordering = ["name"]
-        verbose_name = "Unidade Escolar"
-        verbose_name_plural = "Unidades Escolares"
 
 
 class Witness(TenantAwareModel):
@@ -122,13 +122,13 @@ class Witness(TenantAwareModel):
         verbose_name="Escola",
     )
 
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Testemunha"
+        verbose_name_plural = "Testemunhas"
+
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse("school:witness-detail", kwargs={"pk": self.pk})
-
-    class Meta:
-        ordering = ["name"]
-        verbose_name = "Testemunha"
-        verbose_name_plural = "Testemunhas"

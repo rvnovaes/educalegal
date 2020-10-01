@@ -5,7 +5,6 @@ import json
 from urllib3.exceptions import NewConnectionError
 from requests.exceptions import ConnectionError
 
-from api.third_party.docassemble_client import DocassembleClient, DocumentNotGeneratedException
 from .util import send_email, send_to_esignature
 
 
@@ -13,16 +12,10 @@ logger = logging.getLogger(__name__)
 count_down = 5
 
 
-@shared_task(bind=True, max_retries=3)
-def celery_create_document(self, base_url, api_key, secret, interview_full_name, interview_variables):
-# def celery_create_document(base_url, api_key, secret, interview_full_name, interview_variables):
+# @shared_task(bind=True, max_retries=3)
+# def celery_create_document(self, base_url, api_key, secret, interview_full_name, interview_variables):
+def celery_create_document(dac, secret, interview_full_name, interview_variables, document_not_generated_exception):
     try:
-        dac = DocassembleClient(base_url, api_key)
-        logger.info(
-            "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
-                base_url=base_url, api_key=api_key
-            )
-        )
         interview_session, response_json, status_code = dac.start_interview(
             interview_full_name, secret
         )
@@ -55,7 +48,7 @@ def celery_create_document(self, base_url, api_key, secret, interview_full_name,
                     status_code=status_code, response=str(response),
                 )
                 logger.error(message)
-                raise DocumentNotGeneratedException(message)
+                raise document_not_generated_exception(message)
             else:
                 logger.info('Resposta da chamada interview_set_variables:')
                 logger.info(response)
@@ -69,9 +62,9 @@ def celery_create_document(self, base_url, api_key, secret, interview_full_name,
 
                         doc_uuid = interview_variables["url_args"]["doc_uuid"]
                     else:
-                        raise DocumentNotGeneratedException(json.dumps(response))
+                        raise document_not_generated_exception(json.dumps(response))
                 except KeyError:
-                    raise DocumentNotGeneratedException(json.dumps(response))
+                    raise document_not_generated_exception(json.dumps(response))
 
             return doc_uuid
 
@@ -89,7 +82,7 @@ def celery_create_document(self, base_url, api_key, secret, interview_full_name,
         logger.error(message)
         raise self.retry(e=e, countdown=count_down ** self.request.retries)
 
-    except DocumentNotGeneratedException as e:
+    except document_not_generated_exception as e:
         message = "Não foi exibida a tela final com a mensagem 'Seu documento foi gerado com sucesso!' | {e}".format(
             e=str(e)
         )
@@ -111,9 +104,9 @@ def celery_create_document(self, base_url, api_key, secret, interview_full_name,
         raise
 
 
-@shared_task(bind=True, max_retries=3)
-def celery_submit_to_esignature(self, doc_uuid):
-# def celery_submit_to_esignature(doc_uuid):
+# @shared_task(bind=True, max_retries=3)
+# def celery_submit_to_esignature(self, doc_uuid):
+def celery_submit_to_esignature(doc_uuid):
     try:
         status_code, response = send_to_esignature(doc_uuid)
         if status_code != 202:

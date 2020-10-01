@@ -1,12 +1,9 @@
 import io
 import json
 import logging
-from datetime import datetime
 import requests
 
-from urllib3.exceptions import NewConnectionError
-from requests.exceptions import ConnectionError
-from api.third_party.docassemble_client import DocassembleClient, DocassembleAPIException
+from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -30,46 +27,6 @@ def custom_class_name(interview_custom_file_name):
     return prefix + "_" + interview_custom_file_name
 
 
-def create_secret(base_url, api_key, username, user_password):
-    try:
-        dac = DocassembleClient(base_url, api_key)
-        logger.info(
-            "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
-                base_url=base_url, api_key=api_key
-            )
-        )
-    except NewConnectionError as e:
-        message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
-            e=str(e)
-        )
-        logger.error(message)
-        raise DocassembleAPIException(message)
-    else:
-        try:
-            response_json, status_code = dac.secret_read(username, user_password)
-            secret = response_json
-            logger.info(
-                "Secret obtido do servidor de geração de documentos: {secret}".format(
-                    secret=secret
-                )
-            )
-        except ConnectionError as e:
-            message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
-                e=str(e)
-            )
-            logger.error(message)
-            raise DocassembleAPIException(message)
-        else:
-            if status_code != 200:
-                error = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(
-                    status_code=status_code, response=response_json
-                )
-                logger.error(error)
-                raise DocassembleAPIException(error)
-            else:
-                return secret
-
-
 def dict_to_docassemble_objects(documents, interview_type_id):
     interview_variables_list = list()
 
@@ -82,49 +39,66 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
         if interview_type_id == BulkDocumentKind.PRESTACAO_SERVICOS_ESCOLARES.value:
             # tipos de pessoa no contrato de prestacao de servicos
-            person_types = ['students', 'contractors']
+            parents = ['students', 'contractors']
 
-            for person in person_types:
+            for parent in parents:
                 # cria hierarquia para endereço da pessoa
-                _build_address_dict(document, person)
+                _build_address_dict(document, parent)
 
                 # Cria a representacao do objeto Individual da pessoa
-                _create_person_obj(document, "f", person, 0)
+                _create_person_obj(document, "f", parent)
 
                 # Cria a representacao do objeto Address da pessoa
-                _create_address_obj(document, person, 0)
+                _create_address_obj(document, parent)
+
+                document["valid_" + parent + "_table"] = "continue"
+
+            # para pessoas que nao tem endereco
+            parents = ['witnesses']
+
+            for parent in parents:
+                # Cria a representacao do objeto Individual da pessoa
+                _create_person_obj(document, "f", parent)
+
+                document[parent]["_class"] = "docassemble.base.core.DAList"
+                document[parent]["instanceName"] = parent
+                document["valid_" + parent + "_table"] = "continue"
 
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
 
         elif interview_type_id == BulkDocumentKind.NOTIFICACAO_EXTRAJUDICIAL.value:
             # tipos de pessoa no contrato de prestacao de servicos
-            person_types = ['notifieds']
+            parents = ['notifieds']
 
-            for person in person_types:
+            for parent in parents:
                 # cria hierarquia para endereço da pessoa
-                _build_address_dict(document, person)
+                _build_address_dict(document, parent)
 
                 # Cria a representacao do objeto Individual da pessoa
-                _create_person_obj(document, "f", person, 0)
+                _create_person_obj(document, "f", parent)
 
                 # Cria a representacao do objeto Address da pessoa
-                _create_address_obj(document, person, 0)
+                _create_address_obj(document, parent)
+
+                document["valid_" + parent + "_table"] = "continue"
 
             document["content_document"] = "notificacao-extrajudicial.docx"
 
         elif interview_type_id == BulkDocumentKind.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
             # tipos de pessoa no contrato de prestacao de servicos
-            person_types = ['workers']
+            parents = ['workers']
 
-            for person in person_types:
+            for parent in parents:
                 # cria hierarquia para endereço da pessoa
-                _build_address_dict(document, person)
+                _build_address_dict(document, parent)
 
                 # Cria a representacao do objeto Individual da pessoa
-                _create_person_obj(document, "f", person, 0)
+                _create_person_obj(document, "f", parent)
 
                 # Cria a representacao do objeto Address da pessoa
-                _create_address_obj(document, person, 0)
+                _create_address_obj(document, parent)
+
+                document["valid_" + parent + "_table"] = "continue"
 
             # Cria a representacao da lista de documentos
             _create_documents_obj(document)
@@ -153,9 +127,10 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
 
 def _build_name_dict(document, parent):
-    document[parent]["name"] = dict()
-    document[parent]["name"]["text"] = document[parent]["name_text"]
-    document[parent].pop("name_text")
+    for element in document[parent]['elements']:
+        element["name"] = dict()
+        element["name"]["text"] = element["name_text"]
+        element.pop("name_text")
 
     return document
 
@@ -172,13 +147,13 @@ def _build_address_dict(document, parent):
         "state"
     ]
 
-    for attribute in address_attributes:
-        address[attribute] = document[parent][attribute]
-        document[parent].pop(attribute)
+    for element in document[parent]['elements']:
+        for attribute in address_attributes:
+            address[attribute] = element[attribute]
+            element.pop(attribute)
 
-    document[parent]["address"] = address
-
-    return document
+        # adiciona o dicionario endereco na lista de elementos
+        element["address"] = address
 
 
 def _create_documents_obj(document):
@@ -200,52 +175,40 @@ def _create_documents_obj(document):
     document["documents_list"]["gathered"] = True
     document["documents_list"]["instanceName"] = "documents_list"
 
-    return document
 
-
-def _create_person_obj(document, person_type, person_list_name, index):
+def _create_person_obj(document, person_type, parent):
     """ Cria a representação da pessoa como objeto do Docassemble
         document
         person_type: f  - física
                      j  - jurídica
                      fj - ambos
-        person_list_name - nome da lista da parte: contratantes, contratadas, locatárias, locadoras, etc.
-        index - índice do elemento da lista que será convertido
+        parent: students, contractors, witnesses, etc.
     """
     # cria hierarquia para name do person_list_name
-    _build_name_dict(document, person_list_name)
+    _build_name_dict(document, parent)
 
-    person = document[person_list_name]
+    for index, element in enumerate(document[parent]['elements']):
+        if person_type == 'fj':
+            element["_class"] = "docassemble.base.util.Person"
+            element["name"]["_class"] = "docassemble.base.util.Name"
+        elif person_type == 'f':
+            element["_class"] = "docassemble.base.util.Individual"
+            element["name"]["_class"] = "docassemble.base.util.IndividualName"
+            element["name"]["uses_parts"] = True
+        else:
+            element["_class"] = "docassemble.base.util.Organization"
+            element["name"]["_class"] = "docassemble.base.util.Name"
 
-    if person_type == 'fj':
-        person["_class"] = "docassemble.base.util.Person"
-        person["name"]["_class"] = "docassemble.base.util.Name"
-    elif person_type == 'f':
-        person["_class"] = "docassemble.base.util.Individual"
-        person["name"]["_class"] = "docassemble.base.util.IndividualName"
-        person["name"]["uses_parts"] = True
-    else:
-        person["_class"] = "docassemble.base.util.Organization"
-        person["name"]["_class"] = "docassemble.base.util.Name"
-
-    person["instanceName"] = person_list_name + '[' + str(index) + ']'
-    person["name"]["instanceName"] = person_list_name + '[' + str(index) + '].name'
-    document.pop(person_list_name)
-
-    document[person_list_name] = dict()
-    document[person_list_name]["elements"] = list()
-    document[person_list_name]["elements"].append(person)
-    document[person_list_name]["_class"] = "docassemble.base.core.DAList"
-    document[person_list_name]["instanceName"] = person_list_name
-    document["valid_" + person_list_name + "_table"] = "continue"
+        element["instanceName"] = parent + '[' + str(index) + ']'
+        element["name"]["instanceName"] = parent + '[' + str(index) + '].name'
 
 
-def _create_address_obj(document, person_list_name, index):
-    document[person_list_name]["elements"][index]['address']["instanceName"] = person_list_name + \
-                                                                               '[' + str(index) + '].address'
-    document[person_list_name]["elements"][index]['address']["_class"] = "docassemble.base.util.Address"
-    document[person_list_name]["auto_gather"] = False
-    document[person_list_name]["gathered"] = True
+def _create_address_obj(document, parent):
+    for index, element in enumerate(document[parent]['elements']):
+        element['address']["instanceName"] = parent + '[' + str(index) + '].address'
+        element['address']["_class"] = "docassemble.base.util.Address"
+        document[parent]["auto_gather"] = False
+        document[parent]["gathered"] = True
 
 
 @login_required

@@ -6,8 +6,10 @@ import uuid
 from celery import chain
 from datetime import datetime
 from mongoengine.errors import ValidationError
+from requests.exceptions import ConnectionError
 from rest_framework import generics
 from urllib.request import urlretrieve, urlcleanup
+from urllib3.exceptions import NewConnectionError
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -23,6 +25,7 @@ from django.shortcuts import render, HttpResponse
 from django.utils.safestring import mark_safe
 from django.views import View
 
+from api.third_party.docassemble_client import DocassembleClient, DocassembleAPIException, DocumentNotGeneratedException
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
 from tenant.models import Tenant
@@ -34,7 +37,7 @@ from util.mongo_util import (
 )
 from util.file_import import is_metadata_valid, is_content_valid
 
-from .util import custom_class_name, dict_to_docassemble_objects, create_secret
+from .util import custom_class_name, dict_to_docassemble_objects
 from .forms import BulkDocumentGenerationForm
 from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus, DocumentFileKind
 # https://docs.celeryproject.org/en/latest/userguide/tasks.html#task-naming-relative-imports
@@ -350,6 +353,46 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         return HttpResponse(json.dumps(payload), content_type="application/json")
 
 
+def create_secret(base_url, api_key, username, user_password):
+    try:
+        dac = DocassembleClient(base_url, api_key)
+        logger.info(
+            "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
+                base_url=base_url, api_key=api_key
+            )
+        )
+    except NewConnectionError as e:
+        message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
+            e=str(e)
+        )
+        logger.error(message)
+        raise DocassembleAPIException(message)
+    else:
+        try:
+            response_json, status_code = dac.secret_read(username, user_password)
+            secret = response_json
+            logger.info(
+                "Secret obtido do servidor de geração de documentos: {secret}".format(
+                    secret=secret
+                )
+            )
+        except ConnectionError as e:
+            message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
+                e=str(e)
+            )
+            logger.error(message)
+            raise DocassembleAPIException(message)
+        else:
+            if status_code != 200:
+                error = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(
+                    status_code=status_code, response=response_json
+                )
+                logger.error(error)
+                raise DocassembleAPIException(error)
+            else:
+                return dac, secret
+
+
 def generate_document_from_mongo(request, dynamic_document_class, interview_id, mongo_document_id=None):
     if mongo_document_id:
         mongo_documents_collection = dynamic_document_class.objects.filter(id=mongo_document_id)
@@ -434,7 +477,7 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
     }
 
     try:
-        secret = create_secret(base_url, api_key, username, user_password)
+        dac, secret = create_secret(base_url, api_key, username, user_password)
 
         total_task_size = 0
 
@@ -463,37 +506,35 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
 
             if interview_variables["submit_to_esignature"]:
 
-                # result = celery_create_document(
-                #         base_url,
-                #         api_key,
-                #         secret,
-                #         interview_full_name,
-                #         interview_variables,
-                #     )
-                #
-                # celery_submit_to_esignature(str(el_document.doc_uuid))
-
-                result = chain(
-                    # nao é necessario passar o self, é passado automaticamente
-                    celery_create_document.s(
-                        base_url,
-                        api_key,
+                result = celery_create_document(
+                        dac,
                         secret,
                         interview_full_name,
                         interview_variables,
-                    ),
-                    # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
-                    # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
-                    # https://docs.celeryproject.org/en/stable/userguide/canvas.html#chains
-                    celery_submit_to_esignature.s(),
-                )()
-                result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
-                    parent_id=result.parent.id, child_id=result.id)
+                        DocumentNotGeneratedException
+                    )
+
+                celery_submit_to_esignature(str(el_document.doc_uuid))
+
+                # result = chain(
+                #     # nao é necessario passar o self, é passado automaticamente
+                #     celery_create_document.s(
+                #         secret,
+                #         interview_full_name,
+                #         interview_variables,
+                #     ),
+                #     # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
+                #     # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
+                #     # https://docs.celeryproject.org/en/stable/userguide/canvas.html#chains
+                #     celery_submit_to_esignature.s(),
+                # )()
+                # result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
+                #     parent_id=result.parent.id, child_id=result.id)
 
                 # faz refresh pq alguns campos sao atualizados nas funcoes que o celery chama
                 el_document.refresh_from_db()
-                el_document.task_create_document = result.parent.id
-                el_document.task_submit_to_esignature = result.id
+                # el_document.task_create_document = result.parent.id
+                # el_document.task_submit_to_esignature = result.id
                 total_task_size += 2
             elif interview_variables["el_send_email"]:
 
@@ -543,7 +584,7 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
             request.session["total_task_size"] = total_task_size
 
             el_document.save()
-            logger.info(result_description)
+            # logger.info(result_description)
 
         return True, total_task_size
     except Exception as e:
