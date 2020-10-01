@@ -59,6 +59,7 @@ code: |
         item.name.text
       for item in counterparts:
         item.name.text
+    reviewed_school_email_answer
     has_attachment
     if has_witnesses:
       valid_witnesses_table
@@ -93,7 +94,7 @@ fields:
 ---
 progress: 5
 section: Partes
-question: Tipos de Partes
+question: Tipos de Partes do Documento
 fields:
   - "Denominação da Parte:": part_types[i].name.text
     required: True
@@ -122,9 +123,9 @@ code: |
 ---
 section: Escola
 question: |
-  Qual o tipo da parte é a escola?
+  A Escola será a parte
 fields:
-  - "Tipo:": school_party_type
+  - "Tipo da parte:": school_party_type
     required: True
     datatype: dropdown
     code: |
@@ -335,20 +336,10 @@ code: |
 ---
 code: |
   # Concatenar minuta generica, anexos, folha de assinatura
-  if signature_provider == 'DOCUSING':
-    if has_attachment:
-      generated_file = pdf_concatenate(generic_document, signature_page, uploaded_file, filename=custom_file_name)
-    else:
-      generated_file = pdf_concatenate(generic_document, signature_page, filename=custom_file_name)
+  if has_attachment:
+    generated_file = pdf_concatenate(generic_document, uploaded_file, filename=custom_file_name)
   else:
-    if has_attachment:
-      generated_file = pdf_concatenate(generic_document, uploaded_file, filename=custom_file_name)
-    else:
-      generated_file = pdf_concatenate(generic_document, filename=custom_file_name)
----
-attachment:
-  variable name: signature_page
-  docx template file: include-signature-page.docx
+    generated_file = pdf_concatenate(generic_document, filename=custom_file_name)
 ---
 code: |
   recipients = list()
