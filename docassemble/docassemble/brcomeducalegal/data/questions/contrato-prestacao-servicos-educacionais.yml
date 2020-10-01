@@ -416,13 +416,6 @@ code: |
     from datetime import datetime
     from dateutil.relativedelta import relativedelta
 
-    # converte data string para date
-    if isinstance(installments_date, str):
-        installments_date = datetime.strptime(installments_date, '%d/%m/%Y').date()
-
-    # converte data string para date
-    installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
-
     if method_payment == 'parcelado':
       if has_input_value:
         input_date_format = format_date(input_date, format='dd/MM/yyyy')
@@ -436,6 +429,11 @@ code: |
         installments['installments_value'] = installments_value
         installments_list.append(installments)
 
+      # converte data string para date
+      if isinstance(installments_date, str):
+          installments_date = datetime.strptime(installments_date, '%d/%m/%Y').date()
+
+      # converte data string para date
       installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
     else:
       single_installment_date_format = format_date(single_installment_date, format='dd/MM/yyyy')
