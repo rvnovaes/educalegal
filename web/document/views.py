@@ -836,9 +836,9 @@ def reached_document_limit(tenant_id):
     else:
         document_count = documents.exclude(status="rascunho").count()
 
-    reached_document_limit = False
+    reached_limit = False
     if tenant.plan.document_limit:
         if document_count >= tenant.plan.document_limit:
-            reached_document_limit = True
+            reached_limit = True
 
-    return reached_document_limit, tenant.plan.document_limit
+    return reached_limit, tenant.plan.document_limit
