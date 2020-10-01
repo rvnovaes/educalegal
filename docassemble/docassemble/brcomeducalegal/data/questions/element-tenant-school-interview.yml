@@ -142,9 +142,6 @@ code: |
       log("Dicionário de unidades escolares" + str(school_units_dict), "console")
 ---
 code: |
-    interview_document_type = interview_data['document_type']
----
-code: |
     interview_label = interview_data['name']
     interview_description = interview_data['description'] + ' | ' + interview_data['version'] + ' | ' + interview_data['date_available']
     interview_language = interview_data['language']
