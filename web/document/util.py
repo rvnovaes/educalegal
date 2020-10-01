@@ -51,6 +51,10 @@ def dict_to_docassemble_objects(documents, interview_type_id):
                 # Cria a representacao do objeto Address da pessoa
                 _create_address_obj(document, parent)
 
+                document[parent]["_class"] = "docassemble.base.core.DAList"
+                document[parent]["instanceName"] = parent
+                document[parent]["auto_gather"] = False
+                document[parent]["gathered"] = True
                 document["valid_" + parent + "_table"] = "continue"
 
             # para pessoas que nao tem endereco
@@ -62,6 +66,8 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
                 document[parent]["_class"] = "docassemble.base.core.DAList"
                 document[parent]["instanceName"] = parent
+                document[parent]["auto_gather"] = False
+                document[parent]["gathered"] = True
                 document["valid_" + parent + "_table"] = "continue"
 
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
@@ -80,6 +86,10 @@ def dict_to_docassemble_objects(documents, interview_type_id):
                 # Cria a representacao do objeto Address da pessoa
                 _create_address_obj(document, parent)
 
+                document[parent]["_class"] = "docassemble.base.core.DAList"
+                document[parent]["instanceName"] = parent
+                document[parent]["auto_gather"] = False
+                document[parent]["gathered"] = True
                 document["valid_" + parent + "_table"] = "continue"
 
             document["content_document"] = "notificacao-extrajudicial.docx"
@@ -98,6 +108,10 @@ def dict_to_docassemble_objects(documents, interview_type_id):
                 # Cria a representacao do objeto Address da pessoa
                 _create_address_obj(document, parent)
 
+                document[parent]["_class"] = "docassemble.base.core.DAList"
+                document[parent]["instanceName"] = parent
+                document[parent]["auto_gather"] = False
+                document[parent]["gathered"] = True
                 document["valid_" + parent + "_table"] = "continue"
 
             # Cria a representacao da lista de documentos
@@ -207,8 +221,6 @@ def _create_address_obj(document, parent):
     for index, element in enumerate(document[parent]['elements']):
         element['address']["instanceName"] = parent + '[' + str(index) + '].address'
         element['address']["_class"] = "docassemble.base.util.Address"
-        document[parent]["auto_gather"] = False
-        document[parent]["gathered"] = True
 
 
 @login_required
