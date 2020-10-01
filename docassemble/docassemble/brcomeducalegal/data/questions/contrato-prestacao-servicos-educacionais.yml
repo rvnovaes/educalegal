@@ -368,11 +368,6 @@ fields:
     choices:
       - à vista: à vista
       - parcelado: parcelado
-  - 'Valor da parcela única:': single_installment_value
-    datatype: currency
-    hint: 0000,00
-    js show if: |
-      val("method_payment") == "à vista"
   - 'Data do vencimento da parcela única:': single_installment_date
     datatype: date
     js show if: |
@@ -410,9 +405,8 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
-        $('#X2ZpZWxkXzQ').mask('000000000000000.00', {reverse: true});
-        $('#X2ZpZWxkXzc').mask('000000000000000.00', {reverse: true});
-        $('#X2ZpZWxkXzEw').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzY').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzk').mask('000000000000000.00', {reverse: true});
       });
   </script>
 ---
