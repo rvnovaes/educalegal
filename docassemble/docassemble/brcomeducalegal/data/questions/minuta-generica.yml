@@ -36,35 +36,40 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
-    document_type_selected
-    part_types.target_number = 1
-    for item in part_types:
-      item.name.text
-    school_party_type
-    reviewed_school_email_answer
-    if school_party_type_selected == part_types[0].name.text:
-      for item in counterparts:
+    the_task = background_action('upload_task', upload=generic_document)
+    if not the_task.ready():
+      part_types.target_number = 1
+      for item in part_types:
         item.name.text
-      if part_types[0].has_extraparts:
-        for item in extraparts:
+      school_party_type
+      reviewed_school_email_answer
+      if school_party_type_selected == part_types[0].name.text:
+        for item in counterparts:
           item.name.text
-    elif school_party_type_selected == part_types[0].counterpart_name:
-      for item in parts:
-        item.name.text
-      if part_types[0].has_extraparts:
-        for item in extraparts:
+        if part_types[0].has_extraparts:
+          for item in extraparts:
+            item.name.text
+      elif school_party_type_selected == part_types[0].counterpart_name:
+        for item in parts:
           item.name.text
-    elif school_party_type_selected == part_types[0].extrapart_name:
-      for item in parts:
-        item.name.text
-      for item in counterparts:
-        item.name.text
-    if has_witnesses:
-      valid_witnesses_table
-    custom_file_name
-    generated_file = generic_document
-    el_patch_document
-    document_ready_screen
+        if part_types[0].has_extraparts:
+          for item in extraparts:
+            item.name.text
+      elif school_party_type_selected == part_types[0].extrapart_name:
+        for item in parts:
+          item.name.text
+        for item in counterparts:
+          item.name.text
+      if has_witnesses:
+        valid_witnesses_table
+      custom_file_name
+      generated_file = generic_document
+      el_patch_document
+      document_ready_screen
+---
+event: upload_task
+code: |
+  background_response(action_argument('upload'))
 ---
 section: Minuta
 progress: 5
