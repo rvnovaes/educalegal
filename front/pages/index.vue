@@ -107,6 +107,7 @@
               confirmButton: "btn btn-info btn-fill",
             },
             confirmButtonText: "OK",
+            showCloseButton: true,
             buttonsStyling: false
           });
         }

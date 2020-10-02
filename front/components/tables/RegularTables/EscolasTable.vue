@@ -146,6 +146,7 @@ export default {
                 customClass: {
                   confirmButton: "btn btn-success btn-fill",
                 },
+                showCloseButton: true,
                 buttonsStyling: false
               });
             }
@@ -157,6 +158,7 @@ export default {
                 customClass: {
                   confirmButton: "btn btn-success btn-fill",
                 },
+                showCloseButton: true,
                 buttonsStyling: false
               });
             }
@@ -169,6 +171,7 @@ export default {
               confirmButton: "btn btn-info btn-fill",
             },
             confirmButtonText: "OK",
+            showCloseButton: true,
             buttonsStyling: false
           });
         }

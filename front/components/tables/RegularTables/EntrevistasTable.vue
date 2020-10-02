@@ -134,6 +134,7 @@ export default {
             confirmButton: "btn btn-info btn-fill",
           },
           confirmButtonText: "OK",
+          showCloseButton: true,
           buttonsStyling: false
         });
         return true;
@@ -167,6 +168,7 @@ export default {
             confirmButton: "btn btn-info btn-fill",
           },
           confirmButtonText: "OK",
+          showCloseButton: true,
           buttonsStyling: false
         });
       }

@@ -91,6 +91,7 @@ export default {
             confirmButton: "btn btn-info btn-fill",
           },
           confirmButtonText: "OK",
+          showCloseButton: true,
           buttonsStyling: false
         });
       } else {
@@ -106,6 +107,7 @@ export default {
               customClass: {
                 confirmButton: "btn btn-success btn-fill",
               },
+              showCloseButton: true,
               buttonsStyling: false
             });
             await this.$router.push({path: "/"});
@@ -119,6 +121,7 @@ export default {
               confirmButton: "btn btn-info btn-fill",
             },
             confirmButtonText: "OK",
+            showCloseButton: true,
             buttonsStyling: false
           });
         }

@@ -340,6 +340,7 @@ export default {
         title: `You liked ${row.name}`,
         buttonsStyling: false,
         type: "success",
+        showCloseButton: true,
         confirmButtonClass: "btn btn-success btn-fill"
       });
     },
@@ -368,6 +369,7 @@ export default {
             text: `You deleted ${row.name}`,
             type: "success",
             confirmButtonClass: "btn btn-success btn-fill",
+            showCloseButton: true,
             buttonsStyling: false
           });
         }
