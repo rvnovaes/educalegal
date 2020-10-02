@@ -60,6 +60,7 @@ code: |
     else:
       single_installment_date_format
     signature_local
+    witnesses.uses_parts = False
     valid_witnesses_table
     generated_file
     el_patch_document
@@ -370,11 +371,6 @@ fields:
     choices:
       - à vista: à vista
       - parcelado: parcelado
-  - 'Valor da parcela única:': single_installment_value
-    datatype: currency
-    hint: 0000,00
-    js show if: |
-      val("method_payment") == "à vista"
   - 'Data do vencimento da parcela única:': single_installment_date
     datatype: date
     js show if: |
@@ -412,22 +408,14 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
-        $('#X2ZpZWxkXzQ').mask('000000000000000.00', {reverse: true});
-        $('#X2ZpZWxkXzc').mask('000000000000000.00', {reverse: true});
-        $('#X2ZpZWxkXzEw').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzY').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzk').mask('000000000000000.00', {reverse: true});
       });
   </script>
 ---
 code: |
     from datetime import datetime
     from dateutil.relativedelta import relativedelta
-
-    # converte data string para date
-    if isinstance(installments_date, str):
-        installments_date = datetime.strptime(installments_date, '%d/%m/%Y').date()
-
-    # converte data string para date
-    installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
 
     if method_payment == 'parcelado':
       if has_input_value:
@@ -442,6 +430,11 @@ code: |
         installments['installments_value'] = installments_value
         installments_list.append(installments)
 
+      # converte data string para date
+      if isinstance(installments_date, str):
+          installments_date = datetime.strptime(installments_date, '%d/%m/%Y').date()
+
+      # converte data string para date
       installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
     else:
       single_installment_date_format = format_date(single_installment_date, format='dd/MM/yyyy')
@@ -479,7 +472,7 @@ code: |
   for item in witnesses:
       if item.email:
           new_recipient = dict()
-          new_recipient['name'] = item.name.first
+          new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
           new_recipient['routingOrder'] = 2

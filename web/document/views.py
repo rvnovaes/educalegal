@@ -4,7 +4,7 @@ import pandas as pd
 import uuid
 
 from celery import chain
-from django.core.files.base import ContentFile
+from datetime import datetime
 from mongoengine.errors import ValidationError
 from rest_framework import generics
 from urllib.request import urlretrieve, urlcleanup
@@ -14,6 +14,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
 from django.core.files import File
+from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -819,3 +820,25 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
             return bulk_generation.pk, mongo_document
         else:
             return mongo_document, dynamic_document_class_name, school_names_set, school_units_names_set
+
+
+def reached_document_limit(tenant_id):
+    today = datetime.today()
+
+    # verifica se atingiu o limite de documentos
+    tenant = Tenant.objects.get(pk=tenant_id)
+    documents = Document.objects.filter(tenant=tenant,
+                                        created_date__month=today.month,
+                                        created_date__year=today.year)
+
+    if tenant.has_ged():
+        document_count = documents.exclude(Q(status="rascunho") | Q(status="criado")).count()
+    else:
+        document_count = documents.exclude(status="rascunho").count()
+
+    reached_limit = False
+    if tenant.plan.document_limit:
+        if document_count >= tenant.plan.document_limit:
+            reached_limit = True
+
+    return reached_limit, tenant.plan.document_limit
