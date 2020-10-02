@@ -386,6 +386,8 @@ def send_to_esignature(doc_uuid):
 
                         message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
                                             'sucesso para os destinatários:{}'.format(to_recipients))
+                    else:
+                        return status_code, response_json
 
             elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.name:
                 csc = ClickSignClient(esignature_app.private_key, esignature_app.test_mode)
@@ -414,6 +416,7 @@ def send_to_esignature(doc_uuid):
                     # adiciona signer key no educa legal
                     if not post_signer_key(recipients_sign, esignature_app, document.tenant):
                         message = 'Não foi possível salvar o signatário no sistema.'
+                        status_code = 400
                         return status_code, message
 
                     # adiciona os signatarios ao documento e envia por email para o primeiro signatario
