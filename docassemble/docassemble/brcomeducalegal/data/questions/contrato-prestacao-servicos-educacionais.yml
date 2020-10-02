@@ -60,6 +60,7 @@ code: |
     else:
       single_installment_date_format
     signature_local
+    witnesses.uses_parts = False
     valid_witnesses_table
     generated_file
     el_patch_document
@@ -471,7 +472,7 @@ code: |
   for item in witnesses:
       if item.email:
           new_recipient = dict()
-          new_recipient['name'] = item.name.first
+          new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
           new_recipient['routingOrder'] = 2
