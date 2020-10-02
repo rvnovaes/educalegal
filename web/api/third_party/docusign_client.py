@@ -283,12 +283,14 @@ class DocuSignClient:
                 headers=self.authorization_header,
                 json=request_json,
             )
-            envelope.raise_for_status()
-            return envelope.status_code, json.loads(envelope.text)
+            if envelope.status_code == 201:
+                return envelope.status_code, json.loads(envelope.text)
+            else:
+                return envelope.status_code, json.loads(envelope.text)['message']
         except Exception as e:
             message = str(type(e).__name__) + " : " + str(e)
             logger.error(message)
-            return 0, message
+            return 500, message
 
     def list_envelope_documents(self, envelope_id):
         """Retorna a lista de documentos do envelope"""
@@ -300,7 +302,7 @@ class DocuSignClient:
         except Exception as e:
             message = str(type(e).__name__) + " : " + str(e)
             logger.error(message)
-            return 0, message
+            return 500, message
         else:
             return envelope_documents.status_code, envelope_documents.json()
 

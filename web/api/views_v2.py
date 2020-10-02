@@ -539,7 +539,7 @@ def save_in_ged(data, url, file, tenant):
         message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(e)
         logging.error(message)
 
-        return 0, message, 0
+        return 500, message, 0
     else:
         if status_code != 201:
             message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + response
@@ -559,7 +559,7 @@ def save_in_ged(data, url, file, tenant):
                 except Exception as e:
                     message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
                     logging.error(message)
-                    return 0, message, 0
+                    return 500, message, 0
 
             return status_code, ged_document_data, ged_id
 
