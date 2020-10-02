@@ -949,40 +949,41 @@ def save_document_file(document, data, params):
                            None)
 
     # salva o docx no sistema de arquivos
-    data['name'] = params['docx_filename']
-    data['label'] = data['name']
-    relative_path = 'docs/' + document.tenant.name + '/' + params['docx_filename'][:15] + '/'
+    if 'docx_filename' in params:
+        data['name'] = params['docx_filename']
+        data['label'] = data['name']
+        relative_path = 'docs/' + document.tenant.name + '/' + params['docx_filename'][:15] + '/'
 
-    # salva o docx como documento relacionado. copia do pai algumas propriedades
-    related_document = Document(
-        name=params['docx_filename'],
-        description=document.description,
-        interview=document.interview,
-        school=document.school,
-        tenant=document.tenant,
-        bulk_generation=document.bulk_generation,
-        file_kind=DocumentFileKind.DOCX.value,
-    )
+        # salva o docx como documento relacionado. copia do pai algumas propriedades
+        related_document = Document(
+            name=params['docx_filename'],
+            description=document.description,
+            interview=document.interview,
+            school=document.school,
+            tenant=document.tenant,
+            bulk_generation=document.bulk_generation,
+            file_kind=DocumentFileKind.DOCX.value,
+        )
 
-    # limpa a variavel
-    status_code = 0
-    if has_ged:
-        try:
-            status_code, ged_data, ged_id = save_in_ged(data, params['docx_url'], None, document.tenant)
-        except Exception as e:
-            message = str(e)
-            logging.exception(message)
-        else:
-            if status_code == 201:
-                save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data,
-                                   params['docx_filename'], document)
+        # limpa a variavel
+        status_code = 0
+        if has_ged:
+            try:
+                status_code, ged_data, ged_id = save_in_ged(data, params['docx_url'], None, document.tenant)
+            except Exception as e:
+                message = str(e)
+                logging.exception(message)
             else:
-                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
-                    str(status_code), ged_data)
-                logging.error(message)
-    else:
-        save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None,
-                           params['docx_filename'], document)
+                if status_code == 201:
+                    save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data,
+                                       params['docx_filename'], document)
+                else:
+                    message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                        str(status_code), ged_data)
+                    logging.error(message)
+        else:
+            save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None,
+                               params['docx_filename'], document)
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
