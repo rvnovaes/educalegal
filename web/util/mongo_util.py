@@ -91,22 +91,29 @@ def mongo_to_hierarchical_dict(document, exclude_fields=('id',)):
                 prefix = field.split('__')[0]
                 index = int(field.split('__')[1])
                 field_name = field.split('__')[2]
+                parent = document._fields[field].parent.split('__')[0]
+                parent_type = document._fields[field].parent.split('__')[1]
 
-                key = document._fields[field].parent
                 # verifica se a chave pai já existe no dict
-                if not document._fields[field].parent in document_dict:
-                    document_dict[key] = dict()
-                    document_dict[key]['elements'] = list()
-                    doc_fields = dict()
-                    document_dict[key]['elements'].append(doc_fields)
+                if not parent in document_dict:
+                    document_dict[parent] = dict()
+                    if parent_type == 'list':
+                        document_dict[parent]['elements'] = list()
+                        # adiciona o primeiro indices da lista para o novo parent
+                        document_dict[parent]['elements'].append(dict())
+                    else:
+                        document_dict[parent]['elements'] = dict()
 
-                try:
-                    document_dict[key]['elements'][index]
-                except IndexError:
-                    doc_fields = dict()
-                    document_dict[key]['elements'].append(doc_fields)
+                if parent_type == 'list':
+                    # adiciona os outros indices da lista para o mesmo parent
+                    try:
+                        document_dict[parent]['elements'][index]
+                    except IndexError:
+                        document_dict[parent]['elements'].append(dict())
 
-                document_dict[key]['elements'][index][field_name] = document[field]
+                    document_dict[parent]['elements'][index][field_name] = document[field]
+                else:
+                    document_dict[parent]['elements'][field_name] = document[field]
             else:
                 document_dict[field] = document[field]
         except Exception as e:

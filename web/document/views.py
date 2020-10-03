@@ -267,10 +267,18 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
             data_valid = metadata_valid and content_valid
 
-            bulk_generation_id, mongo_document = validate_data_mongo(
-                self.request, interview.pk, data_valid, bulk_data_content,
-                field_types_dict, required_fields_dict, parent_fields_dict, True
-            )
+            bulk_generation_id = 0
+
+            try:
+                bulk_generation_id, mongo_document = validate_data_mongo(
+                    self.request, interview.pk, data_valid, bulk_data_content,
+                    field_types_dict, required_fields_dict, parent_fields_dict, True
+                )
+            except Exception as e:
+                data_valid = False
+                error_message = "Houve erro no processo de geração em lote. | {exc}".format(
+                    exc=str(type(e).__name__) + " : " + str(e))
+                logger.error(error_message)
 
             if data_valid:
                 return render(
@@ -285,8 +293,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 )
 
             else:
-                # TODO Testar se realmente apaga quando há erro Apaga a colecao do banco
-                mongo_document.drop_collection()
                 return render(
                     request,
                     "document/bulkdocumentgeneration_validate_generate.html",

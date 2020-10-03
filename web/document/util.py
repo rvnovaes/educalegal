@@ -176,8 +176,8 @@ def _create_documents_obj(document):
                  'docdireitoautoral': 'termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx'}
 
     elements = dict()
-    for doc_type in document['documents_list']:
-        elements[doc_names[doc_type]] = document["documents_list"][doc_type]
+    for doc_type in document['documents_list']['elements']:
+        elements[doc_names[doc_type]] = document["documents_list"]['elements'][doc_type]
 
     document.pop("documents_list")
     document["documents_list"] = dict()
@@ -276,8 +276,15 @@ def send_email(doc_uuid):
                 status_code, response_json = sendgrid_send_email(
                     to_emails, subject, html_content, category, file_name, file)
             except Exception as e:
-                message = str(type(e).__name__) + " : " + str(e)
                 status_code = 500
+                message = ''
+                if hasattr(e, 'to_dict'):
+                    for error in e.to_dict['errors']:
+                        message += error['message'] + ' | '
+                        status_code = e.status_code
+                else:
+                    message = str(type(e).__name__) + " : " + str(e)
+
                 return status_code, message
             else:
                 if status_code == 202:
