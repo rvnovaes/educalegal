@@ -203,7 +203,7 @@
       "09/04/2020"
    ],
    "contractors__0__name_text": [
-      "StringField",
+      "FullNameField",
       "true",
       "contractors__list",
       "Nome",
@@ -315,7 +315,7 @@
       "TO"
    ],
    "witnesses__0__name_text": [
-      "StringField",
+      "FullNameField",
       "true",
       "witnesses__list",
       "Fabiana Gomes",
@@ -329,14 +329,14 @@
       "mario.eduardoroberto99774@gmail.com"
    ],
    "witnesses__0__cpf": [
-      "StringField",
+      "CpfField",
       "true",
       "witnesses__list",
       "610.653.886-75",
       "651.062.086-37"
    ],
    "witnesses__1__name_text": [
-      "StringField",
+      "FullNameField",
       "true",
       "witnesses__list",
       "Ruan Elias Cardoso",
@@ -350,7 +350,7 @@
       "allanaamandamayaalmeidaaa88774@gmail.com"
    ],
    "witnesses__1__cpf": [
-      "StringField",
+      "CpfField",
       "true",
       "witnesses__list",
       "416.965.096-45",

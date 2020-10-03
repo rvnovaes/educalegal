@@ -20,6 +20,8 @@ def get_field(field_type, required):
         field = EmailField()
     if field_type == "FloatField":
         field = FloatField()
+    if field_type == "FullNameField":
+        field = StringField()
     if field_type == "IntField":
         field = IntField()
     if field_type == "StringField":
