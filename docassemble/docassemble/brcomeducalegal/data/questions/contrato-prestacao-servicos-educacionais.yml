@@ -418,7 +418,7 @@ code: |
     from dateutil.relativedelta import relativedelta
 
     if method_payment == 'parcelado':
-      # converte data string para date
+      # converte data string para date (usado na importacao csv em lote ou json via api)
       if isinstance(installments_date, str):
           installments_date = datetime.strptime(installments_date, '%d/%m/%Y').date()
 
