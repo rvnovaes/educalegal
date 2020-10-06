@@ -94,7 +94,18 @@ export const getters = {
     }
     return school
   },
+  getWitnesses: (state) => (id) => {
+    let school = state.schools.find(school => school.id === Number(id));
+    // console.log("VUEX: ")
+    // console.log(school)
+    if (school.id === 0){
+      delete school.id
+    }
+    return school.witnesses
+  },
 };
+
+
 export const actions = {
   async fetchAllSchools({commit}) {
     const res = await this.$axios.get("/v2/schools");

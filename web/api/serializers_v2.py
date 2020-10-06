@@ -194,15 +194,6 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
             return None
 
 
-class SchoolSerializer(serializers.ModelSerializer):
-    school_units = serializers.StringRelatedField(many=True)
-
-    class Meta:
-        model = School
-        ref_name = "School v2"
-        fields = "__all__"
-
-
 class SchoolUnitSerializer(serializers.ModelSerializer):
     class Meta:
         model = SchoolUnit
@@ -214,6 +205,17 @@ class WitnessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Witness
         ref_name = "Witness v2"
+        # fields = "__all__"
+        fields = ["name", "email", "cpf"]
+
+
+class SchoolSerializer(serializers.ModelSerializer):
+    school_units = SchoolUnitSerializer(many=True)
+    witnesses = WitnessSerializer(many=True)
+
+    class Meta:
+        model = School
+        ref_name = "School v2"
         fields = "__all__"
 
 

@@ -16,6 +16,13 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col">
+          <div class="card-wrapper">
+            <testemunhas-table :school="school"></testemunhas-table>
+          </div>
+        </div>
+      </div>
     </div>
     <v-tour name="pageTour" :steps="escolaDetalhesSteps" :options="tourOptions"></v-tour>
   </div>
@@ -24,6 +31,7 @@
 
 <script>
 import EscolaForm from "@/components/pages/forms/EscolaForm";
+import TestemunhasTable from "~/components/tables/RegularTables/TestemunhasTable";
 import tourStepsMixin from "@/components/tourSteps/tourStepsMixin";
 
 export default {
@@ -31,6 +39,7 @@ export default {
   layout: "DashboardLayout",
   mixins: [tourStepsMixin],
   components: {
+    TestemunhasTable,
     EscolaForm,
   },
   // passa para o form a escola recuperada a partir no numero em this.$route.params.id
