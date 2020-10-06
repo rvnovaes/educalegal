@@ -206,12 +206,12 @@ class WitnessSerializer(serializers.ModelSerializer):
         model = Witness
         ref_name = "Witness v2"
         # fields = "__all__"
-        fields = ["name", "email", "cpf"]
+        fields = ["id", "name", "email", "cpf"]
 
 
 class SchoolSerializer(serializers.ModelSerializer):
-    school_units = SchoolUnitSerializer(many=True)
-    witnesses = WitnessSerializer(many=True)
+    school_units = SchoolUnitSerializer(many=True, read_only=True)
+    witnesses = WitnessSerializer(many=True, read_only=True)
 
     class Meta:
         model = School

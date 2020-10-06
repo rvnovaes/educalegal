@@ -209,10 +209,17 @@ export default {
       validated: false,
     };
   },
-  // Se o id da escola for 0, cria escola vazia no store
+
+
   created() {
+
     if (this.school.id === 0){
-      this.$store.commit("schools/addSchool", this.school)
+      // Se o id da escola for 0, cria escola vazia no store
+      let newSchool = this.$store.state.schools.schools.filter(school => school.id === 0);
+      // Se ja houver escola vazia, nao cria outra
+      if (newSchool.length === 0) {
+        this.$store.commit("schools/addSchool", this.school)
+      }
     }
   },
   methods: {
@@ -259,7 +266,6 @@ export default {
         this.$store.commit("schools/updateUF", {id: this.school.id, state: e});
     },
     async firstFormSubmit() {
-
       let payload = this.$store.getters["schools/getSchool"](this.school.id)
       console.log(payload)
       if (payload.id) {
