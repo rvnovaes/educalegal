@@ -1,0 +1,386 @@
+---
+metadata:
+  title: Faça o upload do seu documento no Educa Legal
+---
+sections:
+  - Minuta
+  - Parte
+  - Contraparte
+  - Parte extra
+  - Anexos
+  - Conclusão
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+  - element-school-witness.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+  - .module_normalize_ascii
+  - .module_educalegal_client
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    the_task = background_action('upload_task', upload=generic_document)
+    if not the_task.ready():
+      part_types.target_number = 1
+      for item in part_types:
+        item.name.text
+      school_party_type
+      reviewed_school_email_answer
+      if school_party_type_selected == part_types[0].name.text:
+        for item in counterparts:
+          item.name.text
+        if part_types[0].has_extraparts:
+          for item in extraparts:
+            item.name.text
+      elif school_party_type_selected == part_types[0].counterpart_name:
+        for item in parts:
+          item.name.text
+        if part_types[0].has_extraparts:
+          for item in extraparts:
+            item.name.text
+      elif school_party_type_selected == part_types[0].extrapart_name:
+        for item in parts:
+          item.name.text
+        for item in counterparts:
+          item.name.text
+      if has_witnesses:
+        valid_witnesses_table
+      custom_file_name
+      generated_file = generic_document
+      el_patch_document
+      document_ready_screen
+---
+event: upload_task
+code: |
+  background_response(action_argument('upload'))
+---
+section: Minuta
+progress: 5
+question: |
+  Insira a minuta que deseja subir na plataforma.
+fields:
+  - "Tipo do documento:": document_type_selected
+    datatype: dropdown
+    code: |
+      document_types_names_list
+    help: Escolha o tipo do documento para que ele seja classificado corretamente no GED.
+  - "Inserir minuta:": generic_document
+    required: true
+    datatype: files
+---
+objects:
+  - part_types: DAList.using(object_type=Person, ask_number=True)
+---
+section: Parte
+progress: 5
+question: Parte
+fields:
+  - Número de Tipo de Pessoas: part_types.target_number
+    required: true
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 5
+section: Partes
+question: Tipos de Partes do Documento
+fields:
+  - "Denominação da Parte:": part_types[i].name.text
+    required: True
+    help: "Ex: Contratante, Locadora, Receptora, etc."
+  - "Denominação da Contraparte:": part_types[i].counterpart_name
+    required: True
+    help: "Ex: Contratada, Locatária, Reveladora, etc."
+  - "Haverá parte extra (Ex: Fiador):": part_types[i].has_extraparts
+    help: "Ex.: para o contrato de locação há a necessidade de uma 3ª parte que é o fiador."
+    datatype: yesnoradio
+    default: False
+  - "Denominação da Extra parte:": part_types[i].extrapart_name
+    required: True
+    default: "Fiador"
+    js show if: |
+      val("part_types[i].has_extraparts")
+---
+code: |
+  school_party_type_list = list()
+  if part_types[0].has_extraparts:
+    school_party_type_list.append(part_types[0].name.text)
+    school_party_type_list.append(part_types[0].counterpart_name)
+    school_party_type_list.append(part_types[0].extrapart_name)
+  else:
+    school_party_type_list.append(part_types[0].name.text)
+    school_party_type_list.append(part_types[0].counterpart_name)
+---
+section: Escola
+question: |
+  A escola será a parte
+fields:
+  - "Tipo da parte:": school_party_type
+    required: True
+    datatype: radio
+    code: |
+      school_party_type_list
+---
+code: |
+  # Atribuindo os dados da escola para o tipo de parte escolhido pelo usuário
+  school_party_type_selected = school_party_type
+  if school_party_type_selected == part_types[0].name.text:
+    parts.target_number = 1
+    parts[0].name.text = school_legal_name
+    parts[0].email = school_email
+  elif school_party_type_selected == part_types[0].counterpart_name:
+    counterparts.target_number = 1
+    counterparts[0].name.text = school_legal_name
+    counterparts[0].email = school_email
+  elif school_party_type_selected == part_types[0].extrapart_name:
+    extraparts.target_number = 1
+    extraparts[0].name.text = school_legal_name
+    extraparts[0].email = school_email
+---
+objects:
+  - parts: DAList.using(object_type=Person, ask_number=True)
+---
+section: Parte
+progress: 10
+question: Dados da parte ${ part_types[0].name.text }
+fields:
+  - Número de Pessoas: parts.target_number
+    required: true
+    datatype: integer
+    default: 1
+    min: 1
+script: |
+  <script>
+    flash("Os dados da escola foram salvos! Agora, continue preenchendo os dados da(s) outra(s) parte(s).")
+  </script>
+---
+section: Parte
+progress: 20
+question: |
+  Dados do(a) ${word(ordinal(i)) } ${ part_types[0].name.text }
+fields:
+  - 'Nome/Razão social:': parts[i].name.text
+    validate: validate_person_full_name
+    datatype: text
+    required: True
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+  - "E-mail:": parts[i].email
+    datatype: email
+    help: ${ help_email_msg }
+    required: True
+---
+objects:
+  - counterparts: DAList.using(object_type=Person, ask_number=True)
+---
+section: Contraparte
+progress: 40
+question: Dados da parte ${ part_types[0].counterpart_name }
+fields:
+  - Número de Pessoas: counterparts.target_number
+    required: true
+    datatype: integer
+    default: 1
+    min: 1
+script: |
+  <script>
+    flash("Os dados da escola foram salvos! Agora, continue preenchendo os dados da(s) outra(s) parte(s).")
+  </script>
+---
+section: Contraparte
+progress: 50
+question: |
+  Dados do(a) ${word(ordinal(i)) } ${ part_types[i].counterpart_name }
+fields:
+  - 'Nome/Razão social:': counterparts[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+  - "E-mail:": counterparts[i].email
+    datatype: email
+    help: ${ help_email_msg }
+    required: False
+---
+objects:
+  - extraparts: DAList.using(object_type=Person, ask_number=True)
+---
+section: Parte Extra
+progress: 70
+question: ${ part_types[0].extrapart_name }
+fields:
+  - Número de Pessoas: extraparts.target_number
+    required: true
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Parte Extra
+progress: 80
+question: |
+  Dados do(a) ${word(ordinal(i)) } ${ part_types[i].extrapart_name }
+fields:
+  - 'Nome/Razão social:': extraparts[i].name.text
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+  - "E-mail:": extraparts[i].email
+    datatype: email
+    help: ${ help_email_msg }
+    required: True
+---
+code: |
+  # Nome do tipo de documento selecionado pela usuario da escola
+  document_type_selected = int(document_type_selected)
+  for document_type in document_types_names_list:
+      if document_type_selected in document_type:
+          document_type_name = document_type[document_type_selected]
+          break
+---
+code: |
+  # Trantando nome do tipo do documento para nomear o arquivo gerado
+  custom_file_name = today(format = 'YYYYMMdd') + '-' + format_time(last_access_time(), format='hhmmss') + '-' + document_type_name
+  custom_file_name = normalize_ascii(custom_file_name).lower().replace(" ", "-")
+---
+code: |
+  import json
+
+  # private=False - para que o arquivo fique acessivel fora do docassemble
+  generated_file.set_attributes(private=False)
+
+  # Tipo de documento escolhido pelo usuario
+  interview_document_type = document_type_selected
+
+  # dados do documento que serao salvos no educa legal
+  data = {
+     "name": custom_file_name + '.pdf',
+     "description": interview_description,
+     "status": "criado",
+     "school": school_id,
+     "document_type": interview_document_type,
+     "parent": None,
+     "recipients": json.dumps(recipients),
+     "document_data": json.dumps(all_variables())
+  }
+
+  # external=True - acrescenta na url o protocolo and hostname (https://hostname)
+  params = {
+      "trigger": "docassemble",
+      "pdf_url": generated_file.url_for(external=True),
+      "pdf_filename": custom_file_name + '.pdf',
+      "tenant_id": tid,
+      "doc_uuid": doc_uuid,
+  }
+
+  # atualiza no educa legal dados do documento gerado
+  status_code, el_patch_document = elc.patch_document(data, params)
+
+  if status_code == 200:
+    log("Atualizado o documento")
+  else:
+    log("Erro ao atualizar o documento")
+  log("{doc_uuid} - {data}".format(doc_uuid=doc_uuid, data=el_patch_document))
+---
+ga id: |
+  code: ga_id_end
+event: document_ready_screen
+section: Conclusão
+progress: 100
+back button: False
+question: |
+  Seu documento foi gerado com sucesso!
+subquestion: |
+  Nome do documento:
+
+  ${ custom_file_name + '.pdf' }
+action buttons:
+  code: |
+    button_list
+---
+code: |
+  button_list = list()
+  button_list.append(el_button)
+---
+code: |
+  el_button = {'action': educalegal_front_url + '/arquivo/' + doc_uuid,
+                'label': 'Ver detalhes',
+                'color': 'success',
+                'icon': 'check'}
+---
+code: |
+  recipients = list()
+  for item in parts:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  for item in counterparts:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  if part_types[0].has_extraparts:
+      for item in extraparts:
+          if item.email:
+              new_recipient = dict()
+              new_recipient['name'] = item.name.text
+              new_recipient['email'] = item.email
+              new_recipient['group'] = 'signers'
+              new_recipient['routingOrder'] = 1
+              new_recipient['tabs'] = [
+                  {
+                      'type': 'signHere',
+                      'anchorString': generate_anchor('signHere', item.email)
+                  },
+              ]
+              recipients.append(new_recipient)
+
+  if has_witnesses:
+      for item in witnesses:
+          if item.email:
+              new_recipient = dict()
+              new_recipient['name'] = item.name.text
+              new_recipient['email'] = item.email
+              new_recipient['group'] = 'signers'
+              new_recipient['routingOrder'] = 2
+              new_recipient['tabs'] = [
+                  {
+                      'type': 'signHere',
+                      'anchorString': generate_anchor('signHere', item.email)
+                  },
+              ]
+              recipients.append(new_recipient)
+---

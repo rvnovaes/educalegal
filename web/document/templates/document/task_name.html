@@ -1,7 +1,7 @@
-{% if record.task_name == "document.tasks.create_document" %}
+{% if record.task_name == "document.tasks.celery_create_document" %}
 geração
-{% elif record.task_name == "document.tasks.send_email"  %}
+{% elif record.task_name == "document.tasks.celery_send_email"  %}
 envio de e-mail
-{% elif record.task_name == "document.tasks.submit_to_esignature"  %}
+{% elif record.task_name == "document.tasks.celery_submit_to_esignature"  %}
 assinatura eletrônica
 {% endif %}

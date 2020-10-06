@@ -1,56 +1,71 @@
-# 0.56
-django~=3.0.8
+# 2.0
+django~=3.1.1
 # API
-djangorestframework~=3.11.0
-django-cors-headers~=3.4.0
+djangorestframework~=3.11.1
+django-cors-headers~=3.5.0
 drf-yasg~=1.17.1
 django-rest-auth~=0.9.5
 retry-requests~=1.0.1
+djangorestframework-simplejwt
 # Formating of forms
-django-crispy-forms~=1.9.1
+django-crispy-forms~=1.9.2
 # Database Access
-psycopg2-binary~=2.8.5
+psycopg2-binary~=2.8.6
 # Authentication
 django-allauth~=0.42.0
 # Used to create tables and filtering
 django-tables2~=2.3.1
 django-filter~=2.3.0
 # Store files on Digital Ocean Spaces
-django-storages~=1.9.1
-boto3~=1.14.19
+django-storages~=1.10.1
+boto3~=1.15.3
 # Production server
 gunicorn~=20.0.4
 # Misc
-lxml~=4.5.1
+lxml~=4.5.2
 xmltodict~=0.12.0
 Pillow~=7.2.0
 pyyaml~=5.3.1
 django-bootstrap4~=2.2.0
 # Debug
-django-debug-toolbar~=2.2
+django-debug-toolbar~=3.1
 # API Debugging
-django-silk~=4.0.1
+django-silk~=4.1.0
 # Read csv
-pandas~=1.0.5
+pandas~=1.1.2
 # Django models currency
 django-money~=1.1
 # Google Analytics
 # django-google-analytics-app
 # MongoDB
-pymongo~=3.10.1
+pymongo~=3.11.0
 mongoengine~=0.20.0
-# Used to test docusign requests
+
+# Used to in docusign requests
 PyJWT~=1.7.1
+cryptography~=3.1.1
+
 # Validations
 validator-collection~=1.4.2
-validator-collection-br~=0.0.10
+validator-collection-br~=0.0.12
 # Celery
-celery~=4.4.6
+celery~=4.4.7
 django-celery-results~=1.2.1
 future~=0.18.2
 # Tests
-pytest~=5.4.3
+pytest~=6.0.2
 # https://github.com/izimobil/django-rest-framework-datatables
-djangorestframework-datatables
-PySimpleGUI~=4.24.0
+djangorestframework-datatables~=0.5.2
+PySimpleGUI~=4.29.0
 dateparser~=0.7.6
+# GraphQL
+# FOr JWT authentication. Userd with Nuxt Authetication
+# https://pypi.org/project/django-graphql-jwt/
+# https://django-graphql-jwt.domake.io/en/latest/
+# django-graphql-jwt~=0.3.1
+# graphene~=2.1.8
+# graphene-django~=2.12.1
+# https://dateutil.readthedocs.io/en/latest/
+python-dateutil~=2.8.1
+sendgrid~=6.4.7
+pytz~=2020.1

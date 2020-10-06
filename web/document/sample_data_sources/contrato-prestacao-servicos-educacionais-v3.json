@@ -1,0 +1,373 @@
+{
+   "selected_school": [
+      "StringField",
+      "true",
+      null,
+      "Escola",
+      "Development Colégio Bacana"
+   ],
+   "school_division": [
+      "StringField",
+      "true",
+      null,
+      "Unidade",
+      "System Super Bacana"
+   ],
+   "students__0__name_text": [
+      "StringField",
+      "true",
+      "students__list",
+      "Nome",
+      "Agatha Elza Teixeira"
+   ],
+   "students__0__nationality": [
+      "StringField",
+      "true",
+      "students__list",
+      "Nacionalidade",
+      "brasileiro(a)"
+   ],
+   "students__0__cpf": [
+      "StringField",
+      "true",
+      "students__list",
+      "CPF",
+      "009.175.002-45"
+   ],
+   "students__0__rg": [
+      "StringField",
+      "true",
+      "students__list",
+      "RG",
+      "37.750.612-6"
+   ],
+   "students__0__zip": [
+      "StringField",
+      "true",
+      "students__list",
+      "CEP",
+      "69945-970"
+   ],
+   "students__0__street_name": [
+      "StringField",
+      "true",
+      "students__list",
+      "Logradouro",
+      "Avenida Paraná"
+   ],
+   "students__0__street_number": [
+      "StringField",
+      "true",
+      "students__list",
+      "Número",
+      "206"
+   ],
+   "students__0__unit": [
+      "StringField",
+      "false",
+      "students__list",
+      "Complemento",
+      null
+   ],
+   "students__0__neighborhood": [
+      "StringField",
+      "true",
+      "students__list",
+      "Bairro",
+      "Centro"
+   ],
+   "students__0__city": [
+      "StringField",
+      "true",
+      "students__list",
+      "Cidade",
+      "Acrelândia"
+   ],
+   "students__0__state": [
+      "StringField",
+      "true",
+      "students__list",
+      "Estado",
+      "AC"
+   ],
+   "students__0__grade": [
+      "StringField",
+      "true",
+      "students__list",
+      "Série",
+      "1° ano do ensino fundamental"
+   ],
+   "students__0__period": [
+      "StringField",
+      "true",
+      "students__list",
+      "Período",
+      "matutino"
+   ],
+   "school_year": [
+      "IntField",
+      "true",
+      null,
+      "Ano letivo",
+      "2021"
+   ],
+   "annual_value": [
+      "FloatField",
+      "true",
+      null,
+      "Valor anual",
+      "3000"
+   ],
+   "has_discount": [
+      "BooleanField",
+      "true",
+      null,
+      "Tem desconto",
+      "false"
+   ],
+   "discount_notes": [
+      "StringField",
+      "false",
+      null,
+      "Observações",
+      null
+   ],
+   "method_payment": [
+      "StringField",
+      "true",
+      null,
+      "Forma de pagamento",
+      "à vista"
+   ],
+   "single_installment_date": [
+      "StringField",
+      "false",
+      null,
+      "Data do vencimento da parcela única",
+      "10/11/2020"
+   ],
+   "has_input_value": [
+      "BooleanField",
+      "true",
+      null,
+      "Haverá parcela de entrada",
+      "false"
+   ],
+   "input_value": [
+      "FloatField",
+      "false",
+      null,
+      "Valor da parcela de entrada",
+      null
+   ],
+   "input_date": [
+      "StringField",
+      "false",
+      null,
+      "Data do vencimento da parcela de entrada",
+      null
+   ],
+   "quantity_installments": [
+      "IntField",
+      "false",
+      null,
+      "Quantidade de parcelas",
+      null
+   ],
+   "installments_value": [
+      "FloatField",
+      "false",
+      null,
+      "Valor da parcela",
+      null
+   ],
+   "installments_date": [
+      "StringField",
+      "false",
+      null,
+      "Data de vencimento da primeira parcela",
+      null
+   ],
+   "signature_local": [
+      "StringField",
+      "true",
+      null,
+      "Local da assinatura",
+      "Belo Horizonte"
+   ],
+   "signature_date": [
+      "StringField",
+      "true",
+      null,
+      "Data da assinatura",
+      "09/04/2020"
+   ],
+   "contractors__0__name_text": [
+      "FullNameField",
+      "true",
+      "contractors__list",
+      "Nome",
+      "Gabriel Luiz Juan Moura"
+   ],
+   "contractors__0__nationality": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "nacionalidade",
+      "brasileiro(a)"
+   ],
+   "contractors__0__marital_status": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "estadocivil",
+      "casado(a)"
+   ],
+   "contractors__0__occupation": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "Profissão",
+      "contador"
+   ],
+   "contractors__0__cpf": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "CPF",
+      "619.474.792-70"
+   ],
+   "contractors__0__rg": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "RG",
+      "10.812.773-4"
+   ],
+   "contractors__0__phone_number": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "Telefone",
+      "31 3213-6184"
+   ],
+   "contractors__0__whatsapp_number": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "WhatsApp",
+      "31 99888-1122"
+   ],
+   "contractors__0__email": [
+      "EmailField",
+      "true",
+      "contractors__list",
+      "E-mail",
+      "iasmini.gomes@gmail.com"
+   ],
+   "contractors__0__zip": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "CEP",
+      "77405-105"
+   ],
+   "contractors__0__street_name": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "Logradouro",
+      "Rua Presidente Juscelino Kubitschek"
+   ],
+   "contractors__0__street_number": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "Número",
+      "649"
+   ],
+   "contractors__0__unit": [
+      "StringField",
+      "false",
+      "contractors__list",
+      "complemento",
+      "102"
+   ],
+   "contractors__0__neighborhood": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "bairro",
+      "Setor Central"
+   ],
+   "contractors__0__city": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "Cidade",
+      "Gurupi"
+   ],
+   "contractors__0__state": [
+      "StringField",
+      "true",
+      "contractors__list",
+      "UF",
+      "TO"
+   ],
+   "witnesses__0__name_text": [
+      "FullNameField",
+      "true",
+      "witnesses__list",
+      "Fabiana Gomes",
+      "Mário Eduardo Roberto Costa"
+   ],
+   "witnesses__0__email": [
+      "EmailField",
+      "true",
+      "witnesses__list",
+      "fabi_gomesss1256@gmail.com",
+      "mario.eduardoroberto99774@gmail.com"
+   ],
+   "witnesses__0__cpf": [
+      "CpfField",
+      "true",
+      "witnesses__list",
+      "610.653.886-75",
+      "651.062.086-37"
+   ],
+   "witnesses__1__name_text": [
+      "FullNameField",
+      "true",
+      "witnesses__list",
+      "Ruan Elias Cardoso",
+      "Allana Amanda Maya Almeida"
+   ],
+   "witnesses__1__email": [
+      "EmailField",
+      "true",
+      "witnesses__list",
+      "ruaneliascardosooo4575@gmail.com",
+      "allanaamandamayaalmeidaaa88774@gmail.com"
+   ],
+   "witnesses__1__cpf": [
+      "CpfField",
+      "true",
+      "witnesses__list",
+      "416.965.096-45",
+      "420.178.446-08"
+   ],
+   "submit_to_esignature": [
+      "BooleanField",
+      "true",
+      null,
+      "Enviar para assinatura eletrônica",
+      "true"
+   ],
+   "el_send_email": [
+      "BooleanField",
+      "true",
+      null,
+      "Enviar por e-mail",
+      "False"
+   ]
+}

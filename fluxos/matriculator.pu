@@ -7,8 +7,10 @@ EducaLegal -> APITeia: Retorno da validação (App e Mongo)
 activate Docassemble
 EducaLegal -> Docassemble: Gera contrato com dados validados (Celery)
 Docassemble -> EducaLegal: URL do PDF
+EducaLegal -> Docassemble: Requisição do download do PDF
+Docassemble -> EducaLegal: Retorno com PDF
 deactivate Docassemble
-EducaLegal -> GED: Download + upload do documento
+EducaLegal -> GED: upload do documento
 EducaLegal -> ESignature: Documentos para assinatura
 deactivate EducaLegal
 activate ESignature

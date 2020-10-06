@@ -1,0 +1,35 @@
+metadata:
+  title: Debug
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-generate-file.yml
+  - element-document-ready.yml
+---
+sections:
+  - Escola
+  - Aluno(a)
+  - Conclusão
+---
+code:  |
+  content_document = "entrevista-debug-return-app.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    nomeAluno
+    generated_file
+    document_ready_screen
+---
+progress: 10
+section: Aluno(a)
+question: Dados do(a) Aluno(a)
+subquestion: ${ doc_uuid }
+fields:
+  - 'Nome completo: ': nomeAluno
+    datatype: text
+    default: "Anton Bruckner"

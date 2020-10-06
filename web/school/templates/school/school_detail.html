@@ -13,7 +13,7 @@
                         <span class="font-weight-bold">Razão Social: </span>{% if school.legal_name %}
                         {{ school.legal_name }}{% endif %}</li>
                     <li class="list-group-item">
-                        <span class="font-weight-bold">Tipo: </span>{% if school.legal_type == 'J' %}
+                        <span class="font-weight-bold">Tipo: </span>{% if school.legal_nature == 'J' %}
                         Jurídica {% else %} Física {% endif %}
                     </li>
                     <li class="list-group-item">

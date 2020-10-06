@@ -103,7 +103,7 @@ class Migration(migrations.Migration):
                     "legal_type",
                     models.CharField(
                         choices=[("F", "Física"), ("J", "Jurídica")],
-                        default=school.models.LegalType["JURIDICA"],
+                        default=school.models.LegalNature["JURIDICA"],
                         max_length=1,
                         verbose_name="Tipo",
                     ),

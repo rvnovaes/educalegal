@@ -1,0 +1,9 @@
+{
+  allSchools {
+    id
+    name
+    legalName
+    city
+    state
+  }
+}

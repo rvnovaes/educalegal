@@ -3,6 +3,7 @@ VALID_FIELD_TYPES = [
     "DateTimeField",
     "EmailField",
     "FloatField",
+    "FullNameField",
     "IntField",
     "StringField",
     "CpfField",

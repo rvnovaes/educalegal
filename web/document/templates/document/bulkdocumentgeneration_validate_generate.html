@@ -2,7 +2,7 @@
 {% block body_block %}
     <h2>Geração em Lote</h2>
     <br>
-    {% if csv_valid %}
+    {% if data_valid %}
         <p>O arquivo foi validado. Clique para conferir os documentos que serão gerados.</p>
         <a href="{% url 'document:bulk-document-generation-detail' bulk_generation_id %}" class="btn btn-success" >Gerar Lote</a>
     {% else %}

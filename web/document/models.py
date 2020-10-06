@@ -3,11 +3,12 @@ import uuid
 from enum import Enum
 
 from django.db import models
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 
 from tenant.models import TenantAwareModel
 from interview.models import Interview
 from school.models import School
+from web.storage_backends import MediaStorage
 
 
 class DocumentStatus(Enum):
@@ -19,6 +20,35 @@ class DocumentStatus(Enum):
     ASSINADO = "assinado"
     RECUSADO_INVALIDO = "assinatura recusada/inválida"
     NAO_ENCONTRADO = "não encontrado"
+
+    def __str__(self):
+        return str(self.value.lower())
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
+
+
+class BulkDocumentKind(Enum):
+    PRESTACAO_SERVICOS_ESCOLARES = 2
+    NOTIFICACAO_EXTRAJUDICIAL = 8
+    ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
+
+    @classmethod
+    def id_choices(cls):
+        return [x.value for x in cls]
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
+
+
+# evitando usar type pq no graphql da conflito
+class DocumentFileKind(Enum):
+    PDF = "pdf"
+    DOCX = "docx"
+    PDF_SIGNED = "pdf_signed"
+    PDF_CERTIFIED = "pdf_certified"
 
     def __str__(self):
         return str(self.value.lower())
@@ -100,6 +130,7 @@ class Document(TenantAwareModel):
         help_text="UUID do documento. UUID = Universally Unique ID.",
         verbose_name="UUID",
     )
+    cloud_file = models.FileField(max_length=255, storage=MediaStorage(), blank=True, verbose_name='Arquivo na nuvem')
     description = models.TextField(default="", blank=True, verbose_name="Descrição")
     interview = models.ForeignKey(
         Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"
@@ -107,14 +138,15 @@ class Document(TenantAwareModel):
     school = models.ForeignKey(
         School, null=True, on_delete=models.CASCADE, verbose_name="Escola"
     )
-    related_documents = models.ForeignKey(
-        "self",
-        on_delete=models.CASCADE,
+    parent = models.ForeignKey(
+        'self',
         null=True,
         blank=True,
-        related_name="documents",
-    )
+        on_delete=models.CASCADE,
+        related_name='related_documents')
+
     document_data = JSONField(null=True, verbose_name="Dados do Documento")
+    recipients = JSONField(blank=True, default=dict, verbose_name="Destinatários do e-mail/assinatura eletrônica")
 
     bulk_generation = models.ForeignKey(
         BulkDocumentGeneration, null=True, on_delete=models.CASCADE, verbose_name="Criação em Lote"
@@ -127,6 +159,12 @@ class Document(TenantAwareModel):
     send_email = models.BooleanField(default=False, verbose_name="E-mail?")
     mongo_uuid = models.CharField(
         max_length=256, blank=True, default="", verbose_name="UUID do Mongo"
+    )
+    file_kind = models.CharField(
+        max_length=255,
+        choices=DocumentFileKind.choices(),
+        default=DocumentFileKind.PDF.value,
+        verbose_name="Tipo de arquivo",
     )
 
     envelope = models.ForeignKey(
@@ -150,6 +188,20 @@ class Document(TenantAwareModel):
             return self.name + ' - ' + self.school.name
         else:
             return self.name
+
+    def get_docx_file(self):
+        if self.related_documents.exists():
+            return Document.objects.filter(parent=self, file_kind=DocumentFileKind.DOCX.value).last()
+
+    def get_related_documents(self):
+        if self.related_documents.exists():
+            try:
+                related_documents = Document.objects.filter(parent=self)
+            except Document.DoesNotExist:
+                return None
+
+            return related_documents
+        return None
 
 
 class Signer(TenantAwareModel):
@@ -212,7 +264,7 @@ class DocumentTaskView(TenantAwareModel):
     )
     document_status = models.CharField(max_length=256, default="", verbose_name="Status do Documento")
     ged_id = models.CharField(
-        max_length=128, default="", verbose_name="ID do Documento no GED"
+        max_length=128, default="", verbose_name="ID do documento no GED"
     )
     ged_link = models.CharField(max_length=256, default="", verbose_name="Link")
     ged_uuid = models.CharField(
@@ -228,7 +280,7 @@ class DocumentTaskView(TenantAwareModel):
     school = models.ForeignKey(
         School, null=True, on_delete=models.CASCADE, verbose_name="Escola"
     )
-    related_documents = models.ForeignKey(
+    parent = models.ForeignKey(
         "self",
         on_delete=models.CASCADE,
         null=True,

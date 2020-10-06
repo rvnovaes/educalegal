@@ -1,6 +1,22 @@
 version: '3.7'
 
 services:
+  web_server:
+    container_name: web_server
+    build:
+      context: nginx_dockerfile_prod
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - educalegal
+      - educalegal_front
+  educalegal_front:
+    build:
+      args:
+        BUILD_BACKEND_URL: "https://api.educalegal.com.br"
   educalegal:
     command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
     environment:

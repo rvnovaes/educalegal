@@ -1,8 +1,21 @@
 version: '3.7'
 
 services:
+  educalegal_front:
+    image: rvnovaes/educalegal-front:0.3
+    container_name: educalegal_front
+    restart: unless-stopped
+    command: ["yarn", "start", ""]
+    build:
+      context: ../front
+      args:
+        BUILD_BACKEND_URL: "http://educalegal:8008"
+    depends_on:
+      - educalegal
+    ports:
+      - "3000:3000"
   educalegal:
-    image: rvnovaes/educalegal:0.57
+    image: rvnovaes/educalegal:2.0
     container_name: educalegal
     restart: unless-stopped
     build: .
@@ -17,11 +30,12 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.development_docker
       - EL_ENV=development
+      - SENDGRID_API_KEY=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
     depends_on:
-      - educalegal_rabbitmq
+      - educalegal_celery
       - mongo
   educalegal_celery:
-    image: rvnovaes/educalegal:0.57
+    image: rvnovaes/educalegal:2.0
     container_name: educalegal_celery
     build: .
     command: celery -A web worker -l info -c 1 -n educalegalworker1@%h
