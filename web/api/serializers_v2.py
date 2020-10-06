@@ -138,15 +138,16 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
             ged_link = docx_file.ged_link
             name = docx_file.name
             doc_uuid = docx_file.doc_uuid
+
+            docx_file_data = {
+                "url": ged_link,
+                "name": name,
+                "doc_uuid": doc_uuid
+            }
         else:
-            ged_link = None
-            name = None
-            doc_uuid = None
-        docx_file_data = {
-            "url": ged_link,
-            "name": name,
-            "doc_uuid": doc_uuid
-        }
+            # minuta generica nao tem docx, por exemplo
+            docx_file_data = None
+
         return docx_file_data
 
     def get_signers(self, obj):
