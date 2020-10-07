@@ -534,33 +534,26 @@ def save_in_ged(data, url, file, tenant):
 
     # salva o arquivo no ged
     try:
-        logging.info('duplo_4-1')
         status_code, response, ged_id = mc.document_create(data, url, file)
     except Exception as e:
-        logging.info('duplo_4-2')
         message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(e)
         logging.error(message)
 
         return 500, message, 0
     else:
-        logging.info('duplo_4-3')
         if status_code != 201:
-            logging.info('duplo_4-4')
             message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + response
             logging.error(message)
 
             return status_code, response, 0
         else:
-            logging.info('duplo_4-5')
             if ged_id == 0:
-                logging.info('duplo_4-6')
                 message = 'O arquivo foi inserido no GED, mas retornou ID = 0. Erro: ' + str(status_code) + ' - ' + \
                           response
                 logging.error(message)
 
                 return status_code, message, 0
             else:
-                logging.info('duplo_4-7')
                 try:
                     ged_document_data = mc.document_read(ged_id)
                 except Exception as e:

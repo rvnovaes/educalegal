@@ -137,7 +137,6 @@ def webhook_listener(request):
             tenant = Tenant.objects.get(pk=document.tenant.pk)
             # If the envelope is completed, pull out the PDFs from the notification XML an save on disk and send to GED
             if envelope_status == "finalizado":
-                logging.info('duplo_1')
                 # ao finalizar as assinaturas do documento estou recebendo um request.body sem a url do pdf assinado
                 # resposta do suporte da clicksign: Quando o evento auto_close é disparado pela primeira vez, alguns
                 # processos ainda são feitos internamente para que o documento assinado esteja pronto.
@@ -145,7 +144,6 @@ def webhook_listener(request):
                 # Sendo assim, recomendamos que a primeira tentativa seja recusada, ou que o evento só seja aceito com
                 # URL documento assinado.
                 if 'signed_file_url' not in data['document']['downloads']:
-                    logging.info('duplo_2')
                     logging.info('Ignora requisição, pois evento {event} não contém a chave signed_file_url. '
                                  'ID do ocumento {doc_id}'.format(event=data['event']['name'], doc_id=document.id))
                     return HttpResponse(status=400, reason='Falta a chave signed_file_url')
@@ -159,7 +157,6 @@ def webhook_listener(request):
 
                 has_ged = tenant.has_ged()
                 if has_ged:
-                    logging.info('duplo_3')
                     # Get document related interview data to post to GED
                     interview = Interview.objects.get(pk=document.interview.pk)
                     document_description = interview.description if interview.description else ''
@@ -173,20 +170,16 @@ def webhook_listener(request):
                     try:
                         # salva documento no ged
                         post_data["label"] = filename
-                        logging.info('duplo_4')
                         status_code, ged_data, ged_id = save_in_ged(post_data, document_url, None, document.tenant)
                     except Exception as e:
-                        logging.info('duplo_5')
                         message = str(e)
                         logging.error(message)
                         return HttpResponse(status=400, reason=message)
                     else:
-                        logging.info('duplo_6')
                         logging.debug("Posting document to GED: " + filename)
                         logging.debug(ged_data)
 
                         if status_code == 201:
-                            logging.info('duplo_7')
                             # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                             # propriedades
                             related_document = Document(
@@ -201,13 +194,11 @@ def webhook_listener(request):
                             save_document_data(related_document, document_url, None, relative_path, has_ged, ged_data,
                                                filename, document)
                         else:
-                            logging.info('duplo_8')
                             message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                                 str(status_code), ged_data)
                             logging.error(message)
                             return HttpResponse(status=400, reason=message)
                 else:
-                    logging.info('duplo_9')
                     # salva o documento baixado no EL como documento relacionado. copia do pai algumas
                     # propriedades
                     related_document = Document(
@@ -222,7 +213,6 @@ def webhook_listener(request):
                     save_document_data(related_document, document_url, None, relative_path, has_ged, None, filename,
                                        document)
 
-            logging.info('duplo_10')
             # atualiza o status do documento
             document.status = document_status
             document.save(update_fields=['status'])

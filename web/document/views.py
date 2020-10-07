@@ -650,55 +650,44 @@ def save_document_data(document, url, file_data, relative_path, has_ged, ged_dat
         document.ged_link = ged_data['latest_version']['document_url'] + 'download/'
         document.ged_uuid = ged_data['uuid']
 
-    logging.info('duplo_7-1')
     if url:
         try:
             # salva como arquivo temporario
             temp_file, _ = urlretrieve(url)
             # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
             document.cloud_file.save(relative_path + filename, File(open(temp_file, 'rb')))
-            logging.info('duplo_7-2')
         except Exception as e:
-            logging.info('duplo_7-3')
             message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
             logging.error(message)
         finally:
-            logging.info('duplo_7-4')
             # apaga arquivo temporario
             urlcleanup()
     else:
         try:
-            logging.info('duplo_7-5')
             file = ContentFile(file_data, name=filename)
             document.cloud_file.save(relative_path + filename, file)
         except Exception as e:
-            logging.info('duplo_7-6')
             message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
             logging.error(message)
 
     document.status = DocumentStatus.INSERIDO_GED.value
 
     if parent:
-        logging.info('duplo_7-7')
-        # cria documento relacionado ao documento pdf principal
+        # cria documento relacionado ao pdf principal
         document.doc_uuid = uuid.uuid4()
         document.parent = parent
         logging.info(document.doc_uuid)
 
         try:
-            # salva dados do ged do documento no educa legal
+            # salva dados do documento relacionado ao pdf principal
             document.save()
-            logging.info('duplo_7-8')
         except Exception as e:
-            logging.info('duplo_7-9')
             message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
             logging.exception(message)
     else:
-        logging.info('duplo_7-10')
         document.file_kind = DocumentFileKind.PDF.value
 
         try:
-            logging.info('duplo_7-11')
             if has_ged:
                 # salva dados do ged do documento no educa legal
                 document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'status', 'file_kind'])
@@ -706,7 +695,6 @@ def save_document_data(document, url, file_data, relative_path, has_ged, ged_dat
                 # salva dados do ged do documento no educa legal
                 document.save(update_fields=['status', 'file_kind'])
         except Exception as e:
-            logging.info('duplo_7-12')
             message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
             logging.exception(message)
 
