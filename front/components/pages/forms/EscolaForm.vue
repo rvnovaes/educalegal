@@ -209,10 +209,7 @@ export default {
       validated: false,
     };
   },
-
-
   created() {
-
     if (this.school.id === 0){
       // Se o id da escola for 0, cria escola vazia no store
       let newSchool = this.$store.state.schools.schools.filter(school => school.id === 0);
