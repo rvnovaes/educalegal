@@ -8,6 +8,9 @@
         </span>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
+            <span class="font-weight-bold">Escola: </span>{{ currentDocument.school_name }}
+          </li>
+          <li class="list-group-item">
             <span class="font-weight-bold">Nome do arquivo: </span>{{ currentDocument.name }}
           </li>
           <li class="list-group-item">

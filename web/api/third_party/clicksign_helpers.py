@@ -217,9 +217,6 @@ def webhook_listener(request):
             document.status = document_status
             document.save(update_fields=['status'])
 
-            # envia requisicao para webhook
-            # sent_document_status_update()
-
             # se o envelope já existe atualiza o status, caso contrário, cria o envelope
             try:
                 envelope = Envelope.objects.get(identifier=envelope_number)

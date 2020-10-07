@@ -1,6 +1,6 @@
 ---
 metadata:
-  title: Enviar documento para assinatura eletrônica
+  title: Faça o upload do seu documento no Educa Legal
 ---
 sections:
   - Minuta
@@ -74,13 +74,13 @@ code: |
 section: Minuta
 progress: 5
 question: |
-  Insira a minuta que deseja enviar para assinatura eletrônica.
+  Insira a minuta que deseja subir na plataforma.
 fields:
   - "Tipo do documento:": document_type_selected
     datatype: dropdown
     code: |
       document_types_names_list
-    help: Selecione ou digite o nome do tipo do documento.
+    help: Escolha o tipo do documento para que ele seja classificado corretamente no GED.
   - "Inserir minuta:": generic_document
     required: true
     datatype: files
@@ -104,17 +104,17 @@ question: Tipos de Partes do Documento
 fields:
   - "Denominação da Parte:": part_types[i].name.text
     required: True
-    help: "Ex: Contratante(s), Locador(es) "
+    help: "Ex: Contratante, Locadora, Receptora, etc."
   - "Denominação da Contraparte:": part_types[i].counterpart_name
     required: True
-    help: "Ex: Contratada(s), Locatária(s)"
+    help: "Ex: Contratada, Locatária, Reveladora, etc."
   - "Haverá parte extra (Ex: Fiador):": part_types[i].has_extraparts
-    help: "Por exemplo, fiador"
+    help: "Ex.: para o contrato de locação há a necessidade de uma 3ª parte que é o fiador."
     datatype: yesnoradio
     default: False
   - "Denominação da Extra parte:": part_types[i].extrapart_name
     required: True
-    default: "Fiador(es)"
+    default: "Fiador"
     js show if: |
       val("part_types[i].has_extraparts")
 ---
@@ -143,17 +143,14 @@ code: |
   school_party_type_selected = school_party_type
   if school_party_type_selected == part_types[0].name.text:
     parts.target_number = 1
-    parts[0].person_type = "organization"
     parts[0].name.text = school_legal_name
     parts[0].email = school_email
   elif school_party_type_selected == part_types[0].counterpart_name:
     counterparts.target_number = 1
-    counterparts[0].person_type = "organization"
     counterparts[0].name.text = school_legal_name
     counterparts[0].email = school_email
   elif school_party_type_selected == part_types[0].extrapart_name:
     extraparts.target_number = 1
-    extraparts[0].person_type = "organization"
     extraparts[0].name.text = school_legal_name
     extraparts[0].email = school_email
 ---
@@ -162,7 +159,7 @@ objects:
 ---
 section: Parte
 progress: 10
-question: Agora preencha os dados da parte ${ part_types[0].name.text }
+question: Dados da parte ${ part_types[0].name.text }
 fields:
   - Número de Pessoas: parts.target_number
     required: true
@@ -171,7 +168,7 @@ fields:
     min: 1
 script: |
   <script>
-    flash("Os dados da escola foram inseridos no contrato!")
+    flash("Os dados da escola foram salvos! Agora, continue preenchendo os dados da(s) outra(s) parte(s).")
   </script>
 ---
 section: Parte
@@ -179,29 +176,22 @@ progress: 20
 question: |
   Dados do(a) ${word(ordinal(i)) } ${ part_types[0].name.text }
 fields:
-  - "Tipo:": parts[i].person_type
-    datatype: radio
-    choices:
-      - Pessoa Física: individual
-      - Pessoa Jurídica: organization
   - 'Nome/Razão social:': parts[i].name.text
     validate: validate_person_full_name
+    datatype: text
+    required: True
     help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
-    js show if: |
-      val("parts[i].person_type")
   - "E-mail:": parts[i].email
     datatype: email
     help: ${ help_email_msg }
     required: True
-    js show if: |
-       val("parts[i].person_type") != null
 ---
 objects:
   - counterparts: DAList.using(object_type=Person, ask_number=True)
 ---
 section: Contraparte
 progress: 40
-question: Agora preencha os dados da parte ${ part_types[0].counterpart_name }
+question: Dados da parte ${ part_types[0].counterpart_name }
 fields:
   - Número de Pessoas: counterparts.target_number
     required: true
@@ -210,7 +200,7 @@ fields:
     min: 1
 script: |
   <script>
-    flash("Os dados da escola foram inseridos no contrato!")
+    flash("Os dados da escola foram salvos! Agora, continue preenchendo os dados da(s) outra(s) parte(s).")
   </script>
 ---
 section: Contraparte
@@ -218,22 +208,13 @@ progress: 50
 question: |
   Dados do(a) ${word(ordinal(i)) } ${ part_types[i].counterpart_name }
 fields:
-  - "Tipo:": counterparts[i].person_type
-    datatype: radio
-    choices:
-      - Pessoa Física: individual
-      - Pessoa Jurídica: organization
   - 'Nome/Razão social:': counterparts[i].name.text
     validate: validate_person_full_name
     help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
-    js show if: |
-      val("counterparts[i].person_type")
   - "E-mail:": counterparts[i].email
     datatype: email
     help: ${ help_email_msg }
     required: False
-    js show if: |
-       val("counterparts[i].person_type") != null
 ---
 objects:
   - extraparts: DAList.using(object_type=Person, ask_number=True)
@@ -253,22 +234,13 @@ progress: 80
 question: |
   Dados do(a) ${word(ordinal(i)) } ${ part_types[i].extrapart_name }
 fields:
-  - "Tipo:": extraparts[i].person_type
-    datatype: radio
-    choices:
-      - Pessoa Física: individual
-      - Pessoa Jurídica: organization
   - 'Nome/Razão social:': extraparts[i].name.text
     validate: validate_person_full_name
     help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
-    js show if: |
-      val("extraparts[i].person_type")
   - "E-mail:": extraparts[i].email
     datatype: email
     help: ${ help_email_msg }
     required: True
-    js show if: |
-       val("extraparts[i].person_type") != null
 ---
 code: |
   # Nome do tipo de documento selecionado pela usuario da escola
@@ -343,7 +315,7 @@ code: |
   button_list.append(el_button)
 ---
 code: |
-  el_button = {'action': educalegal_url + '/document/document/' + doc_uuid,
+  el_button = {'action': educalegal_front_url + '/arquivo/' + doc_uuid,
                 'label': 'Ver detalhes',
                 'color': 'success',
                 'icon': 'check'}

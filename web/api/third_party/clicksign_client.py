@@ -116,8 +116,19 @@ class ClickSignClient:
                         recipient['response_json'] = response.json()
                         recipient['status_code'] = response.status_code
                     else:
-                        message = 'Erro ao adicionar o signatário. Erro: {status_code} - {response}'.format(
-                            status_code=response.status_code, response=response.json())
+                        message = 'Erro ao adicionar o signatário {name} - {email}.'.format(
+                            name=recipient['name'], email=recipient['email'])
+                        if 'errors' in response.json():
+                            message += ' Erro: {status_code} - {response}'.format(
+                                       status_code=response.status_code,
+                                       response=response.json()['errors'])
+                            return response.status_code, message
+                        else:
+                            message += ' Erro: {status_code} - {response}'.format(
+                                       status_code=response.status_code,
+                                       response=response.json())
+                            return response.status_code, message
+
                         logger.error(message)
         try:
             return response.status_code, response.json()

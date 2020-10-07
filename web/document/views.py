@@ -673,12 +673,13 @@ def save_document_data(document, url, file_data, relative_path, has_ged, ged_dat
     document.status = DocumentStatus.INSERIDO_GED.value
 
     if parent:
-        # cria documento relacionado ao documento pdf principal
+        # cria documento relacionado ao pdf principal
         document.doc_uuid = uuid.uuid4()
         document.parent = parent
+        logging.info(document.doc_uuid)
 
         try:
-            # salva dados do ged do documento no educa legal
+            # salva dados do documento relacionado ao pdf principal
             document.save()
         except Exception as e:
             message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))

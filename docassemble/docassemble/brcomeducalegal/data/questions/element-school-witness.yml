@@ -1,7 +1,7 @@
 ---
 progress: 95
 question: |
-  Enviar o documento para assinatura de 02 testemunhas?
+  Enviar o documento para assinatura de 2 testemunhas?
 yesno: has_witnesses
 ---
 objects:
@@ -85,7 +85,7 @@ script: |
 progress: 95
 question: |
   % if len(witnesses_data_list['results']) == 1:
-    Você possui uma testemunha cadastrada no nosso sistema. Gentileza, inserir os Dados da 2ª testemunha:
+    Você já possui uma testemunha cadastrada no sistema. Devem ser inseridos os dados da 2ª testemunha:
   % else:
     Dados da 2ª testemunha:
   % endif
