@@ -4,8 +4,8 @@ import Swal from "sweetalert2";
 const getDefaultState = () => {
   return {
     schools: []
-  }
-}
+  };
+};
 
 // Entretanto, tivemos que repetir o estado na const state, pq que se chamassemos a funcao:
 // export const state = getDefaultState();
@@ -17,7 +17,6 @@ export const state = () => ({
 
 export const mutations = {
   addSchool(state, school) {
-    console.log(school);
     state.schools.push(school);
   },
   addSchools(state, schools) {
@@ -35,6 +34,21 @@ export const mutations = {
   deleteSchool(state, school) {
     const i = state.schools.map(school => school.id).indexOf(school.id);
     state.schools.splice(i, 1);
+  },
+  addWitness(state, payload) {
+      // procura para verificar se ha testemunha vazia
+      const w = state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(w => w.id === Number(payload.newWitness.id))
+      // se nao houver, adiciona testemunha vazia no store
+      if (w === undefined){
+        state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.push(payload.newWitness)
+      }
+  },
+  updateWitnessId(state, { witness, newId }){
+    state.schools.find(s => s.id === Number(witness.school)).witnesses.find(w => w.id === Number(witness.id)).id = newId
+  },
+  deleteWitness(state, witness) {
+    const i = state.schools.find(s => s.id === witness.school).witnesses.map(w => w).indexOf(witness.id)
+    state.schools.find(s => s.id === witness.school).witnesses.splice(i, 1);
   },
   updateName(state, payload) {
     state.schools.find(school => school.id === Number(payload.id)).name = payload.name;
@@ -78,9 +92,18 @@ export const mutations = {
   updateUF(state, payload) {
     state.schools.find(school => school.id === Number(payload.id)).state = payload.state;
   },
-  resetState (state) {
-    Object.assign(state, getDefaultState())
-  }
+  updateWitnessName(state, payload) {
+      state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).name = payload.name;
+  },
+  updateWitnessEmail(state, payload) {
+    state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).email = payload.email;
+  },
+  updateWitnessCPF(state, payload) {
+      state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).cpf = payload.cpf;
+  },
+  resetState(state) {
+    Object.assign(state, getDefaultState());
+  },
 };
 
 export const getters = {
@@ -89,22 +112,18 @@ export const getters = {
     let school = state.schools.find(school => school.id === Number(id));
     // console.log("VUEX: ")
     // console.log(school)
-    if (school.id === 0){
-      delete school.id
+    if (school.id === 0) {
+      delete school.id;
     }
-    return school
+    return school;
   },
   getWitnesses: (state) => (id) => {
-    let school = state.schools.find(school => school.id === Number(id));
-    // console.log("VUEX: ")
-    // console.log(school)
-    if (school.id === 0){
-      delete school.id
-    }
-    return school.witnesses
+    return state.schools.find(school => school.id === Number(id)).witnesses;
+  },
+  getWitness: (state) => (schoolId, witnessId) => {
+    return state.schools.find(school => school.id === Number(schoolId)).witnesses.find(witness => witness.id === Number(witnessId));
   },
 };
-
 
 export const actions = {
   async fetchAllSchools({commit}) {
@@ -137,13 +156,57 @@ export const actions = {
   async createSchool({commit}, school) {
     // Quando EscolaForm esta na operacao de criar, ele adiciona uma escola vazia, com id 0 que recebeu de escolas / index
     // Essa escola provisoria deve ser removida da lista de escolas do vuex
-    commit("deleteSchool", school)
+    commit("deleteSchool", school);
     // Depois de removida a escola, sera feito a criaca da escola no back
     // O botao que salva a nova escola e chama essa action redireciona depois para a lista de escolas
     // que recarrega todas as escolas de novo do banco, incluindo a recem criada
     await this.$axios.post(`/v2/schools/`, school);
   },
-  resetState({commit}){
-    commit("resetState")
+  async updateWitness({commit, getters, state}, witness){
+    // pega a testemunha do vuex
+    const w = getters.getWitness(witness.school, witness.id)
+    const payload = {
+      id: w.id,
+      name: w.name,
+      email: w.email,
+      cpf: w.cpf,
+      school: w.school,
+      tenant: w.tenant
+    }
+    // retorna a resposta para a tela que fará a exibicao dos erros
+    return  await this.$axios.patch(`v2/schools/${witness.school}/witnesses/${witness.id}`, payload)
+  },
+  async createWitness({commit, getters}, witness) {
+    // Pega a testemunha do vuex
+    const w = getters.getWitness(witness.school, witness.id)
+    // Monta o payload com os dados da testemunha que ja estao no vuex.
+    // Entretanto, como a testemunha recem criada tem id = 0, nao passa id no payload
+    const payload = {
+      name: w.name,
+      email: w.email,
+      cpf: w.cpf,
+      school: w.school,
+      tenant: w.tenant
+    };
+    const res = await this.$axios.post(`v2/schools/${witness.school}/witnesses`, payload)
+    if (res.status === 201) {
+      // pega a id retornada do backend
+      const newId = res.data.id
+      // Atualiza a testemunha do vuex que antes tinha id = 0 com a id retornada pelo backend
+      commit("updateWitnessId", { witness, newId } )
+    } else {
+      commit("deleteWitness", w)
+    }
+    return res
+  },
+  async deleteWitness({commit}, witness) {
+    const res = await this.$axios.delete(`/v2/schools/${witness.school}/witnesses/${witness.id}`);
+    if (res.status === 204) {
+      commit("deleteWitness", witness);
+    }
+    return res;
+  },
+  resetState({commit}) {
+    commit("resetState");
   }
 };
