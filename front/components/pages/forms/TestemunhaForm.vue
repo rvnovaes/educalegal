@@ -10,12 +10,15 @@
             @submit.prevent="handleSubmit(firstFormSubmit)">
         <div class="form-row">
           <div class="col-md-5">
+<!--            para passa um booleano no vuejs deve ser usada a diretiva v-bind, senao ele entende como string-->
+<!--            https://stackoverflow.com/questions/50955095/vee-validate-regex-not-working  e necessario usar /  e / para delimitar a regex-->
             <base-input label="Nome"
                         name="Nome"
                         class="witness-nome"
                         placeholder="Nome"
                         success-message="Parece correto!"
-                        rules="required"
+                        v-bind:required="true"
+                        rules="regex:^['A-zÀ-ÿ-]+(?:\s['A-zÀ-ÿ-]+)+$"
                         :value="witness.name"
                         @input="updateWitnessName">
             </base-input>
@@ -89,6 +92,7 @@ export default {
         try {
           const res = await this.$store.dispatch("schools/updateWitness", this.witness);
           if (res.status === 200) {
+            this.close();
             await Swal.fire({
               title: `Você atualizou ${this.witness.name} com sucesso!`,
               buttonsStyling: false,
@@ -98,7 +102,6 @@ export default {
                 confirmButton: "btn btn-success btn-fill",
               }
             });
-            this.close();
           }
         } catch (e) {
           await Swal.fire({
@@ -117,6 +120,7 @@ export default {
         try {
           const res = await this.$store.dispatch("schools/createWitness", this.witness);
           if (res.status === 201) {
+            this.close();
             await Swal.fire({
               title: `Você criou ${this.witness.name} com sucesso!`,
               buttonsStyling: false,
@@ -126,7 +130,6 @@ export default {
                 confirmButton: "btn btn-success btn-fill",
               }
             });
-            this.close();
           }
         } catch (e) {
           await Swal.fire({
@@ -143,7 +146,10 @@ export default {
         }
     },
     close: function () {
-      // TODO limpar dados da testemunha vazia
+      // Limpa dados da testemunha vazia (id=0) se os campos nao forem preenchidos
+      if (this.witness.name === null || this.witness.email === null || this.witness.cpf === null) {
+        this.$store.commit("schools/deleteWitness", {school: this.witness.school, id: 0});
+      }
       this.$emit("closeWitnessForm");
     }
   }

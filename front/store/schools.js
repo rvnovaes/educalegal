@@ -46,9 +46,9 @@ export const mutations = {
   updateWitnessId(state, { witness, newId }){
     state.schools.find(s => s.id === Number(witness.school)).witnesses.find(w => w.id === Number(witness.id)).id = newId
   },
-  deleteWitness(state, witness) {
-    const i = state.schools.find(s => s.id === witness.school).witnesses.map(w => w).indexOf(witness.id)
-    state.schools.find(s => s.id === witness.school).witnesses.splice(i, 1);
+  deleteWitness(state, payload) {
+    const i = state.schools.find(s => s.id === payload.school).witnesses.map(w => w).indexOf(payload.id)
+    state.schools.find(s => s.id === payload.school).witnesses.splice(i, 1);
   },
   updateName(state, payload) {
     state.schools.find(school => school.id === Number(payload.id)).name = payload.name;
