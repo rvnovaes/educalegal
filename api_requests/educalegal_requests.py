@@ -1,9 +1,12 @@
-import django, os, sys
-# import subprocess
+import django
+import os
+import sys
 
 sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
 from module_educalegal_client import EducaLegalClient
 
+# se adiciona o /opt/educalegal/web/ da erro no module name web.settings.development
+# pq ambos tem o mesmo nome (web), tive que fazer dessa forma
 sys.path.append("/opt/educalegal/web/web/")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")
 django.setup()
@@ -43,7 +46,7 @@ def send_to_clicksign():
 
     recipients = [
    {
-      "name":"Development Sociedade de Ensino Colégio Bacana Ltda.",
+      "name":"Development1 Sociedade de Ensino Colégio Bacana Ltda.",
       "email":"escola.educalegal@gmail.com",
       "group":"signers",
       "routingOrder":1,
