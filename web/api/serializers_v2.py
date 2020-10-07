@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from validator_collection_br import validators_br
 
 from billing.models import Plan
 from document.models import Document, Envelope, Signer
@@ -202,6 +203,13 @@ class SchoolUnitSerializer(serializers.ModelSerializer):
 
 
 class WitnessSerializer(serializers.ModelSerializer):
+    def validate_name(self, data):
+        try:
+            validators_br.person_full_name(data)
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+        return data
+
     class Meta:
         model = Witness
         ref_name = "Witness v2"
