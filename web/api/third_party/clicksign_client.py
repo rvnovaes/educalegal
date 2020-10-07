@@ -119,6 +119,7 @@ class ClickSignClient:
                         message = 'Erro ao adicionar o signatário. Erro: {status_code} - {response}'.format(
                             status_code=response.status_code, response=response.json())
                         logger.error(message)
+                        return response.status_code, response.json()
         try:
             return response.status_code, response.json()
         except NameError:
