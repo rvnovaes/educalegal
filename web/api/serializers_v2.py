@@ -205,10 +205,10 @@ class WitnessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Witness
         ref_name = "Witness v2"
-        # fields = "__all__"
-        fields = ["id", "name", "email", "cpf"]
+        fields = "__all__"
 
 
+# https://www.django-rest-framework.org/api-guide/serializers/#dealing-with-nested-objects
 class SchoolSerializer(serializers.ModelSerializer):
     school_units = SchoolUnitSerializer(many=True, read_only=True)
     witnesses = WitnessSerializer(many=True, read_only=True)
