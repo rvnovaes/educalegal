@@ -1,5 +1,5 @@
 metadata:
-  title: Termo de Reserva de Vaga
+  title: Requerimento Reserva de Vaga
 ---
 include:
   - element-tenant-school-interview.yml
@@ -25,7 +25,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "reserva-de-vaga.docx"
+  content_document = "requerimento-reserva-de-vaga.docx"
 ---
 id: logic
 mandatory: True
@@ -102,20 +102,44 @@ fields:
     datatype: dropdown
 ---
 objects:
-  - contractors: DAList.using(object_type=Person, there_are_any=True)
+  - contractors: DAList.using(object_type=Person, ask_number=True, complete_attribute='complete')
 ---
 progress: 20
-section: Companhia
+section: Contratantes
+question: Número de Contratante(s)
+fields:
+  - Número: contractors.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  contractors[i].name.text
+  contractors[i].complete = True
+---
+comment:
+progress: 20
+section: Contratantes
 question: |
-  Dados do(a) Contratante
+  Dados do(a) ${ word(ordinal(i)) } Contratante(s)
 fields:
   - "Nome completo:": contractors[i].name.text
+    validate: validate_person_full_name
     required: True
+  - "CPF:": contractors[i].cpf
+    required: True
+    validate: validate_cpf
   - "Telefone:": contractors[i].telephone
     required: True
   - "E-mail:": contractors[i].email
     required: True
-list collect: True
+    help: ${ help_email_msg }
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#Y29udHJhY3RvcnNbaV0uY3Bm').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
 ---
 progress: 50
 section: Dados Contratuais
@@ -129,6 +153,7 @@ fields:
 code: |
   from datetime import date
   school_year_default = date.today().year + 1
+  school_current_year = school_year - 1
 ---
 code: |
   from num2words import num2words
@@ -139,10 +164,10 @@ progress: 70
 section: Dados Contratuais
 question: Preço e custo operacional
 fields:
-  - 'Valor a ser pago pelo ato da reserva da vaga': input_value
+  - 'Valor referente à reserva de vaga': input_value
     datatype: currency
     hint: 0000,00
-  - 'Valor dos custos operacionais:': administrative_costs
+  - 'Valor retido no caso de desistência:': administrative_costs
     datatype: currency
     hint: 0000,00
 script: |
