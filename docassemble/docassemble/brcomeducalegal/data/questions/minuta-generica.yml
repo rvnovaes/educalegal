@@ -256,8 +256,6 @@ code: |
   custom_file_name = normalize_ascii(custom_file_name).lower().replace(" ", "-")
 ---
 code: |
-  import json
-
   # private=False - para que o arquivo fique acessivel fora do docassemble
   generated_file.set_attributes(private=False)
 
@@ -272,8 +270,8 @@ code: |
      "school": school_id,
      "document_type": interview_document_type,
      "parent": None,
-     "recipients": json.dumps(recipients),
-     "document_data": json.dumps(all_variables())
+     "recipients": recipients,
+     "document_data": all_variables()
   }
 
   # external=True - acrescenta na url o protocolo and hostname (https://hostname)

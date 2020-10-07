@@ -119,6 +119,11 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
     signers = serializers.SerializerMethodField()
     related_documents = serializers.SerializerMethodField()
 
+    # https://www.django-rest-framework.org/api-guide/fields/#jsonfield
+    # binary=True para nao serializar dicionario como string
+    recipients = serializers.JSONField(binary=True)
+    document_data = serializers.JSONField(binary=True)
+
     envelope = EnvelopeSerializer()
 
     class Meta:
