@@ -1,5 +1,5 @@
 metadata:
-  title: Requerimento Reserva de Vaga
+  title: Requerimento de Reserva de Vaga
 ---
 include:
   - element-tenant-school-interview.yml
@@ -72,7 +72,7 @@ fields:
     datatype: text
   - 'Data de nascimento: ': students[i].birth_date
     datatype: date
-  - 'Série: ': students[i].grade
+  - 'Turma: ': students[i].grade
     datatype: dropdown
     choices:
     - Berçário: Berçário
@@ -93,7 +93,7 @@ fields:
     - 1º ano do ensino médio: 1º ano do ensino médio
     - 2º ano do ensino médio: 2º ano do ensino médio
     - 3º ano do ensino médio: 3º ano do ensino médio
-  - 'Período: ': students[i].period
+  - 'Turno: ': students[i].period
     choices:
     - matutino: matutino
     - vespertino: vespertino
@@ -118,7 +118,7 @@ code: |
   contractors[i].complete = True
 ---
 comment:
-progress: 20
+progress: 25
 section: Contratantes
 question: |
   Dados do(a) ${ word(ordinal(i)) } Contratante(s)
@@ -158,23 +158,18 @@ code: |
 code: |
   from num2words import num2words
   input_value_words = num2words(input_value, lang='pt_BR', to='currency')
-  administrative_costs_words = num2words(administrative_costs, lang='pt_BR', to='currency')
 ---
 progress: 70
 section: Dados Contratuais
-question: Preço e custo operacional
+question: Valor referente à reserva de vaga
 fields:
-  - 'Valor referente à reserva de vaga': input_value
-    datatype: currency
-    hint: 0000,00
-  - 'Valor retido no caso de desistência:': administrative_costs
+  - 'Valor :': input_value
     datatype: currency
     hint: 0000,00
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#aW5wdXRfdmFsdWU').mask('000000000000000.00', {reverse: true});
-        $('#YWRtaW5pc3RyYXRpdmVfY29zdHM').mask('000000000000000.00', {reverse: true});
       });
   </script>
 ---
