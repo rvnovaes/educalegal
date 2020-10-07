@@ -6,6 +6,8 @@ include:
   - element-custom-file-name.yml
 ---
 code: |
+  import json
+
   # private=False - para que o arquivo fique acessivel fora do docassemble
   generated_file.pdf.set_attributes(private=False)
   generated_file.docx.set_attributes(private=False)
@@ -18,8 +20,8 @@ code: |
      "school": school_id,
      "document_type": interview_document_type,
      "parent": None,
-     "recipients": recipients,
-     "document_data": all_variables()
+     "recipients": json.dumps(recipients),
+     "document_data": json.dumps(all_variables())
   }
 
   # external=True - acrescenta na url o protocolo and hostname (https://hostname)
