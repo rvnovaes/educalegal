@@ -31,23 +31,28 @@ export const mutations = {
       }
     });
   },
+  updateSchoolId(state, {school, newId}) {
+    state.schools.find(s => s.id === Number(school.id)).id = newId;
+  },
   deleteSchool(state, school) {
+    console.log("deleteSchool");
+    console.log(JSON.stringify(school));
     const i = state.schools.map(school => school.id).indexOf(school.id);
     state.schools.splice(i, 1);
   },
   addWitness(state, payload) {
-      // procura para verificar se ha testemunha vazia
-      const w = state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(w => w.id === Number(payload.newWitness.id))
-      // se nao houver, adiciona testemunha vazia no store
-      if (w === undefined){
-        state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.push(payload.newWitness)
-      }
+    // procura para verificar se ha testemunha vazia
+    const w = state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(w => w.id === Number(payload.newWitness.id));
+    // se nao houver, adiciona testemunha vazia no store
+    if (w === undefined) {
+      state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.push(payload.newWitness);
+    }
   },
-  updateWitnessId(state, { witness, newId }){
-    state.schools.find(s => s.id === Number(witness.school)).witnesses.find(w => w.id === Number(witness.id)).id = newId
+  updateWitnessId(state, {witness, newId}) {
+    state.schools.find(w => w.id === Number(witness.school)).witnesses.find(w => w.id === Number(witness.id)).id = newId;
   },
   deleteWitness(state, payload) {
-    const i = state.schools.find(s => s.id === payload.school).witnesses.map(w => w).indexOf(payload.id)
+    const i = state.schools.find(s => s.id === payload.school).witnesses.map(w => w).indexOf(payload.id);
     state.schools.find(s => s.id === payload.school).witnesses.splice(i, 1);
   },
   updateName(state, payload) {
@@ -93,29 +98,23 @@ export const mutations = {
     state.schools.find(school => school.id === Number(payload.id)).state = payload.state;
   },
   updateWitnessName(state, payload) {
-      state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).name = payload.name;
+    state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).name = payload.name;
   },
   updateWitnessEmail(state, payload) {
     state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).email = payload.email;
   },
   updateWitnessCPF(state, payload) {
-      state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).cpf = payload.cpf;
+    state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).cpf = payload.cpf;
   },
   resetState(state) {
     Object.assign(state, getDefaultState());
   },
 };
 
+// https://vuex.vuejs.org/guide/getters.html#method-style-access
 export const getters = {
-  // https://vuex.vuejs.org/guide/getters.html#method-style-access
   getSchool: (state) => (id) => {
-    let school = state.schools.find(school => school.id === Number(id));
-    // console.log("VUEX: ")
-    // console.log(school)
-    if (school.id === 0) {
-      delete school.id;
-    }
-    return school;
+    return state.schools.find(school => school.id === Number(id));
   },
   getWitnesses: (state) => (id) => {
     return state.schools.find(school => school.id === Number(id)).witnesses;
@@ -153,51 +152,54 @@ export const actions = {
     }
     return res;
   },
-  async createSchool({commit}, school) {
+  async createSchool({commit, getters}, school) {
     // Quando EscolaForm esta na operacao de criar, ele adiciona uma escola vazia, com id 0 que recebeu de escolas / index
-    // Essa escola provisoria deve ser removida da lista de escolas do vuex
-    commit("deleteSchool", school);
-    // Depois de removida a escola, sera feito a criaca da escola no back
-    // O botao que salva a nova escola e chama essa action redireciona depois para a lista de escolas
-    // que recarrega todas as escolas de novo do banco, incluindo a recem criada
-    await this.$axios.post(`/v2/schools/`, school);
-  },
-  async updateWitness({commit, getters, state}, witness){
-    // pega a testemunha do vuex
-    const w = getters.getWitness(witness.school, witness.id)
-    const payload = {
-      id: w.id,
-      name: w.name,
-      email: w.email,
-      cpf: w.cpf,
-      school: w.school,
-      tenant: w.tenant
+    // Pegamos essa escola vazia do vuex, fazemos uma copia para criar a payload. Em js variaveis que apontam para objetos sao ponteiros.
+    // Para fazer uma copia completa dos valores (deep copy) de modo que a referencia seja quebrada, e preciso usar JSON.stringify
+    let payload = JSON.parse(JSON.stringify(getters.getSchool(school.id)));
+    // remove a id do objeto
+    if (payload["id"] === 0) {
+      delete payload["id"];
     }
+    const res = await this.$axios.post(`/v2/schools/`, payload);
+    if (res.status === 201) {
+      const newId = res.data.id;
+      commit("updateSchoolId", {school, newId});
+    } else {
+      commit("deleteSchool", school);
+    }
+    return res;
+  },
+  async updateSchool({commit, getters, state}, school) {
+    // pega a testemunha do vuex
+    const payload = JSON.parse(JSON.stringify(getters.getSchool(school.id)));
     // retorna a resposta para a tela que fará a exibicao dos erros
-    return  await this.$axios.patch(`v2/schools/${witness.school}/witnesses/${witness.id}`, payload)
+    return await this.$axios.patch(`v2/schools/${school.id}`, payload);
+  },
+  async updateWitness({commit, getters, state}, witness) {
+    // pega a testemunha do vuex
+    const payload = JSON.parse(JSON.stringify(getters.getWitness(witness.school, witness.id)));
+    // retorna a resposta para a tela que fará a exibicao dos erros
+    return await this.$axios.patch(`v2/schools/${witness.school}/witnesses/${witness.id}`, payload);
   },
   async createWitness({commit, getters}, witness) {
     // Pega a testemunha do vuex
-    const w = getters.getWitness(witness.school, witness.id)
+    let payload = JSON.parse(JSON.stringify(getters.getWitness(witness.school, witness.id)));
     // Monta o payload com os dados da testemunha que ja estao no vuex.
     // Entretanto, como a testemunha recem criada tem id = 0, nao passa id no payload
-    const payload = {
-      name: w.name,
-      email: w.email,
-      cpf: w.cpf,
-      school: w.school,
-      tenant: w.tenant
-    };
-    const res = await this.$axios.post(`v2/schools/${witness.school}/witnesses`, payload)
+    if (payload["id"] === 0) {
+      delete payload["id"];
+    }
+    const res = await this.$axios.post(`v2/schools/${witness.school}/witnesses`, payload);
     if (res.status === 201) {
       // pega a id retornada do backend
-      const newId = res.data.id
+      const newId = res.data.id;
       // Atualiza a testemunha do vuex que antes tinha id = 0 com a id retornada pelo backend
-      commit("updateWitnessId", { witness, newId } )
+      commit("updateWitnessId", {witness, newId});
     } else {
-      commit("deleteWitness", w)
+      commit("deleteWitness", witness);
     }
-    return res
+    return res;
   },
   async deleteWitness({commit}, witness) {
     const res = await this.$axios.delete(`/v2/schools/${witness.school}/witnesses/${witness.id}`);

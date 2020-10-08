@@ -2,7 +2,8 @@
   <card v-if="school">
     <!-- Card header -->
     <h3 v-if="school.name" slot="header" class="mb-0">Editar {{ school.name }}</h3>
-    <h3 v-else slot="header" class="mb-0">Preencha corretamente todos os campos. Os dados serão usados nos contratos e documentos.</h3>
+    <h3 v-else slot="header" class="mb-0">Preencha corretamente todos os campos. Os dados serão usados nos contratos e
+      documentos.</h3>
 
     <!-- Card body -->
     <validation-observer v-slot="{handleSubmit}" ref="formValidator">
@@ -210,76 +211,77 @@ export default {
     };
   },
   created() {
-    if (this.school.id === 0){
-      // Se o id da escola for 0, cria escola vazia no store
+    if (this.school.id === 0) {
+      // Procura se existe escola vazia no store
       let newSchool = this.$store.state.schools.schools.filter(school => school.id === 0);
       // Se ja houver escola vazia, nao cria outra
       if (newSchool.length === 0) {
-        this.$store.commit("schools/addSchool", this.school)
+        this.$store.commit("schools/addSchool", this.school);
       }
     }
   },
+  mounted() {
+    console.log(this.school);
+  },
   methods: {
     updateName(e) {
-        this.$store.commit("schools/updateName", {id: this.school.id, name: e});
+      this.$store.commit("schools/updateName", {id: this.school.id, name: e});
     },
     updateLegalName(e) {
-        this.$store.commit("schools/updateLegalName", {id: this.school.id, legal_name: e});
+      this.$store.commit("schools/updateLegalName", {id: this.school.id, legal_name: e});
     },
     updateCNPJ(e) {
-        this.$store.commit("schools/updateCNPJ", {id: this.school.id, cnpj: e});
+      this.$store.commit("schools/updateCNPJ", {id: this.school.id, cnpj: e});
     },
     updateLegalNature(e) {
-        this.$store.commit("schools/updateLegalNature", {id: this.school.id, legal_nature: e});
+      this.$store.commit("schools/updateLegalNature", {id: this.school.id, legal_nature: e});
     },
     updatePhone(e) {
-        this.$store.commit("schools/updatePhone", {id: this.school.id, phone: e});
+      this.$store.commit("schools/updatePhone", {id: this.school.id, phone: e});
     },
     updateSite(e) {
-        this.$store.commit("schools/updateSite", {id: this.school.id, site: e});
+      this.$store.commit("schools/updateSite", {id: this.school.id, site: e});
     },
     updateEmail(e) {
-        this.$store.commit("schools/updateEmail", {id: this.school.id, email: e});
+      this.$store.commit("schools/updateEmail", {id: this.school.id, email: e});
     },
     updateZip(e) {
-        this.$store.commit("schools/updateZip", {id: this.school.id, zip: e});
+      this.$store.commit("schools/updateZip", {id: this.school.id, zip: e});
     },
     updateStreet(e) {
-        this.$store.commit("schools/updateStreet", {id: this.school.id, street: e});
+      this.$store.commit("schools/updateStreet", {id: this.school.id, street: e});
     },
     updateStreetNumber(e) {
-        this.$store.commit("schools/updateStreetNumber", {id: this.school.id, street_number: e});
+      this.$store.commit("schools/updateStreetNumber", {id: this.school.id, street_number: e});
     },
     updateUnit(e) {
-        this.$store.commit("schools/updateUnit", {id: this.school.id, unit: e});
+      this.$store.commit("schools/updateUnit", {id: this.school.id, unit: e});
     },
     updateNeighborhood(e) {
-        this.$store.commit("schools/updateNeighborhood", {id: this.school.id, neighborhood: e});
+      this.$store.commit("schools/updateNeighborhood", {id: this.school.id, neighborhood: e});
     },
     updateCity(e) {
-        this.$store.commit("schools/updateCity", {id: this.school.id, city: e});
+      this.$store.commit("schools/updateCity", {id: this.school.id, city: e});
     },
     updateUF(e) {
-        this.$store.commit("schools/updateUF", {id: this.school.id, state: e});
+      this.$store.commit("schools/updateUF", {id: this.school.id, state: e});
     },
     async firstFormSubmit() {
-      let payload = this.$store.getters["schools/getSchool"](this.school.id)
-      console.log(payload)
-      if (payload.id) {
+      if (this.school.id !== 0) {
         try {
-          this.$axios.patch(`v2/schools/${this.school.id}`, payload)
-            .then((data) => {
-              Swal.fire({
-                title: `Você atualizou ${this.school.name} com sucesso!`,
-                buttonsStyling: false,
-                icon: "success",
-                showCloseButton: true,
-                customClass: {
-                  confirmButton: "btn btn-success btn-fill",
-                }
-              });
-              this.back();
+          const res = await this.$store.dispatch("schools/updateSchool", this.school);
+          if (res.status === 200) {
+            await Swal.fire({
+              title: `Você atualizou ${this.school.name} com sucesso!`,
+              buttonsStyling: false,
+              icon: "success",
+              showCloseButton: true,
+              customClass: {
+                confirmButton: "btn btn-success btn-fill",
+              }
             });
+
+          }
         } catch (e) {
           await Swal.fire({
             title: `Erro ao editar ${this.school.name}`,
@@ -295,19 +297,18 @@ export default {
         }
       } else
         try {
-          await this.$store.dispatch("schools/createSchool", payload)
-            .then((data) => {
-              Swal.fire({
-                title: `Você criou ${this.school.name} com sucesso!`,
-                buttonsStyling: false,
-                icon: "success",
-                showCloseButton: true,
-                customClass: {
-                  confirmButton: "btn btn-success btn-fill",
-                }
-              });
-              this.back();
+          const res = await this.$store.dispatch("schools/createSchool", this.school);
+          if (res.status === 201) {
+            await Swal.fire({
+              title: `Você criou ${this.school.name} com sucesso!`,
+              buttonsStyling: false,
+              icon: "success",
+              showCloseButton: true,
+              customClass: {
+                confirmButton: "btn btn-success btn-fill",
+              }
             });
+          }
         } catch (e) {
           await Swal.fire({
             title: `Erro ao criar ${this.school.name}`,
