@@ -1014,7 +1014,7 @@ paths:
       parameters: []
       responses:
         '200':
-          description: 'Documento enviado para a assinatura eletrônica com sucesso com sucesso para os destinatários: <lista com nome e e-mail dos destinatários>.'
+          description: 'Documento enviado para a assinatura eletrônica com sucesso para os destinatários: <lista com nome e e-mail dos destinatários>.'
       tags:
         - v2
     parameters:
