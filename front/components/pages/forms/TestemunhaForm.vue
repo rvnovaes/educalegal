@@ -26,7 +26,7 @@
           <div class="col-md-5">
             <base-input label="E-mail"
                         name="E-mail"
-                        class="escola-email"
+                        class="witness-email"
                         placeholder="E-mail"
                         rules="required"
                         type="email"
@@ -35,10 +35,10 @@
             </base-input>
           </div>
           <div class="col-md-2">
-            <base-input label="CNPJ/CPF"
-                        name="CNPJ/CPF"
-                        class="escola-cnpj"
-                        placeholder="CNPJ/CPF"
+            <base-input label="CPF"
+                        name="CPF"
+                        class="witness-cnpj"
+                        placeholder="CPF"
                         rules="required"
                         success-message="Parece correto!"
                         :value="witness.cpf"
