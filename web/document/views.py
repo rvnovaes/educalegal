@@ -839,6 +839,7 @@ def reached_document_limit(tenant_id):
     # verifica se atingiu o limite de documentos
     tenant = Tenant.objects.get(pk=tenant_id)
     documents = Document.objects.filter(tenant=tenant,
+                                        parent=None,
                                         created_date__month=today.month,
                                         created_date__year=today.year)
 
