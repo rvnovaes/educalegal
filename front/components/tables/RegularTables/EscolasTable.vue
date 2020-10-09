@@ -7,7 +7,9 @@
         </base-button>
       </div>
     </div>
-
+<!-- https://stackoverflow.com/questions/47862591/vuejs-error-the-client-side-rendered-virtual-dom-tree-is-not-matching-server-re-->
+<!--    https://medium.com/@liutingchun_95744/nuxt-js-best-practices-for-client-side-only-contents-client-only-no-ssr-4843e94d9565-->
+    <client-only>
     <el-table class="table-responsive table-flush"
               header-row-class-name="thead-light"
               :data="schools">
@@ -39,6 +41,7 @@
         </div>
       </el-table-column>
     </el-table>
+    </client-only>
   </div>
 </template>
 <script>

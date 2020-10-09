@@ -42,15 +42,9 @@ export default {
     TestemunhasTable,
     EscolaForm,
   },
-  // passa para o form a escola recuperada a partir no numero em this.$route.params.id
-  data() {
-    return {
-      id: this.$route.params.id
-    };
-  },
   computed: {
     school() {
-      return this.$store.getters["schools/getSchool"](this.id);
+      return this.$store.getters["schools/getSchool"](this.$route.params.id);
     }
   }
 };
