@@ -10,7 +10,7 @@
             @submit.prevent="handleSubmit(firstFormSubmit)">
         <div class="form-row">
           <div class="col-md-5">
-<!--            para passa um booleano no vuejs deve ser usada a diretiva v-bind, senao ele entende como string-->
+<!--            para passar um booleano no vuejs deve ser usada a diretiva v-bind, senao ele entende como string-->
 <!--            https://stackoverflow.com/questions/50955095/vee-validate-regex-not-working  e necessario usar /  e / para delimitar a regex-->
             <base-input label="Nome"
                         name="Nome"

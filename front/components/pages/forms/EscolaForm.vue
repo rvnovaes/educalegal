@@ -99,8 +99,6 @@
             </base-input>
           </div>
         </div>
-
-
         <div class="form-row">
           <div class="col-md-1">
             <base-input label="Cep"
@@ -182,8 +180,6 @@
                            :key="option.label">
                 </el-option>
               </el-select>
-
-
             </base-input>
           </div>
         </div>
@@ -219,9 +215,6 @@ export default {
         this.$store.commit("schools/addSchool", this.school);
       }
     }
-  },
-  mounted() {
-    console.log(this.school);
   },
   methods: {
     updateName(e) {
