@@ -76,7 +76,7 @@ export default {
           label: "CPF",
           minWidth: 220,
           sortable: true,
-          tour: "testemunha-site"
+          tour: "testemunha-cpf"
         },
       ],
       currentWitness: null

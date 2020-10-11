@@ -21,6 +21,7 @@
     "@nuxtjs/pwa": "^3.0.0-beta.19",
     "@vue/cli-shared-utils": "^4.5.3",
     "bootstrap": "4.3.1",
+    "brazilian-values": "^0.9.1",
     "chart.js": "^2.9.3",
     "d3": "^5.7.0",
     "datamaps": "^0.5.9",
@@ -49,6 +50,7 @@
     "vue-flatpickr-component": "^8.1.5",
     "vue-server-renderer": "^2.6.11",
     "vue-template-compiler": "^2.6.11",
+    "vue-the-mask": "^0.11.1",
     "vue-tour": "^1.5.0",
     "vue2-transitions": "^0.2.3",
     "webpack": "^4.44.1"

@@ -40,10 +40,10 @@
                         class="witness-cnpj"
                         placeholder="CPF"
                         rules="required"
+                        v-mask="'###.###.###-##'"
                         success-message="Parece correto!"
                         :value="witness.cpf"
                         @input="updateWitnessCPF">
-
             </base-input>
           </div>
         </div>
@@ -55,12 +55,13 @@
 </template>
 <script>
 import Swal from "sweetalert2";
-import ufs from "@/components/pages/forms/ufs";
-import legalNatures from "@/components/pages/forms/legalNatures";
+import { isCPF } from 'brazilian-values';
+import {mask} from 'vue-the-mask';
 
 export default {
   props: ["witness"],
   components: {},
+  directives: {mask},
   data() {
     return {};
   },
@@ -88,6 +89,20 @@ export default {
       });
     },
     async firstFormSubmit() {
+      if (!isCPF(this.witness.cpf)) {
+        await Swal.fire({
+          title: `CPF ${this.witness.cpf} inválido.`,
+          text: 'Deve ser corrigido o CPF da testemunha.',
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          showCloseButton: true,
+          buttonsStyling: false
+        });
+        return;
+      }
       if (this.witness.id !== 0) {
         try {
           const res = await this.$store.dispatch("schools/updateWitness", this.witness);
