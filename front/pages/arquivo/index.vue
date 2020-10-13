@@ -275,15 +275,11 @@ export default {
         statuses: [
           {value: "assinado", label: "assinado"},
           {value: "assinatura recusada/inválida", label: "assinatura recusada/inválida"},
-          {value: "completado", label: "completado"},
           {value: "criado", label: "criado"},
-          {value: "entregue", label: "entregue"},
-          {value: "enviado", label: "enviado"},
           {value: "enviado para assinatura", label: "enviado para assinatura"},
           {value: "enviado por e-mail", label: "enviado por e-mail"},
           {value: "finalizado", label: "finalizado"},
           {value: "inserido no GED", label: "inserido no GED"},
-          {value: "inválido", label: "inválido"},
           // {value: "rascunho", label: "rascunho"},
           {value: "rascunho - em lote", label: "rascunho - em lote"}
         ],
