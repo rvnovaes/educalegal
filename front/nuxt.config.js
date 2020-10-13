@@ -53,7 +53,7 @@ module.exports = {
     "~/plugins/filters",
     {src: "~/plugins/dashboard/full-calendar", ssr: false},
     {src: "~/plugins/dashboard/world-map", ssr: false},
-    // {src: "~/plugins/persistedState.client.js"}
+    {src: "~/plugins/persistedState.client.js"}
   ],
 
   /*
