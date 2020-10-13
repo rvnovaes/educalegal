@@ -17,6 +17,7 @@ import * as rules from 'vee-validate/dist/rules';
 import { messages } from 'vee-validate/dist/locale/pt_BR.json';
 import { configure } from 'vee-validate';
 
+// https://logaretm.github.io/vee-validate/guide/rules.html#importing-the-rules
 Object.keys(rules).forEach(rule => {
   extend(rule, {
     ...rules[rule], // copies rule configuration

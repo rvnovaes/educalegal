@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from validator_collection_br import validators_br
 
 from billing.models import Plan
 from document.models import Document, Envelope, Signer
@@ -208,16 +209,23 @@ class SchoolUnitSerializer(serializers.ModelSerializer):
 
 
 class WitnessSerializer(serializers.ModelSerializer):
+    def validate_name(self, data):
+        try:
+            validators_br.person_full_name(data)
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+        return data
+
     class Meta:
         model = Witness
         ref_name = "Witness v2"
-        # fields = "__all__"
-        fields = ["name", "email", "cpf"]
+        fields = "__all__"
 
 
+# https://www.django-rest-framework.org/api-guide/serializers/#dealing-with-nested-objects
 class SchoolSerializer(serializers.ModelSerializer):
-    school_units = SchoolUnitSerializer(many=True)
-    witnesses = WitnessSerializer(many=True)
+    school_units = SchoolUnitSerializer(many=True, read_only=True)
+    witnesses = WitnessSerializer(many=True, read_only=True)
 
     class Meta:
         model = School

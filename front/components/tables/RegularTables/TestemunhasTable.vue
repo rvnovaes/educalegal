@@ -9,7 +9,6 @@
         </base-button>
       </div>
     </div>
-
     <el-table class="table-responsive table-flush"
               header-row-class-name="thead-light"
               :data="witnesses">
@@ -39,16 +38,19 @@
         </div>
       </el-table-column>
     </el-table>
+    <testemunha-form v-if="currentWitness" :witness="currentWitness" @closeWitnessForm="currentWitness = null"></testemunha-form>
   </div>
 </template>
 <script>
 import Swal from "sweetalert2";
+import TestemunhaForm from "@/components/pages/forms/TestemunhaForm";
 import {Table, TableColumn} from "element-ui";
 
 export default {
   name: "testemunhas-table",
   props: ["school"],
   components: {
+    TestemunhaForm,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
   },
@@ -74,9 +76,10 @@ export default {
           label: "CPF",
           minWidth: 220,
           sortable: true,
-          tour: "testemunha-site"
+          tour: "testemunha-cpf"
         },
-      ]
+      ],
+      currentWitness: null
     };
   },
   computed: {
@@ -86,10 +89,18 @@ export default {
   },
   methods: {
     handleNew() {
-      this.$router.push({
-        path: "/escolas/criar"
-      });
-
+      let newWitness = {
+        id: 0,
+        tenant: this.school.tenant,
+        school: this.school.id,
+        name: null,
+        email: null,
+        cpf: null
+      }
+      // insere a testemunha vazia no store dentro da lista da escola
+      this.$store.commit("schools/addWitness", {schoolId: this.school.id, newWitness: newWitness})
+      // altera a currentWitness para a testemunha vazia que acabou de ser adicionada para abrir o form vazio de testemunhas
+      this.currentWitness = this.$store.state.schools.schools.find(school => school.id === Number(this.school.id)).witnesses.find(witness => witness.id === 0)
     },
     handleEdit(index, row) {
       this.editRow(row);
@@ -112,7 +123,7 @@ export default {
       if (result.value) {
         console.log(result.value)
         try {
-            const res = await this.$store.dispatch("schools/deleteSchool", row);
+            const res = await this.$store.dispatch("schools/deleteWitness", row);
             if (res.status === 204) {
               await Swal.fire({
                 title: "Excluída!",
@@ -154,9 +165,7 @@ export default {
     },
     editRow(row) {
       let indexToEdit = row.id;
-      this.$router.push({
-        path: "/escolas/" + indexToEdit
-      });
+      this.currentWitness = this.$store.getters["schools/getWitness"](this.school.id, indexToEdit)
     },
     selectionChange(selectedRows) {
       this.selectedRows = selectedRows;

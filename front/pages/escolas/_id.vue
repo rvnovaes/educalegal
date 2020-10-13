@@ -1,5 +1,6 @@
 <template>
   <div>
+    <client-only>
     <base-header class="pb-6">
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-7">
@@ -11,8 +12,7 @@
       <div class="row">
         <div class="col">
           <div class="card-wrapper">
-            <escola-form :school="school">
-            </escola-form>
+            <escola-form :school="school"></escola-form>
           </div>
         </div>
       </div>
@@ -25,10 +25,9 @@
       </div>
     </div>
     <v-tour name="pageTour" :steps="escolaDetalhesSteps" :options="tourOptions"></v-tour>
+    </client-only>
   </div>
-
 </template>
-
 <script>
 import EscolaForm from "@/components/pages/forms/EscolaForm";
 import TestemunhasTable from "~/components/tables/RegularTables/TestemunhasTable";
@@ -42,15 +41,16 @@ export default {
     TestemunhasTable,
     EscolaForm,
   },
-  // passa para o form a escola recuperada a partir no numero em this.$route.params.id
-  data() {
-    return {
-      id: this.$route.params.id
-    };
+  beforeCreate() {
+    console.log("breforeCreate")
+  },
+  created() {
+    console.log("_id created")
+    console.log(this.$route.params.id)
   },
   computed: {
     school() {
-      return this.$store.getters["schools/getSchool"](this.id);
+      return this.$store.getters["schools/getSchool"](this.$route.params.id);
     }
   }
 };
