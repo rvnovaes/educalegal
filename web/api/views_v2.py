@@ -98,6 +98,7 @@ class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
 class DocumentTypesViewSet(viewsets.ViewSet):
     def list(self, request):
         queryset = InterviewDocumentType.objects.all()
+        queryset = queryset.order_by("name")
         serializer = DocumentTypesSerializer(queryset, many=True)
         return Response(serializer.data)
 

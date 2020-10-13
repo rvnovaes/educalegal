@@ -31,9 +31,9 @@ class EducaLegalClient:
     def document_types_names_list(self):
         document_types_list = self.document_types_list()
         document_types_names_list = list()
-        for document_types in document_types_list:
+        for document_type in document_types_list:
             document_types_names_dict = dict()
-            document_types_names_dict[document_types["id"]] = document_types["name"]
+            document_types_names_dict[document_type["id"]] = document_type["name"]
             document_types_names_list.append(document_types_names_dict)
         return document_types_names_list
 

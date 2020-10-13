@@ -7,13 +7,13 @@ from module_educalegal_client import EducaLegalClient
 
 # se adiciona o /opt/educalegal/web/ da erro no module name web.settings.development
 # pq ambos tem o mesmo nome (web), tive que fazer dessa forma
-sys.path.append("/opt/educalegal/web/web/")
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")
-django.setup()
+# sys.path.append("/opt/educalegal/web/web/")
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")
+# django.setup()
 
 from api.third_party.clicksign_client import ClickSignClient
-from document.util import get_signer_key_by_email, post_signer_key
-from tenant.models import Tenant
+# from document.util import get_signer_key_by_email, post_signer_key
+# from tenant.models import Tenant
 
 
 ###### PRODUCTION ######
@@ -139,7 +139,7 @@ def patch_document():
 
 if __name__ == "__main__":
     # # Dados do Tenant
-    # print(elc.tenants_read(2))
+    print(elc.document_types_list())
     #
     # # Dados do GED do Tenant
     # print(elc.tenants_ged_read(2))
@@ -220,7 +220,7 @@ if __name__ == "__main__":
     # print(response)
     #
     # =========== envio do documento para assinatura clicksign ============= #
-    send_to_clicksign()
+    # send_to_clicksign()
     # =========== envio do documento para assinatura clicksign ============= #
 
     # =========== patch_document() ============= #
