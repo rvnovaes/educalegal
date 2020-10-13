@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   educalegal_front:
-    image: rvnovaes/educalegal-front:0.3
+    image: rvnovaes/educalegal-front:0.4
     container_name: educalegal_front
     restart: unless-stopped
     command: ["yarn", "start", ""]
