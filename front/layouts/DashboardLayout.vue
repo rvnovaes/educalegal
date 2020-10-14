@@ -132,7 +132,7 @@ export default {
     }
   },
   mounted() {
-    if (this.$auth.user.tenan_use_ged){
+    if (this.$auth.user.tenant_use_ged){
       this.$store.dispatch("tenant/fetchTenantGedData", this.$auth.user.tenant);
     }
     this.initScrollbar();

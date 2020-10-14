@@ -146,7 +146,7 @@ export default {
         //Aqui tivemos que usar o target como classe, pq so conseguimos passar para a coluna (que e outro componente) a classe
         {
           target: ".filtro-data",
-          content: `Aqui você filtra por data de criação do documento. Você pode selecionar um período clicando em duas datas distintas ou apenas um dia, clicando duas vezes no mesmo dia. Após definir os filtros, clique no botão buscar para recuperar os documentos de acordo com os critérios informados.`,
+          content: `Aqui você filtra por data de criação do documento. Você pode selecionar um período clicando em duas datas distintas ou apenas em um dia, clicando duas vezes no mesmo dia. Após definir os filtros, clique no botão buscar para recuperar os documentos de acordo com os critérios informados.`,
           params: {
             placement: "bottom",
             enableScrolling: false
