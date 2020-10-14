@@ -67,7 +67,7 @@ class DocuSignClient:
         if self.test_mode:
             webhook_url = "https://apitest.educalegal.com.br/v1/docusign/webhook"
         else:
-            webhook_url = "https://api-app.educalegal.com.br/v1/docusign/webhook"
+            webhook_url = "https://api.educalegal.com.br/v1/docusign/webhook"
 
         if self.test_mode:
             self.aud = "account-d.docusign.com"
