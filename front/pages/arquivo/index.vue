@@ -21,13 +21,11 @@
         <div>
           <card class="no-border-card" body-classes="px-0 pb-1" footer-classes="pb-2">
             <div>
-              <div class="col-12 d-flex  justify-content-sm-between flex-wrap"
-              >
-
+              <div class="col-12 d-flex  justify-content-sm-between flex-wrap">
                 <div class="col-2">
-
-                  <base-input label="Data de criação"
-                              addon-left-icon="ni ni-calendar-grid-58">
+                  <base-input label="Nome do Documento" v-model="documentName">
+                  </base-input>
+                  <base-input label="Data de criação" addon-left-icon="ni ni-calendar-grid-58">
                     <flat-pickr slot-scope="{focus, blur}"
                                 @on-open="focus"
                                 @on-close="blur"
@@ -288,6 +286,7 @@ export default {
       },
       selectedRows: [],
       orderByCreatedDate: "descending",
+      documentName: null,
       createdDateRange: null,
       selectedStatuses: [],
       selectedInterviews: [],
@@ -323,6 +322,7 @@ export default {
     if (this.tableData.length === 0) {
       this.$store.dispatch("documents/fetchPaginatedDocuments", {
         offset: 0,
+        documentName: null,
         statusFilter: [],
         schoolFilter: [],
         interviewFilter: [],
@@ -425,6 +425,7 @@ export default {
         console.log("Precisamos de mais documentos!");
         this.$store.dispatch("documents/fetchPaginatedDocuments", {
           offset: onStore,
+          documentNameFilter: this.documentName,
           statusFilter: this.selectedStatuses,
           schoolFilter: this.selectedSchools,
           interviewFilter: this.selectedInterviews,
@@ -437,6 +438,7 @@ export default {
       this.$store.commit("documents/cleanDocuments");
       await this.$store.dispatch("documents/fetchPaginatedDocuments", {
         offset: 0,
+        documentNameFilter: this.documentName,
         statusFilter: this.selectedStatuses,
         schoolFilter: this.selectedSchools,
         interviewFilter: this.selectedInterviews,
@@ -445,11 +447,11 @@ export default {
       });
     },
     cleanFilters() {
+      this.documentName = null;
       this.createdDateRange = null;
       this.selectedInterviews = [];
       this.selectedStatuses = [];
       this.selectedSchools = [];
-      this.createdDateRange = null;
       this.applyFilters();
     },
   },

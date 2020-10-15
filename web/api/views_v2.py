@@ -283,14 +283,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
         """
         paginator = LimitOffsetPagination()
         paginator.page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
+        document_name_filter_param = request.query_params.get("documentName")
         status_filter_param = request.query_params.getlist("status[]")
         school_filter_param = request.query_params.getlist("school[]")
-        interview_filter_param = request.query_params.getlist(
-            "interview[]"
-        )  # TODO parametro de onlyParent
+        interview_filter_param = request.query_params.getlist("interview[]")
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
         queryset = self.get_queryset().filter(parent=None).exclude(status="rascunho")
+        if document_name_filter_param:
+            queryset = queryset.filter(name__unaccent__icontains=document_name_filter_param)
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
