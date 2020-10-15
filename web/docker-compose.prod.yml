@@ -13,11 +13,11 @@ services:
 #    depends_on:
 #      - educalegal
 #      - educalegal_front
-  educalegal_front:
+  educalegal:
     build:
       args:
         BUILD_BACKEND_URL: "https://api.educalegal.com.br"
-  educalegal:
+  api:
     command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.production
