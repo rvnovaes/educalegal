@@ -22,9 +22,11 @@
           <card class="no-border-card" body-classes="px-0 pb-1" footer-classes="pb-2">
             <div>
               <div class="col-12 d-flex  justify-content-sm-between flex-wrap">
-                <div class="col-2">
+                <div class="col-6">
                   <base-input label="Nome do Documento" v-model="documentName">
                   </base-input>
+                </div>
+                <div class="col-2">
                   <base-input label="Data de criação" addon-left-icon="ni ni-calendar-grid-58">
                     <flat-pickr slot-scope="{focus, blur}"
                                 @on-open="focus"
@@ -36,6 +38,22 @@
                   </base-input>
                 </div>
                 <div class="col-4">
+                  <base-input label="Status">
+                    <el-select multiple
+                               class="select-primary filtro-status"
+                               placeholder="Status"
+                               v-model="selectedStatuses">
+                      <el-option
+                        class="select-primary"
+                        v-for="option in selects.statuses"
+                        :value="option.value"
+                        :label="option.label"
+                        :key="option.label">
+                      </el-option>
+                    </el-select>
+                  </base-input>
+                </div>
+                <div class="col-6">
                   <base-input label="Modelo de Documento">
                     <el-select multiple
                                class="select-primary filtro-modelo"
@@ -51,7 +69,7 @@
                     </el-select>
                   </base-input>
                 </div>
-                <div class="col-2">
+                <div class="col-4">
                   <base-input label="Escola">
                     <el-select multiple
                                class="select-primary filtro-escola"
@@ -60,22 +78,6 @@
                       <el-option
                         class="select-primary"
                         v-for="option in schools"
-                        :value="option.value"
-                        :label="option.label"
-                        :key="option.label">
-                      </el-option>
-                    </el-select>
-                  </base-input>
-                </div>
-                <div class="col-2">
-                  <base-input label="Status">
-                    <el-select multiple
-                               class="select-primary filtro-status"
-                               placeholder="Status"
-                               v-model="selectedStatuses">
-                      <el-option
-                        class="select-primary"
-                        v-for="option in selects.statuses"
                         :value="option.value"
                         :label="option.label"
                         :key="option.label">
@@ -330,7 +332,6 @@ export default {
         createdDateRange: null,
       });
     }
-    ;
   },
   methods: {
     handleLike(index, row) {
@@ -459,20 +460,13 @@ export default {
 ;
 </script>
 <style>
-.no-border-card .card-footer {
+.no-border-card {
   border-top: 0;
 }
 
 #filter-buttons {
   margin-bottom: 30px;
   margin-right: 15px;
-}
-
-.el-tag.el-tag--info.el-tag--small.el-tag--light {
-  color: #fff;
-  background: #5e72e4;
-  border-color: #5e72e4;
-  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 </style>
