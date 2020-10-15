@@ -118,6 +118,7 @@ export default {
   name: "painel",
   mounted() {
     this.$store.dispatch("dashboard/fetchDashBoardData");
+    this.$store.dispatch("tenant/fetchTenantData", this.$auth.user.tenant);
     this.$store.dispatch("schools/fetchAllSchools");
   },
   computed: {
