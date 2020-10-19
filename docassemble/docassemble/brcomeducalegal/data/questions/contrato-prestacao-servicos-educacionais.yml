@@ -59,6 +59,8 @@ code: |
         installments_list
     else:
       single_installment_date_format
+    input_installments_data.target_number = quantity_input_installments
+    valid_input_installments_data_table
     signature_local
     witnesses.uses_parts = False
     valid_witnesses_table
@@ -357,12 +359,14 @@ fields:
   - 'Valor anual do contrato: ': annual_value
     datatype: currency
     hint: 0000,00
-  - 'Inserir informações sobre desconto?': has_discount
+    help: "O valor deve ser informado já com o desconto concedido."
+  - 'Houve desconto?': has_discount
     datatype: yesnoradio
-  - 'Desconto: ': discount_notes
+    default: false
+  - 'Informações sobre o desconto : ': discount_notes
     datatype: area
     hint: "exemplo: foi concedido um desconto de 10% sobre o valor anual"
-    help: Definir um percentual sobre o valor anual de contrato.
+    help: Inserir informações sobre o percentual/desconto concedido sobre o valor anual de contrato.
     show if:
       variable: has_discount
       is: True
@@ -371,23 +375,52 @@ fields:
     choices:
       - à vista: à vista
       - parcelado: parcelado
+  - note: |
+      **DADOS DA DA PARCELA ÚNICA**
+    js show if: |
+      val("method_payment") == "à vista"
   - 'Data do vencimento da parcela única:': single_installment_date
     datatype: date
     js show if: |
       val("method_payment") == "à vista"
   - 'Haverá parcela de entrada:': has_input_value
     datatype: yesnoradio
+    default: false
     js show if: |
       val("method_payment") == "parcelado"
-  - 'Valor da parcela de entrada': input_value
+  - note: |
+      **DADOS DA PARCELA DE ENTRADA**
+
+      Ao completar o dados abaixo as parcelas serão geradas automaticamente e poderão ser revisadas na próxima tela.
+    js show if: |
+      val("has_input_value") == true
+  - 'Quantidade de parcelas: ': quantity_input_installments
+    datatype: integer
+    default: 1
+    min: 1
+    js show if: |
+      val("has_input_value") == true
+  - 'Valor da parcela': input_value
     datatype: currency
     hint: 0000,00
     js show if: |
       val("has_input_value") == true
-  - 'Data do vencimento da parcela de entrada': input_date
+  - 'Data do vencimento da primeira parcela': input_date
     datatype: date
     js show if: |
       val("has_input_value") == true
+  - note: |
+      ** DADOS DAS DEMAIS PARCELAS**
+
+      Ao completar o dados abaixo as parcelas serão geradas automaticamente de acordo com a data de vencimento da primeira parcela.
+    js show if: |
+      val("method_payment") == "parcelado" && val("has_input_value") == true
+  - note: |
+      **DADOS DAS PARCELAS**
+
+      Ao completar o dados abaixo as parcelas serão geradas automaticamente de acordo com a data de vencimento da primeira parcela.
+    js show if: |
+      val("method_payment") == "parcelado" && val("has_input_value") == false
   - 'Quantidade de parcelas: ': quantity_installments
     help: Quantidade de parcelas, excluindo a entrada, caso haja.
     datatype: integer
@@ -400,7 +433,7 @@ fields:
     hint: 0000,00
     js show if: |
       val("method_payment") == "parcelado"
-  - 'Data de vencimento da primeira parcela: ': installments_date
+  - 'Data do vencimento da primeira parcela: ': installments_date
     datatype: date
     js show if: |
       val("method_payment") == "parcelado"
@@ -426,7 +459,15 @@ code: |
       installments_date_format = format_date(installments_date, format='dd/MM/yyyy')
 
       if has_input_value:
+        input_installments_list = list()
         input_date_format = format_date(input_date, format='dd/MM/yyyy')
+        for v in range(0, quantity_input_installments):
+          installments = dict()
+          installments_input_due = input_date + relativedelta(months=+v)
+          installments_input_due = format_date(installments_input_due, format='dd/MM/yyyy')
+          installments['installments_input_due'] = installments_input_due
+          installments['installments_value'] = input_value
+          input_installments_list.append(installments)
       installments_list = list()
       installments_date_day = format_date(installments_date, format='dd')
       for v in range(0, quantity_installments):
@@ -438,6 +479,40 @@ code: |
         installments_list.append(installments)
     else:
       single_installment_date_format = format_date(single_installment_date, format='dd/MM/yyyy')
+---
+objects:
+  - input_installments_data: DAList.using(object_type=Thing, ask_number=True)
+---
+question: |
+  Dados da ${word(ordinal(i)) } parcela:
+fields:
+  - "Valor :": input_installments_data[i].name.text
+    datatype: currency
+  - "Data de Vencimento :": input_installments_data[i].date
+    datatype: date
+---
+table: input_installments_data.table
+rows: input_installments_data
+columns:
+  - "#": |
+      row_index + 1
+  - Valor: |
+      row_item.name.text
+  - Data: |
+      row_item.date
+edit:
+  - name.text
+  - date
+delete buttons: False
+---
+field: valid_input_installments_data_table
+progress: 95
+question: |
+  Resumo das parcelas do valor de entrada:
+subquestion: |
+  ${ input_installments_data.table }
+buttons:
+  Continuar: continue
 ---
 code: |
   recipients = list()
