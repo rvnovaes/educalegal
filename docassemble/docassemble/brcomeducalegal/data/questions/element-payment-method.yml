@@ -11,6 +11,8 @@ code: |
   from num2words import num2words
   if has_input_value:
     input_value_words = num2words(input_value, lang='pt_BR', to='currency')
+    input_value_total = quantity_input_installments * input_value
+    input_value_total_words  = num2words(input_value_total , lang='pt_BR', to='currency')
 ---
 code: |
   from num2words import num2words
@@ -106,7 +108,7 @@ script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
-        $('#X2ZpZWxkXzY').mask('000000000000000.00', {reverse: true});
+        $('#X2ZpZWxkXzE0').mask('000000000000000.00', {reverse: true});
         $('#X2ZpZWxkXzk').mask('000000000000000.00', {reverse: true});
       });
   </script>
@@ -132,6 +134,7 @@ code: |
         input_date_format = format_date(input_date, format='dd/MM/yyyy')
 
         input_installments_list = list()
+        installments_input_date_day = format_date(input_date, format='dd')
         for v in range(0, quantity_input_installments):
           installments = dict()
           installments_input_due = input_date + relativedelta(months=+v)
@@ -170,6 +173,12 @@ fields:
     datatype: date
   - "Valor :": input_installments_data[i].value
     datatype: currency
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#aW5wdXRfaW5zdGFsbG1lbnRzX2RhdGFbaV0udmFsdWU').mask('000000000000000.00', {reverse: true});
+      });
+  </script>
 ---
 table: input_installments_data.table
 rows: input_installments_data
