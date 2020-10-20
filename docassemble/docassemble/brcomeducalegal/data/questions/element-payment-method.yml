@@ -33,7 +33,7 @@ fields:
   - 'Informações sobre o desconto : ': discount_notes
     datatype: area
     hint: "exemplo: foi concedido um desconto de 10% sobre o valor anual"
-    help: Inserir informações sobre o percentual/desconto concedido sobre o valor anual de contrato.
+    help: Inserir informações do desconto concedido sobre o valor anual de contrato.
     show if:
       variable: has_discount
       is: True
@@ -58,7 +58,7 @@ fields:
   - note: |
       **DADOS DA PARCELA DE ENTRADA**
 
-      Ao completar o dados abaixo as parcelas serão geradas automaticamente e poderão ser revisadas na próxima tela.
+      Após informar os dados abaixo, as parcelas serão geradas automaticamente e poderão ser revisadas na próxima tela.
     js show if: |
       val("has_input_value") == true
   - 'Quantidade de parcelas: ': quantity_input_installments
@@ -79,13 +79,13 @@ fields:
   - note: |
       ** DADOS DAS DEMAIS PARCELAS**
 
-      Ao completar o dados abaixo as parcelas serão geradas automaticamente e poderão ser revisadas na próxima tela.
+      Após informar os dados abaixo, as parcelas serão geradas automaticamente e poderão ser revisadas na próxima tela.
     js show if: |
       val("method_payment") == "parcelado" && val("has_input_value") == true
   - note: |
       **DADOS DAS PARCELAS**
 
-      Ao completar o dados abaixo as parcelas serão geradas automaticamente e poderão ser revisadas na próxima tela.
+      Após informar os dados abaixo, as parcelas serão geradas automaticamente e poderão ser revisadas na próxima tela.
     js show if: |
       val("method_payment") == "parcelado" && val("has_input_value") == false
   - 'Quantidade de parcelas: ': quantity_installments
