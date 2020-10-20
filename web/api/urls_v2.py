@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import include
 from django.conf.urls import url
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
@@ -12,6 +12,7 @@ from rest_framework_simplejwt.views import (
 from django.urls import path
 
 from .views_v2 import (
+    ChangePassword,
     InterviewViewSet,
     PlanViewSet,
     TenantViewSet,
@@ -94,6 +95,7 @@ private_endpoints = [
     path("create_documents/documents_limit", reached_document_limit),
     path("recover_password/", recover_password),
     path("reset_password/", reset_password),
+    path("change-password/", ChangePassword.as_view(), name='change-password'),
     path("users/", UserView.as_view(), name="users"),
     path("clicksign/webhook", webhook_listener),
     path("docusign/webhook", docusign_webhook_listener),
