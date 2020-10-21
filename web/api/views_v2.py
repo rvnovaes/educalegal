@@ -543,14 +543,14 @@ def save_in_ged(data, url, file, tenant):
         return 500, message, 0
     else:
         if status_code != 201:
-            message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + response
+            message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + response.json()
             logging.error(message)
 
             return status_code, response, 0
         else:
             if ged_id == 0:
                 message = 'O arquivo foi inserido no GED, mas retornou ID = 0. Erro: ' + str(status_code) + ' - ' + \
-                          response
+                          response.json()
                 logging.error(message)
 
                 return status_code, message, 0
