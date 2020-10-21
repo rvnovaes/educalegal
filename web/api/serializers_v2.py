@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from validator_collection_br import validators_br
 
+from django.contrib.auth.password_validation import validate_password
+
 from billing.models import Plan
 from document.models import Document, Envelope, Signer
 from interview.models import Interview, InterviewDocumentType
@@ -264,7 +266,8 @@ class UserSerializer(serializers.ModelSerializer):
             "user_permissions",
             "tenant_name",
             "tenant_use_ged",
-            "schools_count"
+            "schools_count",
+            "force_password_change"
         ]
 
     def get_tenant_name(self, obj):
@@ -275,3 +278,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_schools_count(self, obj):
         return School.objects.filter(tenant=obj.tenant).count()
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password1 = serializers.CharField(required=True)
+    new_password2 = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        validate_password(value)
+        return value

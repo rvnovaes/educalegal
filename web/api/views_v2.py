@@ -11,7 +11,7 @@ from dateutil.relativedelta import relativedelta
 from drf_yasg.renderers import SwaggerUIRenderer, OpenAPIRenderer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework import pagination
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
@@ -60,7 +60,7 @@ from .serializers_v2 import (
     TenantSerializer,
     TenantGedDataSerializer,
     UserSerializer,
-    WitnessSerializer,
+    WitnessSerializer, ChangePasswordSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -283,14 +283,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
         """
         paginator = LimitOffsetPagination()
         paginator.page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
+        document_name_filter_param = request.query_params.get("documentName")
         status_filter_param = request.query_params.getlist("status[]")
         school_filter_param = request.query_params.getlist("school[]")
-        interview_filter_param = request.query_params.getlist(
-            "interview[]"
-        )  # TODO parametro de onlyParent
+        interview_filter_param = request.query_params.getlist("interview[]")
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
         queryset = self.get_queryset().filter(parent=None).exclude(status="rascunho")
+        if document_name_filter_param:
+            queryset = queryset.filter(name__unaccent__icontains=document_name_filter_param)
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
@@ -1264,3 +1265,45 @@ def reached_document_limit(request):
     except Exception as e:
         message = 'Não foi possível obter o limite de documentos. Erro: {}'.format(e)
         return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ChangePassword(APIView):
+    """
+    An endpoint for changing password.
+    """
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def put(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = ChangePasswordSerializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            old_password = serializer.data.get("old_password")
+            new_password1 = serializer.data.get("new_password1")
+            new_password2 = serializer.data.get("new_password2")
+            if not self.object.check_password(old_password):
+                message = "A senha atual está inválida."
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            if old_password:
+                if old_password == new_password1:
+                    message = "A nova senha deve ser diferente da atual."
+                    return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            if new_password1 and new_password2:
+                if new_password1 != new_password2:
+                    message = "A nova senha deve ser igual à sua confirmação."
+                    return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password1"))
+            self.object.force_password_change = False
+            self.object.save()
+            message = "A senha foi alterada com sucesso!"
+            return Response(message, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
