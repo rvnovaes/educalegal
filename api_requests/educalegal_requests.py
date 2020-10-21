@@ -131,7 +131,7 @@ def patch_document():
        'docx_url':'http://docassemble/uploadedfile/37/20200916-124132-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx',
        'docx_filename':'20200916-124132-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx',
        'tenant_id':'1',
-       'doc_uuid':'e67258bf-0152-4bb7-88ca-e3e144d00b87'
+       'doc_uuid':'f1414975-5224-4e8f-bb78-0a2ae46417ed'
     }
 
     status_code, el_patch_document = elc.patch_document(data, params)
@@ -139,7 +139,7 @@ def patch_document():
 
 if __name__ == "__main__":
     # # Dados do Tenant
-    print(elc.document_types_list())
+    # print(elc.document_types_list())
     #
     # # Dados do GED do Tenant
     # print(elc.tenants_ged_read(2))
@@ -224,5 +224,5 @@ if __name__ == "__main__":
     # =========== envio do documento para assinatura clicksign ============= #
 
     # =========== patch_document() ============= #
-    # patch_document()
+    patch_document()
     # =========== patch_document() ============= #
