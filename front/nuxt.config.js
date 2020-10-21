@@ -131,7 +131,7 @@ module.exports = {
     redirect: {
       login: "/",
       logout: "/",
-      home: 1===1 ? "/trocar_senha" : "/painel"
+      home: "/painel"
     },
   },
   build: {

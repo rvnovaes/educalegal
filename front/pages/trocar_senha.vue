@@ -6,7 +6,7 @@
         <div class="header-body text-center mb-5">
           <div class="row justify-content-center">
             <div class="col-xl-5 col-lg-6 col-md-8 px-5">
-              <img src="static/img/brand/logo_educa_legal.png" alt="Logo Educa Legal">
+              <img src="img/brand/logo_educa_legal.png" alt="Logo Educa Legal">
               <p class="text-lead">A sua senha deve ser redefinida</p>
             </div>
           </div>
@@ -20,7 +20,7 @@
         <div class="col-lg-6 col-md-8">
           <div class="card bg-secondary border-0">
             <div class="card-header bg-transparent pb-3">
-              <div class="text-center text-lg">Redefina a sua senha</div>
+              <div class="text-center text-lg">Redefina a sua senha no primeiro login</div>
             </div>
             <div class="card-body px-lg-5 py-lg-5">
               <div class="text-center text-muted mb-4">
@@ -77,7 +77,6 @@ import Swal from "sweetalert2";
 export default {
   layout: "AuthLayout",
   name: "trocar-senha",
-  auth: false,
   data() {
     return {
       old_password: "",
@@ -95,7 +94,6 @@ export default {
         };
         const res = await this.$axios.put("/v2/change-password/", payload);
         if (res.status === 200) {
-          this.close();
           await Swal.fire({
             title: `A senha foi alterada com sucesso!`,
             buttonsStyling: false,
@@ -106,7 +104,6 @@ export default {
             }
           });
           await this.$auth.logout();
-          await this.$router.push({path: "/"});
         }
       } catch (e) {
         let errorMessage = ''

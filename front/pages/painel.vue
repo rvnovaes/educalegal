@@ -115,6 +115,7 @@ export default {
     StatsCard,
     Card
   },
+  middleware: 'force-change-password',
   name: "painel",
   mounted() {
     this.$store.dispatch("dashboard/fetchDashBoardData");
