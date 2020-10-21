@@ -1,5 +1,6 @@
 import datetime
 import io
+import json
 import logging
 import pytz
 import pandas as pd
@@ -397,6 +398,12 @@ class DocumentViewSet(viewsets.ModelViewSet):
             logger.info(
                 "Atualizando o documento {doc_uuid}".format(doc_uuid=str(doc_uuid))
             )
+
+            # limpa a variavel all_variables antes de salvar no sistema
+            data = request.data.copy()
+            all_variables = data['document_data']
+            clean_all_variables(all_variables)
+
             serializer = DocumentDetailSerializer(
                 instance, data=request.data, partial=True, context={"request": request}
             )
@@ -407,7 +414,6 @@ class DocumentViewSet(viewsets.ModelViewSet):
             params = self.request.query_params
             if 'trigger' in params:
                 if params['trigger'] == 'docassemble':
-                    data = self.request.data.copy()
 
                     # salva o documento no sistema de arquivos e/ou ged
                     save_document_file(instance, data, params)
@@ -500,6 +506,19 @@ class DocumentViewSet(viewsets.ModelViewSet):
                             return status.HTTP_404_NOT_FOUND, message
 
         return status.HTTP_200_OK, 'Configuração do GED OK'
+
+
+def clean_all_variables(all_variables, ignore=[]):
+    # The following are keys that Docassemble uses that we never want to extract from the answer set
+    keys_to_ignore = ['_internal', 'url_args', 'PY2', 'string_types', 'nav', '__warningregistry__'] + ignore
+
+    # converte json em dicionario
+    all_variables = json.load(all_variables)
+    interview_variables = {k: v for k, v in all_variables.items() if k not in keys_to_ignore}
+
+    # converte dicionario em json
+    interview_variables = json.dumps(interview_variables)
+    return interview_variables
 
 
 def validate_tenant_plan_ged(tenant):
