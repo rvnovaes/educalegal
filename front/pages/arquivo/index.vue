@@ -1,6 +1,5 @@
 <template>
     <div class="content">
-      <client-only>
       <base-header class="pb-6">
         <div class="row align-items-center py-4">
           <div class="col-11">
@@ -187,7 +186,6 @@
         </div>
       </div>
       <v-tour name="pageTour" :steps="arquivoSteps" :options="tourOptions"></v-tour>
-      </client-only>
     </div>
 </template>
 <script>
