@@ -51,6 +51,7 @@ from tenant.models import Plan, Tenant, TenantGedData
 from users.models import CustomUser
 from util.file_import import is_metadata_valid, is_content_valid
 from util.mongo_util import create_dynamic_document_class
+from util.util import delete_keys_from_obj
 
 from .serializers_v2 import (
     PlanSerializer,
@@ -401,16 +402,17 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 "Atualizando o documento {doc_uuid}".format(doc_uuid=str(doc_uuid))
             )
 
-            # limpa a variavel all_variables antes de salvar no sistema
+            # faz copia do request.data, pois nao é permitido alterar diretamente no request.data
             data = request.data.copy()
 
-            # como vem do docassemble como uma string e não um json, tem que
-            # colocar colchetes na string para torná-la um JSON string válido
+            # como vem do docassemble como uma string e não um json, tem que colocar colchetes na string
+            # para torná-la um JSON string válido e poder usar o json.loads()
             valid_json_string = "[" + data['document_data'] + "]"
             document_data = json.loads(valid_json_string)
             # pega somente o dicionario
             document_data = document_data[0]
 
+            # limpa a variavel all_variables antes de salvar no sistema
             data['document_data'] = clean_all_variables(document_data)
 
             serializer = DocumentDetailSerializer(
@@ -517,28 +519,26 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
 
 def clean_all_variables(all_variables):
-    ignore = ['DocumentStatus', 'Enum', 'cd_name', 'cd_related_documents', 'cd_status', 'content_document',
-              'custom_file_name', 'doc_uuid', 'document_type_data', 'educalegal_front_url', 'educalegal_url',
-              'el_environment', 'el_log_to_console', 'el_send_email', 'elc', 'envelope_statuses',
-              'example_acordo_individual_reducao_de_jornada_e_reducao_salarial',
-              'example_termo_acordo_individual_para_banco_horas_mp_927_2020',
-              'example_termo_mudanca_de_regime_e_cessao_do_direito_autoral', 'generated_file', 'help_email_msg', 'i',
-              'input_installments_list', 'installments_list', 'interview_custom_file_name_string', 'interview_data',
-              'interview_document_type', 'interview_is_freemium', 'interview_language', 'intid', 'item',
-              'job_title_list', 'mc', 'menu_items', 'mongo_uuid', 'new_recipient', 'plan_data', 'plan_use_esignature',
-              'plan_use_ged', 'recipient_group_types_dict', 'recipients', 'reviewed_school_email_answer',
-              'school_data_dict', 'school_id', 'school_letterhead', 'school_names_list', 'school_units_dict',
-              'school_units_list', 'school_witnesses_dict', 'signature_local_default', 'state_initials_list',
-              'tenant_data', 'tenant_esignature_data', 'tenant_ged_data', 'tenant_ged_token', 'tenant_ged_url', 'tid',
-              'ut', 'v', 'valid_cessionarias_table', 'valid_comodatarias_table', 'valid_contractors_table',
-              'valid_contratadas_table', 'valid_data', 'valid_employees_table', 'valid_fiadores_table',
-              'valid_input_installments_data_table', 'valid_locatarios_table', 'valid_notifieds_table',
-              'valid_other_installments_data_table', 'valid_participants_table', 'valid_rescindente_table',
-              'valid_students_table', 'valid_witnesses_table', 'valid_workers_table', 'witnesses_data_list']
-
-    # The following are keys that Docassemble uses that we never want to extract from the answer set
-    keys_to_ignore = ['_internal', 'url_args', 'PY2', 'string_types', 'nav', '__warningregistry__', 'session_local',
-                      'device_local', 'user_local', 'attachments'] + ignore
+    keys_to_ignore = ['DocumentStatus', 'Enum', 'PY2', '__warningregistry__', '_class', '_internal', 'ask_number',
+                      'ask_object_type', 'attachments', 'auto_gather', 'cd_name', 'cd_related_documents', 'cd_status',
+                      'city_only', 'complete', 'complete_attribute', 'content_document', 'custom_file_name',
+                      'device_local', 'doc_uuid', 'document_type_data', 'educalegal_front_url', 'educalegal_url',
+                      'el_environment', 'el_log_to_console', 'el_send_email', 'elc', 'envelope_statuses',
+                      'example_acordo_individual_reducao_de_jornada_e_reducao_salarial',
+                      'example_termo_acordo_individual_para_banco_horas_mp_927_2020',
+                      'example_termo_mudanca_de_regime_e_cessao_do_direito_autoral', 'gathered', 'generated_file',
+                      'geolocated', 'help_email_msg', 'i', 'input_installments_list', 'installments_list',
+                      'instanceName', 'interview_custom_file_name_string', 'interview_data', 'interview_document_type',
+                      'interview_is_freemium', 'interview_language', 'intid', 'item', 'job_title_list', 'location',
+                      'mc', 'menu_items', 'minimum_number', 'mongo_uuid', 'nav', 'new_recipient', 'object_type',
+                      'object_type_parameters', 'plan_data', 'plan_use_esignature', 'plan_use_ged',
+                      'recipient_group_types_dict', 'recipients', 'reviewed_school_email_answer', 'revisit',
+                      'school_data_dict', 'school_id', 'school_letterhead', 'school_names_list', 'school_units',
+                      'school_units_dict', 'school_units_list', 'school_witnesses_dict', 'session_local',
+                      'signature_local_default', 'state_initials_list', 'string_types', 'table', 'target_number',
+                      'tenant_data', 'tenant_esignature_data', 'tenant_ged_data', 'tenant_ged_token', 'tenant_ged_url',
+                      'there_are_any', 'tid', 'url_args', 'user_local', 'uses_parts', 'ut', 'v', 'valid_data',
+                      'witnesses_data_list']
 
     # ignora valid_*_table: ex.: valid_employees_table, valid_locatarios_table
     regex_list = ['valid_(.*)_table']
@@ -546,7 +546,7 @@ def clean_all_variables(all_variables):
     ignore = list(ignore)
     keys_to_ignore += ignore
 
-    interview_variables = {k: v for k, v in all_variables.items() if k not in keys_to_ignore}
+    interview_variables = delete_keys_from_obj(all_variables, keys_to_ignore)
 
     # converte dicionario em json
     interview_variables = json.dumps(interview_variables)
