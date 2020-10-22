@@ -11,6 +11,7 @@ from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
 from dateutil.relativedelta import relativedelta
 from drf_yasg.renderers import SwaggerUIRenderer, OpenAPIRenderer
+from json import dumps
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
@@ -593,15 +594,18 @@ def save_in_ged(data, url, file, tenant):
 
         return 500, message, 0
     else:
+        if isinstance(response, dict):
+            response = dumps(response)
+
         if status_code != 201:
-            message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + response
+            message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + str(response)
             logging.error(message)
 
             return status_code, response, 0
         else:
             if ged_id == 0:
                 message = 'O arquivo foi inserido no GED, mas retornou ID = 0. Erro: ' + str(status_code) + ' - ' + \
-                          response
+                          str(response)
                 logging.error(message)
 
                 return status_code, message, 0
