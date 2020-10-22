@@ -18,6 +18,10 @@ code: |
   from num2words import num2words
   if method_payment == "parcelado":
     installments_value_words = num2words(installments_value, lang='pt_BR', to='currency')
+    net_installments_value_words = num2words(net_installments_value, lang='pt_BR', to='currency')
+---
+variable name: net_installments_value_show
+data: False
 ---
 progress: 85
 section: Dados Contratuais
@@ -104,13 +108,23 @@ fields:
     datatype: date
     js show if: |
       val("method_payment") == "parcelado"
+  - 'Valor líquido da parcela:': net_installments_value
+    datatype: currency
+    help: Valor da parcela com o desconto concedido.
+    hint: 0000,00
+    show if:
+      code: |
+        net_installments_value_show == True
+    js show if: |
+      val("method_payment") == "parcelado"
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
         $('#YW5udWFsX3ZhbHVl').mask('000000000000000.00', {reverse: true});
         $('#X2ZpZWxkXzE0').mask('000000000000000.00', {reverse: true});
         $('#X2ZpZWxkXzk').mask('000000000000000.00', {reverse: true});
-      });
+        $('#X2ZpZWxkXzE2').mask('000000000000000.00', {reverse: true});
+        });
   </script>
 ---
 code: |
