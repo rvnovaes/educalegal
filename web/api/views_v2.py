@@ -2,8 +2,9 @@ import datetime
 import io
 import json
 import logging
-import pytz
 import pandas as pd
+import pytz
+import re
 
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
@@ -401,11 +402,18 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
             # limpa a variavel all_variables antes de salvar no sistema
             data = request.data.copy()
-            all_variables = data['document_data']
-            clean_all_variables(all_variables)
+
+            # como vem do docassemble como uma string e não um json, tem que
+            # colocar colchetes na string para torná-la um JSON string válido
+            valid_json_string = "[" + data['document_data'] + "]"
+            document_data = json.loads(valid_json_string)
+            # pega somente o dicionario
+            document_data = document_data[0]
+
+            data['document_data'] = clean_all_variables(document_data)
 
             serializer = DocumentDetailSerializer(
-                instance, data=request.data, partial=True, context={"request": request}
+                instance, data=data, partial=True, context={"request": request}
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -414,7 +422,6 @@ class DocumentViewSet(viewsets.ModelViewSet):
             params = self.request.query_params
             if 'trigger' in params:
                 if params['trigger'] == 'docassemble':
-
                     # salva o documento no sistema de arquivos e/ou ged
                     save_document_file(instance, data, params)
 
@@ -508,12 +515,36 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return status.HTTP_200_OK, 'Configuração do GED OK'
 
 
-def clean_all_variables(all_variables, ignore=[]):
-    # The following are keys that Docassemble uses that we never want to extract from the answer set
-    keys_to_ignore = ['_internal', 'url_args', 'PY2', 'string_types', 'nav', '__warningregistry__'] + ignore
+def clean_all_variables(all_variables):
+    ignore = ['DocumentStatus', 'Enum', 'cd_name', 'cd_related_documents', 'cd_status', 'content_document',
+              'custom_file_name', 'doc_uuid', 'document_type_data', 'educalegal_front_url', 'educalegal_url',
+              'el_environment', 'el_log_to_console', 'el_send_email', 'elc', 'envelope_statuses',
+              'example_acordo_individual_reducao_de_jornada_e_reducao_salarial',
+              'example_termo_acordo_individual_para_banco_horas_mp_927_2020',
+              'example_termo_mudanca_de_regime_e_cessao_do_direito_autoral', 'generated_file', 'help_email_msg', 'i',
+              'input_installments_list', 'installments_list', 'interview_custom_file_name_string', 'interview_data',
+              'interview_document_type', 'interview_is_freemium', 'interview_language', 'intid', 'item',
+              'job_title_list', 'mc', 'menu_items', 'mongo_uuid', 'new_recipient', 'plan_data', 'plan_use_esignature',
+              'plan_use_ged', 'recipient_group_types_dict', 'recipients', 'reviewed_school_email_answer',
+              'school_data_dict', 'school_id', 'school_letterhead', 'school_names_list', 'school_units_dict',
+              'school_units_list', 'school_witnesses_dict', 'signature_local_default', 'state_initials_list',
+              'tenant_data', 'tenant_esignature_data', 'tenant_ged_data', 'tenant_ged_token', 'tenant_ged_url', 'tid',
+              'ut', 'v', 'valid_cessionarias_table', 'valid_comodatarias_table', 'valid_contractors_table',
+              'valid_contratadas_table', 'valid_data', 'valid_employees_table', 'valid_fiadores_table',
+              'valid_input_installments_data_table', 'valid_locatarios_table', 'valid_notifieds_table',
+              'valid_other_installments_data_table', 'valid_participants_table', 'valid_rescindente_table',
+              'valid_students_table', 'valid_witnesses_table', 'valid_workers_table', 'witnesses_data_list']
 
-    # converte json em dicionario
-    all_variables = json.load(all_variables)
+    # The following are keys that Docassemble uses that we never want to extract from the answer set
+    keys_to_ignore = ['_internal', 'url_args', 'PY2', 'string_types', 'nav', '__warningregistry__', 'session_local',
+                      'device_local', 'user_local', 'attachments'] + ignore
+
+    # ignora valid_*_table: ex.: valid_employees_table, valid_locatarios_table
+    regex_list = ['valid_(.*)_table']
+    ignore = {k for k, v in all_variables.items() if any(re.match(regex, k) for regex in regex_list)}
+    ignore = list(ignore)
+    keys_to_ignore += ignore
+
     interview_variables = {k: v for k, v in all_variables.items() if k not in keys_to_ignore}
 
     # converte dicionario em json
@@ -1290,7 +1321,7 @@ class ChangePassword(APIView):
     """
     An endpoint for changing password.
     """
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self, queryset=None):
         return self.request.user
