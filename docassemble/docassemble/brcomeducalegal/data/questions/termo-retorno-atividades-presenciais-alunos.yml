@@ -24,7 +24,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "termo-retorno-atividades-presenciais-colaboradores.docx"
+  content_document = "termo-retorno-atividades-presenciais-alunos.docx"
 ---
 id: logic
 mandatory: True
@@ -45,7 +45,6 @@ code: |
       item.name.text
     if plan_use_esignature:
       valid_guardians_table
-    return_date
     signature_local
     generated_file
     el_patch_document
@@ -161,11 +160,11 @@ fields:
 script: |
   <script type="text/javascript">
   $(document).ready(function(){
-    $('#d29ya2Vyc1tpXS5hZGRyZXNzLnppcA').mask('00000-000');
+    $('#Z3VhcmRpYW5zW2ldLmFkZHJlc3Muemlw').mask('00000-000');
   });
 
-  $("#d29ya2Vyc1tpXS5hZGRyZXNzLnppcA").focusout(function(){
-    var cep = $("#d29ya2Vyc1tpXS5hZGRyZXNzLnppcA").val();
+  $("#Z3VhcmRpYW5zW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#Z3VhcmRpYW5zW2ldLmFkZHJlc3Muemlw").val();
     cep = cep.replace ("-","");
     if (cep != ""){
       var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
@@ -175,10 +174,10 @@ script: |
         type: "get",
         dataType: "json",
         success: function(data){
-          $("#d29ya2Vyc1tpXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
-          $("#d29ya2Vyc1tpXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
-          $("#d29ya2Vyc1tpXS5hZGRyZXNzLmNpdHk").val(data.localidade);
-          $("#d29ya2Vyc1tpXS5hZGRyZXNzLnN0YXRl").val(data.uf);
+          $("#Z3VhcmRpYW5zW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#Z3VhcmRpYW5zW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#Z3VhcmRpYW5zW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#Z3VhcmRpYW5zW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
         },
         error: function(erro){
           console.log(erro);

@@ -166,7 +166,7 @@ progress: 50
 question: |
   Data de retorno às atividdes
 fields:
-  - Redução: pc_reducao
+  - Retorno em: return_date
     datatype: date
     required: True
 ---
