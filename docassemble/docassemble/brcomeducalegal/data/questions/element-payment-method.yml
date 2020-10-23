@@ -53,7 +53,6 @@ fields:
       val("method_payment") == "à vista"
   - 'Há parcela de entrada:': has_input_value
     datatype: yesnoradio
-    default: false
     js show if: |
       val("method_payment") == "parcelado"
   - note: |
@@ -95,23 +94,23 @@ fields:
     default: 1
     min: 1
     js show if: |
-      val("method_payment") == "parcelado"
+      val("has_input_value") == true || val("has_input_value") == false
   - 'Valor da parcela:': installments_value
     datatype: currency
     hint: 0000,00
     js show if: |
-      val("method_payment") == "parcelado"
+      val("has_input_value") == true || val("has_input_value") == false
   - 'Data do vencimento da primeira parcela: ': installments_date
     datatype: date
     js show if: |
-      val("method_payment") == "parcelado"
+      val("has_input_value") == true || val("has_input_value") == false
   - 'Valor líquido da parcela:': net_installments_value
     datatype: currency
     required: False
     help: Valor da parcela com o desconto concedido.
     hint: 0000,00
     js show if: |
-      val("method_payment") == "parcelado"
+      val("has_input_value") == true || val("has_input_value") == false
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
