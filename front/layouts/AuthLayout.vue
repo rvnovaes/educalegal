@@ -98,7 +98,12 @@
 <!--    </base-nav>-->
 
     <div class="main-content">
-      <nuxt></nuxt>
+      <!-- https://stackoverflow.com/questions/47862591/vuejs-error-the-client-side-rendered-virtual-dom-tree-is-not-matching-server-re-->
+      <!--    https://medium.com/@liutingchun_95744/nuxt-js-best-practices-for-client-side-only-contents-client-only-no-ssr-4843e94d9565-->
+
+      <client-only>
+        <nuxt></nuxt>
+      </client-only>
     </div>
 
     <footer class="py-5" id="footer-main">

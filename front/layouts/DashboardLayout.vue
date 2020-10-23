@@ -87,7 +87,11 @@
       <dashboard-navbar :type="$route.name === 'alternative' ? 'light': 'default'"></dashboard-navbar>
 
       <div @click="$sidebar.displaySidebar(false)">
-        <nuxt></nuxt>
+        <!-- https://stackoverflow.com/questions/47862591/vuejs-error-the-client-side-rendered-virtual-dom-tree-is-not-matching-server-re-->
+        <!--    https://medium.com/@liutingchun_95744/nuxt-js-best-practices-for-client-side-only-contents-client-only-no-ssr-4843e94d9565-->
+        <client-only>
+          <nuxt></nuxt>
+        </client-only>
       </div>
       <content-footer v-if="!$route.meta.hideFooter"></content-footer>
     </div>

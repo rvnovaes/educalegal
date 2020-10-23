@@ -1,17 +1,20 @@
 import datetime
 import io
+import json
 import logging
-import pytz
 import pandas as pd
+import pytz
+import re
 
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
 from dateutil.relativedelta import relativedelta
 from drf_yasg.renderers import SwaggerUIRenderer, OpenAPIRenderer
+from json import dumps
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework import pagination
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
@@ -48,6 +51,7 @@ from tenant.models import Plan, Tenant, TenantGedData
 from users.models import CustomUser
 from util.file_import import is_metadata_valid, is_content_valid
 from util.mongo_util import create_dynamic_document_class
+from util.util import delete_keys_from_obj
 
 from .serializers_v2 import (
     PlanSerializer,
@@ -60,7 +64,7 @@ from .serializers_v2 import (
     TenantSerializer,
     TenantGedDataSerializer,
     UserSerializer,
-    WitnessSerializer,
+    WitnessSerializer, ChangePasswordSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -397,8 +401,22 @@ class DocumentViewSet(viewsets.ModelViewSet):
             logger.info(
                 "Atualizando o documento {doc_uuid}".format(doc_uuid=str(doc_uuid))
             )
+
+            # faz copia do request.data, pois nao é permitido alterar diretamente no request.data
+            data = request.data.copy()
+
+            # como vem do docassemble como uma string e não um json, tem que colocar colchetes na string
+            # para torná-la um JSON string válido e poder usar o json.loads()
+            valid_json_string = "[" + data['document_data'] + "]"
+            document_data = json.loads(valid_json_string)
+            # pega somente o dicionario
+            document_data = document_data[0]
+
+            # limpa a variavel all_variables antes de salvar no sistema
+            data['document_data'] = clean_all_variables(document_data)
+
             serializer = DocumentDetailSerializer(
-                instance, data=request.data, partial=True, context={"request": request}
+                instance, data=data, partial=True, context={"request": request}
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -407,8 +425,6 @@ class DocumentViewSet(viewsets.ModelViewSet):
             params = self.request.query_params
             if 'trigger' in params:
                 if params['trigger'] == 'docassemble':
-                    data = self.request.data.copy()
-
                     # salva o documento no sistema de arquivos e/ou ged
                     save_document_file(instance, data, params)
 
@@ -502,6 +518,41 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return status.HTTP_200_OK, 'Configuração do GED OK'
 
 
+def clean_all_variables(all_variables):
+    keys_to_ignore = ['DocumentStatus', 'Enum', 'PY2', '__warningregistry__', '_class', '_internal', 'ask_number',
+                      'ask_object_type', 'attachments', 'auto_gather', 'cd_name', 'cd_related_documents', 'cd_status',
+                      'city_only', 'complete', 'complete_attribute', 'content_document', 'custom_file_name',
+                      'device_local', 'doc_uuid', 'document_type_data', 'educalegal_front_url', 'educalegal_url',
+                      'el_environment', 'el_log_to_console', 'el_send_email', 'elc', 'envelope_statuses',
+                      'example_acordo_individual_reducao_de_jornada_e_reducao_salarial',
+                      'example_termo_acordo_individual_para_banco_horas_mp_927_2020',
+                      'example_termo_mudanca_de_regime_e_cessao_do_direito_autoral', 'gathered', 'generated_file',
+                      'geolocated', 'help_email_msg', 'i', 'input_installments_list', 'installments_list',
+                      'instanceName', 'interview_custom_file_name_string', 'interview_data', 'interview_document_type',
+                      'interview_is_freemium', 'interview_language', 'intid', 'item', 'job_title_list', 'location',
+                      'mc', 'menu_items', 'minimum_number', 'mongo_uuid', 'nav', 'new_recipient', 'object_type',
+                      'object_type_parameters', 'plan_data', 'plan_use_esignature', 'plan_use_ged',
+                      'recipient_group_types_dict', 'recipients', 'reviewed_school_email_answer', 'revisit',
+                      'school_data_dict', 'school_id', 'school_letterhead', 'school_names_list', 'school_units',
+                      'school_units_dict', 'school_units_list', 'school_witnesses_dict', 'session_local',
+                      'signature_local_default', 'state_initials_list', 'string_types', 'table', 'target_number',
+                      'tenant_data', 'tenant_esignature_data', 'tenant_ged_data', 'tenant_ged_token', 'tenant_ged_url',
+                      'there_are_any', 'tid', 'url_args', 'user_local', 'uses_parts', 'ut', 'v', 'valid_data',
+                      'witnesses_data_list']
+
+    # ignora valid_*_table: ex.: valid_employees_table, valid_locatarios_table
+    regex_list = ['valid_(.*)_table']
+    ignore = {k for k, v in all_variables.items() if any(re.match(regex, k) for regex in regex_list)}
+    ignore = list(ignore)
+    keys_to_ignore += ignore
+
+    interview_variables = delete_keys_from_obj(all_variables, keys_to_ignore)
+
+    # converte dicionario em json
+    interview_variables = json.dumps(interview_variables)
+    return interview_variables
+
+
 def validate_tenant_plan_ged(tenant):
     if not tenant.plan.use_ged:
         message = "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
@@ -543,15 +594,18 @@ def save_in_ged(data, url, file, tenant):
 
         return 500, message, 0
     else:
+        if isinstance(response, dict):
+            response = dumps(response)
+
         if status_code != 201:
-            message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + response
+            message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + str(response)
             logging.error(message)
 
             return status_code, response, 0
         else:
             if ged_id == 0:
                 message = 'O arquivo foi inserido no GED, mas retornou ID = 0. Erro: ' + str(status_code) + ' - ' + \
-                          response
+                          str(response)
                 logging.error(message)
 
                 return status_code, message, 0
@@ -1265,3 +1319,45 @@ def reached_document_limit(request):
     except Exception as e:
         message = 'Não foi possível obter o limite de documentos. Erro: {}'.format(e)
         return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ChangePassword(APIView):
+    """
+    An endpoint for changing password.
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def put(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = ChangePasswordSerializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            old_password = serializer.data.get("old_password")
+            new_password1 = serializer.data.get("new_password1")
+            new_password2 = serializer.data.get("new_password2")
+            if not self.object.check_password(old_password):
+                message = "A senha atual está inválida."
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            if old_password:
+                if old_password == new_password1:
+                    message = "A nova senha deve ser diferente da atual."
+                    return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            if new_password1 and new_password2:
+                if new_password1 != new_password2:
+                    message = "A nova senha deve ser igual à sua confirmação."
+                    return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password1"))
+            self.object.force_password_change = False
+            self.object.save()
+            message = "A senha foi alterada com sucesso!"
+            return Response(message, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
