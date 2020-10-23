@@ -49,7 +49,6 @@ code: |
     if plan_use_esignature:
       valid_contractors_table
     school_year
-    net_installments_value_show = True
     if method_payment == "parcelado":
       installments_list
       if has_input_value:

@@ -195,6 +195,13 @@
       "Data de vencimento da primeira parcela",
       null
    ],
+   "net_installments_value": [
+      "FloatField",
+      "false",
+      null,
+      "Valor líquido da parcela mensal",
+      null
+   ],
    "signature_local": [
       "StringField",
       "true",

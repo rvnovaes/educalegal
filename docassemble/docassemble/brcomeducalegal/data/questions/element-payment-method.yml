@@ -20,9 +20,6 @@ code: |
     installments_value_words = num2words(installments_value, lang='pt_BR', to='currency')
     net_installments_value_words = num2words(net_installments_value, lang='pt_BR', to='currency')
 ---
-variable name: net_installments_value_show
-data: False
----
 progress: 85
 section: Dados Contratuais
 question: Preço e Forma de Pagamento
@@ -110,11 +107,9 @@ fields:
       val("method_payment") == "parcelado"
   - 'Valor líquido da parcela:': net_installments_value
     datatype: currency
+    required: False
     help: Valor da parcela com o desconto concedido.
     hint: 0000,00
-    show if:
-      code: |
-        net_installments_value_show == True
     js show if: |
       val("method_payment") == "parcelado"
 script: |
