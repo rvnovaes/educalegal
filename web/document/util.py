@@ -57,6 +57,9 @@ def dict_to_docassemble_objects(documents, interview_type_id):
             parents = ['input_installments_data', 'other_installments_data']
 
             for parent in parents:
+                if parent not in document:
+                    continue
+
                 # Cria a representacao do objeto Thing
                 _create_thing_obj(document, parent)
 
@@ -222,9 +225,6 @@ def _create_address_obj(document, parent):
 
 
 def _create_da_list_properties(document, parent):
-    if parent not in document:
-        return
-
     document[parent]["_class"] = "docassemble.base.core.DAList"
     document[parent]["instanceName"] = parent
     document[parent]["auto_gather"] = False
@@ -233,9 +233,6 @@ def _create_da_list_properties(document, parent):
 
 
 def _create_thing_obj(document, parent):
-    if parent not in document:
-        return
-
     # cria hierarquia para name do person_list_name
     _build_name_dict(document, parent, True)
 
