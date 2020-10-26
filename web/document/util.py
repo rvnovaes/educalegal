@@ -53,6 +53,15 @@ def dict_to_docassemble_objects(documents, interview_type_id):
 
                 _create_da_list_properties(document, parent)
 
+            # para objetos do tipo Thing
+            parents = ['input_installments_data', 'other_installments_data']
+
+            for parent in parents:
+                # Cria a representacao do objeto Thing
+                _create_thing_obj(document, parent)
+
+                _create_da_list_properties(document, parent)
+
             # para pessoas que nao tem endereco
             parents = ['witnesses']
 
@@ -126,11 +135,14 @@ def dict_to_docassemble_objects(documents, interview_type_id):
     return interview_variables_list
 
 
-def _build_name_dict(document, parent):
+def _build_name_dict(document, parent, empty=False):
     for element in document[parent]['elements']:
         element["name"] = dict()
-        element["name"]["text"] = element["name_text"]
-        element.pop("name_text")
+        if empty:
+            element["name"]["text"] = None
+        else:
+            element["name"]["text"] = element["name_text"]
+            element.pop("name_text")
 
     return document
 
@@ -210,11 +222,29 @@ def _create_address_obj(document, parent):
 
 
 def _create_da_list_properties(document, parent):
+    if parent not in document:
+        return
+
     document[parent]["_class"] = "docassemble.base.core.DAList"
     document[parent]["instanceName"] = parent
     document[parent]["auto_gather"] = False
     document[parent]["gathered"] = True
     document["valid_" + parent + "_table"] = "continue"
+
+
+def _create_thing_obj(document, parent):
+    if parent not in document:
+        return
+
+    # cria hierarquia para name do person_list_name
+    _build_name_dict(document, parent, True)
+
+    for index, element in enumerate(document[parent]['elements']):
+        element["_class"] = "docassemble.base.util.Thing"
+        element["name"]["_class"] = "docassemble.base.util.Name"
+
+        element["instanceName"] = parent + '[' + str(index) + ']'
+        element["name"]["instanceName"] = parent + '[' + str(index) + '].name'
 
 
 @login_required

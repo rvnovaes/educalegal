@@ -1,5 +1,6 @@
 metadata:
   title: Contrato de Prestação de Serviços Educacionais
+  date format: 'dd/MM/yyyy'
 ---
 include:
   - element-tenant-school-interview.yml
