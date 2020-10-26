@@ -14,7 +14,6 @@ include:
   - element-school-email-reviewed.yml
   - element-default-messages.yml
   - element-school-witness.yml
-  - element-payment-method.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
