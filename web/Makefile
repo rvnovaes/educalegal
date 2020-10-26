@@ -3,11 +3,11 @@ build:
 
 build_all_educalegal:
 ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build educalegal educalegal_celery educalegal_front educalegal_flower
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build educalegal apicelery api apiflower
 else ifeq ($(e), test)
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml build educalegal educalegal_celery educalegal_front educalegal_flower
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml build educalegal apicelery api apiflower
 else
-	docker-compose build educalegal educalegal_celery educalegal_front educalegal_flower
+	docker-compose build educalegal apicelery api apiflower
 endif
 
 # parametros

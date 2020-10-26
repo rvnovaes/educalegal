@@ -15,6 +15,8 @@ def config_hosts():
     # Back End
     api_regex = "127.0.1.1 +(api)$"
     api_entry = False
+    db_regex = "127.0.1.1 +(db)$"
+    db_entry = False
     apiflower_regex = "127.0.1.1 +(apiflower)$"
     apiflower_entry = False
     apirabbitmq_regex = "127.0.1.1 +(apirabbitmq)$"
@@ -31,6 +33,7 @@ def config_hosts():
     # Docassemble
     docassemble_regex = "127.0.1.1 +(docassemble)$"
     docassemble_entry = False
+    # DB
 
     with open("/etc/hosts") as hosts_file:
         for line in hosts_file:
@@ -44,6 +47,9 @@ def config_hosts():
             if re.match(api_regex, line) is not None:
                 print("Já existe configuração para a Api em /etc/hosts.txt. Saltando...")
                 api_entry = True
+            if re.match(db_regex, line) is not None:
+                print("Já existe configuração para a Api em /etc/hosts.txt. Saltando...")
+                db_entry = True
             if re.match(apiflower_regex, line) is not None:
                 print("Já existe configuração para o Flower da api em /etc/hosts.txt. Saltando...")
                 apiflower_entry = True
@@ -78,6 +84,10 @@ def config_hosts():
         print("Não há entrada para a Api em /etc/hosts.txt. Criando... ")
         with open("/etc/hosts", "a") as writeable_hosts_file:
             writeable_hosts_file.write("127.0.1.1  api\n")
+    if not db_entry:
+        print("Não há entrada para o DB em /etc/hosts.txt. Criando... ")
+        with open("/etc/hosts", "a") as writeable_hosts_file:
+            writeable_hosts_file.write("127.0.1.1  db\n")
     if not apiflower_entry:
         print("Não há entrada para o Flower da api em /etc/hosts.txt. Criando... ")
         with open("/etc/hosts", "a") as writeable_hosts_file:

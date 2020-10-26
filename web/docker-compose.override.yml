@@ -1,15 +1,15 @@
 version: '3.7'
 
 services:
-  nginx:
-    container_name: nginx
-    build:
-      context: nginx_dockerfile_dev
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - api
+#  nginx:
+#    container_name: nginx
+#    build:
+#      context: nginx_dockerfile_dev
+#      dockerfile: Dockerfile
+#    ports:
+#      - "80:80"
+#    depends_on:
+#      - api
   api:
     # Os settings do banco devem ficar aqui tambem para permitir que o script wait for postgres funcione
     environment:

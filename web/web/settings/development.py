@@ -22,7 +22,7 @@ DATABASES = {
         "USER": "educalegal",
         "PASSWORD": "educalegal",
         "HOST": "db",
-        "PORT": 5432,
+        "PORT": 7654,
     }
 }
 # No password validation

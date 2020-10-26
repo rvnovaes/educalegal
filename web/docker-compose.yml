@@ -9,7 +9,7 @@ services:
     build:
       context: ../front
       args:
-        BUILD_BACKEND_URL: "http://api"
+        BUILD_BACKEND_URL: "http://localhost:8008"
     depends_on:
       - api
     ports:
