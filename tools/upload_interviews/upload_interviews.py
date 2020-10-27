@@ -49,7 +49,7 @@ def post_to_docassemble(
         return "Success posting " + file_path
 
 destination_options = [
-    "http://localhost",
+    "http://docassemble",
     "https://doctest.educalegal.com.br",
     "https://generation.educalegal.com.br",
 ]
@@ -92,7 +92,7 @@ while True:
     if event == sg.WIN_CLOSED or event == "Sair":
         break
     if event == "destination_ok":
-        if values["destination_options"] == "http://localhost":
+        if values["destination_options"] == "http://docassemble":
             api_key = config["keys"]["LOCALHOST"]
         elif values["destination_options"] == "https://doctest.educalegal.com.br":
             api_key = config["keys"]["DOCTEST"]
