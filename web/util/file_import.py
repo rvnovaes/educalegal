@@ -290,6 +290,21 @@ def validate_field(column_name, row_index, field_type_name, field_required, valu
                     )
                 )
 
+        if field_type_name == "FullNameField":
+            is_valid = checkers_br.is_person_full_name(value)
+
+            if is_valid and checkers_br.is_person_full_name(value):
+                value = validators_br.person_full_name(value)
+            elif not is_valid:
+                raise ValueError(
+                    "Erro na coluna {column_name}, linha {row_index}: o valor {value} para o campo {field_type_name} deve ter pelo menos 2 palavras.\n".format(
+                        column_name=column_name,
+                        row_index=row_index,
+                        value=value,
+                        field_type_name=field_type_name,
+                    )
+                )
+
         return value, True
 
 

@@ -4,7 +4,7 @@ import pandas as pd
 import uuid
 
 from celery import chain
-from django.core.files.base import ContentFile
+from datetime import datetime
 from mongoengine.errors import ValidationError
 from rest_framework import generics
 from urllib.request import urlretrieve, urlcleanup
@@ -14,6 +14,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
 from django.core.files import File
+from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -33,11 +34,11 @@ from util.mongo_util import (
 )
 from util.file_import import is_metadata_valid, is_content_valid
 
-from .util import custom_class_name, dict_to_docassemble_objects, create_secret
+from .util import custom_class_name, dict_to_docassemble_objects
 from .forms import BulkDocumentGenerationForm
 from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus, DocumentFileKind
 # https://docs.celeryproject.org/en/latest/userguide/tasks.html#task-naming-relative-imports
-from document.tasks import celery_create_document, celery_submit_to_esignature, celery_send_email
+from document.tasks import celery_create_document, celery_submit_to_esignature, celery_send_email, create_secret
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
 logger = logging.getLogger(__name__)
@@ -266,10 +267,18 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
             data_valid = metadata_valid and content_valid
 
-            bulk_generation_id, mongo_document = validate_data_mongo(
-                self.request, interview.pk, data_valid, bulk_data_content,
-                field_types_dict, required_fields_dict, parent_fields_dict, True
-            )
+            bulk_generation_id = 0
+
+            try:
+                bulk_generation_id, mongo_document = validate_data_mongo(
+                    self.request, interview.pk, data_valid, bulk_data_content,
+                    field_types_dict, required_fields_dict, parent_fields_dict, True
+                )
+            except Exception as e:
+                data_valid = False
+                error_message = "Houve erro no processo de geração em lote. | {exc}".format(
+                    exc=str(type(e).__name__) + " : " + str(e))
+                logger.error(error_message)
 
             if data_valid:
                 return render(
@@ -284,8 +293,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 )
 
             else:
-                # TODO Testar se realmente apaga quando há erro Apaga a colecao do banco
-                mongo_document.drop_collection()
                 return render(
                     request,
                     "document/bulkdocumentgeneration_validate_generate.html",
@@ -333,7 +340,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         else:
             payload = {
                 "success": False,
-                "message": data,
+                "message": str(data),
             }
 
         return HttpResponse(json.dumps(payload), content_type="application/json")
@@ -467,7 +474,7 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
                 #         api_key,
                 #         secret,
                 #         interview_full_name,
-                #         interview_variables,
+                #         interview_variables
                 #     )
                 #
                 # celery_submit_to_esignature(str(el_document.doc_uuid))
@@ -479,7 +486,7 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
                         api_key,
                         secret,
                         interview_full_name,
-                        interview_variables,
+                        interview_variables
                     ),
                     # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
                     # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
@@ -501,7 +508,7 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
                 #         api_key,
                 #         secret,
                 #         interview_full_name,
-                #         interview_variables,
+                #         interview_variables
                 #     )
                 #
                 # celery_send_email(str(el_document.doc_uuid))
@@ -513,7 +520,7 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
                         api_key,
                         secret,
                         interview_full_name,
-                        interview_variables,
+                        interview_variables
                     ),
                     # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
                     # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
@@ -530,7 +537,11 @@ def generate_document_from_mongo(request, dynamic_document_class, interview_id, 
                 total_task_size += 2
             else:
                 result = celery_create_document.delay(
-                    base_url, api_key, secret, interview_full_name, interview_variables,
+                    base_url,
+                    api_key,
+                    secret,
+                    interview_full_name,
+                    interview_variables
                 )
                 result_description = "Criação do documento: {id}".format(id=result.id)
 
@@ -662,12 +673,13 @@ def save_document_data(document, url, file_data, relative_path, has_ged, ged_dat
     document.status = DocumentStatus.INSERIDO_GED.value
 
     if parent:
-        # cria documento relacionado ao documento pdf principal
+        # cria documento relacionado ao pdf principal
         document.doc_uuid = uuid.uuid4()
         document.parent = parent
+        logging.info(document.doc_uuid)
 
         try:
-            # salva dados do ged do documento no educa legal
+            # salva dados do documento relacionado ao pdf principal
             document.save()
         except Exception as e:
             message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
@@ -819,3 +831,26 @@ def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
             return bulk_generation.pk, mongo_document
         else:
             return mongo_document, dynamic_document_class_name, school_names_set, school_units_names_set
+
+
+def reached_document_limit(tenant_id):
+    today = datetime.today()
+
+    # verifica se atingiu o limite de documentos
+    tenant = Tenant.objects.get(pk=tenant_id)
+    documents = Document.objects.filter(tenant=tenant,
+                                        parent=None,
+                                        created_date__month=today.month,
+                                        created_date__year=today.year)
+
+    if tenant.has_ged():
+        document_count = documents.exclude(Q(status="rascunho") | Q(status="criado")).count()
+    else:
+        document_count = documents.exclude(status="rascunho").count()
+
+    reached_limit = False
+    if tenant.plan.document_limit:
+        if document_count >= tenant.plan.document_limit:
+            reached_limit = True
+
+    return reached_limit, tenant.plan.document_limit

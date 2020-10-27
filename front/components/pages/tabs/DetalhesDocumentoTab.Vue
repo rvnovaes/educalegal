@@ -8,6 +8,9 @@
         </span>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
+            <span class="font-weight-bold">Escola: </span>{{ currentDocument.school_name }}
+          </li>
+          <li class="list-group-item">
             <span class="font-weight-bold">Nome do arquivo: </span>{{ currentDocument.name }}
           </li>
           <li class="list-group-item">
@@ -171,21 +174,30 @@ export default {
             title: "O e-mail foi enviado com sucesso!",
             html: res.data,
             icon: "success",
+            showCloseButton: true,
             customClass: {
               confirmButton: "btn btn-success btn-fill",
             },
           });
         }
       } catch (e) {
+        let errorMessage = ''
+        if (e.response.data){
+          errorMessage = e.response.data
+        }
+        else {
+          errorMessage = e
+        }
         this.emailButtonType = "success";
         await Swal.fire({
           title: "Houve erro ao enviar o e-mail.",
-          text: e.response.data,
+          text: errorMessage,
           icon: "error",
           customClass: {
             confirmButton: "btn btn-info btn-fill",
           },
           confirmButtonText: "OK",
+          showCloseButton: true,
           buttonsStyling: false
         });
       }
@@ -201,21 +213,30 @@ export default {
             title: "O documento foi enviado para a assinatura eletrônica com sucesso!",
             html: res.data,
             icon: "success",
+            showCloseButton: true,
             customClass: {
               confirmButton: "btn btn-success btn-fill",
             },
           });
         }
       } catch (e) {
+        let errorMessage = ''
+        if (e.response.data){
+          errorMessage = e.response.data
+        }
+        else {
+          errorMessage = e
+        }
         this.esignatureButtonType = "success";
         await Swal.fire({
           title: "Houve erro ao enviar para a assinatura eletrônica.",
-          text: e.response.data,
+          text: errorMessage,
           icon: "error",
           customClass: {
             confirmButton: "btn btn-info btn-fill",
           },
           confirmButtonText: "OK",
+          showCloseButton: true,
           buttonsStyling: false
         });
       }
@@ -244,6 +265,7 @@ export default {
             confirmButton: "btn btn-info btn-fill",
           },
           confirmButtonText: "OK",
+          showCloseButton: true,
           buttonsStyling: false
         });
       }

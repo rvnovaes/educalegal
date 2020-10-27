@@ -125,6 +125,15 @@ def webhook_listener(request):
             #     return HttpResponse(status=400, reason='HMACs não correspondem.')
             # logging.info('hmac 4')
 
+            # O disparo dos Webhooks tem timeout de 5 segundos. Se a sua aplicação não responder com um código 2XX
+            # neste intervalo, o Webhook será enfileirado para ser disparado novamente
+            # https://developers.clicksign.com/docs/disparos-de-webhooks
+            # se o documento já estiver finalizado no EL, ignora novas requisicoes da clicksign
+            if document.status == DocumentStatus.ASSINADO or document.status == DocumentStatus.RECUSADO_INVALIDO:
+                message = 'O documento {} já foi assinado ou recusado. Ignorada a requisição'.format(document.id)
+                logging.info(message)
+                return HttpResponse(status=200, reason=message)
+
             envelope_status = str(data['document']['status']).lower()
             if envelope_status in envelope_statuses.keys():
                 document_status = envelope_statuses[envelope_status]['el']
@@ -216,9 +225,6 @@ def webhook_listener(request):
             # atualiza o status do documento
             document.status = document_status
             document.save(update_fields=['status'])
-
-            # envia requisicao para webhook
-            # sent_document_status_update()
 
             # se o envelope já existe atualiza o status, caso contrário, cria o envelope
             try:

@@ -56,7 +56,8 @@ export default {
         neighborhood: null,
         city: null,
         state: null,
-        school_units: []
+        school_units: [],
+        witnesses: []
       }
     };
   }

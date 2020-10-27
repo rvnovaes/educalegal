@@ -1,5 +1,9 @@
+import logging
+
 from datetime import datetime
 from mongoengine import *
+
+logger = logging.getLogger(__name__)
 
 
 def create_mongo_connection(db, alias, username, password, host, port):
@@ -16,6 +20,8 @@ def get_field(field_type, required):
         field = EmailField()
     if field_type == "FloatField":
         field = FloatField()
+    if field_type == "FullNameField":
+        field = StringField()
     if field_type == "IntField":
         field = IntField()
     if field_type == "StringField":
@@ -71,12 +77,6 @@ def create_dynamic_document_class(
     return DynamicDocumentClass
 
 
-def _remove_prefix(text, prefix):
-    if text.startswith(prefix):
-        return text[len(prefix):]
-    return text
-
-
 def mongo_to_hierarchical_dict(document, exclude_fields=('id',)):
     """Monta a estrutura do dicionário em níveis de acordo com os objetos do Docassemble"""
 
@@ -87,17 +87,40 @@ def mongo_to_hierarchical_dict(document, exclude_fields=('id',)):
             document_dict[field] = document[field]
             continue
 
-        if document._fields[field].parent:
-            # remove o prefixo (objeto pai) dos campos
-            prefix = document._fields[field].parent + '_'
-            field_name = _remove_prefix(field, prefix)
+        try:
+            if document._fields[field].parent:
+                # separa partes do campo: prefixo, indice e nome
+                prefix = field.split('__')[0]
+                index = int(field.split('__')[1])
+                field_name = field.split('__')[2]
+                parent = document._fields[field].parent.split('__')[0]
+                parent_type = document._fields[field].parent.split('__')[1]
 
-            # verifica se a chave pai já existe no dict
-            if not document._fields[field].parent in document_dict:
-                document_dict[document._fields[field].parent] = dict()
+                # verifica se a chave pai já existe no dict
+                if not parent in document_dict:
+                    document_dict[parent] = dict()
+                    if parent_type == 'list':
+                        document_dict[parent]['elements'] = list()
+                        # adiciona o primeiro indices da lista para o novo parent
+                        document_dict[parent]['elements'].append(dict())
+                    else:
+                        document_dict[parent]['elements'] = dict()
 
-            document_dict[document._fields[field].parent][field_name] = document[field]
-        else:
-            document_dict[field] = document[field]
+                if parent_type == 'list':
+                    # adiciona os outros indices da lista para o mesmo parent
+                    try:
+                        document_dict[parent]['elements'][index]
+                    except IndexError:
+                        document_dict[parent]['elements'].append(dict())
+
+                    document_dict[parent]['elements'][index][field_name] = document[field]
+                else:
+                    document_dict[parent]['elements'][field_name] = document[field]
+            else:
+                document_dict[field] = document[field]
+        except Exception as e:
+            error_message = "Houve erro ao gerar o dicionário hierárquico. | {exc}".format(
+                exc=str(type(e).__name__) + " : " + str(e))
+            logger.error(error_message)
 
     return document_dict

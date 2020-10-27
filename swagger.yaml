@@ -411,7 +411,7 @@ paths:
         Permite enviar por e-mail ou assinatura eletrônica.
         Para cada chave do dicionário temos suas propriedades e valores em uma lista na seguinte ordem:
         - Chave do dicionário com o nome interno do campo.
-        - Tipo do campo. Tipos possíveis: BooleanField, EmailField, FloatField, IntField, StringField, CpfField, CnpjField.
+        - Tipo do campo. Tipos possíveis: BooleanField, EmailField, FloatField, FullNameField, IntField, StringField, CpfField, CnpjField.
           O tipo DateTimeField não deve ser usado, pois não é serializável.
         - Obrigatoriedade do campo: True ou False.
         - Parent do campo. É indicado pela Educa Legal quando deve ser usado.
@@ -1014,7 +1014,7 @@ paths:
       parameters: []
       responses:
         '200':
-          description: 'Documento enviado para a assinatura eletrônica com sucesso com sucesso para os destinatários: <lista com nome e e-mail dos destinatários>.'
+          description: 'Documento enviado para a assinatura eletrônica com sucesso para os destinatários: <lista com nome e e-mail dos destinatários>.'
       tags:
         - v2
     parameters:

@@ -1,15 +1,15 @@
 // https://tahazsh.com/vuebyte-reset-module-state
 const getDefaultState = () => {
   return {
-    "totalDocsCount": null,
-    "cmDocsCount": null,
-    "lmDocsCount": null,
-    "cmInProgressDocsCount": null,
-    "lmInProgressDocsCount": null,
-    "cmSignatureCount": null,
-    "lmSignatureCount": null,
-    "cmInProgressSignatureCount": null,
-    "lmInProgressSignatureCount": null,
+    "totalDocsCount": 0,
+    "cmDocsCount": 0,
+    "lmDocsCount": 0,
+    "cmInProgressDocsCount": 0,
+    "lmInProgressDocsCount": 0,
+    "cmSignatureCount": 0,
+    "lmSignatureCount": 0,
+    "cmInProgressSignatureCount": 0,
+    "lmInProgressSignatureCount": 0,
     loading: null,
   }
 }
@@ -19,15 +19,15 @@ const getDefaultState = () => {
 // o vue ficava dando um warning de que state deve retornar um objeto
 
 export const state = () => ({
-  "totalDocsCount": null,
-  "cmDocsCount": null,
-  "lmDocsCount": null,
-  "cmInProgressDocsCount": null,
-  "lmInProgressDocsCount": null,
-  "cmSignatureCount": null,
-  "lmSignatureCount": null,
-  "cmInProgressSignatureCount": null,
-  "lmInProgressSignatureCount": null,
+  "totalDocsCount": 0,
+  "cmDocsCount": 0,
+  "lmDocsCount": 0,
+  "cmInProgressDocsCount": 0,
+  "lmInProgressDocsCount": 0,
+  "cmSignatureCount": 0,
+  "lmSignatureCount": 0,
+  "cmInProgressSignatureCount": 0,
+  "lmInProgressSignatureCount": 0,
   loading: null,
 });
 

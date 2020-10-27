@@ -47,7 +47,7 @@ cryptography~=3.1.1
 
 # Validations
 validator-collection~=1.4.2
-validator-collection-br~=0.0.11
+validator-collection-br~=0.0.13
 # Celery
 celery~=4.4.7
 django-celery-results~=1.2.1

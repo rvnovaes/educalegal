@@ -1,192 +1,192 @@
 <template>
-  <div class="content">
-    <base-header class="pb-6">
-      <div class="row align-items-center py-4">
-        <div class="col-11">
-          <h6 class="h2 text-white d-inline-block mb-0 arquivo">Arquivo</h6>
-          <p class="text-sm text-white font-weight-bold mb-0">
-            Documentos já gerados por sua escola
-          </p>
-        </div>
-        <div v-if="loading" class="col-1">
-          <HourGlassSpinner></HourGlassSpinner>
-        </div>
-        <div v-else class="col-1 text-right">
-          <base-button size="sm" type="neutral" @click="tour">Ajuda</base-button>
-        </div>
-      </div>
-    </base-header>
-    <div class="container-fluid mt--6">
-      <div>
-        <card class="no-border-card" body-classes="px-0 pb-1" footer-classes="pb-2">
-          <div>
-            <div class="col-12 d-flex  justify-content-sm-between flex-wrap"
-            >
-
-              <div class="col-2">
-
-                <base-input label="Data de criação"
-                            addon-left-icon="ni ni-calendar-grid-58">
-                  <flat-pickr slot-scope="{focus, blur}"
-                              @on-open="focus"
-                              @on-close="blur"
-                              :config="{allowInput: true, mode: 'range'}"
-                              class="form-control datepicker filtro-data"
-                              v-model="createdDateRange">
-                  </flat-pickr>
-                </base-input>
-              </div>
-              <div class="col-4">
-                <base-input label="Modelo de Documento">
-                  <el-select multiple
-                             class="select-primary filtro-modelo"
-                             placeholder="Modelo"
-                             v-model="selectedInterviews">
-                    <el-option
-                      class="select-primary"
-                      v-for="option in interviews"
-                      :value="option.value"
-                      :label="option.label"
-                      :key="option.label">
-                    </el-option>
-                  </el-select>
-                </base-input>
-              </div>
-              <div class="col-2">
-                <base-input label="Escola">
-                  <el-select multiple
-                             class="select-primary filtro-escola"
-                             placeholder="Escola"
-                             v-model="selectedSchools">
-                    <el-option
-                      class="select-primary"
-                      v-for="option in schools"
-                      :value="option.value"
-                      :label="option.label"
-                      :key="option.label">
-                    </el-option>
-                  </el-select>
-                </base-input>
-              </div>
-              <div class="col-2">
-                <base-input label="Status">
-                  <el-select multiple
-                             class="select-primary filtro-status"
-                             placeholder="Status"
-                             v-model="selectedStatuses">
-                    <el-option
-                      class="select-primary"
-                      v-for="option in selects.statuses"
-                      :value="option.value"
-                      :label="option.label"
-                      :key="option.label">
-                    </el-option>
-                  </el-select>
-                </base-input>
-              </div>
-              <div class="col-2">
-                <base-input label="Paginação">
-                  <el-select
-                    class="select-primary pagination-select paginacao"
-                    v-model="pagination.perPage"
-                    placeholder="Per page"
-                  >
-                    <el-option
-                      class="select-primary"
-                      v-for="item in pagination.perPageOptions"
-                      :key="item"
-                      :label="item"
-                      :value="item"
-                    >
-                    </el-option>
-                  </el-select>
-                </base-input>
-              </div>
-            </div>
-            <div class="col-12 d-flex justify-content-end  flex-wrap filter-buttons">
-              <div id="filter-buttons">
-                <base-button @click="applyFilters" type="primary" class="botao-buscar">
-                  <i class="fa fa-search"></i> Buscar
-                </base-button>
-                <base-button @click="cleanFilters" type="warning" class="botao-limpar">
-                  <i class="fa fa-sync"></i> Limpar
-                </base-button>
-              </div>
-            </div>
-            <el-table :data="paginatedData"
-                      row-key="id"
-                      header-row-class-name="thead-light"
-                      @sort-change="sortChange"
-                      @selection-change="selectionChange"
-                      style="width: 100%">
-              <el-table-column
-                v-for="column in tableColumns"
-                :key="column.label"
-                v-bind="column"
-                :class-name="column.tour"
-              >
-              </el-table-column>
-              <el-table-column min-width="80px" align="right" label="Detalhes">
-                <div slot-scope="{$index, row}" class="d-flex">
-                  <!--                  <base-button-->
-                  <!--                    @click.native="handleLike($index, row)"-->
-                  <!--                    class="like btn-link"-->
-                  <!--                    type="info"-->
-                  <!--                    size="sm"-->
-                  <!--                    icon-->
-                  <!--                  >-->
-                  <!--                    <i class="text-white ni ni-like-2"></i>-->
-                  <!--                  </base-button>-->
-                  <base-button
-                    @click.native="handleEdit($index, row)"
-                    class="edit"
-                    type="primary"
-                    size="sm"
-                    icon
-                  >
-                    <i class="text-white fa fa-edit"></i>
-                  </base-button>
-                  <!--                  <base-button-->
-                  <!--                    @click.native="handleDelete($index, row)"-->
-                  <!--                    class="remove btn-link"-->
-                  <!--                    type="danger"-->
-                  <!--                    size="sm"-->
-                  <!--                    icon-->
-                  <!--                  >-->
-                  <!--                    <i class="text-white ni ni-fat-remove"></i>-->
-                  <!--                  </base-button>-->
-                </div>
-              </el-table-column>
-            </el-table>
+    <div class="content">
+      <base-header class="pb-6">
+        <div class="row align-items-center py-4">
+          <div class="col-11">
+            <h6 class="h2 text-white d-inline-block mb-0 arquivo">Arquivo</h6>
+            <p class="text-sm text-white font-weight-bold mb-0">
+              Documentos já gerados por sua escola
+            </p>
           </div>
-          <div
-            slot="footer"
-            class="col-12 d-flex justify-content-center justify-content-sm-between flex-wrap"
-          >
-            <div class="total-documentos">
-              <p class="card-category">
-                Mostrando {{ from + 1 }} a {{ to }} de {{ total }} documentos
+          <div v-if="loading" class="col-1">
+            <HourGlassSpinner></HourGlassSpinner>
+          </div>
+          <div v-else class="col-1 text-right">
+            <base-button size="sm" type="neutral" @click="tour">Ajuda</base-button>
+          </div>
+        </div>
+      </base-header>
+      <div class="container-fluid mt--6">
+        <div>
+          <card class="no-border-card" body-classes="px-0 pb-1" footer-classes="pb-2">
+            <div>
+              <div class="col-12 d-flex  justify-content-sm-between flex-wrap">
+                <div class="col-6">
+                  <base-input label="Nome do Documento" v-model="documentName">
+                  </base-input>
+                </div>
+                <div class="col-2">
+                  <base-input label="Data de criação" addon-left-icon="ni ni-calendar-grid-58">
+                    <flat-pickr slot-scope="{focus, blur}"
+                                @on-open="focus"
+                                @on-close="blur"
+                                :config="{allowInput: true, mode: 'range'}"
+                                class="form-control datepicker filtro-data"
+                                v-model="createdDateRange">
+                    </flat-pickr>
+                  </base-input>
+                </div>
+                <div class="col-4">
+                  <base-input label="Status">
+                    <el-select multiple
+                               class="select-primary filtro-status"
+                               placeholder="Status"
+                               v-model="selectedStatuses">
+                      <el-option
+                        class="select-primary"
+                        v-for="option in selects.statuses"
+                        :value="option.value"
+                        :label="option.label"
+                        :key="option.label">
+                      </el-option>
+                    </el-select>
+                  </base-input>
+                </div>
+                <div class="col-6">
+                  <base-input label="Modelo de Documento">
+                    <el-select multiple
+                               class="select-primary filtro-modelo"
+                               placeholder="Modelo"
+                               v-model="selectedInterviews">
+                      <el-option
+                        class="select-primary"
+                        v-for="option in interviews"
+                        :value="option.value"
+                        :label="option.label"
+                        :key="option.label">
+                      </el-option>
+                    </el-select>
+                  </base-input>
+                </div>
+                <div class="col-4">
+                  <base-input label="Escola">
+                    <el-select multiple
+                               class="select-primary filtro-escola"
+                               placeholder="Escola"
+                               v-model="selectedSchools">
+                      <el-option
+                        class="select-primary"
+                        v-for="option in schools"
+                        :value="option.value"
+                        :label="option.label"
+                        :key="option.label">
+                      </el-option>
+                    </el-select>
+                  </base-input>
+                </div>
+                <div class="col-2">
+                  <base-input label="Paginação">
+                    <el-select
+                      class="select-primary pagination-select paginacao"
+                      v-model="pagination.perPage"
+                      placeholder="Per page"
+                    >
+                      <el-option
+                        class="select-primary"
+                        v-for="item in pagination.perPageOptions"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                      >
+                      </el-option>
+                    </el-select>
+                  </base-input>
+                </div>
+              </div>
+              <div class="col-12 d-flex justify-content-end  flex-wrap filter-buttons">
+                <div id="filter-buttons">
+                  <base-button @click="applyFilters" type="primary" class="botao-buscar">
+                    <i class="fa fa-search"></i> Buscar
+                  </base-button>
+                  <base-button @click="cleanFilters" type="warning" class="botao-limpar">
+                    <i class="fa fa-sync"></i> Limpar
+                  </base-button>
+                </div>
+              </div>
+              <el-table :data="paginatedData"
+                        row-key="id"
+                        header-row-class-name="thead-light"
+                        @sort-change="sortChange"
+                        @selection-change="selectionChange"
+                        style="width: 100%">
+                <el-table-column
+                  v-for="column in tableColumns"
+                  :key="column.label"
+                  v-bind="column"
+                  :class-name="column.tour"
+                >
+                </el-table-column>
+                <el-table-column min-width="80px" align="right" label="Detalhes">
+                  <div slot-scope="{$index, row}" class="d-flex">
+                    <!--                  <base-button-->
+                    <!--                    @click.native="handleLike($index, row)"-->
+                    <!--                    class="like btn-link"-->
+                    <!--                    type="info"-->
+                    <!--                    size="sm"-->
+                    <!--                    icon-->
+                    <!--                  >-->
+                    <!--                    <i class="text-white ni ni-like-2"></i>-->
+                    <!--                  </base-button>-->
+                    <base-button
+                      @click.native="handleEdit($index, row)"
+                      class="edit"
+                      type="primary"
+                      size="sm"
+                      icon
+                    >
+                      <i class="text-white fa fa-edit"></i>
+                    </base-button>
+                    <!--                  <base-button-->
+                    <!--                    @click.native="handleDelete($index, row)"-->
+                    <!--                    class="remove btn-link"-->
+                    <!--                    type="danger"-->
+                    <!--                    size="sm"-->
+                    <!--                    icon-->
+                    <!--                  >-->
+                    <!--                    <i class="text-white ni ni-fat-remove"></i>-->
+                    <!--                  </base-button>-->
+                  </div>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div
+              slot="footer"
+              class="col-12 d-flex justify-content-center justify-content-sm-between flex-wrap"
+            >
+              <div class="total-documentos">
+                <p class="card-category">
+                  Mostrando {{ from + 1 }} a {{ to }} de {{ total }} documentos
 
-                <span v-if="selectedRows.length">
+                  <span v-if="selectedRows.length">
                     &nbsp; &nbsp; {{ selectedRows.length }} rows selected
                   </span>
-              </p>
+                </p>
 
+              </div>
+              <base-pagination
+                class="pagination-no-border"
+                v-model="pagination.currentPage"
+                :per-page="pagination.perPage"
+                :total="total"
+                @input="updatePagination"
+              >
+              </base-pagination>
             </div>
-            <base-pagination
-              class="pagination-no-border"
-              v-model="pagination.currentPage"
-              :per-page="pagination.perPage"
-              :total="total"
-              @input="updatePagination"
-            >
-            </base-pagination>
-          </div>
-        </card>
+          </card>
+        </div>
       </div>
+      <v-tour name="pageTour" :steps="arquivoSteps" :options="tourOptions"></v-tour>
     </div>
-    <v-tour name="pageTour" :steps="arquivoSteps" :options="tourOptions"></v-tour>
-  </div>
 </template>
 <script>
 import {Table, TableColumn, Select, Option} from "element-ui";
@@ -275,21 +275,18 @@ export default {
         statuses: [
           {value: "assinado", label: "assinado"},
           {value: "assinatura recusada/inválida", label: "assinatura recusada/inválida"},
-          {value: "completado", label: "completado"},
           {value: "criado", label: "criado"},
-          {value: "entregue", label: "entregue"},
-          {value: "enviado", label: "enviado"},
           {value: "enviado para assinatura", label: "enviado para assinatura"},
           {value: "enviado por e-mail", label: "enviado por e-mail"},
           {value: "finalizado", label: "finalizado"},
           {value: "inserido no GED", label: "inserido no GED"},
-          {value: "inválido", label: "inválido"},
           // {value: "rascunho", label: "rascunho"},
           {value: "rascunho - em lote", label: "rascunho - em lote"}
         ],
       },
       selectedRows: [],
       orderByCreatedDate: "descending",
+      documentName: null,
       createdDateRange: null,
       selectedStatuses: [],
       selectedInterviews: [],
@@ -325,6 +322,7 @@ export default {
     if (this.tableData.length === 0) {
       this.$store.dispatch("documents/fetchPaginatedDocuments", {
         offset: 0,
+        documentName: null,
         statusFilter: [],
         schoolFilter: [],
         interviewFilter: [],
@@ -332,7 +330,6 @@ export default {
         createdDateRange: null,
       });
     }
-    ;
   },
   methods: {
     handleLike(index, row) {
@@ -340,6 +337,7 @@ export default {
         title: `You liked ${row.name}`,
         buttonsStyling: false,
         type: "success",
+        showCloseButton: true,
         confirmButtonClass: "btn btn-success btn-fill"
       });
     },
@@ -368,6 +366,7 @@ export default {
             text: `You deleted ${row.name}`,
             type: "success",
             confirmButtonClass: "btn btn-success btn-fill",
+            showCloseButton: true,
             buttonsStyling: false
           });
         }
@@ -425,6 +424,7 @@ export default {
         console.log("Precisamos de mais documentos!");
         this.$store.dispatch("documents/fetchPaginatedDocuments", {
           offset: onStore,
+          documentNameFilter: this.documentName,
           statusFilter: this.selectedStatuses,
           schoolFilter: this.selectedSchools,
           interviewFilter: this.selectedInterviews,
@@ -437,6 +437,7 @@ export default {
       this.$store.commit("documents/cleanDocuments");
       await this.$store.dispatch("documents/fetchPaginatedDocuments", {
         offset: 0,
+        documentNameFilter: this.documentName,
         statusFilter: this.selectedStatuses,
         schoolFilter: this.selectedSchools,
         interviewFilter: this.selectedInterviews,
@@ -445,11 +446,11 @@ export default {
       });
     },
     cleanFilters() {
+      this.documentName = null;
       this.createdDateRange = null;
       this.selectedInterviews = [];
       this.selectedStatuses = [];
       this.selectedSchools = [];
-      this.createdDateRange = null;
       this.applyFilters();
     },
   },
@@ -457,20 +458,13 @@ export default {
 ;
 </script>
 <style>
-.no-border-card .card-footer {
+.no-border-card {
   border-top: 0;
 }
 
 #filter-buttons {
   margin-bottom: 30px;
   margin-right: 15px;
-}
-
-.el-tag.el-tag--info.el-tag--small.el-tag--light {
-  color: #fff;
-  background: #5e72e4;
-  border-color: #5e72e4;
-  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 </style>

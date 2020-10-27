@@ -1,11 +1,15 @@
 ---
 progress: 95
 question: |
-  Enviar o documento para assinatura de 02 testemunhas?
+  Enviar o documento para assinatura de 2 testemunhas?
 yesno: has_witnesses
 ---
 objects:
-  - witnesses: DAList.using(object_type=Individual, ask_number=True)
+  - witnesses: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  witnesses[i].name.text
+  witnesses[i].complete = True
 ---
 progress: 95
 question: Testemunhas
@@ -21,14 +25,14 @@ code: |
   if len(witnesses_data_list['results']) == 0:
     valid_witnesses_table
   elif len(witnesses_data_list['results']) == 1:
-    witnesses[0].name.first = witnesses_data_list['results'][0]['name']
+    witnesses[0].name.text = witnesses_data_list['results'][0]['name']
     witnesses[0].email = witnesses_data_list['results'][0]['email']
     witnesses[0].cpf = witnesses_data_list['results'][0]['cpf']
   else:
-    witnesses[0].name.first = witnesses_data_list['results'][0]['name']
+    witnesses[0].name.text = witnesses_data_list['results'][0]['name']
     witnesses[0].email = witnesses_data_list['results'][0]['email']
     witnesses[0].cpf = witnesses_data_list['results'][0]['cpf']
-    witnesses[1].name.first = witnesses_data_list['results'][1]['name']
+    witnesses[1].name.text = witnesses_data_list['results'][1]['name']
     witnesses[1].email = witnesses_data_list['results'][1]['email']
     witnesses[1].cpf = witnesses_data_list['results'][1]['cpf']
 ---
@@ -47,13 +51,13 @@ table: witnesses.table
 rows: witnesses
 columns:
   - Nome: |
-      row_item.name.first
+      row_item.name.text
   - E-mail: |
       row_item.email
   - CPF: |
       row_item.cpf
 edit:
-  - name.first
+  - name.text
   - email
   - cpf
 ---
@@ -61,7 +65,7 @@ progress: 95
 question: |
   Dados da 1ª testemunha:
 fields:
-  - "Nome:": witnesses[0].name.first
+  - "Nome:": witnesses[0].name.text
     required: True
     validate: validate_person_full_name
   - "E-mail:": witnesses[0].email
@@ -81,12 +85,12 @@ script: |
 progress: 95
 question: |
   % if len(witnesses_data_list['results']) == 1:
-    Você possui uma testemunha cadastrada no nosso sistema. Gentileza, inserir os Dados da 2ª testemunha:
+    Você já possui uma testemunha cadastrada no sistema. Devem ser inseridos os dados da 2ª testemunha:
   % else:
     Dados da 2ª testemunha:
   % endif
 fields:
-  - "Nome:": witnesses[1].name.first
+  - "Nome:": witnesses[1].name.text
     required: True
     validate: validate_person_full_name
   - "E-mail:": witnesses[1].email
