@@ -3,6 +3,7 @@ const NODE_ENV = process.env.NODE_ENV;
 console.log(NODE_ENV)
 
 module.exports = {
+  mode: "spa",
   router: {
     base: "/",
     linkExactActiveClass: "active",
@@ -20,7 +21,7 @@ module.exports = {
       {hid: "description", name: "description", content: "Educa Legal - Advocacia Virtual para Escolas"}
     ],
     link: [
-      {rel: "icon", type: "image/x-icon", href: "favicon.ico"},
+      {rel: "icon", type: "image/x-icon", href: "favicon.png"},
       {rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"},
       {
         rel: "stylesheet",
@@ -51,8 +52,6 @@ module.exports = {
     "~/plugins/dashboard/dashboard-plugin",
     "~/plugins/axios-educa-legal",
     "~/plugins/filters",
-    {src: "~/plugins/dashboard/full-calendar", ssr: false},
-    {src: "~/plugins/dashboard/world-map", ssr: false},
     {src: "~/plugins/persistedState.client.js"}
   ],
 
@@ -82,44 +81,8 @@ module.exports = {
     port: 3000, // default: 3000
     host: "0.0.0.0" // default: localhost
   },
-
-  toast: {
-    position: "top-center",
-    iconPack: "fontawesome",
-    duration: 3000,
-    register: [
-      {
-        name: "defaultSuccess",
-        message: (payload) =>
-          !payload.msg ? "Operação bem sucedida" : payload.msg,
-        options: {
-          type: "success",
-          icon: "check",
-          theme: "outline"
-        }
-      },
-      {
-        name: "defaultError",
-        message: (payload) =>
-          !payload.msg ? "Oops.. Erro inesperado" : payload.msg,
-        options: {
-          type: "error",
-          icon: "times",
-          theme: "outline"
-        }
-      }
-    ]
-  },
   auth: {
     strategies: {
-      // getTenantScheme: {
-      //   _scheme: '~/schemes/CustomScheme',
-      //   endpoints: {
-      //     login: { url: '/v2/token/', method: 'post', propertyName: 'access', altProperty: 'refresh' },
-      //     user: { url: '/v2/user/', method: 'get', propertyName: false },
-      //     logout: false,
-      //   }
-
       local: {
         endpoints: {
           login: {url: "/v2/token/", method: "post", propertyName: "access", altProperty: "refresh"},

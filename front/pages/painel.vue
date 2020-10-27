@@ -1,6 +1,5 @@
 <template>
   <div>
-    <client-only>
       <base-header class="pb-6">
         <div class="row align-items-center py-4">
           <div class="col-lg-6 col-7">
@@ -98,7 +97,6 @@
         </div>
       </base-header>
       <v-tour name="pageTour" :steps="painelSteps" :options="tourOptions"></v-tour>
-    </client-only>
   </div>
 </template>
 <script>
