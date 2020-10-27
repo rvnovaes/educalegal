@@ -33,29 +33,29 @@ restart: stop run
 
 collectstatic:
 ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py collectstatic --noinput
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run api python manage.py collectstatic --noinput
 else ifeq ($(e), test)
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml run educalegal python manage.py collectstatic --noinput
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run api python manage.py collectstatic --noinput
 else
-	docker-compose run educalegal python manage.py collectstatic --noinput
+	docker-compose run api python manage.py collectstatic --noinput
 endif
 
 migrate:
 ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py migrate --noinput
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run api python manage.py migrate --noinput
 else ifeq ($(e), test)
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml run educalegal python manage.py migrate --noinput
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run api python manage.py migrate --noinput
 else
-	docker-compose run educalegal python manage.py migrate --noinput
+	docker-compose run api python manage.py migrate --noinput
 endif
 
 makemigrations:
 ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run educalegal python manage.py makemigrations --noinput
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml run api python manage.py makemigrations --noinput
 else ifeq ($(e), test)
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml run educalegal python manage.py makemigrations --noinput
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run api python manage.py makemigrations --noinput
 else
-	docker-compose run educalegal python manage.py makemigrations --noinput
+	docker-compose run api python manage.py makemigrations --noinput
 endif
 
 # Loads fixtures for development
