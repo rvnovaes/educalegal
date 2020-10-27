@@ -1,18 +1,16 @@
 version: '3.7'
 
 services:
-#  web_server:
-#    container_name: web_server
-#    build:
-#      context: nginx_dockerfile_test
-#      dockerfile: Dockerfile
-#    restart: unless-stopped
-#    ports:
-#    - "80:80"
-#    - "443:443"
-#    depends_on:
-#      - educalegal
-#      - educalegal_front
+  nginx:
+    container_name: nginx
+    build:
+      context: dockerfiles/nginx_test
+      dockerfile: nginx_test
+    ports:
+      - "80:80"
+      - "443:443"k
+    depends_on:
+      - api
   educalegal:
     build:
       args:
