@@ -4,8 +4,8 @@ services:
   nginx:
     container_name: nginx
     build:
-      context: nginx_dockerfile_dev
-      dockerfile: Dockerfile
+      context: dockerfiles/nginx_dev
+      dockerfile: Nginx_dev
     ports:
       - "80:80"
     depends_on:

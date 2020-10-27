@@ -6,8 +6,14 @@ services:
     container_name: educalegal
     restart: unless-stopped
     command: ["yarn", "start", ""]
+    # When the value supplied is a relative path, it is interpreted as relative to the location of the Compose file.
+    # This directory is also the build context that is sent to the Docker daemon.
+    # Já caminho do dockerfile é relativo ao context passado acima.
+    # No caso abaixo, ao passarmos ../front o docker-dameon "está" em ../front. Portanto, o caminho do dockerfile
+    # é relativo a ../front.
     build:
       context: ../front
+      dockerfile: ../environments/dockerfiles/educalegal/educalegal
       args:
         BUILD_BACKEND_URL: "http://api"
     depends_on:
@@ -20,14 +26,20 @@ services:
     image: rvnovaes/api:2.0.1
     container_name: api
     restart: unless-stopped
-    build: .
+    # O caminho do context é relativo ao docker-compose e o caminho do dockerfile é relativo ao context
+    build:
+      context: ../web
+      dockerfile: ../environments/dockerfiles/api/api
     command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8008"]
+    # O caminho do source é relativo ao docker-compose e o target ao interior do container
+    # Path on the host, relative to the Compose file
+    # Relative paths should always begin with . or ...
     volumes:
       - type: bind
-        source: .
+        source: ../web
         target: /code
       - type: bind
-        source: ./media
+        source: ../web/media
         target: /code/media
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.development_docker
@@ -39,11 +51,13 @@ services:
   apicelery:
     image: rvnovaes/api:2.0.1
     container_name: apicelery
-    build: .
+    build:
+      context: ../web
+      dockerfile: ../environments/dockerfiles/api/api
     command: celery -A web worker -l info -c 1 -n api1@%h
     volumes:
       - type: bind
-        source: .
+        source: ../web
         target: /code
     environment:
       - DEBUG=1
@@ -89,7 +103,7 @@ services:
       MONGO_INITDB_USERNAME: educalegal
       MONGO_INITDB_PASSWORD: educalegal
     volumes:
-      - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+      - ./dockerfiles/api/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
       - /opt/educalegal/docker_volumes/mongo_db:/data/db
     ports:
       - "27017:27017"
