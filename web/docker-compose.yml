@@ -1,22 +1,24 @@
 version: '3.7'
 
 services:
-  educalegal_front:
-    image: rvnovaes/educalegal-front:2.0.1
-    container_name: educalegal_front
+  educalegal:
+    image: rvnovaes/educalegal:2.0.1
+    container_name: educalegal
     restart: unless-stopped
     command: ["yarn", "start", ""]
     build:
       context: ../front
       args:
-        BUILD_BACKEND_URL: "http://educalegal:8008"
+        BUILD_BACKEND_URL: "http://api"
     depends_on:
-      - educalegal
+      - api
     ports:
       - "3000:3000"
-  educalegal:
-    image: rvnovaes/educalegal:2.0.1
-    container_name: educalegal
+    expose:
+      - "3000"
+  api:
+    image: rvnovaes/api:2.0.1
+    container_name: api
     restart: unless-stopped
     build: .
     command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8008"]
@@ -32,13 +34,13 @@ services:
       - EL_ENV=development
       - SENDGRID_API_KEY=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
     depends_on:
-      - educalegal_celery
-      - mongo
-  educalegal_celery:
-    image: rvnovaes/educalegal:2.0.1
-    container_name: educalegal_celery
+      - apicelery
+      - apimongo
+  apicelery:
+    image: rvnovaes/api:2.0.1
+    container_name: apicelery
     build: .
-    command: celery -A web worker -l info -c 1 -n educalegalworker1@%h
+    command: celery -A web worker -l info -c 1 -n api1@%h
     volumes:
       - type: bind
         source: .
@@ -47,20 +49,22 @@ services:
       - DEBUG=1
       - DJANGO_SETTINGS_MODULE=web.settings.development_docker
     depends_on:
-      - educalegal_rabbitmq
-  educalegal_flower:
-    container_name: educalegal_flower
+      - apirabbitmq
+  apiflower:
+    container_name: apiflower
     image: mher/flower
     environment:
-      - CELERY_BROKER_URL=amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal
+      - CELERY_BROKER_URL=amqp://educalegal:educalegal@apirabbitmq/educalegal
       - FLOWER_BASIC_AUTH=educalegal:cavaloverdegrande
       - FLOWER_PORT=8888
     depends_on:
-      - educalegal_rabbitmq
+      - apirabbitmq
     ports:
       - "8888:8888"
-  educalegal_rabbitmq:
-    container_name: educalegal_rabbitmq
+    expose:
+      - "8888"
+  apirabbitmq:
+    container_name: apirabbitmq
     image: rabbitmq:3.8.4-management
     environment:
       RABBITMQ_DEFAULT_USER: educalegal
@@ -69,11 +73,14 @@ services:
     ports:
       - "5672:5672"
       - "9999:15672"
+    expose:
+      - "5672"
+      - "15672"
     volumes:
       - /opt/educalegal/docker_volumes/rabbitmq_app:/var/lib/rabbitmq
-  mongo:
+  apimongo:
     image: mongo:4.2.6
-    container_name: mongo
+    container_name: apimongo
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: educalegal
@@ -86,16 +93,21 @@ services:
       - /opt/educalegal/docker_volumes/mongo_db:/data/db
     ports:
       - "27017:27017"
-  mongo-express:
-    container_name: mongo-express
+    expose:
+      - "27017"
+  apimongoexpress:
+    container_name: apimongoexpress
     image: mongo-express
     environment:
+      ME_CONFIG_MONGODB_SERVER: apimongo
+      ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_BASICAUTH_USERNAME: educalegal
       ME_CONFIG_BASICAUTH_PASSWORD: cavaloverdegrande
-      ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_MONGODB_ADMINUSERNAME: educalegal
       ME_CONFIG_MONGODB_ADMINPASSWORD: educalegal
     depends_on:
-      - mongo
+      - apimongo
     ports:
       - "8081:8081"
+    expose:
+      - "8081"
