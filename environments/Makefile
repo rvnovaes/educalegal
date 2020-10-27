@@ -1,20 +1,30 @@
-build:
-	docker-compose build educalegal
-
-build_all_educalegal:
+buildf:
 ifeq ($(e), prod)
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build educalegal apicelery api apiflower
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build educalegal
 else ifeq ($(e), test)
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml build educalegal apicelery api apiflower
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml build educalegal
+else
+	docker-compose build educalegal
+endif
+
+buildb:
+ifeq ($(e), prod)
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build api apicelery apiflower
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml build api apicelery apiflower
+else
+	docker-compose build educalegal
+endif
+
+builda:
+ifeq ($(e), prod)
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build educalegal api apicelery apiflower
+else ifeq ($(e), test)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml build educalegal api apicelery apiflower
 else
 	docker-compose build educalegal apicelery api apiflower
 endif
 
-# parametros
-# e=prod - conecta como producao
-# e=nodebug - conecta sem modo de debug (-d: detached mode)
-# se nao passar o parametro - conecta com modo de debug
-# make run e=prod or make run e=nodebug or make run
 run:
 ifeq ($(e), prod)
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
@@ -63,22 +73,17 @@ loaddata_dev:
 	docker-compose run educalegal python manage.py loaddata tenant school interview_document_types interview_server_config interview
 
 # Creates Educa Legal superuser as admin / Silex2109
-create_super_user_educa_legal:
-	docker-compose run educalegal ./create_super_user_educa_legal.sh
-
-# Makes the migrations
-# Migrates
-# Loads fixtures for development
-setup_dev: makemigrations migrate loaddata_dev
-	-make create_super_user_educa_legal
+create_super_user:
+	docker-compose exec api ./create_super_user.shls
 
 logs:
 	docker-compose logs --follow
 
-ps:
-	docker-compose ps
-shell:
-	docker-compose run educalegal bash
+shellf:
+	docker-compose run api bash
+
+shellb:
+	docker-compose run api bash
 
 # Use the task da_app_remote_to_local to dump production database into local docker container
 db_app_start:

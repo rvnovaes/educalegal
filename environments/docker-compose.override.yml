@@ -24,8 +24,6 @@ services:
       - "8008"
     depends_on:
       - db
-      - docassemble
-      - ged
   docassemble:
     container_name: docassemble
     image: jhpyle/docassemble:latest
