@@ -1,4 +1,4 @@
-FROM python:3.8.5
+FROM python:3.8.6
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH "${PYTHONPATH}:/opt/educalegal:/opt/educalegal/web"
@@ -8,4 +8,5 @@ RUN apt-get update && \
     mkdir /code
 COPY . /code
 WORKDIR /code
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
