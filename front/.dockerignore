@@ -1,0 +1,6 @@
+queries
+node_modules
+yarn.lock
+.nuxt
+.idea
+.vscode
