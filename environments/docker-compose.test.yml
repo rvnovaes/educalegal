@@ -27,4 +27,4 @@ services:
       - DEBUG=1
       - DJANGO_SETTINGS_MODULE=web.settings.test
     depends_on:
-      - educalegal_rabbitmq
+      - apirabbitmq
