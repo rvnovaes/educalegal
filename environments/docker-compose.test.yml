@@ -23,7 +23,7 @@ services:
       - certbot-var:/var/lib/letsencrypt
       - web-root:/usr/share/nginx/html
     depends_on:
-      - webserver
+      - nginx
     command: certonly --webroot --webroot-path=/usr/share/nginx/html --email sistemasw@educalegal.com.br --agree-tos --staging -d apptest.educalegal.com.br  -d apitest.educalegal.com.br
   educalegal:
     build:
