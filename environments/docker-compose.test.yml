@@ -22,7 +22,7 @@ services:
       - EL_ENV=test
     ports:
       - "8000:8000"
-  educalegal_celery:
+  apicelery:
     environment:
       - DEBUG=1
       - DJANGO_SETTINGS_MODULE=web.settings.test
