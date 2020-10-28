@@ -82,6 +82,10 @@ class Tenant(models.Model):
         if not self.plan.use_ged:
             return False
         else:
+            # verifica se tem dados do ged configurado para esse tenant
+            if not hasattr(self, 'tenantgeddata'):
+                return False
+
             if self.tenantgeddata:
                 ged_url = self.tenantgeddata.url
                 ged_token = self.tenantgeddata.token
