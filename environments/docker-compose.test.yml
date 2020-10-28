@@ -9,8 +9,22 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/usr/share/nginx/html
     depends_on:
       - api
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/usr/share/nginx/html
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/usr/share/nginx/html --email sistemasw@educalegal.com.br --agree-tos --staging -d apptest.educalegal.com.br  -d apitest.educalegal.com.br
   educalegal:
     build:
       args:
