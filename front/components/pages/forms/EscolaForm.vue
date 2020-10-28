@@ -80,8 +80,7 @@
             <base-input label="Site"
                         name="Site"
                         class="escola-site"
-                        placeholder="Site"
-                        rules="required"
+                        placeholder="https://www.minha-escola.com.br"
                         type="url"
                         :value="school.site"
                         @input="updateSite">
@@ -276,9 +275,10 @@ export default {
 
           }
         } catch (e) {
+          let errorMessage = e.response.data ? e.response.data : e.toString();
           await Swal.fire({
             title: `Erro ao editar ${this.school.name}`,
-            text: e,
+            text: errorMessage,
             icon: "error",
             customClass: {
               confirmButton: "btn btn-info btn-fill",

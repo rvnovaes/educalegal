@@ -45,7 +45,7 @@ class School(TenantAwareModel):
     cnpj = models.CharField(max_length=255, verbose_name="CNPJ/CPF")
     logo = models.ImageField(verbose_name="Logo", blank=True, null=True)
     phone = models.CharField(max_length=255, verbose_name="Telefone")
-    site = models.URLField(verbose_name="Site")
+    site = models.URLField(verbose_name="Site", blank=True)
     email = models.EmailField(verbose_name="E-mail")
     street = models.CharField(max_length=255, verbose_name="Logradouro")
     street_number = models.CharField(max_length=255, verbose_name="Número")
