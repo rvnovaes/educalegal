@@ -42,3 +42,7 @@ services:
       - DJANGO_SETTINGS_MODULE=web.settings.test
     depends_on:
       - apirabbitmq
+volumes:
+  certbot-etc:
+  certbot-var:
+  web-root:
