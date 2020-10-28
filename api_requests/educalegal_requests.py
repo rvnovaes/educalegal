@@ -139,7 +139,7 @@ def patch_document():
 
 if __name__ == "__main__":
     # # Dados do Tenant
-    # print(elc.document_types_list())
+    print(elc.document_types_list())
     #
     # # Dados do GED do Tenant
     # print(elc.tenants_ged_read(2))

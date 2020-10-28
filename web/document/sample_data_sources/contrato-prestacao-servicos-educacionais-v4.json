@@ -150,8 +150,15 @@
       "BooleanField",
       "true",
       null,
-      "Haverá parcela de entrada",
+      "Há parcela de entrada",
       "false"
+   ],
+   "quantity_input_installments": [
+      "IntField",
+      "false",
+      null,
+      "Quantidade de parcelas da entrada",
+      null
    ],
    "input_value": [
       "FloatField",
@@ -164,7 +171,7 @@
       "StringField",
       "false",
       null,
-      "Data do vencimento da parcela de entrada",
+      "Data do vencimento da primeira parcela de entrada",
       null
    ],
    "quantity_installments": [
@@ -186,6 +193,13 @@
       "false",
       null,
       "Data de vencimento da primeira parcela",
+      null
+   ],
+   "net_installments_value": [
+      "FloatField",
+      "false",
+      null,
+      "Valor líquido da parcela mensal",
       null
    ],
    "signature_local": [
