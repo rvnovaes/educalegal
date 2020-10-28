@@ -82,18 +82,15 @@ class Tenant(models.Model):
         if not self.plan.use_ged:
             return False
         else:
-            # verifica se tem dados do ged configurado para esse tenant
+            # verifica se tem dados do ged configurados para esse tenant
             if not hasattr(self, 'tenantgeddata'):
                 return False
-
-            if self.tenantgeddata:
+            else:
                 ged_url = self.tenantgeddata.url
                 ged_token = self.tenantgeddata.token
 
                 # verifica se o ged esta configurado
                 return ged_url != '' and ged_token != ''
-            else:
-                return False
 
     def save(self, *args, **kwargs):
         self.esignature_folder = self.esignature_folder.replace('/', '')
