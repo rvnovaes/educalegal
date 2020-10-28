@@ -47,7 +47,7 @@ from document.views import validate_data_mongo, generate_document_from_mongo, sa
     reached_document_limit as doc_reached_document_limit
 from interview.models import Interview, InterviewDocumentType
 from school.models import School, SchoolUnit, Witness
-from tenant.models import Plan, Tenant, TenantGedData
+from tenant.models import Plan, Tenant, TenantGedData, ESignatureApp, ESignatureAppProvider
 from users.models import CustomUser
 from util.file_import import is_metadata_valid, is_content_valid
 from util.mongo_util import create_dynamic_document_class
@@ -173,6 +173,9 @@ def create_tenant(request):
     logger.info("Novo tenant sendo criado:" + tenant_name)
 
     essential_plan = Plan.objects.get(pk=1)
+    esignature_app = ESignatureApp.objects.filter(
+        provider=ESignatureAppProvider.CLICKSIGN.name,
+        test_mode=True).first()
 
     tenant = Tenant.objects.create(
         name=tenant_name,
@@ -180,7 +183,7 @@ def create_tenant(request):
         eua_agreement=True,
         plan=essential_plan,
         auto_enrolled=True,
-        esignature_app=None,
+        esignature_app=esignature_app,
         phone=phone,
     )
     tenant.save()
