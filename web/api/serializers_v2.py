@@ -230,7 +230,7 @@ class SchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = School
         ref_name = "School v2"
-        fields = "__all__"
+        exclude = ('logo', )
 
 
 class TenantGedDataSerializer(serializers.ModelSerializer):
