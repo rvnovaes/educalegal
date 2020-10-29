@@ -4,3 +4,6 @@ COPY *.conf /etc/nginx/conf.d/
 COPY proxy_params /etc/nginx
 RUN mkdir -p /var/log/nginx
 RUN openssl dhparam -out /etc/ssl/certs/dhparam-2048.pem 2048
+RUN mkdir -p /etc/letsencrypt/live/apptest.educalegal.com.br
+# Tentado criar certificado dummy
+RUN openssl req -x509 -nodes -newkey rsa:1024 -keyout /etc/letsencrypt/live/apptest.educalegal.com.br/privkey.pem -out /etc/letsencrypt/live/apptest.educalegal.com.br/fullchain.pem -days 1 -subj '/CN=localhost'
