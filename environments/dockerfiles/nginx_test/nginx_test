@@ -3,4 +3,3 @@ FROM nginx
 COPY *.conf /etc/nginx/conf.d/
 COPY proxy_params /etc/nginx
 RUN mkdir -p /var/log/nginx
-RUN apt-get update && apt-get install -y python-certbot-nginx
