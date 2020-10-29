@@ -3,3 +3,4 @@ FROM nginx
 COPY *.conf /etc/nginx/conf.d/
 COPY proxy_params /etc/nginx
 RUN mkdir -p /var/log/nginx
+RUN sudo openssl dhparam -out /etc/ssl/certs/dhparam-2048.pem 2048
