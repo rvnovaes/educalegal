@@ -15,4 +15,13 @@ class Migration(migrations.Migration):
             name='site',
             field=models.URLField(blank=True, verbose_name='Site'),
         ),
+        migrations.RemoveField(
+            model_name='school',
+            name='legal_nature',
+        ),
+        migrations.AlterField(
+            model_name='school',
+            name='cnpj',
+            field=models.CharField(max_length=255, verbose_name='CNPJ'),
+        ),
     ]

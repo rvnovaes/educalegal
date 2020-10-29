@@ -44,7 +44,6 @@ export default {
         id: 0,
         name: null,
         legal_name: null,
-        legal_nature: null,
         cnpj: null,
         phone: null,
         site: null,
