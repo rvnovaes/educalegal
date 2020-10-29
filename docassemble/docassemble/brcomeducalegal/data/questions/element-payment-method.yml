@@ -110,7 +110,7 @@ fields:
     help: Valor da parcela com o desconto concedido.
     hint: 0000,00
     js show if: |
-      val("has_input_value") == true || val("has_input_value") == false
+      val("has_discount") == true && (val("has_input_value") == true || val("has_input_value") == false)
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
