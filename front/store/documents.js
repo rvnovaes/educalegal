@@ -63,6 +63,7 @@ export const actions = {
         {
           limit: 50,
           offset: payload.offset,
+          documentName: payload.documentNameFilter,
           status: payload.statusFilter,
           school: payload.schoolFilter,
           interview: payload.interviewFilter,

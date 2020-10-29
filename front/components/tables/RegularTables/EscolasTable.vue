@@ -7,7 +7,6 @@
         </base-button>
       </div>
     </div>
-
     <el-table class="table-responsive table-flush"
               header-row-class-name="thead-light"
               :data="schools">
@@ -100,13 +99,13 @@ export default {
       currentPage: 1
     };
   },
-
   created() {
     this.$store.dispatch("schools/fetchAllSchools");
   },
   computed: {
+    // Nao dexa exibir na lista escola vazia, que e usada apenas para a criacao de novas escolas
     schools() {
-      return this.$store.state.schools.schools;
+      return this.$store.state.schools.schools.filter(school => school.id !== 0);
     },
   },
   methods: {
@@ -114,7 +113,6 @@ export default {
       this.$router.push({
         path: "/escolas/criar"
       });
-
     },
     handleEdit(index, row) {
       this.editRow(row);
@@ -146,6 +144,7 @@ export default {
                 customClass: {
                   confirmButton: "btn btn-success btn-fill",
                 },
+                showCloseButton: true,
                 buttonsStyling: false
               });
             }
@@ -157,6 +156,7 @@ export default {
                 customClass: {
                   confirmButton: "btn btn-success btn-fill",
                 },
+                showCloseButton: true,
                 buttonsStyling: false
               });
             }
@@ -169,6 +169,7 @@ export default {
               confirmButton: "btn btn-info btn-fill",
             },
             confirmButtonText: "OK",
+            showCloseButton: true,
             buttonsStyling: false
           });
         }

@@ -74,6 +74,7 @@ export default {
           title: "Solicitação de recuperação de senha enviada com sucesso!",
           text: "Se houver usuário associado a este e-mail, em breve você receberá instruções para recuperação da senha.",
           icon: "success",
+          showCloseButton: true,
           customClass: {
             confirmButton: "btn btn-success btn-fill",
           },
@@ -89,6 +90,7 @@ export default {
             confirmButton: "btn btn-info btn-fill",
           },
           confirmButtonText: "OK",
+          showCloseButton: true,
           buttonsStyling: false
         });
       }

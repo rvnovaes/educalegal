@@ -73,6 +73,7 @@ export default {
             confirmButton: "btn btn-info btn-fill",
           },
           confirmButtonText: "OK",
+          showCloseButton: true,
           buttonsStyling: false
         });
         await this.$router.push({path: "/arquivo"});

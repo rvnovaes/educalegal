@@ -35,3 +35,27 @@ def save_file_from_url_in_disk(url, relative_path, filename):
         return message, ''
 
     return absolute_path, relative_file_path
+
+
+def delete_keys_from_obj(obj, keys_to_delete):
+    """Apaga recursivamente os itens não desejados do dicionário ou da lista.
+    :param
+        obj - dicionário ou lista de onde serão excluídos os itens
+        keys_to_delete - string ou lista de chaves que devem ser excluídas
+    :return
+        obj - dicionário ou lista com os itens excluídos
+    """
+    if isinstance(keys_to_delete, str):
+        keys_to_delete = [keys_to_delete]
+
+    if isinstance(obj, dict):
+        for key in set(keys_to_delete):
+            if key in obj:
+                del obj[key]
+        for k, v in obj.items():
+            delete_keys_from_obj(v, keys_to_delete)
+    elif isinstance(obj, list):
+        for i in obj:
+            delete_keys_from_obj(i, keys_to_delete)
+
+    return obj

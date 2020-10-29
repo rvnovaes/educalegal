@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   educalegal_front:
-    image: rvnovaes/educalegal-front:0.3
+    image: rvnovaes/educalegal-front:2.0.1
     container_name: educalegal_front
     restart: unless-stopped
     command: ["yarn", "start", ""]
@@ -15,7 +15,7 @@ services:
     ports:
       - "3000:3000"
   educalegal:
-    image: rvnovaes/educalegal:2.0
+    image: rvnovaes/educalegal:2.0.1
     container_name: educalegal
     restart: unless-stopped
     build: .
@@ -35,7 +35,7 @@ services:
       - educalegal_celery
       - mongo
   educalegal_celery:
-    image: rvnovaes/educalegal:2.0
+    image: rvnovaes/educalegal:2.0.1
     container_name: educalegal_celery
     build: .
     command: celery -A web worker -l info -c 1 -n educalegalworker1@%h

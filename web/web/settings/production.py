@@ -2,7 +2,7 @@ from .base import *
 
 from django.contrib.messages import constants as message_constants
 
-ALLOWED_HOSTS = ["app.educalegal.com.br", "167.71.161.48"]
+ALLOWED_HOSTS = ["app.educalegal.com.br", "api.educalegal.com.br", "167.71.161.48"]
 
 DEBUG = False
 MESSAGE_LEVEL = message_constants.INFO

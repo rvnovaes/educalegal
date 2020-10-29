@@ -138,6 +138,7 @@ export default {
             confirmButton: "btn btn-info btn-fill",
           },
           confirmButtonText: "OK",
+          showCloseButton: true,
           buttonsStyling: false
         });
       }
@@ -146,6 +147,7 @@ export default {
           title: `Você criou ${this.model.tenantName} com sucesso!`,
           buttonsStyling: false,
           icon: "success",
+          showCloseButton: true,
           customClass: {
             confirmButton: "btn btn-success btn-fill",
           }

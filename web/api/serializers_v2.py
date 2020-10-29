@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from validator_collection_br import validators_br
+
+from django.contrib.auth.password_validation import validate_password
 
 from billing.models import Plan
 from document.models import Document, Envelope, Signer
@@ -119,6 +122,11 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
     signers = serializers.SerializerMethodField()
     related_documents = serializers.SerializerMethodField()
 
+    # https://www.django-rest-framework.org/api-guide/fields/#jsonfield
+    # binary=True para nao serializar dicionario como string
+    recipients = serializers.JSONField(binary=True)
+    document_data = serializers.JSONField(binary=True)
+
     envelope = EnvelopeSerializer()
 
     class Meta:
@@ -138,15 +146,16 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
             ged_link = docx_file.ged_link
             name = docx_file.name
             doc_uuid = docx_file.doc_uuid
+
+            docx_file_data = {
+                "url": ged_link,
+                "name": name,
+                "doc_uuid": doc_uuid
+            }
         else:
-            ged_link = None
-            name = None
-            doc_uuid = None
-        docx_file_data = {
-            "url": ged_link,
-            "name": name,
-            "doc_uuid": doc_uuid
-        }
+            # minuta generica nao tem docx, por exemplo
+            docx_file_data = None
+
         return docx_file_data
 
     def get_signers(self, obj):
@@ -194,15 +203,6 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
             return None
 
 
-class SchoolSerializer(serializers.ModelSerializer):
-    school_units = serializers.StringRelatedField(many=True)
-
-    class Meta:
-        model = School
-        ref_name = "School v2"
-        fields = "__all__"
-
-
 class SchoolUnitSerializer(serializers.ModelSerializer):
     class Meta:
         model = SchoolUnit
@@ -211,9 +211,27 @@ class SchoolUnitSerializer(serializers.ModelSerializer):
 
 
 class WitnessSerializer(serializers.ModelSerializer):
+    def validate_name(self, data):
+        try:
+            validators_br.person_full_name(data)
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+        return data
+
     class Meta:
         model = Witness
         ref_name = "Witness v2"
+        fields = "__all__"
+
+
+# https://www.django-rest-framework.org/api-guide/serializers/#dealing-with-nested-objects
+class SchoolSerializer(serializers.ModelSerializer):
+    school_units = SchoolUnitSerializer(many=True, read_only=True)
+    witnesses = WitnessSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = School
+        ref_name = "School v2"
         fields = "__all__"
 
 
@@ -248,7 +266,8 @@ class UserSerializer(serializers.ModelSerializer):
             "user_permissions",
             "tenant_name",
             "tenant_use_ged",
-            "schools_count"
+            "schools_count",
+            "force_password_change"
         ]
 
     def get_tenant_name(self, obj):
@@ -259,3 +278,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_schools_count(self, obj):
         return School.objects.filter(tenant=obj.tenant).count()
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password1 = serializers.CharField(required=True)
+    new_password2 = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        validate_password(value)
+        return value

@@ -98,7 +98,12 @@
 <!--    </base-nav>-->
 
     <div class="main-content">
-      <nuxt></nuxt>
+      <!-- https://stackoverflow.com/questions/47862591/vuejs-error-the-client-side-rendered-virtual-dom-tree-is-not-matching-server-re-->
+      <!--    https://medium.com/@liutingchun_95744/nuxt-js-best-practices-for-client-side-only-contents-client-only-no-ssr-4843e94d9565-->
+
+      <client-only>
+        <nuxt></nuxt>
+      </client-only>
     </div>
 
     <footer class="py-5" id="footer-main">
@@ -106,7 +111,7 @@
         <div class="row align-items-center justify-content-xl-between">
           <div class="col-xl-12">
             <div class="copyright text-center text-black-50 text-lg-right">
-              © {{year}} <a href="https://www.educalegal.com.br" class="font-weight-bold text-white ml-1" target="_blank" rel="noopener">Educa Legal</a> - Versão 2.0
+              © {{year}} <a href="https://www.educalegal.com.br" class="font-weight-bold text-white ml-1" target="_blank" rel="noopener">Educa Legal</a> - Versão 2.0.1
             </div>
 <!--          </div>-->
 <!--          <div class="col-xl-6">-->

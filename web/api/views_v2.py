@@ -1,17 +1,20 @@
 import datetime
 import io
+import json
 import logging
-import pytz
 import pandas as pd
+import pytz
+import re
 
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str, url_str_to_user_pk
 from dateutil.relativedelta import relativedelta
 from drf_yasg.renderers import SwaggerUIRenderer, OpenAPIRenderer
+from json import dumps
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework import pagination
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
@@ -40,14 +43,15 @@ from django.contrib.sites.shortcuts import get_current_site
 from api.third_party.mayan_client import MayanClient
 from document.models import Document, DocumentFileKind, BulkDocumentKind
 from document.util import send_email as doc_send_email, send_to_esignature as doc_send_to_esignature
-from document.views import save_document_data
-from document.views import validate_data_mongo, generate_document_from_mongo
+from document.views import validate_data_mongo, generate_document_from_mongo, save_document_data, \
+    reached_document_limit as doc_reached_document_limit
 from interview.models import Interview, InterviewDocumentType
 from school.models import School, SchoolUnit, Witness
-from tenant.models import Plan, Tenant, TenantGedData
+from tenant.models import Plan, Tenant, TenantGedData, ESignatureApp, ESignatureAppProvider
 from users.models import CustomUser
 from util.file_import import is_metadata_valid, is_content_valid
 from util.mongo_util import create_dynamic_document_class
+from util.util import delete_keys_from_obj
 
 from .serializers_v2 import (
     PlanSerializer,
@@ -60,7 +64,7 @@ from .serializers_v2 import (
     TenantSerializer,
     TenantGedDataSerializer,
     UserSerializer,
-    WitnessSerializer,
+    WitnessSerializer, ChangePasswordSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -98,6 +102,7 @@ class InterviewViewSet(viewsets.ReadOnlyModelViewSet):
 class DocumentTypesViewSet(viewsets.ViewSet):
     def list(self, request):
         queryset = InterviewDocumentType.objects.all()
+        queryset = queryset.order_by("name")
         serializer = DocumentTypesSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -168,6 +173,9 @@ def create_tenant(request):
     logger.info("Novo tenant sendo criado:" + tenant_name)
 
     essential_plan = Plan.objects.get(pk=1)
+    esignature_app = ESignatureApp.objects.filter(
+        provider=ESignatureAppProvider.CLICKSIGN.name,
+        test_mode=True).first()
 
     tenant = Tenant.objects.create(
         name=tenant_name,
@@ -175,7 +183,7 @@ def create_tenant(request):
         eua_agreement=True,
         plan=essential_plan,
         auto_enrolled=True,
-        esignature_app=None,
+        esignature_app=esignature_app,
         phone=phone,
     )
     tenant.save()
@@ -282,14 +290,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
         """
         paginator = LimitOffsetPagination()
         paginator.page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
+        document_name_filter_param = request.query_params.get("documentName")
         status_filter_param = request.query_params.getlist("status[]")
         school_filter_param = request.query_params.getlist("school[]")
-        interview_filter_param = request.query_params.getlist(
-            "interview[]"
-        )  # TODO parametro de onlyParent
+        interview_filter_param = request.query_params.getlist("interview[]")
         order_by_created_date = request.query_params.get("orderByCreatedDate")
         created_date_range = request.query_params.get("createdDateRange")
         queryset = self.get_queryset().filter(parent=None).exclude(status="rascunho")
+        if document_name_filter_param:
+            queryset = queryset.filter(name__unaccent__icontains=document_name_filter_param)
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
@@ -395,8 +404,22 @@ class DocumentViewSet(viewsets.ModelViewSet):
             logger.info(
                 "Atualizando o documento {doc_uuid}".format(doc_uuid=str(doc_uuid))
             )
+
+            # faz copia do request.data, pois nao é permitido alterar diretamente no request.data
+            data = request.data.copy()
+
+            # como vem do docassemble como uma string e não um json, tem que colocar colchetes na string
+            # para torná-la um JSON string válido e poder usar o json.loads()
+            valid_json_string = "[" + data['document_data'] + "]"
+            document_data = json.loads(valid_json_string)
+            # pega somente o dicionario
+            document_data = document_data[0]
+
+            # limpa a variavel all_variables antes de salvar no sistema
+            data['document_data'] = clean_all_variables(document_data)
+
             serializer = DocumentDetailSerializer(
-                instance, data=request.data, partial=True, context={"request": request}
+                instance, data=data, partial=True, context={"request": request}
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -405,8 +428,6 @@ class DocumentViewSet(viewsets.ModelViewSet):
             params = self.request.query_params
             if 'trigger' in params:
                 if params['trigger'] == 'docassemble':
-                    data = self.request.data.copy()
-
                     # salva o documento no sistema de arquivos e/ou ged
                     save_document_file(instance, data, params)
 
@@ -500,6 +521,41 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return status.HTTP_200_OK, 'Configuração do GED OK'
 
 
+def clean_all_variables(all_variables):
+    keys_to_ignore = ['DocumentStatus', 'Enum', 'PY2', '__warningregistry__', '_class', '_internal', 'ask_number',
+                      'ask_object_type', 'attachments', 'auto_gather', 'cd_name', 'cd_related_documents', 'cd_status',
+                      'city_only', 'complete', 'complete_attribute', 'content_document', 'custom_file_name',
+                      'device_local', 'doc_uuid', 'document_type_data', 'educalegal_front_url', 'educalegal_url',
+                      'el_environment', 'el_log_to_console', 'el_send_email', 'elc', 'envelope_statuses',
+                      'example_acordo_individual_reducao_de_jornada_e_reducao_salarial',
+                      'example_termo_acordo_individual_para_banco_horas_mp_927_2020',
+                      'example_termo_mudanca_de_regime_e_cessao_do_direito_autoral', 'gathered', 'generated_file',
+                      'geolocated', 'help_email_msg', 'i', 'input_installments_list', 'installments_list',
+                      'instanceName', 'interview_custom_file_name_string', 'interview_data', 'interview_document_type',
+                      'interview_is_freemium', 'interview_language', 'intid', 'item', 'job_title_list', 'location',
+                      'mc', 'menu_items', 'minimum_number', 'mongo_uuid', 'nav', 'new_recipient', 'object_type',
+                      'object_type_parameters', 'plan_data', 'plan_use_esignature', 'plan_use_ged',
+                      'recipient_group_types_dict', 'recipients', 'reviewed_school_email_answer', 'revisit',
+                      'school_data_dict', 'school_id', 'school_letterhead', 'school_names_list', 'school_units',
+                      'school_units_dict', 'school_units_list', 'school_witnesses_dict', 'session_local',
+                      'signature_local_default', 'state_initials_list', 'string_types', 'table', 'target_number',
+                      'tenant_data', 'tenant_esignature_data', 'tenant_ged_data', 'tenant_ged_token', 'tenant_ged_url',
+                      'there_are_any', 'tid', 'url_args', 'user_local', 'uses_parts', 'ut', 'v', 'valid_data',
+                      'witnesses_data_list']
+
+    # ignora valid_*_table: ex.: valid_employees_table, valid_locatarios_table
+    regex_list = ['valid_(.*)_table']
+    ignore = {k for k, v in all_variables.items() if any(re.match(regex, k) for regex in regex_list)}
+    ignore = list(ignore)
+    keys_to_ignore += ignore
+
+    interview_variables = delete_keys_from_obj(all_variables, keys_to_ignore)
+
+    # converte dicionario em json
+    interview_variables = json.dumps(interview_variables)
+    return interview_variables
+
+
 def validate_tenant_plan_ged(tenant):
     if not tenant.plan.use_ged:
         message = "Somente clientes cadastrados num plano que possui GED podem baixar documentos."
@@ -539,17 +595,20 @@ def save_in_ged(data, url, file, tenant):
         message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(e)
         logging.error(message)
 
-        return 0, message, 0
+        return 500, message, 0
     else:
+        if isinstance(response, dict):
+            response = dumps(response)
+
         if status_code != 201:
-            message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + response
+            message = 'Não foi possível inserir o arquivo no GED. Erro: ' + str(status_code) + ' - ' + str(response)
             logging.error(message)
 
             return status_code, response, 0
         else:
             if ged_id == 0:
                 message = 'O arquivo foi inserido no GED, mas retornou ID = 0. Erro: ' + str(status_code) + ' - ' + \
-                          response
+                          str(response)
                 logging.error(message)
 
                 return status_code, message, 0
@@ -559,7 +618,7 @@ def save_in_ged(data, url, file, tenant):
                 except Exception as e:
                     message = 'Não foi possível localizar o arquivo no GED. Erro: ' + str(e)
                     logging.error(message)
-                    return 0, message, 0
+                    return 500, message, 0
 
             return status_code, ged_document_data, ged_id
 
@@ -949,40 +1008,41 @@ def save_document_file(document, data, params):
                            None)
 
     # salva o docx no sistema de arquivos
-    data['name'] = params['docx_filename']
-    data['label'] = data['name']
-    relative_path = 'docs/' + document.tenant.name + '/' + params['docx_filename'][:15] + '/'
+    if 'docx_filename' in params:
+        data['name'] = params['docx_filename']
+        data['label'] = data['name']
+        relative_path = 'docs/' + document.tenant.name + '/' + params['docx_filename'][:15] + '/'
 
-    # salva o docx como documento relacionado. copia do pai algumas propriedades
-    related_document = Document(
-        name=params['docx_filename'],
-        description=document.description,
-        interview=document.interview,
-        school=document.school,
-        tenant=document.tenant,
-        bulk_generation=document.bulk_generation,
-        file_kind=DocumentFileKind.DOCX.value,
-    )
+        # salva o docx como documento relacionado. copia do pai algumas propriedades
+        related_document = Document(
+            name=params['docx_filename'],
+            description=document.description,
+            interview=document.interview,
+            school=document.school,
+            tenant=document.tenant,
+            bulk_generation=document.bulk_generation,
+            file_kind=DocumentFileKind.DOCX.value,
+        )
 
-    # limpa a variavel
-    status_code = 0
-    if has_ged:
-        try:
-            status_code, ged_data, ged_id = save_in_ged(data, params['docx_url'], None, document.tenant)
-        except Exception as e:
-            message = str(e)
-            logging.exception(message)
-        else:
-            if status_code == 201:
-                save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data,
-                                   params['docx_filename'], document)
+        # limpa a variavel
+        status_code = 0
+        if has_ged:
+            try:
+                status_code, ged_data, ged_id = save_in_ged(data, params['docx_url'], None, document.tenant)
+            except Exception as e:
+                message = str(e)
+                logging.exception(message)
             else:
-                message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
-                    str(status_code), ged_data)
-                logging.error(message)
-    else:
-        save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None,
-                           params['docx_filename'], document)
+                if status_code == 201:
+                    save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data,
+                                       params['docx_filename'], document)
+                else:
+                    message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
+                        str(status_code), ged_data)
+                    logging.error(message)
+        else:
+            save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None,
+                               params['docx_filename'], document)
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
@@ -1247,3 +1307,60 @@ def send_to_esignature(request):
     status_code, message = doc_send_to_esignature(doc_uuid)
 
     return Response(message, status=status_code)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def reached_document_limit(request):
+    try:
+        reached_limit, document_limit = doc_reached_document_limit(request.user.tenant_id)
+        message = {"reached_limit": reached_limit,
+                   "document_limit": document_limit
+                   }
+        return Response(message, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        message = 'Não foi possível obter o limite de documentos. Erro: {}'.format(e)
+        return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ChangePassword(APIView):
+    """
+    An endpoint for changing password.
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def put(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = ChangePasswordSerializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            old_password = serializer.data.get("old_password")
+            new_password1 = serializer.data.get("new_password1")
+            new_password2 = serializer.data.get("new_password2")
+            if not self.object.check_password(old_password):
+                message = "A senha atual está inválida."
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            if old_password:
+                if old_password == new_password1:
+                    message = "A nova senha deve ser diferente da atual."
+                    return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            if new_password1 and new_password2:
+                if new_password1 != new_password2:
+                    message = "A nova senha deve ser igual à sua confirmação."
+                    return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password1"))
+            self.object.force_password_change = False
+            self.object.save()
+            message = "A senha foi alterada com sucesso!"
+            return Response(message, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
