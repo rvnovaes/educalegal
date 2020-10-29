@@ -24,7 +24,7 @@ services:
       - web-root:/usr/share/nginx/html
     depends_on:
       - nginx
-    command: certonly --webroot --webroot-path=/usr/share/nginx/html --email sistemas@educalegal.com.br --agree-tos --staging --non-interactive -d apptest.educalegal.com.br -d apitest.educalegal.com.br"
+    command: certonly --webroot --webroot-path=/usr/share/nginx/html --email sistemas@educalegal.com.br --agree-tos --staging --non-interactive -d apptest.educalegal.com.br -d apitest.educalegal.com.br
   educalegal:
     build:
       args:
