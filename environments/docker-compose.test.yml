@@ -17,7 +17,7 @@ services:
       - api
   certbot:
     image: certbot/certbot
-    container_name: appcertbot
+    container_name: certbot
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
