@@ -33,19 +33,13 @@ class LegalNature(Enum):
 class School(TenantAwareModel):
     legal_name = models.CharField(max_length=255, verbose_name="Razão social")
     name = models.CharField(max_length=255, blank=True, verbose_name="Nome Fantasia")
-    legal_nature = models.CharField(
-        verbose_name="Tipo",
-        max_length=1,
-        choices=((x.value, x.format(x.value)) for x in LegalNature),
-        default=LegalNature.JURIDICA,
-    )
     # https://docs.djangoproject.com/en/3.0/ref/models/fields/
     # when a CharField has both unique=True and blank=True set null=True is required to
     # avoid unique constraint violations when saving multiple objects with blank values
-    cnpj = models.CharField(max_length=255, verbose_name="CNPJ/CPF")
+    cnpj = models.CharField(max_length=255, verbose_name="CNPJ")
     logo = models.ImageField(verbose_name="Logo", blank=True, null=True)
     phone = models.CharField(max_length=255, verbose_name="Telefone")
-    site = models.URLField(verbose_name="Site")
+    site = models.URLField(verbose_name="Site", blank=True)
     email = models.EmailField(verbose_name="E-mail")
     street = models.CharField(max_length=255, verbose_name="Logradouro")
     street_number = models.CharField(max_length=255, verbose_name="Número")

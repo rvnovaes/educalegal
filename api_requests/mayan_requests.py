@@ -3,10 +3,6 @@ from api.third_party.mayan_client import MayanClient
 # https://ged-educalegal.educalegal.com.br (Educa Legal)
 # base_url = 'https://ged-educalegal.educalegal.com.br'
 # tenant_ged_token = 'aaa4d93a7611637578984d43958eedc6316e42f3'
-=========
-sys.path.append("/opt/educalegal/docassemble/docassemble/brcomeducalegal/data")
-from element_mayan_client import MayanClient
->>>>>>>>> Temporary merge branch 2
 
 # https://gedtest.educalegal.com.br (Development)
 # base_url = 'https://gedtest.educalegal.com.br'
