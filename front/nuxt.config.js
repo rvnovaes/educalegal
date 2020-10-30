@@ -3,7 +3,8 @@ const NODE_ENV = process.env.NODE_ENV;
 console.log(NODE_ENV)
 
 module.exports = {
-  mode: "spa",
+  // mode option is deprecated. Please use ssr: true for universal mode or ssr: false for spa mode
+  ssr: false,
   router: {
     base: "/",
     linkExactActiveClass: "active",
