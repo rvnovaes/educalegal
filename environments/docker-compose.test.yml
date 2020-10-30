@@ -3,6 +3,7 @@ version: '3.7'
 services:
   nginx:
     container_name: nginx
+    restart: unless-stopped
     build:
       context: dockerfiles/nginx_test
       dockerfile: nginx_test
