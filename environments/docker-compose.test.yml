@@ -31,7 +31,21 @@ services:
       - DJANGO_SETTINGS_MODULE=web.settings.test
     depends_on:
       - apirabbitmq
+  docassemble:
+    container_name: docassemble
+    image: jhpyle/docassemble:latest
+    environment:
+      - DAPYTHONVERSION=3
+      - TIMEZONE=America/Sao_Paulo
+      - LANGUAGE=pt
+      - LOCALE=pt_BR.utf8
+      - DAWEBSERVER=nginx
+      - SERVERADMIN=sistemas@educalegal.com.br
+      - PYTHONPACKAGES=docassemble-wrappers,num2words,validator-collection-br,retry-requests,sendgrid
+    ports:
+      - "8800:80"
+    expose:
+      - "80"
 volumes:
   certbot-etc:
   certbot-var:
-  web-root:
