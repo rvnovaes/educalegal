@@ -12,19 +12,8 @@ services:
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
-      - web-root:/usr/share/nginx/html
     depends_on:
       - api
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - web-root:/usr/share/nginx/html
-    depends_on:
-      - nginx
-    command: certonly --webroot --webroot-path=/usr/share/nginx/html --email sistemas@educalegal.com.br --agree-tos --force-renew --non-interactive -d apptest.educalegal.com.br -d apitest.educalegal.com.br
   educalegal:
     build:
       args:
