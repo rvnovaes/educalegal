@@ -4,4 +4,4 @@ docker cp conf_final/api.conf nginx:/etc/nginx/conf.d
 docker cp conf_final/educalegal.conf nginx:/etc/nginx/conf.d
 docker restart nginx
 source ./add_renew_crontab.sh
-service crontab restart
+service cron restart
