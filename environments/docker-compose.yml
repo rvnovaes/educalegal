@@ -51,6 +51,7 @@ services:
   apicelery:
     image: rvnovaes/api:2.0.1
     container_name: apicelery
+    restart: unless-stopped
     build:
       context: ../web
       dockerfile: ../environments/dockerfiles/api/api
@@ -66,6 +67,7 @@ services:
       - apirabbitmq
   apiflower:
     container_name: apiflower
+    restart: unless-stopped
     image: mher/flower
     environment:
       - CELERY_BROKER_URL=amqp://educalegal:educalegal@apirabbitmq/educalegal
@@ -79,6 +81,7 @@ services:
       - "8888"
   apirabbitmq:
     container_name: apirabbitmq
+    restart: unless-stopped
     image: rabbitmq:3.8.4-management
     environment:
       RABBITMQ_DEFAULT_USER: educalegal
@@ -111,6 +114,7 @@ services:
       - "27017"
   apimongoexpress:
     container_name: apimongoexpress
+    restart: unless-stopped
     image: mongo-express
     environment:
       ME_CONFIG_MONGODB_SERVER: apimongo

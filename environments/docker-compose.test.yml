@@ -33,6 +33,7 @@ services:
       - apirabbitmq
   docassemble:
     container_name: docassemble
+    restart: unless-stopped
     image: jhpyle/docassemble:latest
     environment:
       - DAPYTHONVERSION=3
