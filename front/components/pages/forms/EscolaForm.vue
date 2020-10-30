@@ -171,7 +171,7 @@
 <script>
 import Swal from "sweetalert2";
 import ufs from "@/components/pages/forms/ufs";
-import {isCNPJ, isCPF} from 'brazilian-values';
+import {isCNPJ} from 'brazilian-values';
 import {mask} from 'vue-the-mask';
 
 export default {
@@ -264,7 +264,6 @@ export default {
                 confirmButton: "btn btn-success btn-fill",
               }
             });
-
           }
         } catch (e) {
           let errorMessage = e.response.data ? e.response.data : e.toString();
@@ -293,6 +292,8 @@ export default {
                 confirmButton: "btn btn-success btn-fill",
               }
             });
+            // recarrega a escola que foi criada
+            await this.$router.push({path: "/escolas/" + res.data.id});
           }
         } catch (e) {
           await Swal.fire({
