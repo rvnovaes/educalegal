@@ -131,6 +131,11 @@ module.exports = {
           }
         ]
       ]
+    },
+    filenames: {
+      app: "[name].[contenthash].js",
+      chunk: "[name].[contenthash].js",
+      css: "[name].[contenthash].css",
     }
   }
 };
