@@ -182,8 +182,7 @@ fields:
     - Grupo 5: Grupo 5
   - 'Período: ': students[i].period
     choices:
-    - Escolar matutino: Escolar matutino (04 horas diárias)
-    - Escolar vespertino: Escolar vespertino (04 horas diárias)
+    - Escolar: Escolar (04 horas diárias)
     - Estendido : Estendido (até 06 horas diárias)
     - Semi-integral : Semi-integral (até 09 horas diárias)
     - Integral: Integral (até 12 horas e 45 minutos diários)
