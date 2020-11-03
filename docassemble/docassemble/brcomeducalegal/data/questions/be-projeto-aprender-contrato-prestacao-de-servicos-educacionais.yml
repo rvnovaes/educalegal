@@ -173,17 +173,17 @@ fields:
   - 'Série: ': students[i].grade
     datatype: dropdown
     choices:
-    - Colinho: Colinho (berçário I)
-    - Pezinho: Pezinho (berçário II)
-    - Grupo 1: Grupo 1 (berçário III)
-    - Grupo 2: Grupo 2 (maternal I)
-    - Grupo 3: Grupo 3 (maternal I)
-    - Grupo 4: Grupo 4 (pré I)
-    - Grupo 5: Grupo 5 (pré II)
+    - Colinho: Colinho
+    - Pezinho: Pezinho
+    - Grupo 1: Grupo 1
+    - Grupo 2: Grupo 2
+    - Grupo 3: Grupo 3
+    - Grupo 4: Grupo 4
+    - Grupo 5: Grupo 5
   - 'Período: ': students[i].period
     choices:
-    - Escolar matutino: Escolar matutino (05 horas diárias)
-    - Escolar vespertino: Escolar vespertino (05 horas diárias)
+    - Escolar matutino: Escolar matutino (04 horas diárias)
+    - Escolar vespertino: Escolar vespertino (04 horas diárias)
     - Estendido : Estendido (até 06 horas diárias)
     - Semi-integral : Semi-integral (até 09 horas diárias)
     - Integral: Integral (até 12 horas e 45 minutos diários)
