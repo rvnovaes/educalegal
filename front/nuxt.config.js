@@ -133,9 +133,12 @@ module.exports = {
       ]
     },
     filenames: {
-      app: "[name].[contenthash].js",
-      chunk: "[name].[contenthash].js",
-      css: "[name].[contenthash].css",
+      app: '[name].[contenthash].js',
+      chunk: '[name].[contenthash].js',
+      css: '[name].[contenthash].css',
+      img: 'img/[contenthash:7].[ext]',
+      font: 'fonts/[contenthash:7].[ext]',
+      video: 'videos/[contenthash:7].[ext]'
     }
   }
 };
