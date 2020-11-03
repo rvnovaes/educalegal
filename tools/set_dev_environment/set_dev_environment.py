@@ -24,8 +24,6 @@ def config_hosts():
     apiflower_entry = False
     apirabbitmq_regex = "127.0.1.1 +(apirabbitmq)$"
     apirabbitmq_entry = False
-    apimongo_regex = "127.0.1.1 +(apimongo)$"
-    apimongo_entry = False
     apimongoexpress_regex = "127.0.1.1 +(apimongoexpress)$"
     apimongoexpress_entry = False
     # GED
@@ -59,9 +57,6 @@ def config_hosts():
             if re.match(apirabbitmq_regex, line) is not None:
                 print("Já existe configuração para o Rabbitmq da api em /etc/hosts.txt. Saltando...")
                 apirabbitmq_entry = True
-            if re.match(apimongo_regex, line) is not None:
-                print("Já existe configuração para o Mongo em /etc/hosts.txt. Saltando...")
-                apimongo_entry = True
             if re.match(apimongoexpress_regex, line) is not None:
                 print("Já existe configuração para o Mongo Express em /etc/hosts.txt. Saltando...")
                 apimongoexpress_entry = True
@@ -99,10 +94,6 @@ def config_hosts():
         print("Não há entrada para o Rabbitmq da api em /etc/hosts.txt. Criando... ")
         with open("/etc/hosts", "a") as writeable_hosts_file:
             writeable_hosts_file.write("127.0.1.1  apirabbitmq\n")
-    if not apimongo_entry:
-        print("Não há entrada para o Mongo em /etc/hosts.txt. Criando... ")
-        with open("/etc/hosts", "a") as writeable_hosts_file:
-            writeable_hosts_file.write("127.0.1.1  apimongo\n")
     if not apimongoexpress_entry:
         print("Não há entrada para o Mongo Express em /etc/hosts.txt. Criando... ")
         with open("/etc/hosts", "a") as writeable_hosts_file:
