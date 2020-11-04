@@ -14,7 +14,10 @@ sed -i "s/language: en/language: pt/" $DACONFIG
 sed -i "s/locale: en_US.utf8/locale: pt_BR.utf8/" $DACONFIG
 sed -i "s/us-words.yml/pt-br-words.yml/" $DACONFIG
 # Adiciona as linhas no final do arquivo.
-echo "admin full width: true" >> $DACONFIG
-echo "el environment: test" >> $DACONFIG
-echo "el log to console: true"  >> $DACONFIG
-echo "allow non-idempotent questions: false" >> $DACONFIG
+{
+  echo -e "\n"
+  "admin full width: true"
+  "el environment: test"
+  "el log to console: true"
+  "allow non-idempotent questions: false"
+} >> $DACONFIG
