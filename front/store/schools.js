@@ -64,9 +64,6 @@ export const mutations = {
   updateCNPJ(state, payload) {
     state.schools.find(school => school.id === Number(payload.id)).cnpj = payload.cnpj;
   },
-  updateLegalNature(state, payload) {
-    state.schools.find(school => school.id === Number(payload.id)).legal_nature = payload.legal_nature;
-  },
   updateSite(state, payload) {
     state.schools.find(school => school.id === Number(payload.id)).site = payload.site;
   },

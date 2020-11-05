@@ -51,11 +51,19 @@ def dict_to_docassemble_objects(documents, interview_type_id):
                 # Cria a representacao do objeto Address da pessoa
                 _create_address_obj(document, parent)
 
-                document[parent]["_class"] = "docassemble.base.core.DAList"
-                document[parent]["instanceName"] = parent
-                document[parent]["auto_gather"] = False
-                document[parent]["gathered"] = True
-                document["valid_" + parent + "_table"] = "continue"
+                _create_da_list_properties(document, parent)
+
+            # para objetos do tipo Thing
+            parents = ['input_installments_data', 'other_installments_data']
+
+            for parent in parents:
+                if parent not in document:
+                    continue
+
+                # Cria a representacao do objeto Thing
+                _create_thing_obj(document, parent)
+
+                _create_da_list_properties(document, parent)
 
             # para pessoas que nao tem endereco
             parents = ['witnesses']
@@ -64,12 +72,10 @@ def dict_to_docassemble_objects(documents, interview_type_id):
                 # Cria a representacao do objeto Individual da pessoa
                 _create_person_obj(document, "f", parent)
 
-                document[parent]["_class"] = "docassemble.base.core.DAList"
-                document[parent]["instanceName"] = parent
-                document[parent]["auto_gather"] = False
-                document[parent]["gathered"] = True
-                document["valid_" + parent + "_table"] = "continue"
+                _create_da_list_properties(document, parent)
 
+            document["valid_input_installments_data_table"] = "continue"
+            document["valid_other_installments_data_table"] = "continue"
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
 
         elif interview_type_id == BulkDocumentKind.NOTIFICACAO_EXTRAJUDICIAL.value:
@@ -86,11 +92,7 @@ def dict_to_docassemble_objects(documents, interview_type_id):
                 # Cria a representacao do objeto Address da pessoa
                 _create_address_obj(document, parent)
 
-                document[parent]["_class"] = "docassemble.base.core.DAList"
-                document[parent]["instanceName"] = parent
-                document[parent]["auto_gather"] = False
-                document[parent]["gathered"] = True
-                document["valid_" + parent + "_table"] = "continue"
+                _create_da_list_properties(document, parent)
 
             document["content_document"] = "notificacao-extrajudicial.docx"
 
@@ -108,11 +110,7 @@ def dict_to_docassemble_objects(documents, interview_type_id):
                 # Cria a representacao do objeto Address da pessoa
                 _create_address_obj(document, parent)
 
-                document[parent]["_class"] = "docassemble.base.core.DAList"
-                document[parent]["instanceName"] = parent
-                document[parent]["auto_gather"] = False
-                document[parent]["gathered"] = True
-                document["valid_" + parent + "_table"] = "continue"
+                _create_da_list_properties(document, parent)
 
             # Cria a representacao da lista de documentos
             _create_documents_obj(document)
@@ -140,11 +138,14 @@ def dict_to_docassemble_objects(documents, interview_type_id):
     return interview_variables_list
 
 
-def _build_name_dict(document, parent):
+def _build_name_dict(document, parent, empty=False):
     for element in document[parent]['elements']:
         element["name"] = dict()
-        element["name"]["text"] = element["name_text"]
-        element.pop("name_text")
+        if empty:
+            element["name"]["text"] = None
+        else:
+            element["name"]["text"] = element["name_text"]
+            element.pop("name_text")
 
     return document
 
@@ -221,6 +222,26 @@ def _create_address_obj(document, parent):
     for index, element in enumerate(document[parent]['elements']):
         element['address']["instanceName"] = parent + '[' + str(index) + '].address'
         element['address']["_class"] = "docassemble.base.util.Address"
+
+
+def _create_da_list_properties(document, parent):
+    document[parent]["_class"] = "docassemble.base.core.DAList"
+    document[parent]["instanceName"] = parent
+    document[parent]["auto_gather"] = False
+    document[parent]["gathered"] = True
+    document["valid_" + parent + "_table"] = "continue"
+
+
+def _create_thing_obj(document, parent):
+    # cria hierarquia para name do person_list_name
+    _build_name_dict(document, parent, True)
+
+    for index, element in enumerate(document[parent]['elements']):
+        element["_class"] = "docassemble.base.util.Thing"
+        element["name"]["_class"] = "docassemble.base.util.Name"
+
+        element["instanceName"] = parent + '[' + str(index) + ']'
+        element["name"]["instanceName"] = parent + '[' + str(index) + '].name'
 
 
 @login_required

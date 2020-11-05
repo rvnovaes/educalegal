@@ -37,7 +37,7 @@
           <div class="col-md-2">
             <base-input label="CPF"
                         name="CPF"
-                        class="witness-cnpj"
+                        class="witness-cpf"
                         placeholder="CPF"
                         rules="required"
                         v-mask="'###.###.###-##'"

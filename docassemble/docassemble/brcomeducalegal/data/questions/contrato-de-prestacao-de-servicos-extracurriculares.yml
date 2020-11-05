@@ -1,6 +1,5 @@
 metadata:
-  title: Contrato de Prestação de Serviços Educacionais
-  date format: 'dd/MM/yyyy'
+  title: Contrato de Prestação de Serviços Extracurriculares
 ---
 include:
   - element-tenant-school-interview.yml
@@ -29,7 +28,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "contrato-prestacao-servicos-educacionais.docx"
+  content_document = "contrato-de-prestacao-de-servicos-extracurriculares.docx"
 ---
 id: logic
 mandatory: True
@@ -57,15 +56,11 @@ code: |
     if plan_use_esignature:
       valid_contractors_table
     school_year
-    if method_payment == "parcelado":
-      installments_list
-      if has_input_value:
-        valid_input_installments_data_table
-      valid_other_installments_data_table
+    if method_payment == 'parcelado':
+        installments_list
     else:
       single_installment_date_format
     signature_local
-    witnesses.uses_parts = False
     valid_witnesses_table
     generated_file
     el_patch_document
@@ -198,6 +193,8 @@ fields:
     - noturno: noturno
     - integral: integral
     datatype: dropdown
+  - 'Atividade Extracurricular: ': students[i].extracurricular_activity
+    datatype: text
 ---
 objects:
   - contractors: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)

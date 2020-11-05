@@ -390,14 +390,6 @@ export default {
           }
         },
         {
-          target: ".escola-tipo",
-          content: `O tipo da pessoa da escola. Se você possui empresa regularmente constituída com CNPJ, escolha "Jurídica". Caso contrário, escolha pessoa Física.`,
-          params: {
-            placement: "top",
-            enableScrolling: false
-          }
-        },
-        {
           target: ".escola-email",
           content: `E-mail da escola. O cadastro correto deste e-mail é fundamental. Por padrão, os documentos enviados por e-mail ou para assinatura eletrônica usam o endereço cadastrado neste campo.`,
           params: {

@@ -327,7 +327,10 @@ code: |
           new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 1
+          if school_party_type_selected == part_types[0].name.text:
+            new_recipient['routingOrder'] = 2
+          else:
+            new_recipient['routingOrder'] = 1
           new_recipient['tabs'] = [
               {
                   'type': 'signHere',
@@ -342,7 +345,10 @@ code: |
           new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 1
+          if school_party_type_selected == part_types[0].counterpart_name:
+            new_recipient['routingOrder'] = 2
+          else:
+            new_recipient['routingOrder'] = 1
           new_recipient['tabs'] = [
               {
                   'type': 'signHere',
@@ -358,7 +364,10 @@ code: |
               new_recipient['name'] = item.name.text
               new_recipient['email'] = item.email
               new_recipient['group'] = 'signers'
-              new_recipient['routingOrder'] = 1
+              if school_party_type_selected == part_types[0].extrapart_name:
+                new_recipient['routingOrder'] = 2
+              else:
+                new_recipient['routingOrder'] = 1
               new_recipient['tabs'] = [
                   {
                       'type': 'signHere',
@@ -374,7 +383,7 @@ code: |
               new_recipient['name'] = item.name.text
               new_recipient['email'] = item.email
               new_recipient['group'] = 'signers'
-              new_recipient['routingOrder'] = 2
+              new_recipient['routingOrder'] = 1
               new_recipient['tabs'] = [
                   {
                       'type': 'signHere',

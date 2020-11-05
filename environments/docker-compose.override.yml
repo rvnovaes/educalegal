@@ -39,6 +39,9 @@ services:
       - "8800:80"
     expose:
       - "80"
+      - "80:80"
+    volumes:
+      - ./fonts/calibri:/usr/share/fonts/calibri
   ged:
     container_name: ged
     image: mayanedms/mayanedms:3.5.1
