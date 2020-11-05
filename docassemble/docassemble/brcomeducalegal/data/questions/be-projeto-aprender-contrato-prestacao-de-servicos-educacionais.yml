@@ -1,0 +1,374 @@
+metadata:
+  title: Contrato de Prestação de Serviços Educacionais
+  date format: 'dd/MM/yyyy'
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+  - element-school-witness.yml
+  - element-payment-method.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+---
+sections:
+  - Escola
+  - Aluno(a)
+  - Contratantes
+  - Dados Contratuais
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "be-projeto-aprender-contrato-prestacao-de-servicos-educacionais.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
+    if len(school_units_list) == 0:
+      # nao pode ser usado school_unit pq essa variavel foi usada no endereco da escola
+      school_division = None
+    elif len(school_units_list) == 1:
+      school_division = school_units_list[0]
+    else:
+      school_division
+    students.target_number = 1
+    for item in students:
+      item.name.text
+    students[0].grade
+    contractors.gather()
+    if plan_use_esignature:
+      valid_contractors_table
+    school_year
+    if method_payment == "parcelado":
+      installments_list
+      if has_input_value:
+        valid_input_installments_data_table
+      valid_other_installments_data_table
+    else:
+      single_installment_date_format
+    signature_local
+    witnesses.uses_parts = False
+    valid_witnesses_table
+    generated_file
+    el_patch_document
+    document_ready_screen
+---
+objects:
+  - students: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  students[i].name.text
+  students[i].address.street_name
+  students[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+ga id: |
+  code: ga_id_begin
+section: Aluno
+progress: 5
+question: Número de Alunos
+fields:
+  - Número: students.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 10
+section: Aluno(a)
+question: Dados do(a) Aluno(a)
+fields:
+  - 'Nome completo: ': students[i].name.text
+    datatype: text
+  - 'CPF:': students[i].cpf
+    datatype: text
+    required: False
+    validate: validate_cpf
+  - 'Número do RG: ': students[i].rg
+    datatype: text
+    required: False
+  - 'Nacionalidade: ': students[i].nationality
+    datatype: text
+    default: brasileiro(a)
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#c3R1ZGVudHNbaV0uY3Bm').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+progress: 15
+section: Aluno(a)
+question: Endereço do(a) Aluno(a)
+fields:
+  - 'CEP: ': students[i].address.zip
+    datatype: text
+  - 'Logradouro: ': students[i].address.street_name
+    datatype: text
+    address autocomplete: True
+  - 'Número: ': students[i].address.street_number
+    datatype: text
+  - 'Complemento: ': students[i].address.unit
+    datatype: text
+    required: False
+  - 'Bairro: ': students[i].address.neighborhood
+    datatype: text
+  - 'Município: ': students[i].address.city
+    datatype: text
+  - 'Estado: ': students[i].address.state
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+  });
+
+  $("#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#c3R1ZGVudHNbaV0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#c3R1ZGVudHNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+progress: 20
+section: Aluno(a)
+question: Dados escolares
+fields:
+  - 'Série: ': students[i].grade
+    datatype: dropdown
+    choices:
+    - Colinho: Colinho
+    - Pezinho: Pezinho
+    - Grupo 1: Grupo 1
+    - Grupo 2: Grupo 2
+    - Grupo 3: Grupo 3
+    - Grupo 4: Grupo 4
+    - Grupo 5: Grupo 5
+  - 'Período: ': students[i].period
+    choices:
+    - Escolar: Escolar (04 horas diárias)
+    - Estendido : Estendido (até 06 horas diárias)
+    - Semi-integral : Semi-integral (até 09 horas diárias)
+    - Integral: Integral (até 12 horas e 45 minutos diários)
+    datatype: dropdown
+---
+objects:
+  - contractors: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  contractors[i].name.text
+  contractors[i].address.street_name
+  contractors[i].complete = True
+---
+progress: 35
+section: Contratantes
+question: |
+  Número de Contratantes
+fields:
+  - Número: contractors.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 50
+section: Contratantes
+question: Dados do(a) ${word(ordinal(i)) } Contratante
+fields:
+  - 'Nome completo: ': contractors[i].name.text
+    validate: validate_person_full_name
+    datatype: text
+  - 'CPF: ': contractors[i].cpf
+    datatype: text
+    validate: validate_cpf
+  - 'Número do RG: ': contractors[i].rg
+    datatype: text
+    required: False
+  - 'Nacionalidade:': contractors[i].nationality
+    datatype: text
+    default: brasileiro(a)
+  - 'Estado Civil: ': contractors[i].marital_status
+    required: False
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+  - 'Profissão: ': contractors[i].occupation
+    datatype: text
+    required: False
+  - 'E-mail: ': contractors[i].email
+    help: ${ help_email_msg }
+    datatype: email
+  - 'Telefone: ': contractors[i].phone_number
+    datatype: text
+  - 'Whatsapp:': contractors[i].whatsapp_number
+    datatype: text
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#Y29udHJhY3RvcnNbaV0uY3Bm').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+progress: 65
+section: Contratantes
+question: Endereço de ${ contractors[i].name.text }
+fields:
+  - 'CEP: ': contractors[i].address.zip
+    datatype: text
+  - 'Logradouro: ': contractors[i].address.street_name
+    datatype: text
+  - 'Número': contractors[i].address.street_number
+    datatype: text
+  - 'Complemento: ': contractors[i].address.unit
+    datatype: text
+    required: False
+  - 'Bairro: ': contractors[i].address.neighborhood
+    datatype: text
+  - 'Município: ': contractors[i].address.city
+    datatype: text
+  - 'Estado: ': contractors[i].address.state
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+  });
+
+  $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#Y29udHJhY3RvcnNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Contratantes
+field: valid_contractors_table
+question: |
+  Contratantes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ contractors.table }
+buttons:
+  Continuar: continue
+---
+table: contractors.table
+rows: contractors
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+progress: 70
+section: Dados Contratuais
+question: Ano Letivo
+fields:
+  - 'Ano Letivo: ': school_year
+    datatype: integer
+    default: |
+      ${ school_year_default }
+---
+code: |
+  recipients = list()
+  for item in contractors:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  for item in witnesses:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 2
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
