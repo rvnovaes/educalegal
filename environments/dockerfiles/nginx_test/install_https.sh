@@ -4,6 +4,9 @@ docker cp conf_final/api.conf nginx:/etc/nginx/conf.d
 docker cp conf_final/docassemble.conf nginx:/etc/nginx/conf.d
 docker cp conf_final/educalegal.conf nginx:/etc/nginx/conf.dO
 docker cp conf_final/menu.conf nginx:/etc/nginx/conf.d
+docker cp conf_final/apirabbitmq.conf nginx:/etc/nginx/conf.d
+docker cp conf_final/apirmongoexpress.conf nginx:/etc/nginx/conf.d
+docker cp conf_final/apiflower.conf nginx:/etc/nginx/conf.d
 docker cp menu.html nginx:/usr/share/nginx/html
 docker restart nginx
 crontab -l | { cat; echo "0 0 2-30/2 * * /opt/educalegal/environments/dockerfiles/nginx_test/ssl_renew.sh"; } | crontab -
