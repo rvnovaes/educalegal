@@ -48,7 +48,7 @@ code: |
 ---
 objects:
   - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
-  - example_termo_de_rescisao_de_acordo_individual_de_trabalho: DAStaticFile.using(filename='example-termo-de-rescisao-de-acordo-individual-de-trabalho.yml.pdf')
+  - example_termo_de_rescisao_de_acordo_individual_de_trabalho: DAStaticFile.using(filename='example-termo-de-rescisao-de-acordo-individual-de-trabalho.pdf')
 ---
 code: |
   workers[i].name.text
