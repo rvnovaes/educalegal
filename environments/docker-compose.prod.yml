@@ -1,24 +1,25 @@
 version: '3.7'
 
 services:
-#  web_server:
-#    container_name: web_server
-#    build:
-#      context: nginx_dockerfile_prod
-#      dockerfile: Dockerfile
-#    restart: unless-stopped
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    depends_on:
-#      - educalegal
-#      - educalegal_front
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    build:
+      context: dockerfiles/nginx_prod
+      dockerfile: nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+    depends_on:
+      - api
   educalegal:
     build:
       args:
         BUILD_BACKEND_URL: "https://api.educalegal.com.br"
   api:
-    command:  gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
+    command: gunicorn web.wsgi:application --bind 0.0.0.0:8000 --workers=4 --timeout=300
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.production
       - EL_ENV=production
@@ -30,3 +31,29 @@ services:
       - DJANGO_SETTINGS_MODULE=web.settings.production
     depends_on:
       - apirabbitmq
+  docassemble:
+    container_name: docassemble
+    restart: unless-stopped
+    image: jhpyle/docassemble:latest
+    environment:
+      - DAPYTHONVERSION=3
+      - TIMEZONE=America/Sao_Paulo
+      - LANGUAGE=pt
+      - LOCALE=pt_BR.utf8
+      - DAWEBSERVER=nginx
+      - DAHOSTNAME=doctest.educalegal.com.br
+      - SERVERADMIN=sistemas@educalegal.com.br
+      - PYTHONPACKAGES=docassemble-wrappers,num2words,validator-collection-br,retry-requests,sendgrid
+    ports:
+      - "8800:80"
+    expose:
+      - "80"
+    volumes:
+      - docassemble-postgres:/var/lib/postgresql/11/main
+      - docassemble-config:/usr/share/docassemble/config
+      - docassemble-files:/usr/share/docassemble/files
+volumes:
+  certbot-etc:
+  docassemble-postgres:
+  docassemble-config:
+  docassemble-files:
