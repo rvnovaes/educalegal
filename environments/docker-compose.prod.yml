@@ -41,7 +41,7 @@ services:
       - LANGUAGE=pt
       - LOCALE=pt_BR.utf8
       - DAWEBSERVER=nginx
-      - DAHOSTNAME=doctest.educalegal.com.br
+      - DAHOSTNAME=generation.educalegal.com.br
       - SERVERADMIN=sistemas@educalegal.com.br
       - PYTHONPACKAGES=docassemble-wrappers,num2words,validator-collection-br,retry-requests,sendgrid
     ports:
