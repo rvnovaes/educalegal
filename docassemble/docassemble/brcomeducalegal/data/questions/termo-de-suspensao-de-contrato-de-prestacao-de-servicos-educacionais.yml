@@ -1,6 +1,5 @@
 metadata:
   title: Termo de Suspensão de Contrato de Prestação de Serviços Educacionais
-  date format: 'dd/MM/yyyy'
 ---
 include:
   - element-tenant-school-interview.yml
