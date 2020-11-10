@@ -328,6 +328,10 @@ columns:
 edit:
   - email
 ---
+code: |
+  from datetime import date
+  school_year_default = date.today().year + 1
+---
 progress: 70
 section: Dados Contratuais
 question: Ano Letivo
