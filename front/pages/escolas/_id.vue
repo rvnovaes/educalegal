@@ -39,13 +39,6 @@ export default {
     TestemunhasTable,
     EscolaForm,
   },
-  beforeCreate() {
-    console.log("breforeCreate")
-  },
-  created() {
-    console.log("_id created")
-    console.log(this.$route.params.id)
-  },
   computed: {
     school() {
       return this.$store.getters["schools/getSchool"](this.$route.params.id);

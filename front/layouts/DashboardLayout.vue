@@ -19,14 +19,6 @@
           }">
         </sidebar-item>
 
-        <!--        <sidebar-item-->
-        <!--          :link="{-->
-        <!--            name: 'Geração em Lote',-->
-        <!--            icon: 'ni ni-ungroup text-orange',-->
-        <!--            path: '/lote'-->
-        <!--          }">-->
-        <!--        </sidebar-item>-->
-
         <sidebar-item
           :link="{
             name: 'Arquivo',
@@ -42,14 +34,6 @@
             path: '/escolas'
           }">
         </sidebar-item>
-
-        <!--        <sidebar-item-->
-        <!--          :link="{-->
-        <!--            name: 'Atendimento',-->
-        <!--            icon: 'fa fa-user-tie text-red',-->
-        <!--            path: '/atendimento'-->
-        <!--          }">-->
-        <!--        </sidebar-item>-->
       </template>
 
       <template slot="links-after">
@@ -87,7 +71,7 @@
       <dashboard-navbar :type="$route.name === 'alternative' ? 'light': 'default'"></dashboard-navbar>
 
       <div @click="$sidebar.displaySidebar(false)">
-        <nuxt></nuxt>
+          <nuxt></nuxt>
       </div>
       <content-footer v-if="!$route.meta.hideFooter"></content-footer>
     </div>

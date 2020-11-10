@@ -10,7 +10,7 @@
       <form class="needs-validation"
             @submit.prevent="handleSubmit(firstFormSubmit)">
         <div class="form-row">
-          <div class="col-md-4">
+          <div class="col-md-5">
             <base-input label="Nome"
                         name="Nome"
                         class="escola-nome"
@@ -33,36 +33,16 @@
             </base-input>
           </div>
           <div class="col-md-2">
-            <base-input label="CNPJ/CPF"
-                        name="CNPJ/CPF"
+            <base-input label="CNPJ"
+                        name="CNPJ"
                         class="escola-cnpj"
-                        placeholder="CNPJ/CPF"
+                        placeholder="CNPJ"
                         rules="required"
+                        v-mask="'##.###.###/####-##'"
                         success-message="Parece correto!"
                         :value="school.cnpj"
                         @input="updateCNPJ">
             </base-input>
-          </div>
-          <div class="col-md-1">
-            <base-input label="Tipo"
-                        name="Tipo"
-                        class="escola-tipo"
-                        placeholder="Tipo "
-                        rules="required"
-                        success-message="Parece correto!">
-              <el-select class="select-danger"
-                         placeholder="Tipo"
-                         :value="school.legal_nature"
-                         @input="updateLegalNature">
-                <el-option v-for="option in selects.legal_natures"
-                           class="select-danger"
-                           :value="option.value"
-                           :label="option.label"
-                           :key="option.label">
-                </el-option>
-              </el-select>
-            </base-input>
-
           </div>
         </div>
         <div class="form-row">
@@ -80,8 +60,7 @@
             <base-input label="Site"
                         name="Site"
                         class="escola-site"
-                        placeholder="Site"
-                        rules="required"
+                        placeholder="https://www.minha-escola.com.br"
                         type="url"
                         :value="school.site"
                         @input="updateSite">
@@ -192,15 +171,16 @@
 <script>
 import Swal from "sweetalert2";
 import ufs from "@/components/pages/forms/ufs";
-import legalNatures from "@/components/pages/forms/legalNatures";
+import {isCNPJ} from 'brazilian-values';
+import {mask} from 'vue-the-mask';
 
 export default {
   props: ["school"],
   components: {},
+  directives: {mask},
   data() {
     return {
       selects: {
-        legal_natures: legalNatures,
         ufs: ufs
       },
       validated: false,
@@ -225,9 +205,6 @@ export default {
     },
     updateCNPJ(e) {
       this.$store.commit("schools/updateCNPJ", {id: this.school.id, cnpj: e});
-    },
-    updateLegalNature(e) {
-      this.$store.commit("schools/updateLegalNature", {id: this.school.id, legal_nature: e});
     },
     updatePhone(e) {
       this.$store.commit("schools/updatePhone", {id: this.school.id, phone: e});
@@ -260,6 +237,20 @@ export default {
       this.$store.commit("schools/updateUF", {id: this.school.id, state: e});
     },
     async firstFormSubmit() {
+      if (!isCNPJ(this.school.cnpj)) {
+        await Swal.fire({
+          title: `CNPJ ${this.school.cnpj} inválido.`,
+          text: 'Deve ser corrigido o CNPJ da esola.',
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-info btn-fill",
+          },
+          confirmButtonText: "OK",
+          showCloseButton: true,
+          buttonsStyling: false
+        });
+        return;
+      }
       if (this.school.id !== 0) {
         try {
           const res = await this.$store.dispatch("schools/updateSchool", this.school);
@@ -273,12 +264,12 @@ export default {
                 confirmButton: "btn btn-success btn-fill",
               }
             });
-
           }
         } catch (e) {
+          let errorMessage = e.response.data ? e.response.data : e.toString();
           await Swal.fire({
             title: `Erro ao editar ${this.school.name}`,
-            text: e,
+            text: errorMessage,
             icon: "error",
             customClass: {
               confirmButton: "btn btn-info btn-fill",
@@ -301,6 +292,8 @@ export default {
                 confirmButton: "btn btn-success btn-fill",
               }
             });
+            // recarrega a escola que foi criada
+            await this.$router.push({path: "/escolas/" + res.data.id});
           }
         } catch (e) {
           await Swal.fire({

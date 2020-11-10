@@ -6,8 +6,8 @@ from allauth.account.forms import SignupForm
 
 from tenant.models import (
     Tenant,
-    TenantGedData,
-    ESignatureApp
+    ESignatureApp,
+    ESignatureAppProvider
 )
 from interview.models import Interview
 from billing.models import Plan
@@ -42,6 +42,9 @@ class EducaLegalSignupForm(SignupForm):
 
     def save(self, request):
         essential_plan = Plan.objects.get(pk=1)
+        esignature_app = ESignatureApp.objects.filter(
+            provider=ESignatureAppProvider.CLICKSIGN.name,
+            test_mode=True).first()
 
         tenant = Tenant.objects.create(
             name=self.cleaned_data.get("tenant_name"),
@@ -49,7 +52,7 @@ class EducaLegalSignupForm(SignupForm):
             eua_agreement=self.cleaned_data.get("eua"),
             plan=essential_plan,
             auto_enrolled=True,
-            esignature_app=None,
+            esignature_app=esignature_app,
             phone=self.cleaned_data.get("phone"),
         )
         tenant.save()

@@ -3,7 +3,8 @@ const NODE_ENV = process.env.NODE_ENV;
 console.log(NODE_ENV)
 
 module.exports = {
-  mode: "spa",
+  // mode option is deprecated. Please use ssr: true for universal mode or ssr: false for spa mode
+  ssr: false,
   router: {
     base: "/",
     linkExactActiveClass: "active",
@@ -131,14 +132,6 @@ module.exports = {
           }
         ]
       ]
-    },
-    filenames: {
-      app: '[name].[contenthash].js',
-      chunk: '[name].[contenthash].js',
-      css: '[name].[contenthash].css',
-      img: 'img/[contenthash:7].[ext]',
-      font: 'fonts/[contenthash:7].[ext]',
-      video: 'videos/[contenthash:7].[ext]'
     }
   }
 };

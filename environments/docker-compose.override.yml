@@ -1,0 +1,126 @@
+version: '3.7'
+
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: dockerfiles/nginx_dev
+      dockerfile: nginx_dev
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+  api:
+    # Os settings do banco devem ficar aqui tambem para permitir que o script wait for postgres funcione
+    environment:
+      DATABASE_NAME: educalegal
+      DATABASE_USER: educalegal
+      DATABASE_PASSWORD: educalegal
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+    ports:
+      - "8008:8008"
+    expose:
+      - "8008"
+    depends_on:
+      - db
+  docassemble:
+    container_name: docassemble
+    image: jhpyle/docassemble:latest
+    environment:
+      - DAPYTHONVERSION=3
+      - TIMEZONE=America/Sao_Paulo
+      - LANGUAGE=pt
+      - LOCALE=pt_BR.utf8
+      - DAWEBSERVER=nginx
+      - SERVERADMIN=sistemas@educalegal.com.br
+      - PYTHONPACKAGES=docassemble-wrappers,num2words,validator-collection-br,retry-requests,sendgrid
+    ports:
+      - "8800:80"
+    expose:
+      - "80"
+      - "80:80"
+    volumes:
+      - ./fonts/calibri:/usr/share/fonts/calibri
+  ged:
+    container_name: ged
+    image: mayanedms/mayanedms:3.5.1
+    environment: &mayan_env
+      MAYAN_CELERY_BROKER_URL: "amqp://mayan:mayanrabbitpass@gedrabbitmq:5672/mayan"
+      MAYAN_CELERY_RESULT_BACKEND: "redis://:mayanredispassword@gedredis:6379/0"
+      MAYAN_DATABASES: "{'default':{'ENGINE':'django.db.backends.postgresql','NAME':'mayan','PASSWORD':'mayandbpass','USER':'mayan','HOST':'geddb'}}"
+      MAYAN_APT_INSTALLS: "tesseract-ocr-deu tesseract-ocr-spa tesseract-ocr-por tesseract-ocr-fra"
+    volumes:
+      - /opt/educalegal/docker_volumes/mayan:/var/lib/mayan
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+    depends_on:
+      - geddb
+      - gedredis
+  gedredis:
+    container_name: gedredis
+    image: redis:5.0-alpine
+    command:
+      - redis-server
+      - --databases
+      - "2"
+      - --maxmemory-policy
+      - allkeys-lru
+      - --save
+      - ""
+      - --requirepass mayanredispassword
+    volumes:
+      - /opt/educalegal/docker_volumes/redis:/data
+  gedrabbitmq:
+    container_name: gedrabbitmq
+    image: healthcheck/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: mayan
+      RABBITMQ_DEFAULT_PASS: mayanrabbitpass
+      RABBITMQ_DEFAULT_VHOST: mayan
+    volumes:
+      - /opt/educalegal/docker_volumes/rabbitmq_ged:/var/lib/rabbitmq
+  gedceleryflower:
+    container_name: gedceleryflower
+    command:
+      - run_celery
+      - flower
+    depends_on:
+      - geddb
+      - gedredis
+      - gedrabbitmq
+    environment:
+      <<: *mayan_env
+    image: mayanedms/mayanedms:3.5.1
+    ports:
+      - "5555:5555"
+    expose:
+      - "5555"
+  db:
+    container_name: db
+    image: postgres:11-alpine
+    volumes:
+    - /opt/educalegal/docker_volumes/postgres_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: educalegal
+      POSTGRES_USER: educalegal
+      POSTGRES_PASSWORD: educalegal
+    ports:
+      - "7654:5432"
+    expose:
+      - "5432"
+  geddb:
+    container_name: geddb
+    image: postgres:11-alpine
+    environment:
+      POSTGRES_DB: mayan
+      POSTGRES_USER: mayan
+      POSTGRES_PASSWORD: mayandbpass
+    ports:
+      - "6543:5432"
+    expose:
+      - "5432"
+    volumes:
+      - /opt/educalegal/docker_volumes/postgres_db_ged:/var/lib/postgresql/data

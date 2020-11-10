@@ -211,12 +211,18 @@ CORS_ORIGIN_WHITELIST = [
     "http://educalegal:3000",
     "http://localhost:8001",
     "http://127.0.0.1:8001",
+    "http://api:8001",
     "http://educalegal:8001",
     "http://localhost:8008",
     "http://127.0.0.1:8008",
+    "http://api:8008",
     "http://educalegal:8008",
     "https://apptest.educalegal.com.br",
     "https://app.educalegal.com.br",
+    "http://educalegal",
+    "http://api",
+    "http://127.0.0.1:8800",
+    "http://localhost:8800"
 ]
 
 # CORS_ALLOW_CREDENTIALS = True
@@ -299,7 +305,7 @@ CURRENCIES = ("BRL",)
 
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "django-cache"
-CELERY_BROKER_URL = "amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal"
+CELERY_BROKER_URL = "amqp://educalegal:educalegal@apirabbitmq/educalegal"
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
