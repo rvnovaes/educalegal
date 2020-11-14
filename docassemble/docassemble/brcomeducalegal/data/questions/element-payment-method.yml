@@ -1,9 +1,5 @@
 ---
 code: |
-  from datetime import date
-  school_year_default = date.today().year + 1
----
-code: |
   from num2words import num2words
   annual_value_words = num2words(annual_value, lang='pt_BR', to='currency')
 ---

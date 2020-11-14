@@ -1,5 +1,5 @@
 metadata:
-  title: Contrato de Prestação de Serviços Extracurriculares
+  title: Termo de Suspensão de Contrato de Prestação de Serviços Educacionais
 ---
 include:
   - element-tenant-school-interview.yml
@@ -13,7 +13,6 @@ include:
   - element-school-email-reviewed.yml
   - element-default-messages.yml
   - element-school-witness.yml
-  - element-payment-method.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -28,7 +27,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "contrato-de-prestacao-de-servicos-extracurriculares.docx"
+  content_document = "termo-de-suspensao-de-contrato-de-prestacao-de-servicos-educacionais.docx"
 ---
 id: logic
 mandatory: True
@@ -56,12 +55,10 @@ code: |
     if plan_use_esignature:
       valid_contractors_table
     school_year
-    if method_payment == 'parcelado':
-        installments_list
-    else:
-      single_installment_date_format
-    signature_local
+    start_suspension_date
+    witnesses.uses_parts = False
     valid_witnesses_table
+    signature_local
     generated_file
     el_patch_document
     document_ready_screen
@@ -193,8 +190,6 @@ fields:
     - noturno: noturno
     - integral: integral
     datatype: dropdown
-  - 'Atividade Extracurricular: ': students[i].extracurricular_activity
-    datatype: text
 ---
 objects:
   - contractors: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
@@ -338,6 +333,15 @@ fields:
     default: |
       ${ school_year_default }
 ---
+progress: 75
+section: Dados Contratuais
+question: Data de início e fim da suspensão do contrato do aluno
+fields:
+  - 'Data do início da suspensão: ': start_suspension_date
+    datatype: date
+  - 'Data do final da suspensão: ': end_suspension_date
+    datatype: date
+---
 code: |
   recipients = list()
   for item in contractors:
@@ -374,7 +378,7 @@ code: |
           new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 2
+          new_recipient['routingOrder'] = 1
           new_recipient['tabs'] = [
               {
                   'type': 'signHere',
