@@ -310,10 +310,11 @@ def webhook_listener(request):
                                 logging.info('click_13')
                                 message = 'Não foi possível salvar o Signer: ' + str(e)
                                 logging.error(message)
+                                return HttpResponse(status=400, reason=message)
     except Exception as e:
         logging.info('click_14')
-        message = str(type(e).__name__) + " : " + str(e)
-        logging.error('Exceção webhook clicksign')
+        message = 'Exceção genéria webhook clicksign. ' + str(type(e).__name__) + " : " + str(e)
         logging.error(message)
+        return HttpResponse(status=400, reason=message)
 
     return HttpResponse(status=200, reason="Success!")
