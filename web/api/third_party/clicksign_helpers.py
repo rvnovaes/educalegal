@@ -98,6 +98,7 @@ def verify_hmac(headers, request_body, test_mode):
 @csrf_exempt
 def webhook_listener(request):
     try:
+        logging.info('click_0-0')
         # converte json para dict
         data = json.loads(request.body)
 
@@ -313,7 +314,7 @@ def webhook_listener(request):
                                 return HttpResponse(status=400, reason=message)
     except Exception as e:
         logging.info('click_14')
-        message = 'Exceção genéria webhook clicksign. ' + str(type(e).__name__) + " : " + str(e)
+        message = 'Exceção genérica webhook clicksign. ' + str(type(e).__name__) + " : " + str(e)
         logging.error(message)
         return HttpResponse(status=400, reason=message)
 
