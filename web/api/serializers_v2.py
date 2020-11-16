@@ -7,7 +7,7 @@ from billing.models import Plan
 from document.models import Document, Envelope, Signer
 from interview.models import Interview, InterviewDocumentType
 from interview.util import get_interview_link as util_get_interview_link
-from school.models import School, SchoolUnit, Witness
+from school.models import School, SchoolUnit, SigningPerson
 from tenant.models import Tenant, TenantGedData, ESignatureApp
 from users.models import CustomUser
 
@@ -210,7 +210,7 @@ class SchoolUnitSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class WitnessSerializer(serializers.ModelSerializer):
+class SigningPersonSerializer(serializers.ModelSerializer):
     def validate_name(self, data):
         try:
             validators_br.person_full_name(data)
@@ -219,15 +219,15 @@ class WitnessSerializer(serializers.ModelSerializer):
         return data
 
     class Meta:
-        model = Witness
-        ref_name = "Witness v2"
+        model = SigningPerson
+        ref_name = "SigningPerson v2"
         fields = "__all__"
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#dealing-with-nested-objects
 class SchoolSerializer(serializers.ModelSerializer):
     school_units = SchoolUnitSerializer(many=True, read_only=True)
-    witnesses = WitnessSerializer(many=True, read_only=True)
+    signing_people = SigningPersonSerializer(many=True, read_only=True)
 
     class Meta:
         model = School

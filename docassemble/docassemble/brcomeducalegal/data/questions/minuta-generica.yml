@@ -18,6 +18,7 @@ include:
   - element-school-email-reviewed.yml
   - element-default-messages.yml
   - element-school-witness.yml
+  - element-school-representative.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -40,8 +41,9 @@ code: |
       part_types.target_number = 1
       for item in part_types:
         item.name.text
+      representatives_list
+      valid_representatives_table
       school_party_type
-      reviewed_school_email_answer
       if school_party_type_selected == part_types[0].name.text:
         for item in counterparts:
           item.name.text
@@ -141,17 +143,23 @@ code: |
   # Atribuindo os dados da escola para o tipo de parte escolhido pelo usuário
   school_party_type_selected = school_party_type
   if school_party_type_selected == part_types[0].name.text:
-    parts.target_number = 1
-    parts[0].name.text = school_legal_name
-    parts[0].email = school_email
+    parts.target_number = len(representatives_list)
+    for i, signer in enumerate(representatives_list):
+        parts[i].name.text = signer['name']
+        parts[i].email = signer['email']
+        parts[i].cpf = signer['cpf']
   elif school_party_type_selected == part_types[0].counterpart_name:
-    counterparts.target_number = 1
-    counterparts[0].name.text = school_legal_name
-    counterparts[0].email = school_email
+    counterparts.target_number = len(representatives_list)
+    for i, signer in enumerate(representatives_list):
+        counterparts[i].name.text = signer['name']
+        counterparts[i].email = signer['email']
+        counterparts[i].cpf = signer['cpf']
   elif school_party_type_selected == part_types[0].extrapart_name:
-    extraparts.target_number = 1
-    extraparts[0].name.text = school_legal_name
-    extraparts[0].email = school_email
+    extraparts.target_number = len(representatives_list)
+    for i, signer in enumerate(representatives_list):
+        extraparts[i].name.text = signer['name']
+        extraparts[i].email = signer['email']
+        extraparts[i].cpf = signer['cpf']
 ---
 objects:
   - parts: DAList.using(object_type=Person, ask_number=True)

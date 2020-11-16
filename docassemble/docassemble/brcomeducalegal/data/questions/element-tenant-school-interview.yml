@@ -133,7 +133,7 @@ code: |
 code: |
     elc = EducaLegalClient(educalegal_url, ut)
     log("Chamando elc.tenants_school_names_school_data", "console")
-    school_names_list, school_units_dict, school_data_dict, school_witnesses_dict = elc.tenants_school_names_school_data(tid)
+    school_names_list, school_units_dict, school_data_dict = elc.tenants_school_names_school_data(tid)
     log("Lista de nomes de escolas" + str(school_names_list), "console")
     if el_log_to_console:
       log("Lista de nomes de esocolas" + str(school_names_list), "console")
@@ -162,9 +162,9 @@ code: |
 ---
 code: |
   elc = EducaLegalClient(educalegal_url, ut)
-  witnesses_data_list = elc.witnesses_list(school_data_dict[selected_school]['id'])
+  signing_people = elc.signing_people(school_data_dict[selected_school]['id'])
   if el_log_to_console:
-    log("Lista de testemunhas das escolas" + str(witnesses_data_list), "console")
+    log("Lista de signatários das escolas" + str(signing_people), "console")
 ---
 progress: 1
 section: Escola

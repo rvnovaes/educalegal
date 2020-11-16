@@ -56,7 +56,7 @@ class SchoolSerializer(serializers.ModelSerializer):
     state = serializers.StringRelatedField()
     country = serializers.StringRelatedField()
     school_units = serializers.StringRelatedField(many=True)
-    witnesses = serializers.StringRelatedField(many=True)
+    signing_people = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = School

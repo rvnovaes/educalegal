@@ -46,7 +46,7 @@ from document.util import send_email as doc_send_email, send_to_esignature as do
 from document.views import validate_data_mongo, generate_document_from_mongo, save_document_data, \
     reached_document_limit as doc_reached_document_limit
 from interview.models import Interview, InterviewDocumentType
-from school.models import School, SchoolUnit, Witness
+from school.models import School, SchoolUnit, SigningPerson
 from tenant.models import Plan, Tenant, TenantGedData, ESignatureApp, ESignatureAppProvider
 from users.models import CustomUser
 from util.file_import import is_metadata_valid, is_content_valid
@@ -61,10 +61,11 @@ from .serializers_v2 import (
     InterviewSerializer,
     SchoolSerializer,
     SchoolUnitSerializer,
+    SigningPersonSerializer,
     TenantSerializer,
     TenantGedDataSerializer,
     UserSerializer,
-    WitnessSerializer, ChangePasswordSerializer,
+    ChangePasswordSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -537,11 +538,11 @@ def clean_all_variables(all_variables):
                       'object_type_parameters', 'plan_data', 'plan_use_esignature', 'plan_use_ged',
                       'recipient_group_types_dict', 'recipients', 'reviewed_school_email_answer', 'revisit',
                       'school_data_dict', 'school_id', 'school_letterhead', 'school_names_list', 'school_units',
-                      'school_units_dict', 'school_units_list', 'school_witnesses_dict', 'session_local',
+                      'school_units_dict', 'school_units_list', 'school_signingperson_dict', 'session_local',
                       'signature_local_default', 'state_initials_list', 'string_types', 'table', 'target_number',
                       'tenant_data', 'tenant_esignature_data', 'tenant_ged_data', 'tenant_ged_token', 'tenant_ged_url',
                       'there_are_any', 'tid', 'url_args', 'user_local', 'uses_parts', 'ut', 'v', 'valid_data',
-                      'witnesses_data_list']
+                      'signingperson_data_list']
 
     # ignora valid_*_table: ex.: valid_employees_table, valid_locatarios_table
     regex_list = ['valid_(.*)_table']
@@ -1098,20 +1099,20 @@ class SchoolUnitViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class WitnessViewSet(viewsets.ModelViewSet):
+class SigningPersonViewSet(viewsets.ModelViewSet):
     """
-    Permite criar, alterar, listar e apagar as testemunhas das escolas.
-    Só permite excluir testemunha vinculada ao tenant referente ao token informado.
+    Permite criar, alterar, listar e apagar os tipos de signatários das escolas.
+    Só permite excluir os signatários vinculados ao tenant referente ao token informado.
     """
 
-    queryset = Witness.objects.all()
-    serializer_class = WitnessSerializer
+    queryset = SigningPerson.objects.all()
+    serializer_class = SigningPersonSerializer
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             # queryset just for schema generation metadata
             # https://github.com/axnsan12/drf-yasg/issues/333
-            return Witness.objects.none()
+            return SigningPerson.objects.none()
         school_pk = self.kwargs["spk"]
         tenant = self.request.user.tenant
         queryset = self.queryset.filter(school_id=school_pk, tenant=tenant)

@@ -69,16 +69,14 @@ class EducaLegalClient:
         school_names_list = list()
         school_data_dict = dict()
         school_units_dict = dict()
-        school_witnesses_dict = dict()
         for school in schools_list:
             school_names_list.append(school["name"])
             school_data_dict[school["name"]] = school
             school_units_dict[school["name"]] = school["school_units"]
-            school_witnesses_dict[school["name"]] = school["witnesses"]
-        return school_names_list, school_units_dict, school_data_dict, school_witnesses_dict
+        return school_names_list, school_units_dict, school_data_dict
 
-    def witnesses_list(self, school_id):
-        final_url = self.api_base_url + "/v2/schools/{id}/witnesses".format(id=school_id)
+    def signing_people(self, school_id):
+        final_url = self.api_base_url + "/v2/schools/{id}/signing_people".format(id=school_id)
         response = self.session.get(final_url).json()
         return response
 
