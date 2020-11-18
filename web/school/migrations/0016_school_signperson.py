@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='signingperson',
             name='signing_person_kind',
-            field=models.CharField(choices=[('WITNESS', 'Witness'), ('REPRESENTATIVE', 'Representative')],
+            field=models.CharField(choices=[('WITNESS', 'Testemunha'), ('REPRESENTATIVE', 'Representante')],
                                    default=school.models.SigningPersonKind['WITNESS'],
                                    max_length=255,
                                    verbose_name='Tipo de Signatário da Escola')

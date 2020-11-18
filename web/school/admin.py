@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import School, SigningPerson
+from .models import School, SigningPerson,Grade
 
 
 @admin.register(School)
@@ -12,4 +12,9 @@ class SchoolAdmin(admin.ModelAdmin):
 
 @admin.register(SigningPerson)
 class SigningPersonAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Grade)
+class GradeAdmin(admin.ModelAdmin):
     pass

@@ -7,7 +7,7 @@ from billing.models import Plan
 from document.models import Document, Envelope, Signer
 from interview.models import Interview, InterviewDocumentType
 from interview.util import get_interview_link as util_get_interview_link
-from school.models import School, SchoolUnit, SigningPerson
+from school.models import School, SchoolUnit, SigningPerson, Grade
 from tenant.models import Tenant, TenantGedData, ESignatureApp
 from users.models import CustomUser
 
@@ -221,6 +221,13 @@ class SigningPersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = SigningPerson
         ref_name = "SigningPerson v2"
+        fields = "__all__"
+
+
+class GradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        ref_name = "Grade v2"
         fields = "__all__"
 
 

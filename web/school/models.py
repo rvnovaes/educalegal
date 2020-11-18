@@ -141,3 +141,21 @@ class SigningPerson(TenantAwareModel):
 
     def __str__(self):
         return self.name
+
+
+class Grade(TenantAwareModel):
+    name = models.CharField(max_length=255, verbose_name="Nome")
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name="grades",
+        verbose_name="Escola",
+    )
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Série"
+        verbose_name_plural = "Séries"
+
+    def __str__(self):
+        return self.name

@@ -21,6 +21,7 @@ from .views_v2 import (
     DocumentDownloadViewSet,
     DocumentCloudDownloadViewSet,
     DocumentTypesViewSet,
+    GradeViewSet,
     SchoolViewSet,
     SchoolUnitViewSet,
     TenantGedDataViewSet,
@@ -71,6 +72,9 @@ public_endpoints = [
          SchoolUnitViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     path("schools/<int:spk>/signing_people", SigningPersonViewSet.as_view({"post": "create", "get": "list"})),
     path("schools/<int:spk>/signing_people/<int:pk>",
+         SigningPersonViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+    path("schools/<int:spk>/grades", GradeViewSet.as_view({"post": "create", "get": "list"})),
+    path("schools/<int:spk>/grades/<int:pk>",
          SigningPersonViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
 ]
 

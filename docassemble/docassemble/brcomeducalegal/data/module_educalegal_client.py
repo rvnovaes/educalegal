@@ -80,6 +80,11 @@ class EducaLegalClient:
         response = self.session.get(final_url).json()
         return response
 
+    def grades(self, school_id):
+        final_url = self.api_base_url + "/v2/schools/{id}/grades".format(id=school_id)
+        response = self.session.get(final_url).json()
+        return response
+
     def patch_document(self, data, params):
         final_url = self.api_base_url + "/v2/documents/{}".format(params['doc_uuid'])
 
