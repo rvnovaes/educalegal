@@ -1,6 +1,7 @@
 import logging
 import os
 
+from datetime import datetime, timedelta
 from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
@@ -50,11 +51,19 @@ class ClickSignClient:
         path = os.path.join("/", document["tenant"]["esignature_folder"], document["school"]["esignature_folder"],
                             document['name'])
 
+        # 2019-11-28T14:30:59-03:00
+        deadline_at = datetime.today() + timedelta(days=90)
+        deadline_at = deadline_at.astimezone().replace(microsecond=0).isoformat()
+
         payload = {
             "document": {
                 "path": path,
                 "content_base64": 'data:application/pdf;base64,' + document['documentBase64'],
-                "sequence_enabled": True
+                "sequence_enabled": True,
+                # 2019-11-28T14:30:59-03:00
+                "deadline_at": deadline_at,
+                # Intervalos suportados: 1, 2, 3, 7, 14
+                "remind_interval": 14
                 }
             }
 
@@ -97,7 +106,7 @@ class ClickSignClient:
                             "email"
                         ],
                         "name": recipient['name'],
-                        "has_documentation": False,
+                        "has_documentation": True,
                         "delivery": "email"
                     }
                 }
