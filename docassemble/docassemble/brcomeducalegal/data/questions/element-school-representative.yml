@@ -10,7 +10,7 @@ code: |
   # Extraindo lista de representantes legais da escola do json response
   representatives_list = list()
   for signer in signing_people['results']:
-      if signer['signing_person_kind'].upper() == 'REPRESENTATIVE':
+      if signer['kind'].upper() == 'REPRESENTATIVE':
           representatives_list.append(signer)
 
   # Populando DAList

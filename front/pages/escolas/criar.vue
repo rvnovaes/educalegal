@@ -56,7 +56,7 @@ export default {
         city: null,
         state: null,
         school_units: [],
-        witnesses: []
+        representatives: []
       }
     };
   }

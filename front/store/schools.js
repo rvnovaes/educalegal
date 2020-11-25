@@ -40,20 +40,20 @@ export const mutations = {
     const i = state.schools.map(school => school.id).indexOf(school.id);
     state.schools.splice(i, 1);
   },
-  addWitness(state, payload) {
-    // procura para verificar se ha testemunha vazia
-    const w = state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(w => w.id === Number(payload.newWitness.id));
-    // se nao houver, adiciona testemunha vazia no store
+  addRepresentative(state, payload) {
+    // procura para verificar se ha representante vazio
+    const w = state.schools.find(s => s.id === Number(payload.schoolId)).representatives.find(w => w.id === Number(payload.newRepresentative.id));
+    // se nao houver, adiciona representante vazio no store
     if (w === undefined) {
-      state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.push(payload.newWitness);
+      state.schools.find(s => s.id === Number(payload.schoolId)).representatives.push(payload.newRepresentative);
     }
   },
-  updateWitnessId(state, {witness, newId}) {
-    state.schools.find(w => w.id === Number(witness.school)).witnesses.find(w => w.id === Number(witness.id)).id = newId;
+  updateRepresentativeId(state, {representative, newId}) {
+    state.schools.find(w => w.id === Number(representative.school)).representatives.find(w => w.id === Number(representative.id)).id = newId;
   },
-  deleteWitness(state, payload) {
-    const i = state.schools.find(s => s.id === payload.school).witnesses.map(w => w).indexOf(payload.id);
-    state.schools.find(s => s.id === payload.school).witnesses.splice(i, 1);
+  deleteRepresentative(state, payload) {
+    const i = state.schools.find(s => s.id === payload.school).representatives.map(w => w).indexOf(payload.id);
+    state.schools.find(s => s.id === payload.school).representatives.splice(i, 1);
   },
   updateName(state, payload) {
     state.schools.find(school => school.id === Number(payload.id)).name = payload.name;
@@ -94,14 +94,14 @@ export const mutations = {
   updateUF(state, payload) {
     state.schools.find(school => school.id === Number(payload.id)).state = payload.state;
   },
-  updateWitnessName(state, payload) {
-    state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).name = payload.name;
+  updateRepresentativeName(state, payload) {
+    state.schools.find(s => s.id === Number(payload.schoolId)).representatives.find(representative => representative.id === Number(payload.representativeId)).name = payload.name;
   },
-  updateWitnessEmail(state, payload) {
-    state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).email = payload.email;
+  updateRepresentativeEmail(state, payload) {
+    state.schools.find(s => s.id === Number(payload.schoolId)).representatives.find(representative => representative.id === Number(payload.representativeId)).email = payload.email;
   },
-  updateWitnessCPF(state, payload) {
-    state.schools.find(s => s.id === Number(payload.schoolId)).witnesses.find(witness => witness.id === Number(payload.witnessId)).cpf = payload.cpf;
+  updateRepresentativeCPF(state, payload) {
+    state.schools.find(s => s.id === Number(payload.schoolId)).representatives.find(representative => representative.id === Number(payload.representativeId)).cpf = payload.cpf;
   },
   resetState(state) {
     Object.assign(state, getDefaultState());
@@ -113,11 +113,11 @@ export const getters = {
   getSchool: (state) => (id) => {
     return state.schools.find(school => school.id === Number(id));
   },
-  getWitnesses: (state) => (id) => {
-    return state.schools.find(school => school.id === Number(id)).witnesses;
+  getRepresentatives: (state) => (id) => {
+    return state.schools.find(school => school.id === Number(id)).representatives;
   },
-  getWitness: (state) => (schoolId, witnessId) => {
-    return state.schools.find(school => school.id === Number(schoolId)).witnesses.find(witness => witness.id === Number(witnessId));
+  getRepresentative: (state) => (schoolId, representativeId) => {
+    return state.schools.find(school => school.id === Number(schoolId)).representatives.find(representative => representative.id === Number(representativeId));
   },
 };
 
@@ -168,40 +168,40 @@ export const actions = {
     return res;
   },
   async updateSchool({commit, getters, state}, school) {
-    // pega a testemunha do vuex
+    // pega a representante do vuex
     const payload = JSON.parse(JSON.stringify(getters.getSchool(school.id)));
     // retorna a resposta para a tela que fará a exibicao dos erros
     return await this.$axios.patch(`v2/schools/${school.id}`, payload);
   },
-  async updateWitness({commit, getters, state}, witness) {
-    // pega a testemunha do vuex
-    const payload = JSON.parse(JSON.stringify(getters.getWitness(witness.school, witness.id)));
+  async updateRepresentative({commit, getters, state}, representative) {
+    // pega a representante do vuex
+    const payload = JSON.parse(JSON.stringify(getters.getRepresentative(representative.school, representative.id)));
     // retorna a resposta para a tela que fará a exibicao dos erros
-    return await this.$axios.patch(`v2/schools/${witness.school}/witnesses/${witness.id}`, payload);
+    return await this.$axios.patch(`v2/schools/${representative.school}/representatives/${representative.id}`, payload);
   },
-  async createWitness({commit, getters}, witness) {
-    // Pega a testemunha do vuex
-    let payload = JSON.parse(JSON.stringify(getters.getWitness(witness.school, witness.id)));
-    // Monta o payload com os dados da testemunha que ja estao no vuex.
-    // Entretanto, como a testemunha recem criada tem id = 0, nao passa id no payload
+  async createRepresentative({commit, getters}, representative) {
+    // Pega a representante do vuex
+    let payload = JSON.parse(JSON.stringify(getters.getRepresentative(representative.school, representative.id)));
+    // Monta o payload com os dados do representante que ja estao no vuex.
+    // Entretanto, como o representante recem criado tem id = 0, nao passa id no payload
     if (payload["id"] === 0) {
       delete payload["id"];
     }
-    const res = await this.$axios.post(`v2/schools/${witness.school}/witnesses`, payload);
+    const res = await this.$axios.post(`v2/schools/${representative.school}/representatives`, payload);
     if (res.status === 201) {
       // pega a id retornada do backend
       const newId = res.data.id;
-      // Atualiza a testemunha do vuex que antes tinha id = 0 com a id retornada pelo backend
-      commit("updateWitnessId", {witness, newId});
+      // Atualiza o representante do vuex que antes tinha id = 0 com a id retornada pelo backend
+      commit("updateRepresentativeId", {representative, newId});
     } else {
-      commit("deleteWitness", witness);
+      commit("deleteRepresentative", representative);
     }
     return res;
   },
-  async deleteWitness({commit}, witness) {
-    const res = await this.$axios.delete(`/v2/schools/${witness.school}/witnesses/${witness.id}`);
+  async deleteRepresentative({commit}, representative) {
+    const res = await this.$axios.delete(`/v2/schools/${representative.school}/representatives/${representative.id}`);
     if (res.status === 204) {
-      commit("deleteWitness", witness);
+      commit("deleteRepresentative", representative);
     }
     return res;
   },

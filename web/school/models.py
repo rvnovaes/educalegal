@@ -120,7 +120,7 @@ class SigningPerson(TenantAwareModel):
     name = models.CharField(max_length=255, verbose_name="Nome")
     email = models.EmailField(verbose_name="E-mail")
     cpf = models.CharField(max_length=255, verbose_name="CPF")
-    signing_person_kind = models.CharField(
+    kind = models.CharField(
         verbose_name="Tipo de Signatário da Escola",
         max_length=255,
         choices=SigningPersonKind.choices(),

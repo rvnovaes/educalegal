@@ -1,8 +1,8 @@
 <template>
   <card v-if="">
     <!-- Card header -->
-    <h3 v-if="witness.name" slot="header" class="mb-0">Editar {{ witness.name }}</h3>
-    <h3 v-else slot="header" class="mb-0">Testemunhas são usadas nas assinaturas físicas e eletrônicas.</h3>
+    <h3 v-if="representative.name" slot="header" class="mb-0">Editar {{ representative.name }}</h3>
+    <h3 v-else slot="header" class="mb-0">Representantes são usados nas assinaturas físicas e eletrônicas.</h3>
 
     <!-- Card body -->
     <validation-observer v-slot="{handleSubmit}" ref="formValidator">
@@ -14,36 +14,36 @@
 <!--            https://stackoverflow.com/questions/50955095/vee-validate-regex-not-working  e necessario usar /  e / para delimitar a regex-->
             <base-input label="Nome"
                         name="Nome"
-                        class="witness-nome"
+                        class="representative-nome"
                         placeholder="Nome"
                         success-message="Parece correto!"
                         v-bind:required="true"
                         rules="regex:^['A-zÀ-ÿ-]+(?:\s['A-zÀ-ÿ-]+)+$"
-                        :value="witness.name"
-                        @input="updateWitnessName">
+                        :value="representative.name"
+                        @input="updateRepresentativeName">
             </base-input>
           </div>
           <div class="col-md-5">
             <base-input label="E-mail"
                         name="E-mail"
-                        class="witness-email"
+                        class="representative-email"
                         placeholder="E-mail"
                         rules="required"
                         type="email"
-                        :value="witness.email"
-                        @input="updateWitnessEmail">
+                        :value="representative.email"
+                        @input="updateRepresentativeEmail">
             </base-input>
           </div>
           <div class="col-md-2">
             <base-input label="CPF"
                         name="CPF"
-                        class="witness-cpf"
+                        class="representative-cpf"
                         placeholder="CPF"
                         rules="required"
                         v-mask="'###.###.###-##'"
                         success-message="Parece correto!"
-                        :value="witness.cpf"
-                        @input="updateWitnessCPF">
+                        :value="representative.cpf"
+                        @input="updateRepresentativeCPF">
             </base-input>
           </div>
         </div>
@@ -59,40 +59,40 @@ import { isCPF } from 'brazilian-values';
 import {mask} from 'vue-the-mask';
 
 export default {
-  props: ["witness"],
+  props: ["representative"],
   components: {},
   directives: {mask},
   data() {
     return {};
   },
   methods: {
-    // witness.school e apenas a pk da escola
-    updateWitnessName(e) {
-      this.$store.commit("schools/updateWitnessName", {
-        schoolId: this.witness.school,
-        witnessId: this.witness.id,
+    // representative.school e apenas a pk da escola
+    updateRepresentativeName(e) {
+      this.$store.commit("schools/updateRepresentativeName", {
+        schoolId: this.representative.school,
+        representativeId: this.representative.id,
         name: e
       });
     },
-    updateWitnessEmail(e) {
-      this.$store.commit("schools/updateWitnessEmail", {
-        schoolId: this.witness.school,
-        witnessId: this.witness.id,
+    updateRepresentativeEmail(e) {
+      this.$store.commit("schools/updateRepresentativeEmail", {
+        schoolId: this.representative.school,
+        representativeId: this.representative.id,
         email: e
       });
     },
-    updateWitnessCPF(e) {
-      this.$store.commit("schools/updateWitnessCPF", {
-        schoolId: this.witness.school,
-        witnessId: this.witness.id,
+    updateRepresentativeCPF(e) {
+      this.$store.commit("schools/updateRepresentativeCPF", {
+        schoolId: this.representative.school,
+        representativeId: this.representative.id,
         cpf: e
       });
     },
     async firstFormSubmit() {
-      if (!isCPF(this.witness.cpf)) {
+      if (!isCPF(this.representative.cpf)) {
         await Swal.fire({
-          title: `CPF ${this.witness.cpf} inválido.`,
-          text: 'Deve ser corrigido o CPF da testemunha.',
+          title: `CPF ${this.representative.cpf} inválido.`,
+          text: 'Deve ser corrigido o CPF do representante.',
           icon: "error",
           customClass: {
             confirmButton: "btn btn-info btn-fill",
@@ -103,13 +103,13 @@ export default {
         });
         return;
       }
-      if (this.witness.id !== 0) {
+      if (this.representative.id !== 0) {
         try {
-          const res = await this.$store.dispatch("schools/updateWitness", this.witness);
+          const res = await this.$store.dispatch("schools/updateRepresentative", this.representative);
           if (res.status === 200) {
             this.close();
             await Swal.fire({
-              title: `Você atualizou ${this.witness.name} com sucesso!`,
+              title: `Você atualizou ${this.representative.name} com sucesso!`,
               buttonsStyling: false,
               icon: "success",
               showCloseButton: true,
@@ -120,7 +120,7 @@ export default {
           }
         } catch (e) {
           await Swal.fire({
-            title: `Erro ao editar ${this.witness.name}`,
+            title: `Erro ao editar ${this.representative.name}`,
             text: e,
             icon: "error",
             customClass: {
@@ -133,11 +133,11 @@ export default {
         }
       } else
         try {
-          const res = await this.$store.dispatch("schools/createWitness", this.witness);
+          const res = await this.$store.dispatch("schools/createRepresentative", this.representative);
           if (res.status === 201) {
             this.close();
             await Swal.fire({
-              title: `Você criou ${this.witness.name} com sucesso!`,
+              title: `Você criou ${this.representative.name} com sucesso!`,
               buttonsStyling: false,
               icon: "success",
               showCloseButton: true,
@@ -148,7 +148,7 @@ export default {
           }
         } catch (e) {
           await Swal.fire({
-            title: `Erro ao criar ${this.witness.name}`,
+            title: `Erro ao criar ${this.representative.name}`,
             text: e,
             icon: "error",
             customClass: {
@@ -161,11 +161,11 @@ export default {
         }
     },
     close: function () {
-      // Limpa dados da testemunha vazia (id=0) se os campos nao forem preenchidos
-      if (this.witness.name === null || this.witness.email === null || this.witness.cpf === null) {
-        this.$store.commit("schools/deleteWitness", {school: this.witness.school, id: 0});
+      // Limpa dados do representante vazio (id=0) se os campos nao forem preenchidos
+      if (this.representative.name === null || this.representative.email === null || this.representative.cpf === null) {
+        this.$store.commit("schools/deleteRepresentative", {school: this.representative.school, id: 0});
       }
-      this.$emit("closeWitnessForm");
+      this.$emit("closeRepresentativeForm");
     }
   }
 };

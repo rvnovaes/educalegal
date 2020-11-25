@@ -25,7 +25,7 @@ code: |
   # Extraindo lista de testemunhas do json response
   witnesses_list = list()
   for signer in signing_people['results']:
-      if signer['signing_person_kind'].upper() == 'WITNESS':
+      if signer['kind'].upper() == 'WITNESS':
           witnesses_list.append(signer)
 
   # Populando lista docassemble para exibir tabela e campos da testemunha

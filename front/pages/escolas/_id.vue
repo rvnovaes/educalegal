@@ -18,7 +18,7 @@
       <div class="row">
         <div class="col">
           <div class="card-wrapper">
-            <testemunhas-table :school="school"></testemunhas-table>
+            <representantes-table :school="school"></representantes-table>
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
 </template>
 <script>
 import EscolaForm from "@/components/pages/forms/EscolaForm";
-import TestemunhasTable from "~/components/tables/RegularTables/TestemunhasTable";
+import RepresentantesTable from "~/components/tables/RegularTables/RepresentantesTable";
 import tourStepsMixin from "@/components/tourSteps/tourStepsMixin";
 
 export default {
@@ -36,7 +36,7 @@ export default {
   layout: "DashboardLayout",
   mixins: [tourStepsMixin],
   components: {
-    TestemunhasTable,
+    RepresentantesTable,
     EscolaForm,
   },
   computed: {
