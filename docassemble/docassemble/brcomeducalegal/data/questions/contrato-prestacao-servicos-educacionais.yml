@@ -171,13 +171,10 @@ section: Aluno(a)
 question: Dados escolares
 fields:
   - 'Série: ': students[i].grade
-    datatype: dropdown
-    choices:
-      code: |
-        if len(grades['results']) == 0:
-          grades_default
-        else:
-          grades['results']
+    datatype: combobox
+    code: |
+      grades_select
+    hint: "Selecione ou digite neste campo"
   - 'Período: ': students[i].period
     choices:
     - matutino: matutino

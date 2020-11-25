@@ -171,6 +171,12 @@ code: |
   grades = elc.grades(school_data_dict[selected_school]['id'])
   if el_log_to_console:
     log("Lista de séries das escolas" + str(grades), "console")
+
+  # Lista com nome das séries escolares
+  grades_list = list()
+  for grade in grades['results']:
+       grades_list.append(grade['name'])
+  grades_select = grades_list if len(grades_list) > 0 else grades_default
 ---
 progress: 1
 section: Escola
@@ -205,27 +211,6 @@ code: |
    school_state = school['state']
    school_zip = school['zip']
    school_letterhead = school['letterhead']
----
-code: |
-   grades_default = [
-       Infantil - Berçário (0 a 1 ano),
-       Infantil - G1 (1 a 2 anos),
-       Infantil - G2 (2 anos),
-       Infantil - G3 (3 anos),
-       Infantil - G4 (4 anos),
-       Infantil - G5 (5 anos),
-       Fundamental - 1° Ano,
-       Fundamental - 2° Ano,
-       Fundamental - 3° Ano,
-       Fundamental - 4° Ano,
-       Fundamental - 5° Ano,
-       Fundamental - 6° Ano,
-       Fundamental - 7° Ano,
-       Fundamental - 8° Ano,
-       Fundamental - 9° Ano,
-       Médio - 1° Ano,
-       Médio - 2° Ano,
-       Médio - 3° Ano]
 ---
 code: |
     ga_id_begin = str(interview_document_type) + '-begin'
