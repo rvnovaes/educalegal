@@ -37,10 +37,9 @@ code: |
       selected_school = school_names_list[0]
     school
     reviewed_school_email_answer
-    workers_party_type
     workers.target_number = 1
     for item in workers:
-      item.name.text
+      item.party_type
     if plan_use_esignature:
       valid_workers_table
     option_agreement
@@ -49,9 +48,12 @@ code: |
     el_patch_document
     document_ready_screen
 ---
+objects:
+  - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
 code: |
+  workers[i].party_type
   workers[i].name.text
-  workers[i].address.street_name
   workers[i].complete = True
 comment: |
   1. A ordem informada nesse bloco é a ordem que aparece na entrevista
@@ -64,20 +66,21 @@ fields:
   - "Tipo:": workers[i].party_type
     required: True
     datatype: radio
+    default: capable
     choices:
       - Sim, é plenamente capaz: capable
       - Não, é menor de idade e/ou necessita de representante: incapable
   - "Nome do representante:": workers[i].name_representative
     validate: validate_person_full_name
     required: True
-    js hide if: |
-      val("workers_party_type") == "incapable"
+    js show if: |
+      val("workers[i].party_type") == "incapable"
   - "E-mail do representante:": workers[i].email_representative
     help: ${ help_email_msg }
     required: True
     datatype: email
-    js hide if: |
-      val("workers_party_type") == "incapable"
+    js show if: |
+      val("workers[i].party_type") == "incapable"
 ---
 ga id: |
   code: ga_id_begin
@@ -94,10 +97,10 @@ fields:
   - "Número de série:": workers[i].serie
     required: True
   - "Departamento:": workers[i].department
-    required: False
+    required: True
   - "E-mail:": workers[i].email
     help: ${ help_email_msg }
-    required: False
+    required: True
     datatype: email
 script: |
   <script type="text/javascript">
@@ -131,7 +134,7 @@ edit:
 section: Acordo
 progress: 80
 question: |
-  Opções e dia do término das atividades do empregado
+  Forma e dia do término das atividades do empregado
 fields:
   - "Opções:": option_agreement
     required: True
