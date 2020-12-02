@@ -1,49 +1,69 @@
 <template>
   <card v-if="">
     <!-- Card header -->
-    <h3 v-if="representative.name" slot="header" class="mb-0">Editar {{ representative.name }}</h3>
-    <h3 v-else slot="header" class="mb-0">Representantes são usados nas assinaturas físicas e eletrônicas.</h3>
+    <h3 v-if="signatory.name" slot="header" class="mb-0">Editar {{ signatory.name }}</h3>
+    <h3 v-else slot="header" class="mb-0">Signatários são usados nas assinaturas físicas e eletrônicas.</h3>
 
     <!-- Card body -->
     <validation-observer v-slot="{handleSubmit}" ref="formValidator">
       <form class="needs-validation"
             @submit.prevent="handleSubmit(firstFormSubmit)">
         <div class="form-row">
-          <div class="col-md-5">
+          <div class="col-md-4">
 <!--            para passar um booleano no vuejs deve ser usada a diretiva v-bind, senao ele entende como string-->
 <!--            https://stackoverflow.com/questions/50955095/vee-validate-regex-not-working  e necessario usar /  e / para delimitar a regex-->
             <base-input label="Nome"
                         name="Nome"
-                        class="representative-nome"
+                        class="signatory-nome"
                         placeholder="Nome"
                         success-message="Parece correto!"
                         v-bind:required="true"
                         rules="regex:^['A-zÀ-ÿ-]+(?:\s['A-zÀ-ÿ-]+)+$"
-                        :value="representative.name"
-                        @input="updateRepresentativeName">
+                        :value="signatory.name"
+                        @input="updateSignatoryName">
             </base-input>
           </div>
-          <div class="col-md-5">
+          <div class="col-md-4">
             <base-input label="E-mail"
                         name="E-mail"
-                        class="representative-email"
+                        class="signatory-email"
                         placeholder="E-mail"
                         rules="required"
                         type="email"
-                        :value="representative.email"
-                        @input="updateRepresentativeEmail">
+                        :value="signatory.email"
+                        @input="updateSignatoryEmail">
             </base-input>
           </div>
           <div class="col-md-2">
             <base-input label="CPF"
                         name="CPF"
-                        class="representative-cpf"
+                        class="signatory-cpf"
                         placeholder="CPF"
                         rules="required"
                         v-mask="'###.###.###-##'"
                         success-message="Parece correto!"
-                        :value="representative.cpf"
-                        @input="updateRepresentativeCPF">
+                        :value="signatory.cpf"
+                        @input="updateSignatoryCPF">
+            </base-input>
+          </div>
+          <div class="col-md-2">
+            <base-input label="Tipo"
+                        name="Tipo"
+                        class="signatory-tipo"
+                        placeholder="Tipo "
+                        rules="required"
+                        success-message="Parece correto!">
+              <el-select class="select-danger"
+                         placeholder="Tipo"
+                         :value="signatory.kind"
+                         @input="updateSignatoryKind">
+                <el-option v-for="option in selects.kinds"
+                           class="select-danger"
+                           :value="option.value"
+                           :label="option.label"
+                           :key="option.label">
+                </el-option>
+              </el-select>
             </base-input>
           </div>
         </div>
@@ -55,44 +75,56 @@
 </template>
 <script>
 import Swal from "sweetalert2";
+import { signatoryKind } from "@/components/pages/forms/enum";
 import { isCPF } from 'brazilian-values';
 import {mask} from 'vue-the-mask';
 
 export default {
-  props: ["representative"],
+  props: ["signatory"],
   components: {},
   directives: {mask},
   data() {
-    return {};
+    return {
+      selects: {
+        kinds: signatoryKind
+      },
+    };
   },
   methods: {
-    // representative.school e apenas a pk da escola
-    updateRepresentativeName(e) {
-      this.$store.commit("schools/updateRepresentativeName", {
-        schoolId: this.representative.school,
-        representativeId: this.representative.id,
+    // signatory.school e apenas a pk da escola
+    updateSignatoryName(e) {
+      this.$store.commit("schools/updateSignatoryName", {
+        schoolId: this.signatory.school,
+        signatoryId: this.signatory.id,
         name: e
       });
     },
-    updateRepresentativeEmail(e) {
-      this.$store.commit("schools/updateRepresentativeEmail", {
-        schoolId: this.representative.school,
-        representativeId: this.representative.id,
+    updateSignatoryEmail(e) {
+      this.$store.commit("schools/updateSignatoryEmail", {
+        schoolId: this.signatory.school,
+        signatoryId: this.signatory.id,
         email: e
       });
     },
-    updateRepresentativeCPF(e) {
-      this.$store.commit("schools/updateRepresentativeCPF", {
-        schoolId: this.representative.school,
-        representativeId: this.representative.id,
+    updateSignatoryCPF(e) {
+      this.$store.commit("schools/updateSignatoryCPF", {
+        schoolId: this.signatory.school,
+        signatoryId: this.signatory.id,
         cpf: e
       });
     },
+    updateSignatoryKind(e) {
+      this.$store.commit("schools/updateSignatoryKind", {
+        schoolId: this.signatory.school,
+        signatoryId: this.signatory.id,
+        kind: e
+      });
+    },
     async firstFormSubmit() {
-      if (!isCPF(this.representative.cpf)) {
+      if (!isCPF(this.signatory.cpf)) {
         await Swal.fire({
-          title: `CPF ${this.representative.cpf} inválido.`,
-          text: 'Deve ser corrigido o CPF do representante.',
+          title: `CPF ${this.signatory.cpf} inválido.`,
+          text: 'Deve ser corrigido o CPF do signatário.',
           icon: "error",
           customClass: {
             confirmButton: "btn btn-info btn-fill",
@@ -103,13 +135,13 @@ export default {
         });
         return;
       }
-      if (this.representative.id !== 0) {
+      if (this.signatory.id !== 0) {
         try {
-          const res = await this.$store.dispatch("schools/updateRepresentative", this.representative);
+          const res = await this.$store.dispatch("schools/updateSignatory", this.signatory);
           if (res.status === 200) {
             this.close();
             await Swal.fire({
-              title: `Você atualizou ${this.representative.name} com sucesso!`,
+              title: `Você atualizou ${this.signatory.name} com sucesso!`,
               buttonsStyling: false,
               icon: "success",
               showCloseButton: true,
@@ -120,7 +152,7 @@ export default {
           }
         } catch (e) {
           await Swal.fire({
-            title: `Erro ao editar ${this.representative.name}`,
+            title: `Erro ao editar ${this.signatory.name}`,
             text: e,
             icon: "error",
             customClass: {
@@ -133,11 +165,11 @@ export default {
         }
       } else
         try {
-          const res = await this.$store.dispatch("schools/createRepresentative", this.representative);
+          const res = await this.$store.dispatch("schools/createSignatory", this.signatory);
           if (res.status === 201) {
             this.close();
             await Swal.fire({
-              title: `Você criou ${this.representative.name} com sucesso!`,
+              title: `Você criou ${this.signatory.name} com sucesso!`,
               buttonsStyling: false,
               icon: "success",
               showCloseButton: true,
@@ -148,7 +180,7 @@ export default {
           }
         } catch (e) {
           await Swal.fire({
-            title: `Erro ao criar ${this.representative.name}`,
+            title: `Erro ao criar ${this.signatory.name}`,
             text: e,
             icon: "error",
             customClass: {
@@ -161,11 +193,11 @@ export default {
         }
     },
     close: function () {
-      // Limpa dados do representante vazio (id=0) se os campos nao forem preenchidos
-      if (this.representative.name === null || this.representative.email === null || this.representative.cpf === null) {
-        this.$store.commit("schools/deleteRepresentative", {school: this.representative.school, id: 0});
+      // Limpa dados do signatário vazio (id=0) se os campos nao forem preenchidos
+      if (this.signatory.name === null || this.signatory.email === null || this.signatory.cpf === null) {
+        this.$store.commit("schools/deleteSignatory", {school: this.signatory.school, id: 0});
       }
-      this.$emit("closeRepresentativeForm");
+      this.$emit("closeSignatoryForm");
     }
   }
 };

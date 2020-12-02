@@ -24,7 +24,7 @@ code: |
   witnesses.target_number = 2
   # Extraindo lista de testemunhas do json response
   witnesses_list = list()
-  for signer in signing_people['results']:
+  for signer in signatories['results']:
       if signer['kind'].upper() == 'WITNESS':
           witnesses_list.append(signer)
 

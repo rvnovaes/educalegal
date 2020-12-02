@@ -26,7 +26,7 @@ from .views_v2 import (
     SchoolUnitViewSet,
     TenantGedDataViewSet,
     UserView,
-    SigningPersonViewSet,
+    SignatoryViewSet,
     dashboard_data,
     recover_password,
     reset_password,
@@ -70,12 +70,12 @@ public_endpoints = [
     path("schools/<int:spk>/school_units", SchoolUnitViewSet.as_view({"post": "create", "get": "list"})),
     path("schools/<int:spk>/school_units/<int:pk>",
          SchoolUnitViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
-    path("schools/<int:spk>/signing_people", SigningPersonViewSet.as_view({"post": "create", "get": "list"})),
-    path("schools/<int:spk>/signing_people/<int:pk>",
-         SigningPersonViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+    path("schools/<int:spk>/signatories", SignatoryViewSet.as_view({"post": "create", "get": "list"})),
+    path("schools/<int:spk>/signatories/<int:pk>",
+         SignatoryViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     path("schools/<int:spk>/grades", GradeViewSet.as_view({"post": "create", "get": "list"})),
     path("schools/<int:spk>/grades/<int:pk>",
-         SigningPersonViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+         SignatoryViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
 ]
 
 # Apenas as URLS acima (public_endpoints) serao adicionadas ao swagger

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import School, SigningPerson,Grade
+from .models import School, Signatory,Grade
 
 
 @admin.register(School)
@@ -10,8 +10,8 @@ class SchoolAdmin(admin.ModelAdmin):
     list_display_links = ("legal_name",)
 
 
-@admin.register(SigningPerson)
-class SigningPersonAdmin(admin.ModelAdmin):
+@admin.register(Signatory)
+class SignatoryAdmin(admin.ModelAdmin):
     pass
 
 

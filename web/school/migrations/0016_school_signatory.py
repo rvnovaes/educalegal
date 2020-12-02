@@ -15,25 +15,22 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RenameModel(
             old_name='Witness',
-            new_name='SigningPerson',
+            new_name='Signatory',
         ),
         migrations.AddField(
-            model_name='signingperson',
+            model_name='signatory',
             name='kind',
-            field=models.CharField(choices=[('WITNESS', 'Testemunha'), ('REPRESENTATIVE', 'Representante')],
-                                   default=school.models.SigningPersonKind['WITNESS'],
-                                   max_length=255,
-                                   verbose_name='Tipo de Signatário da Escola')
+            field=models.CharField(choices=[('WITNESS', 'Testemunha'), ('REPRESENTATIVE', 'Representante')], default='Testemunha', max_length=255, verbose_name='Tipo de Signatário da Escola'),
         ),
         migrations.AlterModelOptions(
-            name='signingperson',
+            name='signatory',
             options={'ordering': ['name'], 'verbose_name': 'Signatário da Escola',
                      'verbose_name_plural': 'Signatários da Escola'},
         ),
         migrations.AlterField(
-            model_name='signingperson',
+            model_name='signatory',
             name='school',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='signing_people',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='signatories',
                                     to='school.school', verbose_name='Escola'),
         ),
     ]

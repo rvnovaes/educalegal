@@ -162,9 +162,9 @@ code: |
 ---
 code: |
   elc = EducaLegalClient(educalegal_url, ut)
-  signing_people = elc.signing_people(school_data_dict[selected_school]['id'])
+  signatories = elc.signatories(school_data_dict[selected_school]['id'])
   if el_log_to_console:
-    log("Lista de signatários das escolas" + str(signing_people), "console")
+    log("Lista de signatários das escolas" + str(signatories), "console")
 ---
 code: |
   elc = EducaLegalClient(educalegal_url, ut)

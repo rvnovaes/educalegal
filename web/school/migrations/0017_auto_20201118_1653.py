@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('tenant', '0012_auto_20200824_1402'),
-        ('school', '0016_school_signperson'),
+        ('school', '0016_school_signatory'),
     ]
 
     operations = [

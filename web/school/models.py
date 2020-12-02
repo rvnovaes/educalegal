@@ -104,33 +104,33 @@ class SchoolUnit(TenantAwareModel):
         return reverse("school:school-unit-detail", kwargs={"pk": self.pk})
 
 
-class SigningPersonKind(Enum):
+class SignatoryKind(Enum):
     WITNESS = "Testemunha"
     REPRESENTATIVE = "Representante"
 
     def __str__(self):
-        return str(self.value.lower())
+        return self.value
 
     @classmethod
     def choices(cls):
         return [(x.name, x.value) for x in cls]
 
 
-class SigningPerson(TenantAwareModel):
+class Signatory(TenantAwareModel):
     name = models.CharField(max_length=255, verbose_name="Nome")
     email = models.EmailField(verbose_name="E-mail")
     cpf = models.CharField(max_length=255, verbose_name="CPF")
     kind = models.CharField(
         verbose_name="Tipo de Signatário da Escola",
         max_length=255,
-        choices=SigningPersonKind.choices(),
-        default=SigningPersonKind.WITNESS,
+        choices=SignatoryKind.choices(),
+        default=SignatoryKind.WITNESS.value,
     )
 
     school = models.ForeignKey(
         School,
         on_delete=models.CASCADE,
-        related_name="signing_people",
+        related_name="signatories",
         verbose_name="Escola",
     )
 

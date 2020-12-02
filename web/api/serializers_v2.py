@@ -7,7 +7,7 @@ from billing.models import Plan
 from document.models import Document, Envelope, Signer
 from interview.models import Interview, InterviewDocumentType
 from interview.util import get_interview_link as util_get_interview_link
-from school.models import School, SchoolUnit, SigningPerson, Grade
+from school.models import School, SchoolUnit, Signatory, Grade, SignatoryKind
 from tenant.models import Tenant, TenantGedData, ESignatureApp
 from users.models import CustomUser
 
@@ -210,7 +210,9 @@ class SchoolUnitSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class SigningPersonSerializer(serializers.ModelSerializer):
+class SignatorySerializer(serializers.ModelSerializer):
+    kind_name = serializers.SerializerMethodField()
+
     def validate_name(self, data):
         try:
             validators_br.person_full_name(data)
@@ -219,9 +221,16 @@ class SigningPersonSerializer(serializers.ModelSerializer):
         return data
 
     class Meta:
-        model = SigningPerson
-        ref_name = "SigningPerson v2"
+        model = Signatory
+        ref_name = "Signatory v2"
         fields = "__all__"
+
+    def get_kind_name(self, obj):
+        kind_name = 'Testemunhaaa'
+        names = [item.name for item in SignatoryKind]
+        if obj.kind in names:
+            kind_name = SignatoryKind[obj.kind].value
+        return kind_name
 
 
 class GradeSerializer(serializers.ModelSerializer):
@@ -234,7 +243,7 @@ class GradeSerializer(serializers.ModelSerializer):
 # https://www.django-rest-framework.org/api-guide/serializers/#dealing-with-nested-objects
 class SchoolSerializer(serializers.ModelSerializer):
     school_units = SchoolUnitSerializer(many=True, read_only=True)
-    signing_people = SigningPersonSerializer(many=True, read_only=True)
+    signatories = SignatorySerializer(many=True, read_only=True)
 
     class Meta:
         model = School
