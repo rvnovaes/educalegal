@@ -141,8 +141,8 @@ fields:
     datatype: radio
     choices:
       - Reduçäo de duas horas diárias: option_one
-      - Ausência no Trabalho de sete dias corridos: option_two
-      - Aviso Prévio não indenizável: option_tree
+      - Ausência no trabalho de sete dias corridos: option_two
+      - Aviso prévio indenizado: option_tree
   - Término das atividades: activities_final_date
     datatype: date
     required: true
