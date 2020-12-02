@@ -142,6 +142,7 @@ fields:
     choices:
       - Reduçäo de duas horas diárias: option_one
       - Ausência no Trabalho de sete dias corridos: option_two
+      - Aviso Prévio não indenizável: option_tree
   - Término das atividades: activities_final_date
     datatype: date
     required: true
