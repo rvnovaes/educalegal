@@ -1,5 +1,3 @@
-from collections import OrderedDict
-from operator import itemgetter
 from rest_framework import serializers
 from validator_collection_br import validators_br
 
