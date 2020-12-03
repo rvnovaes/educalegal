@@ -68,7 +68,7 @@ services:
   apiflower:
     container_name: apiflower
     restart: unless-stopped
-    image: mher/flower
+    image: mher/flower:0.9.5
     environment:
       - CELERY_BROKER_URL=amqp://educalegal:educalegal@apirabbitmq/educalegal
       - FLOWER_BASIC_AUTH=educalegal:cavaloverdegrande
