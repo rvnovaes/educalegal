@@ -1,0 +1,195 @@
+metadata:
+  title: Aviso Prévio do Empregador
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+---
+sections:
+  - Empregado
+  - Acordo
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "balao-vermelho-aviso-previo-do-empregador.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
+    workers.target_number = 1
+    for item in workers:
+      item.party_type
+    if plan_use_esignature:
+      valid_workers_table
+    option_agreement
+    signature_local
+    generated_file
+    el_patch_document
+    document_ready_screen
+---
+objects:
+  - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  workers[i].party_type
+  workers[i].name.text
+  workers[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Empregado
+question: |
+  O empregado é maior de idade e plenamente capaz?
+fields:
+  - "Tipo:": workers[i].party_type
+    required: True
+    datatype: radio
+    default: capable
+    choices:
+      - Sim, é plenamente capaz: capable
+      - Não, é menor de idade e/ou necessita de representante: incapable
+  - "Nome do representante:": workers[i].name_representative
+    validate: validate_person_full_name
+    required: True
+    js show if: |
+      val("workers[i].party_type") == "incapable"
+  - "E-mail do representante:": workers[i].email_representative
+    help: ${ help_email_msg }
+    required: True
+    datatype: email
+    js show if: |
+      val("workers[i].party_type") == "incapable"
+---
+ga id: |
+  code: ga_id_begin
+section: Empregado
+progress: 20
+question: |
+  Dados do(a) Empregado
+fields:
+  - "Nome completo:": workers[i].name.text
+    validate: validate_person_full_name
+    required: True
+  - "CTPS:": workers[i].ctps
+    required: True
+  - "Número de série:": workers[i].serie
+    required: True
+  - "Departamento:": workers[i].department
+    required: True
+  - "E-mail:": workers[i].email
+    help: ${ help_email_msg }
+    required: True
+    datatype: email
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#d29ya2Vyc1tpXS5jcGY').mask('000.000.000-00', {reverse: true});
+    });
+  </script>
+---
+section: Empregado
+field: valid_workers_table
+progress: 40
+question: |
+  Empregado:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ workers.table }
+buttons:
+  Continuar: continue
+---
+table: workers.table
+rows: workers
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Acordo
+progress: 80
+question: |
+  Forma e dia do término das atividades do empregado
+fields:
+  - "Opções:": option_agreement
+    required: True
+    datatype: radio
+    choices:
+      - Reduçäo de duas horas diárias: option_one
+      - Ausência no trabalho de sete dias corridos: option_two
+      - Aviso prévio indenizado: option_tree
+  - Término das atividades: activities_final_date
+    datatype: date
+    required: true
+---
+code: |
+  recipients = list()
+
+  for item in workers:
+      if item.party_type == "incapable":
+          new_recipient = dict()
+          new_recipient['name'] = item.name_representative
+          new_recipient['email'] = item.email_representative
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email_representative)
+              },
+          ]
+          recipients.append(new_recipient)
+
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
