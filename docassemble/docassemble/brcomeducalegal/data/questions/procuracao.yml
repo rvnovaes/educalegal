@@ -1,0 +1,381 @@
+
+---
+section: Assembleia
+progress: 15
+question: Data e Horário da Assembleia
+fields:
+  - Data: general_shareholder_meeting_date
+    datatype: date
+    required: True
+  - "Horário:": general_shareholder_meeting_hours
+    datatype: time
+    required: True
+---
+section: Assembleia
+progress: 15
+question: Integrantes da mesa da Assembleia
+fields:
+  - "Nome completo do presidente: ": chairman_name
+    validate: validate_person_full_name
+    required: True
+  - "E-mail do presidente: ": chairman_email
+    help: ${ help_email_msg }
+    datatype: email
+  - "Nome completo do secretário: ": secretary_name
+    validate: validate_person_full_name
+    required: True
+  - "E-mail do secretário: ": secretary_email
+    help: ${ help_email_msg }
+    datatype: email
+---
+section: Assembleia
+progress: 15
+question: Exercício Social
+subquestion: |
+  As demonstrações financeiras apresentadas pela Companhia são relativas ao exercício social encerrado em [FIELD accounting_year].
+fields:
+  - Ano: accounting_year
+    datatype: integer
+    inline width: 10em
+    required: True
+---
+objects:
+  - agenda: DAList.using(object_type=Thing, there_are_any=True)
+---
+progress: 25
+section: Agenda
+question: Ordem do dia
+subquestion: |
+  Esta assembleia terá como agenda:
+fields:
+  - "Ordem:": agenda[i].name.text
+    input type: area
+    rows: 10
+    required: True
+list collect: True
+---
+objects:
+  - adoptions: DAList.using(object_type=Thing, there_are_any=True)
+---
+progress: 30
+section: Deliberações
+question: Deliberações
+subquestion: |
+  Os acionistas decidiram, por unanimidade, sem quaisquer reservas ou ressalvas:
+fields:
+  - "Ordem:": adoptions[i].name.text
+    required: True
+    default: "APROVAR, "
+    input type: area
+    rows: 10
+list collect: True
+
+
+
+
+
+
+---
+objects:
+  - grantors: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+  - grantors[i].child: |
+      DAList.using(
+        object_type=Individual,
+        ask_number=True)
+---
+code: |
+  grantors[i].name.text
+  grantors[i].address.street_name
+  grantors[i].complete = True
+---
+code: |
+  grantors[i].type
+  grantors[i].name.text
+  if grantors[i].type == 'organization':
+    grantors[i].child.gather()
+  grantors[i].complete = True
+---
+section: Acionistas
+question: |
+  Número de outorgantes
+fields:
+  - Número: grantors.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Acionistas
+question: |
+  Tipo do ${ word(ordinal(i)) } acionista
+fields:
+  - "Tipo:": grantors[i].type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+---
+question: |
+  Dados do(a) ${ word(ordinal(i)) } acionista
+fields:
+  - "Nome/Razão Social": grantors[i].name.text
+  - "Número de representantes:": grantors[i].child.target_number
+    required: False
+    datatype: integer
+    default: 1
+    min: 1
+    show if:
+      code: |
+        grantors[i].type == "organization"
+  - "CPF:": grantors[i].cpf
+    required: True
+    validate: validate_cpf
+    show if:
+      variable: grantors[i].person_type
+      is: individual
+  - "Número do RG:": grantors[i].rg
+    required: True
+    show if:
+      variable: grantors[i].person_type
+      is: individual
+  - "Nacionalidade:": grantors[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if: 
+      variable: grantors[i].person_type
+      is: individual
+  - "Estado Civil:": grantors[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+    show if: 
+      variable: grantors[i].person_type
+      is: individual
+  - "Profissão:": grantors[i].occupation
+    required: True
+    show if: 
+      variable: grantors[i].person_type
+      is: individual
+  - "CNPJ:": grantors[i].cnpj
+    required: True
+    validate: validate_cnpj
+    show if:
+      variable: grantors[i].person_type
+      is: organization
+  - "E-mail:": grantors[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+    js show if: |
+      val("grantors[i].person_type") == "organization" || val("grantors[i].person_type") == "individual"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+        $('#X2ZpZWxkXzc').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Outra Parte
+progress: 15
+question: |
+  Endereço do(a) ${ grantors[i] }
+fields:
+  - "CEP:": grantors[i].address.zip
+    required: True
+  - "Logradouro:": grantors[i].address.street_name
+    required: True
+  - "Número:": grantors[i].address.street_number
+    required: True
+  - "Complemento:": grantors[i].address.unit
+    required: False
+  - "Bairro:": grantors[i].address.neighborhood
+    required: True
+  - "Cidade:": grantors[i].address.city
+    required: True
+  - "Estado:": grantors[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Acionistas
+question: |
+  Dados do ${ word(ordinal(j)) } representante do(a) ${ grantors[i] }:
+fields:
+  - "Nome completo:": grantors[i].child[j].name.first
+    required: False
+---
+objects:
+  - granted: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+ga id: |
+  code: ga_id_begin
+section: Outra Parte
+progress: 15
+question: |
+  Número de granted
+fields:
+  - "Número:": granted.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  granted[i].name.text
+  granted[i].address.street_name
+  granted[i].complete = True
+---
+section: Outorgado
+progress: 15
+question: |
+  Dados do(a) ${ word(ordinal(i)) } locador(a)
+fields:
+
+  - 'Nome Completo:': granted[i].name.text
+    validate: validate_person_full_name
+  - "CPF:": granted[i].cpf
+    required: True
+    validate: validate_cpf
+  - "Número do RG:": granted[i].rg
+    required: True
+  - "Nacionalidade:": granted[i].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado Civil:": granted[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+  - "E-mail:": granted[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+section: Outorgado
+progress: 15
+question: |
+  Endereço do(a) ${ granted[i] }
+fields:
+  - "CEP:": granted[i].address.zip
+    required: True
+  - "Logradouro:": granted[i].address.street_name
+    required: True
+  - "Número:": granted[i].address.street_number
+    required: True
+  - "Complemento:": granted[i].address.unit
+    required: False
+  - "Bairro:": granted[i].address.neighborhood
+    required: True
+  - "Cidade:": granted[i].address.city
+    required: True
+  - "Estado:": granted[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#bG9jYWRvcmVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Dados da Pessoa
+field: valid_granted_table
+question: |
+  Outorgado:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ granted.table }
+buttons:
+  Continuar: continue
+---
+table: granted.table
+rows: granted
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Poderes
+progress: 15
+question: Data final
+fields:
+  - Data: final date
+    datatype: date
+    required: True
+---
