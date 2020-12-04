@@ -134,7 +134,7 @@ export default {
             const res = await this.$store.dispatch("schools/deleteSignatory", row);
             if (res.status === 204) {
               await Swal.fire({
-                title: "Excluída!",
+                title: "Exclusão!",
                 text: `Você excluiu ${row.name}`,
                 icon: "success",
                 customClass: {

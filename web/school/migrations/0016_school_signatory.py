@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='signatory',
             name='kind',
-            field=models.CharField(choices=[('WITNESS', 'Testemunha'), ('REPRESENTATIVE', 'Representante')], default='Testemunha', max_length=255, verbose_name='Tipo de Signatário da Escola'),
+            field=models.CharField(choices=[('Testemunha', 'Testemunha'), ('Representante', 'Representante')], default='Testemunha', max_length=255, verbose_name='Tipo de Signatário da Escola'),
         ),
         migrations.AlterModelOptions(
             name='signatory',

@@ -30,6 +30,18 @@ class LegalNature(Enum):
         return label.get(value)
 
 
+class SignatoryKind(Enum):
+    Testemunha = "Testemunha"
+    Representante = "Representante"
+
+    def __str__(self):
+        return self.value
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
+
+
 class School(TenantAwareModel):
     legal_name = models.CharField(max_length=255, verbose_name="Razão social")
     name = models.CharField(max_length=255, blank=True, verbose_name="Nome Fantasia")
@@ -104,18 +116,6 @@ class SchoolUnit(TenantAwareModel):
         return reverse("school:school-unit-detail", kwargs={"pk": self.pk})
 
 
-class SignatoryKind(Enum):
-    WITNESS = "Testemunha"
-    REPRESENTATIVE = "Representante"
-
-    def __str__(self):
-        return self.value
-
-    @classmethod
-    def choices(cls):
-        return [(x.name, x.value) for x in cls]
-
-
 class Signatory(TenantAwareModel):
     name = models.CharField(max_length=255, verbose_name="Nome")
     email = models.EmailField(verbose_name="E-mail")
@@ -124,7 +124,7 @@ class Signatory(TenantAwareModel):
         verbose_name="Tipo de Signatário da Escola",
         max_length=255,
         choices=SignatoryKind.choices(),
-        default=SignatoryKind.WITNESS.value,
+        default=SignatoryKind.Testemunha.value,
     )
 
     school = models.ForeignKey(
