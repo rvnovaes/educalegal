@@ -62,6 +62,7 @@ code: |
         for item in counterparts:
           item.name.text
       if has_witnesses:
+        witnesses_list
         valid_witnesses_table
       custom_file_name
       generated_file = generic_document
