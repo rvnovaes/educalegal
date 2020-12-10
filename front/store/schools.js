@@ -40,6 +40,21 @@ export const mutations = {
     const i = state.schools.map(school => school.id).indexOf(school.id);
     state.schools.splice(i, 1);
   },
+  addGrade(state, payload) {
+    // procura para verificar se ha serie vazia
+    const w = state.schools.find(s => s.id === Number(payload.schoolId)).grades.find(w => w.id === Number(payload.newGrade.id));
+    // se nao houver, adiciona serie vazia no store
+    if (w === undefined) {
+      state.schools.find(s => s.id === Number(payload.schoolId)).grades.push(payload.newGrade);
+    }
+  },
+  updateGradeId(state, {grade, newId}) {
+    state.schools.find(w => w.id === Number(grade.school)).grades.find(w => w.id === Number(grade.id)).id = newId;
+  },
+  deleteGrade(state, payload) {
+    const i = state.schools.find(s => s.id === payload.school).grades.map(w => w).indexOf(payload.id);
+    state.schools.find(s => s.id === payload.school).grades.splice(i, 1);
+  },
   addSignatory(state, payload) {
     // procura para verificar se ha signatário vazio
     const w = state.schools.find(s => s.id === Number(payload.schoolId)).signatories.find(w => w.id === Number(payload.newSignatory.id));
@@ -94,6 +109,9 @@ export const mutations = {
   updateUF(state, payload) {
     state.schools.find(school => school.id === Number(payload.id)).state = payload.state;
   },
+  updateGradeName(state, payload) {
+    state.schools.find(s => s.id === Number(payload.schoolId)).grades.find(grade => grade.id === Number(payload.gradeId)).name = payload.name;
+  },
   updateSignatoryName(state, payload) {
     state.schools.find(s => s.id === Number(payload.schoolId)).signatories.find(signatory => signatory.id === Number(payload.signatoryId)).name = payload.name;
   },
@@ -115,6 +133,12 @@ export const mutations = {
 export const getters = {
   getSchool: (state) => (id) => {
     return state.schools.find(school => school.id === Number(id));
+  },
+  getGrades: (state) => (id) => {
+    return state.schools.find(school => school.id === Number(id)).grades;
+  },
+  getGrade: (state) => (schoolId, gradeId) => {
+    return state.schools.find(school => school.id === Number(schoolId)).grades.find(grade => grade.id === Number(gradeId));
   },
   getSignatories: (state) => (id) => {
     return state.schools.find(school => school.id === Number(id)).signatories;
@@ -171,10 +195,41 @@ export const actions = {
     return res;
   },
   async updateSchool({commit, getters, state}, school) {
-    // pega o signatário do vuex
     const payload = JSON.parse(JSON.stringify(getters.getSchool(school.id)));
     // retorna a resposta para a tela que fará a exibicao dos erros
     return await this.$axios.patch(`v2/schools/${school.id}`, payload);
+  },
+  async updateGrade({commit, getters, state}, grade) {
+    // pega a serie do vuex
+    const payload = JSON.parse(JSON.stringify(getters.getGrade(grade.school, grade.id)));
+    // retorna a resposta para a tela que fará a exibicao dos erros
+    return await this.$axios.patch(`v2/schools/${grade.school}/grades/${grade.id}`, payload);
+  },
+  async createGrade({commit, getters}, grade) {
+    // Pega a serie do vuex
+    let payload = JSON.parse(JSON.stringify(getters.getGrade(grade.school, grade.id)));
+    // Monta o payload com os dados da serie que ja estao no vuex.
+    // Entretanto, como a serie recem criada tem id = 0, nao passa id no payload
+    if (payload["id"] === 0) {
+      delete payload["id"];
+    }
+    const res = await this.$axios.post(`v2/schools/${grade.school}/grades`, payload);
+    if (res.status === 201) {
+      // pega a id retornada do backend
+      const newId = res.data.id;
+      // Atualiza a serie do vuex que antes tinha id = 0 com a id retornada pelo backend
+      commit("updateGradeId", {grade, newId});
+    } else {
+      commit("deleteGrade", grade);
+    }
+    return res;
+  },
+  async deleteGrade({commit}, grade) {
+    const res = await this.$axios.delete(`/v2/schools/${grade.school}/grades/${grade.id}`);
+    if (res.status === 204) {
+      commit("deleteGrade", grade);
+    }
+    return res;
   },
   async updateSignatory({commit, getters, state}, signatory) {
     // pega o signatário do vuex

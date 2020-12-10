@@ -1,15 +1,16 @@
 <template>
   <div class="card">
     <div class="border-0 card-header">
+      <h3 class="mb-0">Séries</h3>
       <div class="col-lg-12 col-5 text-right">
         <base-button size="md" type="success" @click="handleNew" class="botao-nova-escola">
-          <i class="fa fa-plus-circle"></i> Nova Escola
+          <i class="fa fa-plus-circle"></i> Nova Série
         </base-button>
       </div>
     </div>
     <el-table class="table-responsive table-flush"
               header-row-class-name="thead-light"
-              :data="schools">
+              :data="grades">
       <el-table-column
         v-for="column in tableColumns"
         :key="column.label"
@@ -19,34 +20,36 @@
         <div slot-scope="{$index, row}" class="d-flex">
           <base-button
             @click.native="handleEdit($index, row)"
-            class="edit botao-editar-escola"
+            class="edit botao-editar-serie"
             type="primary"
             size="sm"
-            icon
-          >
+            icon>
             <i class="text-white fa fa-edit"></i>
           </base-button>
           <base-button
             @click.native="handleDelete($index, row)"
-            class="remove btn-link botao-apagar-escola"
+            class="remove btn-link botao-apagar-serie"
             type="danger"
             size="sm"
-            icon
-          >
+            icon>
             <i class="text-white fa fa-trash"></i>
           </base-button>
         </div>
       </el-table-column>
     </el-table>
+    <serie-form v-if="currentGrade" :grade="currentGrade" @closeGradeForm="currentGrade = null"></serie-form>
   </div>
 </template>
 <script>
 import Swal from "sweetalert2";
 import {Table, TableColumn} from "element-ui";
+import SerieForm from "@/components/pages/forms/SerieForm";
 
 export default {
-  name: "escolas-table",
+  name: "series-table",
+  props: ["school"],
   components: {
+    SerieForm,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
   },
@@ -56,63 +59,31 @@ export default {
         {
           prop: "name",
           label: "Nome",
-          minWidth: 140,
+          minWidth: 500,
           sortable: true,
-          tour: "escola-nome"
-        },
-        {
-          prop: "phone",
-          label: "Telefone",
-          minWidth: 100,
-          sortable: true,
-          tour: "escola-telefone"
-        },
-        {
-          prop: "email",
-          label: "E-mail",
-          minWidth: 220,
-          sortable: true,
-          tour: "escola-email"
-        },
-        {
-          prop: "site",
-          label: "Site",
-          minWidth: 220,
-          sortable: true,
-          tour: "escola-site"
-        },
-        {
-          prop: "city",
-          label: "Cidade",
-          minWidth: 120,
-          sortable: true,
-          tour: "escola-cidade"
-        },
-        {
-          prop: "state",
-          label: "UF",
-          minWidth: 60,
-          sortable: true,
-          tour: "escola-estado"
+          tour: "serie-nome"
         },
       ],
-      currentPage: 1
+      currentGrade: null
     };
   },
-  created() {
-    this.$store.dispatch("schools/fetchAllSchools");
-  },
   computed: {
-    // Nao dexa exibir na lista escola vazia, que e usada apenas para a criacao de novas escolas
-    schools() {
-      return this.$store.state.schools.schools.filter(school => school.id !== 0);
+    grades() {
+      return this.$store.getters["schools/getGrades"](this.school.id)
     },
   },
   methods: {
     handleNew() {
-      this.$router.push({
-        path: "/escolas/criar"
-      });
+      let newGrade = {
+        id: 0,
+        tenant: this.school.tenant,
+        school: this.school.id,
+        name: null
+      }
+      // insere a serie vazia no store dentro da lista da escola
+      this.$store.commit("schools/addGrade", {schoolId: this.school.id, newGrade: newGrade})
+      // altera a currentGrade para a serie vazia que acabou de ser adicionada para abrir o form vazio de serie
+      this.currentGrade = this.$store.state.schools.schools.find(school => school.id === Number(this.school.id)).grades.find(grade => grade.id === 0)
     },
     handleEdit(index, row) {
       this.editRow(row);
@@ -135,7 +106,7 @@ export default {
       if (result.value) {
         console.log(result.value)
         try {
-            const res = await this.$store.dispatch("schools/deleteSchool", row);
+            const res = await this.$store.dispatch("schools/deleteGrade", row);
             if (res.status === 204) {
               await Swal.fire({
                 title: "Exclusão!",
@@ -177,9 +148,7 @@ export default {
     },
     editRow(row) {
       let indexToEdit = row.id;
-      this.$router.push({
-        path: "/escolas/" + indexToEdit
-      });
+      this.currentGrade = this.$store.getters["schools/getGrade"](this.school.id, indexToEdit)
     },
     selectionChange(selectedRows) {
       this.selectedRows = selectedRows;

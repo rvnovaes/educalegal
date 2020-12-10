@@ -4,8 +4,8 @@ const personKind = [
 ];
 
 const signatoryKind = [
-  {value: "WITNESS", label: "Testemunha"},
-  {value: "REPRESENTATIVE", label: "Representante"},
+  {value: "Testemunha", label: "Testemunha"},
+  {value: "Representante", label: "Representante"},
 ];
 
 export {

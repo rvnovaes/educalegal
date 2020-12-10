@@ -211,8 +211,6 @@ class SchoolUnitSerializer(serializers.ModelSerializer):
 
 
 class SignatorySerializer(serializers.ModelSerializer):
-    kind_name = serializers.SerializerMethodField()
-
     def validate_name(self, data):
         try:
             validators_br.person_full_name(data)
@@ -224,13 +222,6 @@ class SignatorySerializer(serializers.ModelSerializer):
         model = Signatory
         ref_name = "Signatory v2"
         fields = "__all__"
-
-    def get_kind_name(self, obj):
-        kind_name = 'Testemunhaaa'
-        names = [item.name for item in SignatoryKind]
-        if obj.kind in names:
-            kind_name = SignatoryKind[obj.kind].value
-        return kind_name
 
 
 class GradeSerializer(serializers.ModelSerializer):
@@ -245,6 +236,7 @@ class SchoolSerializer(serializers.ModelSerializer):
     unit = serializers.CharField(allow_blank=True)
     school_units = SchoolUnitSerializer(many=True, read_only=True)
     signatories = SignatorySerializer(many=True, read_only=True)
+    grades = GradeSerializer(many=True, read_only=True)
 
     class Meta:
         model = School

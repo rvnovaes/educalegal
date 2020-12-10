@@ -56,6 +56,7 @@ export default {
         city: null,
         state: null,
         school_units: [],
+        grades: [],
         signatories: []
       }
     };

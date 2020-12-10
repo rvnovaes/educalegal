@@ -1,6 +1,6 @@
 ---
 objects:
-  - representatives: DAList.using(object_type=Individual, complete_attribute='complete', there_is_another=False )
+  - representatives: DAList.using(object_type=Individual, complete_attribute='complete', there_is_another=False)
 ---
 code: |
   representatives[i].name.text
@@ -9,8 +9,8 @@ code: |
 code: |
   # Extraindo lista de representantes legais da escola do json response
   representatives_list = list()
-  for signer in signing_people['results']:
-      if signer['kind'].upper() == 'REPRESENTATIVE':
+  for signer in signatories_list['results']:
+      if signer['kind'].upper() == 'REPRESENTANTE':
           representatives_list.append(signer)
 
   # Populando DAList
@@ -24,12 +24,12 @@ progress: 95
 question: |
   Dados dos Representantes Legais da Escola
 subquestion: |
-  * Confira os e-mails dos Representantes Legais abaixo, pois estes serão usados
+  * Confira os e-mails dos representantes legais abaixo, pois estes serão usados
   no envio para a assinatura eletrônica ou e-mail.
 
-  * Os e-mails dos Representantes Legais devem ser diferentes.
+  * Os e-mails dos representantes legais devem ser diferentes.
 
-  * Para adicionar outro Representante clique no botão "ADICIONAR"
+  * Para adicionar mais um representante clique no botão "Adicionar outro"
   ${ representatives.table }
   ${ representatives.add_action() }
 buttons:
@@ -66,7 +66,7 @@ fields:
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
-        $('#d2l0bmVzc2VzWzBdLmNwZg').mask('000.000.000-00', {reverse: true});
+        $('#cmVwcmVzZW50YXRpdmVzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
       });
   </script>
 ---
