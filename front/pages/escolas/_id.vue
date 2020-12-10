@@ -22,6 +22,13 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col">
+          <div class="card-wrapper">
+            <series-table :school="school"></series-table>
+          </div>
+        </div>
+      </div>
     </div>
     <v-tour name="pageTour" :steps="escolaDetalhesSteps" :options="tourOptions"></v-tour>
   </div>
@@ -29,6 +36,7 @@
 <script>
 import EscolaForm from "@/components/pages/forms/EscolaForm";
 import SignatariosTable from "@/components/tables/RegularTables/SignatariosTable";
+import SeriesTable from "@/components/tables/RegularTables/SeriesTable";
 import tourStepsMixin from "@/components/tourSteps/tourStepsMixin";
 
 export default {
@@ -37,6 +45,7 @@ export default {
   mixins: [tourStepsMixin],
   components: {
     SignatariosTable,
+    SeriesTable,
     EscolaForm,
   },
   computed: {

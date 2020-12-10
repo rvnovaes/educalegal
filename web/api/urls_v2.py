@@ -75,7 +75,7 @@ public_endpoints = [
          SignatoryViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
     path("schools/<int:spk>/grades", GradeViewSet.as_view({"post": "create", "get": "list"})),
     path("schools/<int:spk>/grades/<int:pk>",
-         SignatoryViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
+         GradeViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"})),
 ]
 
 # Apenas as URLS acima (public_endpoints) serao adicionadas ao swagger
