@@ -1,80 +1,53 @@
-
+metadata:
+  title: Procuração
 ---
-section: Assembleia
-progress: 15
-question: Data e Horário da Assembleia
-fields:
-  - Data: general_shareholder_meeting_date
-    datatype: date
-    required: True
-  - "Horário:": general_shareholder_meeting_hours
-    datatype: time
-    required: True
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+  - element-school-witness.yml
+  - element-payment-method.yml
 ---
-section: Assembleia
-progress: 15
-question: Integrantes da mesa da Assembleia
-fields:
-  - "Nome completo do presidente: ": chairman_name
-    validate: validate_person_full_name
-    required: True
-  - "E-mail do presidente: ": chairman_email
-    help: ${ help_email_msg }
-    datatype: email
-  - "Nome completo do secretário: ": secretary_name
-    validate: validate_person_full_name
-    required: True
-  - "E-mail do secretário: ": secretary_email
-    help: ${ help_email_msg }
-    datatype: email
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
 ---
-section: Assembleia
-progress: 15
-question: Exercício Social
-subquestion: |
-  As demonstrações financeiras apresentadas pela Companhia são relativas ao exercício social encerrado em [FIELD accounting_year].
-fields:
-  - Ano: accounting_year
-    datatype: integer
-    inline width: 10em
-    required: True
+sections:
+  - Outorgantes
+  - Outorgados
+  - Dados da Procuração
+  - Assinatura
+  - Conclusão
 ---
-objects:
-  - agenda: DAList.using(object_type=Thing, there_are_any=True)
+code:  |
+  content_document = "contrato-prestacao-servicos-educacionais.docx"
 ---
-progress: 25
-section: Agenda
-question: Ordem do dia
-subquestion: |
-  Esta assembleia terá como agenda:
-fields:
-  - "Ordem:": agenda[i].name.text
-    input type: area
-    rows: 10
-    required: True
-list collect: True
----
-objects:
-  - adoptions: DAList.using(object_type=Thing, there_are_any=True)
----
-progress: 30
-section: Deliberações
-question: Deliberações
-subquestion: |
-  Os acionistas decidiram, por unanimidade, sem quaisquer reservas ou ressalvas:
-fields:
-  - "Ordem:": adoptions[i].name.text
-    required: True
-    default: "APROVAR, "
-    input type: area
-    rows: 10
-list collect: True
-
-
-
-
-
-
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    for item in grantors:
+      item.name.text
+    for item in grantors:
+      item.name.text
+    final_date
+    signature_local
+    generated_file
+    el_patch_document
+    document_ready_screen
 ---
 objects:
   - grantors: |
@@ -88,18 +61,13 @@ objects:
         ask_number=True)
 ---
 code: |
-  grantors[i].name.text
-  grantors[i].address.street_name
-  grantors[i].complete = True
----
-code: |
   grantors[i].type
   grantors[i].name.text
   if grantors[i].type == 'organization':
     grantors[i].child.gather()
   grantors[i].complete = True
 ---
-section: Acionistas
+section: Outorgantes
 question: |
   Número de outorgantes
 fields:
@@ -108,9 +76,9 @@ fields:
     default: 1
     min: 1
 ---
-section: Acionistas
+section: Outorgantes
 question: |
-  Tipo do ${ word(ordinal(i)) } acionista
+  Tipo do ${ word(ordinal(i)) } outorgante
 fields:
   - "Tipo:": grantors[i].type
     required: True
@@ -120,7 +88,7 @@ fields:
       - Pessoa Jurídica: organization
 ---
 question: |
-  Dados do(a) ${ word(ordinal(i)) } acionista
+  Dados do(a) ${ word(ordinal(i)) } outorgante
 fields:
   - "Nome/Razão Social": grantors[i].name.text
   - "Número de representantes:": grantors[i].child.target_number
@@ -250,10 +218,10 @@ objects:
 ---
 ga id: |
   code: ga_id_begin
-section: Outra Parte
+section: Outorgado
 progress: 15
 question: |
-  Número de granted
+  Número de Outorgado
 fields:
   - "Número:": granted.target_number
     datatype: integer
@@ -268,9 +236,8 @@ code: |
 section: Outorgado
 progress: 15
 question: |
-  Dados do(a) ${ word(ordinal(i)) } locador(a)
+  Dados do(a) ${ word(ordinal(i)) } outorgado
 fields:
-
   - 'Nome Completo:': granted[i].name.text
     validate: validate_person_full_name
   - "CPF:": granted[i].cpf
@@ -350,7 +317,7 @@ script: |
   });
   </script>
 ---
-section: Dados da Pessoa
+section: Outorgado
 field: valid_granted_table
 question: |
   Outorgado:
@@ -371,11 +338,11 @@ columns:
 edit:
   - email
 ---
-section: Poderes
+section: Outorgado
 progress: 15
 question: Data final
 fields:
-  - Data: final date
+  - Data: final_date
     datatype: date
     required: True
 ---
