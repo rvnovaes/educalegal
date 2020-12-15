@@ -32,7 +32,6 @@ from validator_collection import checkers
 
 from django.core.files.storage import default_storage
 from django.core.exceptions import MultipleObjectsReturned
-from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -367,7 +366,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
         status_code, message = self.verify_ged_settings()
         if status_code != status.HTTP_200_OK:
-            return JsonResponse({"message": message}, status=status_code)
+            return Response(message, status=status_code)
         else:
             return super(DocumentViewSet, self).create(request, *args, **kwargs)
 

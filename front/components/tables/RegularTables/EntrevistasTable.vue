@@ -141,7 +141,6 @@ export default {
       }
     },
     async editRow(row) {
-      console.log(row);
       const urlParams = new URLSearchParams(row.interview_link);
       const payload = {
         name: "---",
@@ -161,8 +160,16 @@ export default {
         }
       }
       catch (e){
+        let errorMessage = ''
+        if (e.response.data){
+          errorMessage = e.response.data
+        }
+        else {
+          errorMessage = e.toString()
+        }
         await Swal.fire({
-          title: e.response.data['message'],
+          title: 'Erro ao gerar o documento',
+          text: errorMessage,
           icon: "error",
           customClass: {
             confirmButton: "btn btn-info btn-fill",
