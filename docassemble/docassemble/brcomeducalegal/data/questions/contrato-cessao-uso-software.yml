@@ -1,0 +1,425 @@
+metadata:
+  title: Contrato de Cessão de Uso de Software
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+---
+sections:
+  - Licenciada
+  - Licenciante
+  - Cláusulas
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "contrato-cessao-uso-software.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    reviewed_school_email_answer
+    licenciada_inserirDadosGestor
+    licenciantes.gather()
+    if plan_use_esignature:
+      valid_licenciantes_table
+    licenciante_inserirDadosGestor
+    software_name
+    tipoParcela
+    prazoInicio
+    state
+    signature_local
+    generated_file
+    el_patch_document
+    document_ready_screen
+---
+ga id: |
+  code: ga_id_begin
+section: Licenciada
+progress: 10
+question: Gestor do Contrato da Escola
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': licenciada_inserirDadosGestor
+    datatype: yesnoradio
+  - 'Nome:': licenciada_nome_gestor
+    datatype: text
+    show if:
+      variable: licenciada_inserirDadosGestor
+      is: true
+  - 'E-mail:': licenciada_email_gestor
+    datatype: email
+    show if:
+      variable: licenciada_inserirDadosGestor
+      is: true
+    required: False
+  - 'Telefone:': licenciada_telefone_gestor
+    datatype: text
+    show if:
+      variable: licenciada_inserirDadosGestor
+      is: true
+    required: False
+---
+objects:
+  - licenciantes: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  licenciantes[i].name.first
+  licenciantes[i].address.street_name
+  licenciantes[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Licenciante
+progress: 30
+question: Número de licenciantes
+fields:
+  - Número: licenciantes.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Licenciante
+progress: 35
+question: Dados do(a) ${word(ordinal(i)) } licenciante
+fields:
+  - Tipo de pessoa: licenciantes[i].tipo_pessoa
+    input type: radio
+    choices:
+      - Física
+      - Jurídica
+  - 'Nome/Razão social:': licenciantes[i].name.first
+    validate: validate_person_full_name
+    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
+    js show if: |
+      val("licenciantes[i].tipo_pessoa")
+  - 'CNPJ:': licenciantes[i].cnpj
+    validate: validate_cnpj
+    show if:
+      variable: licenciantes[i].tipo_pessoa
+      is: Jurídica
+  - 'CPF:': licenciantes[i].cpf
+    validate: validate_cpf
+    show if:
+      variable: licenciantes[i].tipo_pessoa
+      is: Física
+  - 'RG:': licenciantes[i].rg
+    datatype: text
+    show if:
+      variable: licenciantes[i].tipo_pessoa
+      is: Física
+  - 'Nacionalidade:': licenciantes[i].nacionalidade
+    datatype: text
+    default: brasileiro(a)
+    show if:
+      variable: licenciantes[i].tipo_pessoa
+      is: Física
+  - 'Estado civil:': licenciantes[i].estado_civil
+    input type: radio
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    show if:
+      variable: licenciantes[i].tipo_pessoa
+      is: Física
+  - 'Profissão:': licenciantes[i].profissao
+    datatype: text
+    required: False
+    show if:
+      variable: licenciantes[i].tipo_pessoa
+      is: Física
+  - "E-mail:": licenciantes[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+    js show if: |
+      val("licenciantes[i].tipo_pessoa") == "Física" || val("licenciantes[i].tipo_pessoa") == "Jurídica"
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzI').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzM').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+section: Licenciante
+progress: 40
+question: Endereço do(a) ${ licenciantes[i].name.first }
+fields:
+  - 'CEP:': licenciantes[i].address.zip
+    datatype: text
+  - 'Logradouro:': licenciantes[i].address.street_name
+    datatype: text
+  - 'Número:': licenciantes[i].address.street_number
+    datatype: text
+  - 'Complemento:': licenciantes[i].address.unit
+    datatype: text
+    required: false
+  - 'Bairro:': licenciantes[i].address.neighborhood
+    datatype: text
+  - 'Município:': licenciantes[i].address.city
+    datatype: text
+  - 'Estado:': licenciantes[i].address.state
+    code: state_initials_list
+    datatype: dropdown
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Licenciante
+field: valid_licenciantes_table
+question: |
+  Licenciantes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ licenciantes.table }
+buttons:
+  Continuar: continue
+---
+table: licenciantes.table
+rows: licenciantes
+columns:
+  - Name: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Licenciante
+progress: 50
+question: Gestor do Contrato
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': licenciante_inserirDadosGestor
+    datatype: yesnoradio
+  - 'Nome:': licenciante_nome_gestor
+    datatype: text
+    show if:
+      variable: licenciante_inserirDadosGestor
+      is: true
+  - 'E-mail:': licenciante_email_gestor
+    datatype: email
+    show if:
+      variable: licenciante_inserirDadosGestor
+      is: true
+    required: False
+  - 'Telefone:': licenciante_telefone_gestor
+    datatype: text
+    show if:
+      variable: licenciante_inserirDadosGestor
+      is: true
+    required: False
+---
+section: Cláusulas
+progress: 55
+question: |
+  Software
+subquestion: |
+  O presente Contrato tem como objeto a cessão do direito de uso do software [FIELD software_name].
+fields:
+  - 'Nome do software:': software_name
+    datatype: text
+    inline width: 30em
+  - 'A Licenciante prestará os serviços de manutenção e atualização do software licenciado?': has_maintenance
+    datatype: yesnoradio
+  - 'Existe anexo de cronograma de pagamento?': has_attachment
+    datatype: yesnoradio
+  - 'Inserir anexo(s) :': attachments
+    datatype: files
+    show if:
+      variable: has_attachment
+      is: true
+    required: True
+    help: "Formatos válidos: PDF, JPEG e PNG"
+    accept: |
+      "image/jpeg, image/png, application/pdf"
+---
+code: |
+  from num2words import num2words
+  valorContratoExtenso = num2words(valorContrato, lang='pt_BR', to='currency')
+
+  if tipoParcela != 'mensal' and formaPagamento == 'parcelado':
+    nrParcelasExtenso = num2words(nrParcelas, lang='pt_BR')
+---
+section: Cláusulas
+progress: 60
+question: Preço e forma de pagamento
+subquestion: |
+  A Licenciada pagará à Licenciante o valor [FIELD tipoParcela] de [FIELD valorContrato].
+fields:
+  - 'A Licenciada pagará à Licenciante o valor:': tipoParcela
+    datatype: dropdown
+    choices:
+    - mensal: mensal
+    - anual: anual
+    - total: total
+  - 'Valor:': valorContrato
+    datatype: currency
+    hint: 0000,00
+  - Forma de pagamento: formaPagamento
+    datatype: radio
+    choices:
+      - À vista: a_vista
+      - Parcelado: parcelado
+    hide if:
+      variable: tipoParcela
+      is: mensal
+  - 'Nº de parcelas:': nrParcelas
+    datatype: integer
+    show if:
+      variable: formaPagamento
+      is: parcelado
+  - 'O pagamento do Preço será realizado mediante:': tipoPagamento
+    choices:
+      - Conta corrente: conta corrente
+      - Boleto bancário: boleto bancário
+    datatype: radio
+  - 'Banco:': banco
+    datatype: text
+    help: 'Ex.: Bradesco'
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - 'Agência:': agencia
+    datatype: text
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - 'Conta corrente:': contaCorrente
+    datatype: text
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - Tipo de pessoa: tipo_pessoa_cc
+    input type: radio
+    choices:
+      - Física
+      - Jurídica
+    show if:
+      is: conta corrente
+      variable: tipoPagamento
+  - 'CNPJ:': cnpj_cc
+    validate: validate_cnpj
+    show if:
+      variable: tipo_pessoa_cc
+      is: Jurídica
+  - 'CPF:': cpf_cc
+    validate: validate_cpf
+    show if:
+      variable: tipo_pessoa_cc
+      is: Física
+  - 'O Contrato é reajustado anualmente?': reajusteAnual
+    datatype: yesnoradio 
+  - Tipo de reajuste: tipoReajuste
+    datatype: radio
+    choices: 
+    - IGP-M: IGP-M
+    - IPC-A: IPC-A
+    show if:
+      is: true
+      variable: reajusteAnual
+  - 'Quem arcará com as despesas de locomoção, estadia e alimentação?': pgtoDespesasExtras
+    input type: radio
+    choices:
+      - Licenciante
+      - Licenciada
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#X2ZpZWxkXzk').mask('00.000.000/0000-00', {reverse: true});
+        $('#X2ZpZWxkXzEw').mask('000.000.000-00', {reverse: true});
+        $('#dmFsb3JDb250cmF0bw').mask('000000000000000.00', {reverse: true});
+    });
+  </script>
+---
+section: Cláusulas
+progress: 65
+question: Prazo
+subquestion: |
+  O presente Contrato irá vigorar de [FIELD prazoInicio] até [FIELD prazoFim].
+fields:
+  - 'Data do início do Contrato': prazoInicio
+    datatype: date
+  - 'Data do fim do Contrato': prazoFim
+    datatype: date
+---
+code: |
+  recipients = list()
+  for item in licenciantes:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.first
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
