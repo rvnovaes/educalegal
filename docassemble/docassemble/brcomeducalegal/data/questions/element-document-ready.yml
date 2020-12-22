@@ -11,15 +11,7 @@ question: |
   Seu documento foi gerado com sucesso!
 subquestion: |
   Nome do documento:
-
   ${ generated_file.pdf.filename }
-attachment:
-  name: Your letter
-  filename: letter
-  docx template file: contrato-cessao-uso-software.docx
-  valid formats:
-    - pdf
-    - docx
 action buttons:
   code: |
     button_list

@@ -12,6 +12,7 @@ include:
   - element-educalegal-patch-document.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
+  - element-school-witness.yml
   - element-default-messages.yml
 ---
 modules:
@@ -49,6 +50,8 @@ code: |
     prazoInicio
     state
     signature_local
+    if has_witnesses:
+      valid_witnesses_table
     generated_file
     el_patch_document
     document_ready_screen
@@ -83,7 +86,7 @@ objects:
   - licenciantes: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
 ---
 code: |
-  licenciantes[i].name.first
+  licenciantes[i].name.text
   licenciantes[i].address.street_name
   licenciantes[i].complete = True
 comment: |
@@ -108,7 +111,7 @@ fields:
     choices:
       - Física
       - Jurídica
-  - 'Nome/Razão social:': licenciantes[i].name.first
+  - 'Nome/Razão social:': licenciantes[i].name.text
     validate: validate_person_full_name
     help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
     js show if: |
@@ -166,7 +169,7 @@ script: |
 ---
 section: Licenciante
 progress: 40
-question: Endereço do(a) ${ licenciantes[i].name.first }
+question: Endereço do(a) ${ licenciantes[i].name.text }
 fields:
   - 'CEP:': licenciantes[i].address.zip
     datatype: text
@@ -229,7 +232,7 @@ table: licenciantes.table
 rows: licenciantes
 columns:
   - Name: |
-      row_item.name.first
+      row_item.name.text
   - E-mail: |
       row_item.email
 edit:
@@ -274,7 +277,7 @@ fields:
   - 'Existe anexo de cronograma de pagamento?': has_attachment
     datatype: yesnoradio
   - 'Inserir anexo(s) :': attachments
-    datatype: files
+    datatype: file
     show if:
       variable: has_attachment
       is: true
@@ -397,7 +400,7 @@ code: |
   for item in licenciantes:
       if item.email:
           new_recipient = dict()
-          new_recipient['name'] = item.name.first
+          new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
           new_recipient['routingOrder'] = 1
@@ -421,5 +424,21 @@ code: |
       },
   ]
   recipients.append(new_recipient)
+
+  if has_witnesses:
+    for item in witnesses:
+        if item.email:
+            new_recipient = dict()
+            new_recipient['name'] = item.name.text
+            new_recipient['email'] = item.email
+            new_recipient['group'] = 'signers'
+            new_recipient['routingOrder'] = 2
+            new_recipient['tabs'] = [
+                {
+                    'type': 'signHere',
+                    'anchorString': generate_anchor('signHere', item.email)
+                },
+            ]
+            recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
