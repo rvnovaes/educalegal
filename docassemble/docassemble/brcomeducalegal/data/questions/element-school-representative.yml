@@ -1,6 +1,6 @@
 ---
 objects:
-  - representatives: DAList.using(object_type=Individual, complete_attribute='complete', there_is_another=False)
+  - representatives: DAList.using(object_type=Individual, complete_attribute='complete', there_is_another=False, minimum_number=1)
 ---
 code: |
   representatives[i].name.text
