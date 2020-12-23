@@ -39,6 +39,7 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
+    signatories_list
     reviewed_school_email_answer
     licenciada_inserirDadosGestor
     licenciantes.gather()
