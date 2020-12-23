@@ -29,7 +29,7 @@ subquestion: |
 
   * Os e-mails dos representantes legais devem ser diferentes.
 
-  * Os representantes são cadastrados no menu da Escola"
+  * Os representantes são cadastrados no menu da Escola
   ${ representatives.table }
 buttons:
   Continuar: continue
