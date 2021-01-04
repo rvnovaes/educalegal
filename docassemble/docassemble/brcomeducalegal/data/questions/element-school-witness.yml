@@ -22,30 +22,22 @@ fields:
 ---
 code: |
   witnesses.target_number = 2
-  log("1 - target number", "console")
   if 'results' in signatories_list:
     signatories_esw = signatories_list['results']
-    log("2 - criando signatories_esw : ", "console")
-    log(signatories_esw, "console")
     witnesses_list = list()
 
     if len(signatories_esw) > 0:
       # Extraindo lista de testemunhas do json response
-      log("3 - if len(signatories_esw) > 0", "console")
-
       for signer in signatories_esw:
         if signer['kind'].upper() == 'TESTEMUNHA':
           witnesses_list.append(signer)
-          log("4 - signer : ", "console")
 
       # Populando lista docassemble para exibir tabela e campos da testemunha
       if len(witnesses_list) == 1:
-        log("5 - len(witnesses_list) == 1", "console")
         witnesses[0].name.text = witnesses_list[0]['name']
         witnesses[0].email = witnesses_list[0]['email']
         witnesses[0].cpf = witnesses_list[0]['cpf']
-      else:
-        log("6 - len(witnesses_list) == 2", "console")
+      elif len(witnesses_list) == 2:
         witnesses[0].name.text = witnesses_list[0]['name']
         witnesses[0].email = witnesses_list[0]['email']
         witnesses[0].cpf = witnesses_list[0]['cpf']
