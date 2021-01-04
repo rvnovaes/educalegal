@@ -24,11 +24,10 @@ code: |
   witnesses.target_number = 2
   if 'results' in signatories_list:
     signatories_esw = signatories_list['results']
+    witnesses_list = list()
 
     if len(signatories_esw) > 0:
       # Extraindo lista de testemunhas do json response
-      witnesses_list = list()
-
       for signer in signatories_esw:
         if signer['kind'].upper() == 'TESTEMUNHA':
           witnesses_list.append(signer)
@@ -38,15 +37,13 @@ code: |
         witnesses[0].name.text = witnesses_list[0]['name']
         witnesses[0].email = witnesses_list[0]['email']
         witnesses[0].cpf = witnesses_list[0]['cpf']
-      else:
+      elif len(witnesses_list) == 2:
         witnesses[0].name.text = witnesses_list[0]['name']
         witnesses[0].email = witnesses_list[0]['email']
         witnesses[0].cpf = witnesses_list[0]['cpf']
         witnesses[1].name.text = witnesses_list[1]['name']
         witnesses[1].email = witnesses_list[1]['email']
         witnesses[1].cpf = witnesses_list[1]['cpf']
-    else:
-        valid_witnesses_table
 ---
 field: valid_witnesses_table
 progress: 95
