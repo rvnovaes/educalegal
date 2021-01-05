@@ -233,10 +233,6 @@ fields:
       is: true
     required: False
 ---
-code: |
-  horaInicioExecucaoServicos = format_time(horaInicioExecucaoServicos, format='HH:mm')
-  horaFimExecucaoServicos = format_time(horaFimExecucaoServicos, format='HH:mm')
----
 section: Cláusulas
 progress: 80
 question: Nome da criança e horário da prestação dos serviços
@@ -247,6 +243,10 @@ fields:
     datatype: time
   - 'Hora fim:': horaFimExecucaoServicos
     datatype: time
+---
+code: |
+  horaInicioExecucaoServicosFormatada = format_time(horaInicioExecucaoServicos, format='HH:mm')
+  horaFimExecucaoServicosFormatada = format_time(horaFimExecucaoServicos, format='HH:mm')
 ---
 objects:
   services_location: Address
