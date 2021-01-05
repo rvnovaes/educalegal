@@ -47,6 +47,8 @@ code: |
       valid_contratantes_table
     contratante_inserirDadosGestor
     child_name
+    services_location.zip
+    valorContrato
     state
     signature_local
     if has_witnesses:
@@ -231,24 +233,28 @@ fields:
       is: true
     required: False
 ---
-section: Contratante
+code: |
+  horaInicioExecucaoServicos = format_time(horaInicioExecucaoServicos, format='HH:mm')
+  horaFimExecucaoServicos = format_time(horaFimExecucaoServicos, format='HH:mm')
+---
+section: Cláusulas
 progress: 80
-question: Dados da criança
+question: Nome da criança e horário da prestação dos serviços
 fields:
   - 'Nome completo:': child_name
     validate: validate_person_full_name
+  - 'Hora início:': horaInicioExecucaoServicos
+    datatype: time
+  - 'Hora fim:': horaFimExecucaoServicos
+    datatype: time
 ---
 objects:
   services_location: Address
 ---
 section: Cláusulas
 progress: 90
-question: Horário e local da prestação dos serviços
+question: Local da prestação dos serviços
 fields:
-  - 'Hora início:': horaInicioExecucaoServicos
-    datatype: time
-  - 'Hora fim:': horaFimExecucaoServicos
-    datatype: time
   - 'CEP:': services_location.zip
     datatype: text
   - 'Logradouro:': services_location.street_name
@@ -331,9 +337,9 @@ fields:
 script: |
   <script type='text/javascript'>
     $(document).ready(function(){
-        $('#X2ZpZWxkXzk').mask('00.000.000/0000-00', {reverse: true});
-        $('#X2ZpZWxkXzEw').mask('000.000.000-00', {reverse: true});
         $('#dmFsb3JDb250cmF0bw').mask('000000000000000.00', {reverse: true});
+        $('#dmFsb3JIb3Jh').mask('000000000000000.00', {reverse: true});
+        $('#dmFsb3JBZGljaW9uYWxIb3JhRXhjZWRpZGE').mask('000000000000000.00', {reverse: true});
     });
   </script>
 ---
