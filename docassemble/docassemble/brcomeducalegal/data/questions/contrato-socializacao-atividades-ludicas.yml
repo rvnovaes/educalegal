@@ -27,7 +27,7 @@ sections:
   - Conclusão
 ---
 code:  |
-  content_document = "contrato-cessao-uso-software.docx"
+  content_document = "contrato-socializacao-atividades-ludicas.docx"
 ---
 id: logic
 mandatory: True
@@ -47,8 +47,6 @@ code: |
       valid_contratantes_table
     contratante_inserirDadosGestor
     child_name
-    tipoParcela
-    prazoInicio
     state
     signature_local
     if has_witnesses:
@@ -95,7 +93,7 @@ comment: |
   2. O complete = True deve ser a última instrução sempre
 ---
 section: Contratante
-progress: 30
+progress: 20
 question: Número de contratantes
 fields:
   - Número: contratantes.target_number
@@ -107,69 +105,39 @@ section: Contratante
 progress: 35
 question: Dados do(a) ${word(ordinal(i)) } contratante
 fields:
-  - Tipo de pessoa: contratantes[i].tipo_pessoa
-    input type: radio
-    choices:
-      - Física
-      - Jurídica
   - 'Nome/Razão social:': contratantes[i].name.text
     validate: validate_person_full_name
-    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
-    js show if: |
-      val("contratantes[i].tipo_pessoa")
-  - 'CNPJ:': contratantes[i].cnpj
-    validate: validate_cnpj
-    show if:
-      variable: contratantes[i].tipo_pessoa
-      is: Jurídica
+    help: 'Informe o nome completo.'
   - 'CPF:': contratantes[i].cpf
     validate: validate_cpf
-    show if:
-      variable: contratantes[i].tipo_pessoa
-      is: Física
   - 'RG:': contratantes[i].rg
     datatype: text
-    show if:
-      variable: contratantes[i].tipo_pessoa
-      is: Física
-  - 'Nacionalidade:': contratantes[i].nacionalidade
+  - 'Nacionalidade:': contratantes[i].nationality
     datatype: text
     default: brasileiro(a)
-    show if:
-      variable: contratantes[i].tipo_pessoa
-      is: Física
-  - 'Estado civil:': contratantes[i].estado_civil
+  - 'Estado civil:': contratantes[i].marital_status
     input type: radio
     choices:
       - solteiro(a)
       - casado(a)
       - divorciado(a)
       - viúvo(a)
-    show if:
-      variable: contratantes[i].tipo_pessoa
-      is: Física
-  - 'Profissão:': contratantes[i].profissao
+  - 'Profissão:': contratantes[i].occupation
     datatype: text
     required: False
-    show if:
-      variable: contratantes[i].tipo_pessoa
-      is: Física
   - "E-mail:": contratantes[i].email
     help: ${ help_email_msg }
     required: false
     datatype: email
-    js show if: |
-      val("contratantes[i].tipo_pessoa") == "Física" || val("contratantes[i].tipo_pessoa") == "Jurídica"
 script: |
   <script type='text/javascript'>
     $(document).ready(function(){
-        $('#X2ZpZWxkXzI').mask('00.000.000/0000-00', {reverse: true});
-        $('#X2ZpZWxkXzM').mask('000.000.000-00', {reverse: true});
+        $('#Y29udHJhdGFudGVzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
       });
   </script>
 ---
 section: Contratante
-progress: 40
+progress: 50
 question: Endereço do(a) ${ contratantes[i].name.text }
 fields:
   - 'CEP:': contratantes[i].address.zip
@@ -191,11 +159,11 @@ fields:
 script: |
   <script type="text/javascript">
   $(document).ready(function(){
-    $('#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+    $('#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
   });
 
-  $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
-    var cep = $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muemlw").val();
+  $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muemlw").val();
     cep = cep.replace ("-","");
     if (cep != ""){
       var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
@@ -205,10 +173,10 @@ script: |
         type: "get",
         dataType: "json",
         success: function(data){
-          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
-          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
-          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
-          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
         },
         error: function(erro){
           console.log(erro);
@@ -240,7 +208,7 @@ edit:
   - email
 ---
 section: Contratante
-progress: 50
+progress: 65
 question: Gestor do Contrato
 fields:
   - 'Inserir os dados de contato do gestor do contrato?': contratante_inserirDadosGestor
@@ -264,7 +232,7 @@ fields:
     required: False
 ---
 section: Contratante
-progress: 50
+progress: 80
 question: Dados da criança
 fields:
   - 'Nome completo:': child_name
@@ -300,11 +268,11 @@ fields:
 script: |
   <script type="text/javascript">
   $(document).ready(function(){
-    $('#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+    $('#c2VydmljZXNfbG9jYXRpb24uemlw').mask('00000-000');
   });
 
-  $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
-    var cep = $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muemlw").val();
+  $("#c2VydmljZXNfbG9jYXRpb24uemlw").focusout(function(){
+    var cep = $("#c2VydmljZXNfbG9jYXRpb24uemlw").val();
     cep = cep.replace ("-","");
     if (cep != ""){
       var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
@@ -314,10 +282,10 @@ script: |
         type: "get",
         dataType: "json",
         success: function(data){
-          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
-          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
-          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
-          $("#bGljZW5jaWFudGVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+          $("#c2VydmljZXNfbG9jYXRpb24uc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#c2VydmljZXNfbG9jYXRpb24ubmVpZ2hib3Job29k").val(data.bairro);
+          $("#c2VydmljZXNfbG9jYXRpb24uY2l0eQ").val(data.localidade);
+          $("#c2VydmljZXNfbG9jYXRpb24uc3RhdGU").val(data.uf);
         },
         error: function(erro){
           console.log(erro);
@@ -340,7 +308,7 @@ code: |
   valorAdicionalHoraExcedidaExtenso = num2words(valorAdicionalHoraExcedida, lang='pt_BR', to='currency')
 ---
 section: Cláusulas
-progress: 60
+progress: 100
 question: Preço e forma de pagamento
 subquestion: |
   A contratada pagará à Contratante o valor mensal de [FIELD valorContrato].
