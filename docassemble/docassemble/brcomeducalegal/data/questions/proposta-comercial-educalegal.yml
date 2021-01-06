@@ -12,7 +12,6 @@ include:
   - element-document-ready.yml
   - element-school-email-reviewed.yml
   - element-default-messages.yml
-  - element-school-witness.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -36,24 +35,24 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
-    for item in prospect:
+    for item in prospects:
       item.name.text
-    for item in schools:
+    for item in school_prospects:
       item.name.text
     scope_setected
-    monthly_instalment
+    monthly_installment
     signature_local
     generated_file
     el_patch_document
     document_ready_screen
 ---
 objects:
-  - prospect: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
-  - schools: DAList.using(object_type=Person, there_are_any=True)
+  - prospects: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+  - school_prospects: DAList.using(object_type=Person, there_are_any=True)
 ---
 code: |
-  prospect[i].name.text
-  prospect[i].complete = True
+  prospects[i].name.text
+  prospects[i].complete = True
 ---
 ga id: |
   code: ga_id_begin
@@ -61,7 +60,7 @@ section: Prospect
 progress: 5
 question: Número de Destinatários
 fields:
-  - Número: prospect.target_number
+  - Número: prospects.target_number
     datatype: integer
     default: 1
     min: 1
@@ -71,10 +70,10 @@ section: Prospect
 question: |
   Dados do(a) ${word(ordinal(i)) } destinatário:
 fields:
-  - "Nome completo:": prospect[i].name.text
+  - "Nome completo:": prospects[i].name.text
     required: True
     validate: validate_person_full_name
-  - "E-mail:": prospect[i].email
+  - "E-mail:": prospects[i].email
     help: ${ help_email_msg }
     required: True
     datatype: email
@@ -84,7 +83,7 @@ section: Prospect
 question: |
   Escola(s):
 fields:
-  - "Razão Social:": schools[i].name.text
+  - "Razão Social:": school_prospects[i].name.text
     required: True
 list collect: True
 ---
@@ -140,8 +139,8 @@ fields:
   - "Suporte Técnico:": technical_support
     datatype: checkboxes
     choices:
-      - Suporte Técnico Nível I - 6h SLA: sup1
-      - Suporte Técnico Nível II - 24h SLA: sup2
+      - Suporte Técnico Nível I - 6h SLA: Suporte Técnico Nível I - 6h SLA
+      - Suporte Técnico Nível II - 24h SLA: Suporte Técnico Nível II - 24h SLA
     none of the above: False
     default:
       code: |
@@ -151,14 +150,21 @@ fields:
 ---
 code: |
   from num2words import num2words
-  mensalidade_words = num2words(mensalidade, lang='pt_BR', to='currency')
+  monthly_installment_words = num2words(monthly_installment, lang='pt_BR', to='currency')
+  signature_unit_price_words = num2words(signature_unit_price, lang='pt_BR', to='currency')
+  extrahour_consultation_value_words = num2words(extrahour_consultation_value, lang='pt_BR', to='currency')
+  development_hour_value_words = num2words(development_hour_value, lang='pt_BR', to='currency')
+---
+code: |
+  bulk_unit_price_one = bulk_unit_price - 0.50
+  bulk_unit_price_two = bulk_unit_price - 1.00
 ---
 section: Honorários
 progress: 25
 question: |
   Honorários e preço dos serviços
 fields:
-  - "Mensalidade:": monthly_instalment
+  - "Mensalidade:": monthly_installment
     datatype: currency
     hint: 0000,00
   - "Preço horas excedentes da consultoria jurídica:": extrahour_consultation_value
@@ -180,7 +186,7 @@ fields:
 ---
 code: |
   recipients = list()
-  for item in prospect:
+  for item in prospects:
       if item.email:
           new_recipient = dict()
           new_recipient['name'] = item.name.text
