@@ -275,7 +275,7 @@ fields:
     inline width: 30em
   - 'A Licenciante prestará os serviços de manutenção e atualização do software licenciado?': has_maintenance
     datatype: yesnoradio
-  - 'Existe anexo de cronograma de pagamento?': has_attachment
+  - 'Deseja anexar algum arquivo?': has_attachment
     datatype: yesnoradio
   - 'Inserir anexo(s) :': attachments
     datatype: file
