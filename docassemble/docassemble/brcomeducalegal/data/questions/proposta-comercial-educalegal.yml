@@ -95,12 +95,12 @@ fields:
   - "Proposta:": scope_setected
     datatype: checkboxes
     choices:
-      - "Plataforma de geração de documentos.": scope_1
-      - "GED - Gerenciador Eletrônico de Documentos.": scope_2
-      - "Assinatura eletrônica digital.": scope_3
-      - "Consultoria jurídica.": scope_4
-      - "Geração, assinatura e armazenamento em lote.": scope_5
-      - "Suporte técnico.": scope_6
+      - "Plataforma de geração de documentos": scope_1
+      - "GED - Gerenciador Eletrônico de Documentos": scope_2
+      - "Assinatura eletrônica digital": scope_3
+      - "Consultoria jurídica": scope_4
+      - "Geração em lote": scope_5
+      - "Suporte técnico": scope_6
     none of the above: False
   - "Número de usuários:": amount_users
     datatype: integer
@@ -120,11 +120,10 @@ fields:
     js show if: |
       val("limit_documents") == "Limitada"
   - "Serviço de assinatura eletrônca:": signature_service
-    datatype: checkboxes
+    datatype: radio
     choices:
       - Clicksign: clicksign
       - Docusign: docusign
-    none of the above: False
     default:
       code: |
         dict(clicksign=True, docusign=False)
@@ -183,6 +182,16 @@ fields:
     datatype: currency
     hint: 0000,00
     default: 250.00
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#bW9udGhseV9pbnN0YWxsbWVudA').mask('000000000000000.00', {reverse: true});
+        $('#ZXh0cmFob3VyX2NvbnN1bHRhdGlvbl92YWx1ZQ').mask('000000000000000.00', {reverse: true});
+        $('#c2lnbmF0dXJlX3VuaXRfcHJpY2U').mask('000000000000000.00', {reverse: true});
+        $('#YnVsa191bml0X3ByaWNl').mask('000000000000000.00', {reverse: true});
+        $('#ZGV2ZWxvcG1lbnRfaG91cl92YWx1ZQ').mask('000000000000000.00', {reverse: true});
+    });
+  </script>
 ---
 code: |
   recipients = list()
