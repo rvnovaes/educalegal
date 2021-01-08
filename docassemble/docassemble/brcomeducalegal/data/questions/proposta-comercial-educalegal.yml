@@ -57,7 +57,7 @@ code: |
 ga id: |
   code: ga_id_begin
 section: Prospect
-progress: 20
+progress: 15
 question: Número de Destinatários
 fields:
   - Número: prospects.target_number
@@ -65,7 +65,7 @@ fields:
     default: 1
     min: 1
 ---
-progress: 40
+progress: 30
 section: Prospect
 question: |
   Dados do(a) ${word(ordinal(i)) } destinatário:
@@ -78,7 +78,7 @@ fields:
     required: True
     datatype: email
 ---
-progress: 60
+progress: 45
 section: Prospect
 question: |
   Escola(s):
@@ -88,7 +88,7 @@ fields:
 list collect: True
 ---
 section: Escopo da Proposta
-progress: 80
+progress: 60
 question: |
   Escopo da proposta
 fields:
@@ -157,7 +157,7 @@ code: |
   bulk_unit_price_two = bulk_unit_price - 1.00
 ---
 section: Honorários
-progress: 100
+progress: 80
 question: |
   Honorários e preço dos serviços
 fields:
