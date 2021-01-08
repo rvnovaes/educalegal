@@ -57,7 +57,7 @@ code: |
 ga id: |
   code: ga_id_begin
 section: Prospect
-progress: 5
+progress: 15
 question: Número de Destinatários
 fields:
   - Número: prospects.target_number
@@ -65,7 +65,7 @@ fields:
     default: 1
     min: 1
 ---
-progress: 5
+progress: 30
 section: Prospect
 question: |
   Dados do(a) ${word(ordinal(i)) } destinatário:
@@ -78,7 +78,7 @@ fields:
     required: True
     datatype: email
 ---
-progress: 10
+progress: 45
 section: Prospect
 question: |
   Escola(s):
@@ -88,7 +88,7 @@ fields:
 list collect: True
 ---
 section: Escopo da Proposta
-progress: 15
+progress: 60
 question: |
   Escopo da proposta
 fields:
@@ -99,7 +99,7 @@ fields:
       - "GED - Gerenciador Eletrônico de Documentos": scope_2
       - "Assinatura eletrônica digital": scope_3
       - "Consultoria jurídica": scope_4
-      - "Geração em lote": scope_5
+      - "Geração de documentos em lote": scope_5
       - "Suporte técnico": scope_6
     none of the above: False
   - "Número de usuários:": amount_users
@@ -122,11 +122,9 @@ fields:
   - "Serviço de assinatura eletrônca:": signature_service
     datatype: radio
     choices:
-      - Clicksign: clicksign
-      - Docusign: docusign
-    default:
-      code: |
-        dict(clicksign=True, docusign=False)
+      - Clicksign
+      - Docusign
+    default: Clicksign
     js show if: |
       val("scope_setected['scope_3']")
   - "Horas de consultoria jurídica:": consultation_hours
@@ -159,7 +157,7 @@ code: |
   bulk_unit_price_two = bulk_unit_price - 1.00
 ---
 section: Honorários
-progress: 25
+progress: 80
 question: |
   Honorários e preço dos serviços
 fields:
