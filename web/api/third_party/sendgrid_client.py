@@ -20,7 +20,7 @@ from sendgrid.helpers.mail import (
 logger = logging.getLogger(__name__)
 
 
-def send_email(to_emails, subject, html_content, category, file_path, file_name, file):
+def send_email(to_emails, subject, html_content, category, file_name, file):
     message = Mail(
         subject=subject,
         html_content=html_content)
@@ -39,14 +39,13 @@ def send_email(to_emails, subject, html_content, category, file_path, file_name,
         to_emails_deduplication.append(current_email)
     message.to = to_emails_names
     message.category = Category(category)
-    if file_path:
-        with open(file_path, 'rb') as f:
-            data = f.read()
-            f.close()
-    else:
+
+    if file:
         f = file
         data = f.read()
         f.close()
+    else:
+        data = None
 
     if data:
         encoded = base64.b64encode(data).decode()
@@ -58,17 +57,20 @@ def send_email(to_emails, subject, html_content, category, file_path, file_name,
         message.attachment = attachment
 
     try:
-        # SENDGRID_API_KEY - variave de ambiente criada no container do EL
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        # para debugar pela venv use a chave abaixo
-        # sg = SendGridAPIClient('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')
+        # SENDGRID_API_KEY - variavel de ambiente criada no container do EL
+        if not os.environ.get("SENDGRID_API_KEY"):
+            # para debugar pela venv use a chave abaixo
+            sg = SendGridAPIClient('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')
+        else:
+            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
+    except Exception:
+        raise
+    else:
         if response.status_code == 202:
             return response.status_code, 'Email enviado com sucesso'
         else:
             return response.status_code, response.body
-    except Exception as e:
-        return 0, str(e)
 
 
 if __name__ == "__main__":

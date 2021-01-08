@@ -2,7 +2,7 @@
   "id": "d13d76a7-ff4a-4c87-894e-7824dc6c25b4",
   "version": "2.0",
   "name": "termo-de-compromisso-e-rescisao-do-contrato-de-prestacao-de-servicos-educacionais",
-  "url": "https://test.educalegal.com.br/",
+  "url": "https://apptest.educalegal.com.br/",
   "tests": [{
     "id": "324c99d2-a0c2-4281-8de5-a73db54dc955",
     "name": "termo-de-compromisso-e-rescisao-do-contrato-de-prestacao-de-servicos-educacionais",
@@ -10,7 +10,7 @@
       "id": "4b48c07e-5d69-49b8-a9e0-41f3a1ff063a",
       "comment": "",
       "command": "open",
-      "target": "https://test.educalegal.com.br/",
+      "target": "https://apptest.educalegal.com.br/",
       "targets": [],
       "value": ""
     }, {
@@ -687,6 +687,6 @@
     "timeout": 300,
     "tests": ["324c99d2-a0c2-4281-8de5-a73db54dc955"]
   }],
-  "urls": ["https://test.educalegal.com.br/"],
+  "urls": ["https://apptest.educalegal.com.br/"],
   "plugins": []
 }

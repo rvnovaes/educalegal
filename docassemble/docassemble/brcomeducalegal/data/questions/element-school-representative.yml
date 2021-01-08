@@ -1,0 +1,71 @@
+---
+objects:
+  - representatives: DAList.using(object_type=Individual, complete_attribute='complete', there_is_another=False, minimum_number=1)
+---
+code: |
+  representatives[i].name.text
+  representatives[i].complete = True
+---
+code: |
+  # Extraindo lista de representantes legais da escola do json response
+  representatives_list = list()
+  for signer in signatories_list['results']:
+      if signer['kind'].upper() == 'REPRESENTANTE':
+          representatives_list.append(signer)
+
+  # Populando DAList
+  for i, signer in enumerate(representatives_list):
+      representatives[i].name.text = signer['name']
+      representatives[i].email = signer['email']
+      representatives[i].cpf = signer['cpf']
+---
+field: valid_representatives_table
+progress: 95
+question: |
+  Dados dos Representantes Legais da Escola
+subquestion: |
+  * Confira os e-mails dos representantes legais abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica ou e-mail.
+
+  * Os e-mails dos representantes legais devem ser diferentes.
+
+  * Os representantes são cadastrados no menu da Escola
+  ${ representatives.table }
+buttons:
+  Continuar: continue
+---
+table: representatives.table
+rows: representatives
+columns:
+  - Nome: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+  - CPF: |
+      row_item.cpf
+edit:
+  - name.text
+  - email
+  - cpf
+---
+progress: 95
+question: |
+    Dados do Representante Legal da Escola:
+fields:
+  - "Nome:": representatives[i].name.text
+    required: True
+    validate: validate_person_full_name
+  - "E-mail:": representatives[i].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: True
+  - "CPF:": representatives[i].cpf
+    required: True
+    validate: validate_cpf
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#cmVwcmVzZW50YXRpdmVzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---

@@ -234,6 +234,15 @@ pipeline {
                }
            }
        }
+       stage('test_termo-de-rescisao-de-acordo-individual-de-trabalho.py') {
+           steps {
+               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                   dir('docassemble/docassemble/selenium_tests/'){
+                       sh './jenkins_test_termo-de-rescisao-de-acordo-individual-de-trabalho.sh'
+                   }
+               }
+           }
+       }
    }
    post {
         always  {

@@ -1,0 +1,131 @@
+version: '3.7'
+
+services:
+  educalegal:
+    image: rvnovaes/educalegal:2.0.1
+    container_name: educalegal
+    restart: unless-stopped
+    command: ["yarn", "start", ""]
+    # When the value supplied is a relative path, it is interpreted as relative to the location of the Compose file.
+    # This directory is also the build context that is sent to the Docker daemon.
+    # Já caminho do dockerfile é relativo ao context passado acima.
+    # No caso abaixo, ao passarmos ../front o docker-dameon "está" em ../front. Portanto, o caminho do dockerfile
+    # é relativo a ../front.
+    build:
+      context: ../front
+      dockerfile: ../environments/dockerfiles/educalegal/educalegal
+      args:
+        BUILD_BACKEND_URL: "http://api"
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+  api:
+    image: rvnovaes/api:2.0.1
+    container_name: api
+    restart: unless-stopped
+    # O caminho do context é relativo ao docker-compose e o caminho do dockerfile é relativo ao context
+    build:
+      context: ../web
+      dockerfile: ../environments/dockerfiles/api/api
+    command: ["./wait-for-postgres.sh", "python", "./manage.py", "runserver 0.0.0.0:8008"]
+    # O caminho do source é relativo ao docker-compose e o target ao interior do container
+    # Path on the host, relative to the Compose file
+    # Relative paths should always begin with . or ...
+    volumes:
+      - type: bind
+        source: ../web
+        target: /code
+      - type: bind
+        source: ../web/media
+        target: /code/media
+    environment:
+      - DJANGO_SETTINGS_MODULE=web.settings.development_docker
+      - EL_ENV=development
+      - SENDGRID_API_KEY=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
+    depends_on:
+      - apicelery
+      - apimongo
+  apicelery:
+    image: rvnovaes/api:2.0.1
+    container_name: apicelery
+    restart: unless-stopped
+    build:
+      context: ../web
+      dockerfile: ../environments/dockerfiles/api/api
+    command: celery -A web worker -l info -c 1 -n api1@%h
+    volumes:
+      - type: bind
+        source: ../web
+        target: /code
+    environment:
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=web.settings.development_docker
+    depends_on:
+      - apirabbitmq
+  apiflower:
+    container_name: apiflower
+    restart: unless-stopped
+    image: mher/flower:0.9.5
+    environment:
+      - CELERY_BROKER_URL=amqp://educalegal:educalegal@apirabbitmq/educalegal
+      - FLOWER_BASIC_AUTH=educalegal:cavaloverdegrande
+      - FLOWER_PORT=8888
+    depends_on:
+      - apirabbitmq
+    ports:
+      - "8888:8888"
+    expose:
+      - "8888"
+  apirabbitmq:
+    container_name: apirabbitmq
+    restart: unless-stopped
+    image: rabbitmq:3.8.4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: educalegal
+      RABBITMQ_DEFAULT_PASS: educalegal
+      RABBITMQ_DEFAULT_VHOST: educalegal
+    ports:
+      - "5672:5672"
+      - "9999:15672"
+    expose:
+      - "5672"
+      - "15672"
+    volumes:
+      - /opt/educalegal/docker_volumes/rabbitmq_app:/var/lib/rabbitmq
+  apimongo:
+    image: mongo:4.2.6
+    container_name: apimongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: educalegal
+      MONGO_INITDB_ROOT_PASSWORD: educalegal
+      MONGO_INITDB_DATABASE: educalegal
+      MONGO_INITDB_USERNAME: educalegal
+      MONGO_INITDB_PASSWORD: educalegal
+    volumes:
+      - ./dockerfiles/api/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+      - /opt/educalegal/docker_volumes/mongo_db:/data/db
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+  apimongoexpress:
+    container_name: apimongoexpress
+    restart: unless-stopped
+    image: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_SERVER: apimongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_BASICAUTH_USERNAME: educalegal
+      ME_CONFIG_BASICAUTH_PASSWORD: cavaloverdegrande
+      ME_CONFIG_MONGODB_ADMINUSERNAME: educalegal
+      ME_CONFIG_MONGODB_ADMINPASSWORD: educalegal
+    depends_on:
+      - apimongo
+    ports:
+      - "8081:8081"
+    expose:
+      - "8081"

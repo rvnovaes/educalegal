@@ -2,7 +2,7 @@
   "id": "bf5ffe2e-a40d-4e60-953b-9bce96418d00",
   "version": "2.0",
   "name": "aditivo-de-reparcelamento-do-contrato-do-aluno",
-  "url": "https://test.educalegal.com.br/",
+  "url": "https://apptest.educalegal.com.br/",
   "tests": [{
     "id": "ebd12c62-034b-491f-8b97-de7e34c7366f",
     "name": "aditivo-de-reparcelamento-do-contrato-do-aluno",
@@ -10,7 +10,7 @@
       "id": "9e919493-1e9b-40df-86f9-9b5ac8f4651a",
       "comment": "",
       "command": "open",
-      "target": "https://test.educalegal.com.br/",
+      "target": "https://apptest.educalegal.com.br/",
       "targets": [],
       "value": ""
     }, {
@@ -944,6 +944,6 @@
     "timeout": 300,
     "tests": ["ebd12c62-034b-491f-8b97-de7e34c7366f"]
   }],
-  "urls": ["https://test.educalegal.com.br/", "https://test.educalegal.com.br/interview/interview"],
+  "urls": ["https://apptest.educalegal.com.br/", "https://apptest.educalegal.com.br/interview/interview"],
   "plugins": []
 }

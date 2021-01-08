@@ -1,11 +1,13 @@
 # DocuSign Integration for Docassemble
-import base64
 import logging
 import json
 import jwt
 import re
 import requests
 import time
+
+from base64 import b64encode
+from os import path
 
 __all__ = ["DocuSignClient", "make_document_base64"]
 
@@ -63,9 +65,19 @@ class DocuSignClient:
         self.private_key = private_key
 
         if self.test_mode:
-            webhook_url = "https://test.educalegal.com.br/v1/docusign/webhook"
+            webhook_url = "https://apitest.educalegal.com.br/v1/docusign/webhook"
         else:
-            webhook_url = "https://app.educalegal.com.br/v1/docusign/webhook"
+            webhook_url = "https://api.educalegal.com.br/v1/docusign/webhook"
+
+        if self.test_mode:
+            self.aud = "account-d.docusign.com"
+            self.base_uri = "https://account-d.docusign.com"
+        else:
+            self.aud = "account.docusign.com"
+            self.base_uri = "https://account.docusign.com"
+
+        self.get_token()
+        self.get_user_info()
 
         self.event_notification = {
             "url": webhook_url,
@@ -111,12 +123,6 @@ class DocuSignClient:
         return url
 
     def get_token(self):
-        if self.test_mode:
-            aud = "account-d.docusign.com"
-            base_uri = "https://account-d.docusign.com"
-        else:
-            aud = "account.docusign.com"
-            base_uri = "https://account.docusign.com"
         current_time = int(time.time())
         hour_later = int(time.time()) + 3600
         self.jwt_code = jwt.encode(
@@ -125,14 +131,14 @@ class DocuSignClient:
                 "sub": self.impersonated_user_guid,
                 "iat": current_time,
                 "exp": hour_later,
-                "aud": aud,
+                "aud": self.aud,
                 "scope": "signature impersonation",
             },
             self.private_key,
             algorithm="RS256",
         )
         request_for_token = requests.post(
-            base_uri + "/oauth/token",
+            self.base_uri + "/oauth/token",
             data={
                 "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
                 "assertion": self.jwt_code,
@@ -140,14 +146,11 @@ class DocuSignClient:
         )
         self.token = json.loads(request_for_token.text)["access_token"]
 
+
     def get_user_info(self):
-        if self.test_mode:
-            base_uri = "https://account-d.docusign.com"
-        else:
-            base_uri = "https://account.docusign.com"
         self.authorization_header = {"Authorization": "Bearer " + self.token}
         request_for_user = requests.get(
-            base_uri + "/oauth/userinfo", headers=self.authorization_header
+            self.base_uri + "/oauth/userinfo", headers=self.authorization_header
         )
         user_account_id = json.loads(request_for_user.text)["accounts"][0]["account_id"]
         user_base_uri = json.loads(request_for_user.text)["accounts"][0]["base_uri"]
@@ -161,8 +164,6 @@ class DocuSignClient:
         # If it outputs '/restapi/v2/accounts/' authentication is not working.
         # If it outputs 'https://server.address/restapi/v2/accounts/client-id' then it is working.
 
-        self.get_token()
-        self.get_user_info()
         return self.extended_base_uri
 
     def send_to_docusign(
@@ -276,24 +277,78 @@ class DocuSignClient:
         for key in kwargs:
             request_json[key] = kwargs[key]
 
-        # Send off envelope request and return the results
-        self.get_token()
-        self.get_user_info()
         try:
             envelope = requests.post(
                 self.extended_base_uri + "/envelopes",
                 headers=self.authorization_header,
                 json=request_json,
             )
-            envelope.raise_for_status()
-            return envelope.status_code, json.loads(envelope.text)
+            if envelope.status_code == 201:
+                return envelope.status_code, json.loads(envelope.text)
+            else:
+                return envelope.status_code, json.loads(envelope.text)['message']
         except Exception as e:
             message = str(type(e).__name__) + " : " + str(e)
             logger.error(message)
-            return 0, message
+            return 500, message
+
+    def list_envelope_documents(self, envelope_id):
+        """Retorna a lista de documentos do envelope"""
+
+        try:
+            envelope_documents = requests.get(
+                self.extended_base_uri + "/envelopes/" + envelope_id + '/documents', headers=self.authorization_header
+            )
+        except Exception as e:
+            message = str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return 500, message
+        else:
+            return envelope_documents.status_code, envelope_documents.json()
+
+    def get_envelope_document(self, envelope_id, document_id):
+        """Retorna a URL do documento"""
+
+        try:
+            envelope_document = requests.get(
+                self.extended_base_uri + "/envelopes/" + envelope_id + '/documents/' + document_id,
+                headers=self.authorization_header
+            )
+        except Exception as e:
+            message = str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return 400, message
+        else:
+            if envelope_document.status_code == 200:
+                return envelope_document.status_code, envelope_document
+            else:
+                return envelope_document.status_code, envelope_document.json()['message']
+
+    def download_envelope_document(self, envelope_id, document_id, filepath, filename):
+        """Baixa o documento no diretório indicado"""
+
+        try:
+            status_code, document = self.get_envelope_document(envelope_id, document_id)
+        except Exception as e:
+            message = str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return 400, message
+        else:
+            if status_code == 200:
+                try:
+                    with open(path.join(filepath, filename), 'wb') as f:
+                        f.write(document.content)
+                except Exception as e:
+                    message = str(type(e).__name__) + " : " + str(e)
+                    logger.error(message)
+                    return 400, message
+
+            if isinstance(document, str):
+                return status_code, document
+            else:
+                return status_code, document.reason
 
 
-def make_document_base64(document_path):
+def make_document_base64(document):
     """Converts your document from document_path to a base64 string, as used by Docusign"""
-    with open(document_path, "rb") as document:
-        return base64.b64encode(document.read()).decode("utf-8")
+    return b64encode(document.read()).decode("utf-8")

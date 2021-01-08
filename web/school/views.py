@@ -16,7 +16,6 @@ class SchoolCreateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, CreateV
     fields = [
         "legal_name",
         "name",
-        "legal_type",
         "cnpj",
         "logo",
         "phone",
@@ -54,7 +53,6 @@ class SchoolUpdateView(LoginRequiredMixin, TenantAwareCreateUpdateMixin, UpdateV
     fields = [
         "legal_name",
         "name",
-        "legal_type",
         "cnpj",
         "logo",
         "phone",

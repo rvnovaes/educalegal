@@ -1,0 +1,554 @@
+metadata:
+  title: Procuração
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+---
+sections:
+  - Outorgantes
+  - Outorgados
+  - Dados da Procuração
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "procuracao.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    for item in grantors:
+      item.type
+    for item in granted:
+      item.name.text
+    powers_list
+    if powers_list['type_3']:
+      financial_data.gather()
+    if powers_list['type_4']:
+      property_description
+    final_date
+    signature_local
+    generated_file
+    el_patch_document
+    document_ready_screen
+---
+objects:
+  - grantors: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+  - grantors[i].child: |
+      DAList.using(
+        object_type=Individual,
+        ask_number=True)
+---
+code: |
+  grantors[i].type
+  grantors[i].name.text
+  grantors[i].address.zip
+  if grantors[i].type == 'organization':
+    grantors[i].child.gather()
+  grantors[i].complete = True
+---
+section: Outorgantes
+question: |
+  Número de outorgantes
+fields:
+  - Número: grantors.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Outorgantes
+question: |
+  Tipo do ${ word(ordinal(i)) } outorgante
+fields:
+  - "Tipo:": grantors[i].type
+    required: True
+    datatype: radio
+    choices:
+      - Pessoa Física: individual
+      - Pessoa Jurídica: organization
+---
+question: |
+  Dados do(a) ${ word(ordinal(i)) } outorgante
+fields:
+  - "Nome/Razão Social": grantors[i].name.text
+  - "Número de representantes:": grantors[i].child.target_number
+    required: False
+    datatype: integer
+    default: 1
+    min: 1
+    show if:
+      code: |
+        grantors[i].type == "organization"
+  - "CPF:": grantors[i].cpf
+    required: True
+    validate: validate_cpf
+    show if:
+      code: |
+        grantors[i].type == "individual"
+  - "Número do RG:": grantors[i].rg
+    required: True
+    show if:
+      code: |
+        grantors[i].type == "individual"
+  - "Nacionalidade:": grantors[i].nationality
+    required: True
+    default: brasileiro(a)
+    show if:
+      code: |
+        grantors[i].type == "individual"
+  - "Estado Civil:": grantors[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+    show if:
+      code: |
+        grantors[i].type == "individual"
+  - "CNPJ:": grantors[i].cnpj
+    required: True
+    validate: validate_cnpj
+    show if:
+      code: |
+        grantors[i].type == "organization"
+  - "E-mail:": grantors[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+    show if:
+      code: |
+        grantors[i].type == "organization" or grantors[i].type == "individual"
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#Z3JhbnRvcnNbaV0uY3Bm').mask('000.000.000-00', {reverse: true});
+        $('#Z3JhbnRvcnNbaV0uY25wag').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Outra Parte
+progress: 15
+question: |
+  Endereço do(a) ${ grantors[i] }
+fields:
+  - "CEP:": grantors[i].address.zip
+    required: True
+  - "Logradouro:": grantors[i].address.street_name
+    required: True
+  - "Número:": grantors[i].address.street_number
+    required: True
+  - "Complemento:": grantors[i].address.unit
+    required: False
+  - "Bairro:": grantors[i].address.neighborhood
+    required: True
+  - "Cidade:": grantors[i].address.city
+    required: True
+  - "Estado:": grantors[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Z3JhbnRvcnNbaV0uYWRkcmVzcy56aXA').mask('00000-000');
+  });
+
+  $("#Z3JhbnRvcnNbaV0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#Z3JhbnRvcnNbaV0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Z3JhbnRvcnNbaV0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#Z3JhbnRvcnNbaV0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#Z3JhbnRvcnNbaV0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#Z3JhbnRvcnNbaV0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Acionistas
+question: |
+  Dados do ${ word(ordinal(j)) } representante do(a) ${ grantors[i] }:
+fields:
+  - "Nome completo:": grantors[i].child[j].name.first
+    required: False
+  - "CPF:": grantors[i].child[j].cpf
+    required: True
+    validate: validate_cpf
+  - "Número do RG:": grantors[i].child[j].rg
+    required: True
+  - "Nacionalidade:": grantors[i].child[j].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado Civil:": grantors[i].child[j].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+  - "E-mail:": grantors[i].child[j].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+  - "CEP:": grantors[i].child[j].address.zip
+    required: True
+  - "Logradouro:": grantors[i].child[j].address.street_name
+    required: True
+  - "Número:": grantors[i].child[j].address.street_number
+    required: True
+  - "Complemento:": grantors[i].child[j].address.unit
+    required: False
+  - "Bairro:": grantors[i].child[j].address.neighborhood
+    required: True
+  - "Cidade:": grantors[i].child[j].address.city
+    required: True
+  - "Estado:": grantors[i].child[j].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Z3JhbnRvcnNbaV0uY2hpbGRbal0uYWRkcmVzcy56aXA').mask('00000-000');
+    $('#Z3JhbnRvcnNbaV0uY2hpbGRbal0uY3Bm').mask('000.000.000-00', {reverse: true});
+  });
+
+  $("#Z3JhbnRvcnNbaV0uY2hpbGRbal0uYWRkcmVzcy56aXA").focusout(function(){
+    var cep = $("#Z3JhbnRvcnNbaV0uY2hpbGRbal0uYWRkcmVzcy56aXA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Z3JhbnRvcnNbaV0uY2hpbGRbal0uYWRkcmVzcy5zdHJlZXRfbmFtZQ").val(data.logradouro);
+          $("#Z3JhbnRvcnNbaV0uY2hpbGRbal0uYWRkcmVzcy5uZWlnaGJvcmhvb2Q").val(data.bairro);
+          $("#Z3JhbnRvcnNbaV0uY2hpbGRbal0uYWRkcmVzcy5jaXR5").val(data.localidade);
+          $("#Z3JhbnRvcnNbaV0uY2hpbGRbal0uYWRkcmVzcy5zdGF0ZQ").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+objects:
+  - granted: |
+      DAList.using(
+        object_type=Person,
+        ask_number=True,
+        complete_attribute='complete')
+---
+ga id: |
+  code: ga_id_begin
+section: Outorgado
+progress: 15
+question: |
+  Número de Outorgado
+fields:
+  - "Número:": granted.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+code: |
+  granted[i].name.text
+  granted[i].address.street_name
+  granted[i].complete = True
+---
+section: Outorgado
+progress: 15
+question: |
+  Dados do(a) ${ word(ordinal(i)) } outorgado
+fields:
+  - 'Nome Completo:': granted[i].name.text
+    validate: validate_person_full_name
+  - "CPF:": granted[i].cpf
+    required: True
+    validate: validate_cpf
+  - "Número do RG:": granted[i].rg
+    required: True
+  - "Nacionalidade:": granted[i].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado Civil:": granted[i].marital_status
+    required: True
+    choices:
+      - solteiro(a): solteiro(a)
+      - casado(a): casado(a)
+      - divorciado(a): divorciado(a)
+      - viúvo(a): viúvo(a)
+    datatype: radio
+  - "E-mail:": granted[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#Z3JhbnRlZFtpXS5jcGY').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+section: Outorgado
+progress: 15
+question: |
+  Endereço do(a) ${ granted[i] }
+fields:
+  - "CEP:": granted[i].address.zip
+    required: True
+  - "Logradouro:": granted[i].address.street_name
+    required: True
+  - "Número:": granted[i].address.street_number
+    required: True
+  - "Complemento:": granted[i].address.unit
+    required: False
+  - "Bairro:": granted[i].address.neighborhood
+    required: True
+  - "Cidade:": granted[i].address.city
+    required: True
+  - "Estado:": granted[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Z3JhbnRlZFtpXS5hZGRyZXNzLnppcA').mask('00000-000');
+  });
+
+  $("#Z3JhbnRlZFtpXS5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#Z3JhbnRlZFtpXS5hZGRyZXNzLnppcA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Z3JhbnRlZFtpXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#Z3JhbnRlZFtpXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#Z3JhbnRlZFtpXS5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#Z3JhbnRlZFtpXS5hZGRyZXNzLnN0YXRl").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Outorgado
+field: valid_granted_table
+question: |
+  Outorgado:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ granted.table }
+buttons:
+  Continuar: continue
+---
+table: granted.table
+rows: granted
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Dados da Procuração
+progress: 50
+question: Selecione o tipo de procuração a ser gerada
+fields:
+  - "Poderes": powers_list
+    datatype: checkboxes
+    none of the above: False
+    code: |
+      [
+        {'type_1': 'representar a outorgante perante as concessionárias de serviços públicos'},
+        {'type_2': 'representar a outorgante na sua administração ordinária, na área de recursos humanos/trabalhista'},
+        {'type_3': 'representar  a  outorgante  perante  o  banco para movimentações financeiras'},
+        {'type_4': 'representar  a  outorgante na área imobiliária perante  as  concessionárias  de  serviços públicos,  Prefeitura  Municipal e demais orgãos'},
+        {'type_5': 'representar  a  outorgante  com amplo e gerais poderes'},
+      ]
+---
+objects:
+  - financial_data: DAList.using(object_type=Thing, minimum_number=1)
+---
+section: Outorgado
+progress: 15
+question: Dados financeiros da conta bancária
+fields:
+  - Banco: financial_data[i].name.text
+    required: True
+  - Agência: financial_data[i].agency
+    required: True
+  - Conta: financial_data[i].account
+    required: True
+---
+question: |
+  Há outra conta?
+yesno: financial_data.there_is_another
+---
+section: Imóvel
+progress: 80
+question: |
+  Dados do Imóvel
+fields:
+  - "Descrição/Área total(m²):": property_description
+    datatype: area
+  - "Número da matrícula:": registries_number
+    datatype: text
+  - "Cartório:": registration
+    datatype: area
+    hint: "ex.: Cartório do 4º Ofício de Registro de Imóveis de Belo Horizonte/MG"
+  - "CEP:": property_zip
+    required: True
+  - "Logradouro:": property_street_name
+    required: True
+  - "Número:": property_street_number
+    required: True
+  - "Complemento:": property_unit
+    required: False
+  - "Bairro:": property_neighborhood
+    required: True
+  - "Cidade:": property_city
+    required: True
+  - "Estado:": property_state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#cHJvcGVydHlfemlw').mask('00000-000');
+  });
+
+  $("#cHJvcGVydHlfemlw").focusout(function(){
+    var cep = $("#cHJvcGVydHlfemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#cHJvcGVydHlfc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#cHJvcGVydHlfbmVpZ2hib3Job29k").val(data.bairro);
+          $("#cHJvcGVydHlfY2l0eQ").val(data.localidade);
+          $("#cHJvcGVydHlfc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Outorgado
+progress: 15
+question: Data final para a representação dos poderes
+fields:
+  - Data: final_date
+    datatype: date
+    required: True
+---
+code: |
+  recipients = list()
+  for grantor in grantors:
+      if grantor.type == 'organization':
+          for item in grantor.child:
+              if item.email:
+                  new_recipient = dict()
+                  new_recipient['name'] = item.name.first
+                  new_recipient['email'] = item.email
+                  new_recipient['group'] = 'signers'
+                  new_recipient['routingOrder'] = 1
+                  new_recipient['tabs'] = [
+                      {
+                          'type': 'signHere',
+                          'anchorString': generate_anchor('signHere', item.email)
+                      },
+                  ]
+                  recipients.append(new_recipient)
+
+      if grantor.type == 'individual':
+          if grantor.email:
+              new_recipient = dict()
+              new_recipient['name'] = grantor.name.text
+              new_recipient['email'] = grantor.email
+              new_recipient['group'] = 'signers'
+              new_recipient['routingOrder'] = 1
+              new_recipient['tabs'] = [
+                  {
+                      'type': 'signHere',
+                      'anchorString': generate_anchor('signHere', grantor.email)
+                  },
+              ]
+              recipients.append(new_recipient)
+
+  for item in granted:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'

@@ -1,17 +1,12 @@
 import io
+import json
 import logging
-import os
-from enum import Enum
-from datetime import datetime
 import requests
 
-from urllib3.exceptions import NewConnectionError
-from requests.exceptions import ConnectionError
-from api.third_party.docassemble_client import DocassembleClient, DocassembleAPIException
+from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.db import IntegrityError
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
@@ -19,63 +14,17 @@ from django.utils.safestring import mark_safe
 from api.third_party.clicksign_client import ClickSignClient
 from api.third_party.docusign_client import DocuSignClient, make_document_base64
 from api.third_party.sendgrid_client import send_email as sendgrid_send_email
-from document.models import DocumentStatus
+from document.models import Document, DocumentStatus
 from tenant.models import ESignatureAppProvider, ESignatureAppSignerKey
 
-from .models import Document
+from .models import BulkDocumentKind
 
 logger = logging.getLogger(__name__)
-
-
-class DocumentType(Enum):
-    PRESTACAO_SERVICOS_ESCOLARES = 2
-    NOTIFICACAO_EXTRAJUDICIAL = 8
-    ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
 
 
 def custom_class_name(interview_custom_file_name):
     prefix = datetime.today().strftime("%Y%m%d_%H%M%S")
     return prefix + "_" + interview_custom_file_name
-
-
-def create_secret(base_url, api_key, username, user_password):
-    try:
-        dac = DocassembleClient(base_url, api_key)
-        logger.info(
-            "Dados do servidor de entrevistas: {base_url} - {api_key}".format(
-                base_url=base_url, api_key=api_key
-            )
-        )
-    except NewConnectionError as e:
-        message = "Não foi possível estabelecer conexão com o servidor de geração de documentos. | {e}".format(
-            e=str(e)
-        )
-        logger.error(message)
-        raise DocassembleAPIException(message)
-    else:
-        try:
-            response_json, status_code = dac.secret_read(username, user_password)
-            secret = response_json
-            logger.info(
-                "Secret obtido do servidor de geração de documentos: {secret}".format(
-                    secret=secret
-                )
-            )
-        except ConnectionError as e:
-            message = "Não foi possível obter o secret do servidor de geração de documentos. | {e}".format(
-                e=str(e)
-            )
-            logger.error(message)
-            raise DocassembleAPIException(message)
-        else:
-            if status_code != 200:
-                error = "Erro ao gerar o secret | Status Code: {status_code} | Response: {response}".format(
-                    status_code=status_code, response=response_json
-                )
-                logger.error(error)
-                raise DocassembleAPIException(error)
-            else:
-                return secret
 
 
 def dict_to_docassemble_objects(documents, interview_type_id):
@@ -88,51 +37,80 @@ def dict_to_docassemble_objects(documents, interview_type_id):
             )
         )
 
-        if interview_type_id == DocumentType.PRESTACAO_SERVICOS_ESCOLARES.value:
+        if interview_type_id == BulkDocumentKind.PRESTACAO_SERVICOS_ESCOLARES.value:
             # tipos de pessoa no contrato de prestacao de servicos
-            person_types = ['students', 'contractors']
+            parents = ['students', 'contractors']
 
-            for person in person_types:
+            for parent in parents:
                 # cria hierarquia para endereço da pessoa
-                _build_address_dict(document, person)
+                _build_address_dict(document, parent)
 
                 # Cria a representacao do objeto Individual da pessoa
-                _create_person_obj(document, "f", person, 0)
+                _create_person_obj(document, "f", parent)
 
                 # Cria a representacao do objeto Address da pessoa
-                _create_address_obj(document, person, 0)
+                _create_address_obj(document, parent)
 
+                _create_da_list_properties(document, parent)
+
+            # para objetos do tipo Thing
+            parents = ['input_installments_data', 'other_installments_data']
+
+            for parent in parents:
+                if parent not in document:
+                    continue
+
+                # Cria a representacao do objeto Thing
+                _create_thing_obj(document, parent)
+
+                _create_da_list_properties(document, parent)
+
+            # para pessoas que nao tem endereco
+            parents = ['witnesses']
+
+            for parent in parents:
+                # Cria a representacao do objeto Individual da pessoa
+                _create_person_obj(document, "f", parent)
+
+                _create_da_list_properties(document, parent)
+
+            document["valid_input_installments_data_table"] = "continue"
+            document["valid_other_installments_data_table"] = "continue"
             document["content_document"] = "contrato-prestacao-servicos-educacionais.docx"
 
-        elif interview_type_id == DocumentType.NOTIFICACAO_EXTRAJUDICIAL.value:
+        elif interview_type_id == BulkDocumentKind.NOTIFICACAO_EXTRAJUDICIAL.value:
             # tipos de pessoa no contrato de prestacao de servicos
-            person_types = ['notifieds']
+            parents = ['notifieds']
 
-            for person in person_types:
+            for parent in parents:
                 # cria hierarquia para endereço da pessoa
-                _build_address_dict(document, person)
+                _build_address_dict(document, parent)
 
                 # Cria a representacao do objeto Individual da pessoa
-                _create_person_obj(document, "f", person, 0)
+                _create_person_obj(document, "f", parent)
 
                 # Cria a representacao do objeto Address da pessoa
-                _create_address_obj(document, person, 0)
+                _create_address_obj(document, parent)
+
+                _create_da_list_properties(document, parent)
 
             document["content_document"] = "notificacao-extrajudicial.docx"
 
-        elif interview_type_id == DocumentType.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
+        elif interview_type_id == BulkDocumentKind.ACORDOS_TRABALHISTAS_INDIVIDUAIS.value:
             # tipos de pessoa no contrato de prestacao de servicos
-            person_types = ['workers']
+            parents = ['workers']
 
-            for person in person_types:
+            for parent in parents:
                 # cria hierarquia para endereço da pessoa
-                _build_address_dict(document, person)
+                _build_address_dict(document, parent)
 
                 # Cria a representacao do objeto Individual da pessoa
-                _create_person_obj(document, "f", person, 0)
+                _create_person_obj(document, "f", parent)
 
                 # Cria a representacao do objeto Address da pessoa
-                _create_address_obj(document, person, 0)
+                _create_address_obj(document, parent)
+
+                _create_da_list_properties(document, parent)
 
             # Cria a representacao da lista de documentos
             _create_documents_obj(document)
@@ -160,10 +138,14 @@ def dict_to_docassemble_objects(documents, interview_type_id):
     return interview_variables_list
 
 
-def _build_name_dict(document, parent):
-    document[parent]["name"] = dict()
-    document[parent]["name"]["text"] = document[parent]["name_text"]
-    document[parent].pop("name_text")
+def _build_name_dict(document, parent, empty=False):
+    for element in document[parent]['elements']:
+        element["name"] = dict()
+        if empty:
+            element["name"]["text"] = None
+        else:
+            element["name"]["text"] = element["name_text"]
+            element.pop("name_text")
 
     return document
 
@@ -180,13 +162,13 @@ def _build_address_dict(document, parent):
         "state"
     ]
 
-    for attribute in address_attributes:
-        address[attribute] = document[parent][attribute]
-        document[parent].pop(attribute)
+    for element in document[parent]['elements']:
+        for attribute in address_attributes:
+            address[attribute] = element[attribute]
+            element.pop(attribute)
 
-    document[parent]["address"] = address
-
-    return document
+        # adiciona o dicionario endereco na lista de elementos
+        element["address"] = address
 
 
 def _create_documents_obj(document):
@@ -195,8 +177,8 @@ def _create_documents_obj(document):
                  'docdireitoautoral': 'termo-mudanca-de-regime-e-cessao-do-direito-autoral.docx'}
 
     elements = dict()
-    for doc_type in document['documents_list']:
-        elements[doc_names[doc_type]] = document["documents_list"][doc_type]
+    for doc_type in document['documents_list']['elements']:
+        elements[doc_names[doc_type]] = document["documents_list"]['elements'][doc_type]
 
     document.pop("documents_list")
     document["documents_list"] = dict()
@@ -208,52 +190,58 @@ def _create_documents_obj(document):
     document["documents_list"]["gathered"] = True
     document["documents_list"]["instanceName"] = "documents_list"
 
-    return document
 
-
-def _create_person_obj(document, person_type, person_list_name, index):
+def _create_person_obj(document, person_type, parent):
     """ Cria a representação da pessoa como objeto do Docassemble
         document
         person_type: f  - física
                      j  - jurídica
                      fj - ambos
-        person_list_name - nome da lista da parte: contratantes, contratadas, locatárias, locadoras, etc.
-        index - índice do elemento da lista que será convertido
+        parent: students, contractors, witnesses, etc.
     """
     # cria hierarquia para name do person_list_name
-    _build_name_dict(document, person_list_name)
+    _build_name_dict(document, parent)
 
-    person = document[person_list_name]
+    for index, element in enumerate(document[parent]['elements']):
+        if person_type == 'fj':
+            element["_class"] = "docassemble.base.util.Person"
+            element["name"]["_class"] = "docassemble.base.util.Name"
+        elif person_type == 'f':
+            element["_class"] = "docassemble.base.util.Individual"
+            element["name"]["_class"] = "docassemble.base.util.IndividualName"
+            element["name"]["uses_parts"] = True
+        else:
+            element["_class"] = "docassemble.base.util.Organization"
+            element["name"]["_class"] = "docassemble.base.util.Name"
 
-    if person_type == 'fj':
-        person["_class"] = "docassemble.base.util.Person"
-        person["name"]["_class"] = "docassemble.base.util.Name"
-    elif person_type == 'f':
-        person["_class"] = "docassemble.base.util.Individual"
-        person["name"]["_class"] = "docassemble.base.util.IndividualName"
-        person["name"]["uses_parts"] = True
-    else:
-        person["_class"] = "docassemble.base.util.Organization"
-        person["name"]["_class"] = "docassemble.base.util.Name"
-
-    person["instanceName"] = person_list_name + '[' + str(index) + ']'
-    person["name"]["instanceName"] = person_list_name + '[' + str(index) + '].name'
-    document.pop(person_list_name)
-
-    document[person_list_name] = dict()
-    document[person_list_name]["elements"] = list()
-    document[person_list_name]["elements"].append(person)
-    document[person_list_name]["_class"] = "docassemble.base.core.DAList"
-    document[person_list_name]["instanceName"] = person_list_name
-    document["valid_" + person_list_name + "_table"] = "continue"
+        element["instanceName"] = parent + '[' + str(index) + ']'
+        element["name"]["instanceName"] = parent + '[' + str(index) + '].name'
 
 
-def _create_address_obj(document, person_list_name, index):
-    document[person_list_name]["elements"][index]['address']["instanceName"] = person_list_name + \
-                                                                               '[' + str(index) + '].address'
-    document[person_list_name]["elements"][index]['address']["_class"] = "docassemble.base.util.Address"
-    document[person_list_name]["auto_gather"] = False
-    document[person_list_name]["gathered"] = True
+def _create_address_obj(document, parent):
+    for index, element in enumerate(document[parent]['elements']):
+        element['address']["instanceName"] = parent + '[' + str(index) + '].address'
+        element['address']["_class"] = "docassemble.base.util.Address"
+
+
+def _create_da_list_properties(document, parent):
+    document[parent]["_class"] = "docassemble.base.core.DAList"
+    document[parent]["instanceName"] = parent
+    document[parent]["auto_gather"] = False
+    document[parent]["gathered"] = True
+    document["valid_" + parent + "_table"] = "continue"
+
+
+def _create_thing_obj(document, parent):
+    # cria hierarquia para name do person_list_name
+    _build_name_dict(document, parent, True)
+
+    for index, element in enumerate(document[parent]['elements']):
+        element["_class"] = "docassemble.base.util.Thing"
+        element["name"]["_class"] = "docassemble.base.util.Name"
+
+        element["instanceName"] = parent + '[' + str(index) + ']'
+        element["name"]["instanceName"] = parent + '[' + str(index) + '].name'
 
 
 @login_required
@@ -273,12 +261,19 @@ def send_email(doc_uuid):
     except Document.DoesNotExist:
         message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
         logger.error(message)
+        return 404, message
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
+        return 500, message
     else:
         if document.recipients:
             to_emails = document.recipients
+
+            if isinstance(to_emails, str):
+                # converte string para dict
+                to_emails = json.loads(to_emails)
+
             school_name = document.school.name if document.school.name else document.school.legal_name
             interview_name = document.interview.name if document.interview.name else ''
             subject = "IMPORTANTE: " + school_name + " | " + interview_name
@@ -290,22 +285,28 @@ def send_email(doc_uuid):
 
             file = None
 
-            if document.relative_file_path:
-                file_path = os.path.join(settings.BASE_DIR, "media/", document.relative_file_path.path)
+            if document.cloud_file:
+                response = requests.get(document.cloud_file.url)
+                file = io.BytesIO(response.content)
             else:
-                file_path = ''
                 if document.tenant.plan.use_ged and document.ged_link:
                     response = requests.get(document.ged_link)
                     file = io.BytesIO(response.content)
 
             try:
                 status_code, response_json = sendgrid_send_email(
-                    to_emails, subject, html_content, category, file_path, file_name, file)
+                    to_emails, subject, html_content, category, file_name, file)
             except Exception as e:
-                message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
-                error_message = message + "{}".format(str(type(e).__name__) + " : " + str(e))
-                logger.debug(error_message)
-                logger.error(error_message)
+                status_code = 500
+                message = ''
+                if hasattr(e, 'to_dict'):
+                    for error in e.to_dict['errors']:
+                        message += error['message'] + ' | '
+                        status_code = e.status_code
+                else:
+                    message = str(type(e).__name__) + " : " + str(e)
+
+                return status_code, message
             else:
                 if status_code == 202:
                     document.send_email = True
@@ -314,15 +315,15 @@ def send_email(doc_uuid):
 
                     to_recipients = ''
                     for recipient in to_emails:
-                        to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+                        to_recipients += '<br/>' + recipient['name'] + ' - ' + recipient['email']
 
                     message = mark_safe('O e-mail foi enviado com sucesso para os destinatários:{}'.format(
                         to_recipients))
                 else:
-                    message = 'Não foi possível enviar o e-mail. Entre em contato com o suporte.'
-                    error_message = message + "{} - {}".format(status_code, response_json)
-                    logger.debug(error_message)
-                    logger.error(error_message)
+                    message = response_json
+                    logger.error(message)
+        else:
+            return 404, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
     return status_code, message
 
@@ -331,7 +332,8 @@ def send_email(doc_uuid):
 def redirect_send_to_esignature(request, doc_uuid):
     status_code, message = send_to_esignature(doc_uuid)
 
-    if status_code == 202:
+    # o docusign retorna 201 e o clicksign retorna 202
+    if status_code == 202 or status_code == 201:
         messages.success(request, message)
     else:
         messages.error(request, message)
@@ -344,24 +346,47 @@ def send_to_esignature(doc_uuid):
     except Document.DoesNotExist:
         message = 'Não foi encontrado o documento com o uuid = {}'.format(doc_uuid)
         logger.error(message)
+        return 404, message
     except Exception as e:
         message = str(type(e).__name__) + " : " + str(e)
         logger.error(message)
+        return 500, message
     else:
+        status_code = 500
+        message = ''
         if document.recipients:
+            if isinstance(document.recipients, str):
+                # converte string para dict
+                document.recipients = json.loads(document.recipients)
+
+            if document.tenant.plan.use_esignature:
+                if not document.tenant.esignature_app:
+                    message = 'Entre em contato com a nossa equipe para configurar o envio de assinatura eletrônica ' \
+                              'pela plataforma.'
+                    status_code = 400
+                    return status_code, message
+            else:
+                message = 'Plano contratado: {}. Entre em contato com a nossa equipe para adquirir um plano com ' \
+                          'assinatura eletrônica.'.format(document.tenant.plan.name)
+                status_code = 400
+                return status_code, message
+
             esignature_app = document.tenant.esignature_app
-            message = 'Não foi possível enviar para a assinatura eletrônica. Entre em contato com o suporte.'
 
-            if not document.relative_file_path:
-                message = 'Não foi encontrado o caminho do arquivo. Entre em contato com o suporte.'
+            if not document.cloud_file:
+                message = 'Não foi encontrado o caminho do arquivo para envio para a assinatura eletrônica. ' \
+                          'Entre em contato com o suporte.'
+                status_code = 400
+                return status_code, message
 
-            file_path = os.path.join(settings.BASE_DIR, "media/", document.relative_file_path.path)
+            response = requests.get(document.cloud_file.url)
+            file = io.BytesIO(response.content)
 
             documents = [
                 {
                     'name': document.name,
                     'fileExtension': 'pdf',
-                    'documentBase64': make_document_base64(file_path)
+                    'documentBase64': make_document_base64(file)
                 }
             ]
 
@@ -373,13 +398,24 @@ def send_to_esignature(doc_uuid):
                     status_code, response_json = dsc.send_to_docusign(
                         document.recipients, documents, email_subject="Documento para sua assinatura")
                 except Exception as e:
-                    logger.error(str(type(e).__name__) + " : " + str(e))
+                    message = str(type(e).__name__) + " : " + str(e)
+                    logger.error(message)
+                    return 400, message
                 else:
                     if status_code == 201:
                         document.submit_to_esignature = True
                         document.status = DocumentStatus.ENVIADO_ASS_ELET.value
                         document.envelope_number = response_json['envelopeId']
                         document.save(update_fields=['submit_to_esignature', 'status', 'envelope_number'])
+
+                        to_recipients = ''
+                        for recipient in document.recipients:
+                            to_recipients += '<br/>' + recipient['name'] + ' - ' + recipient['email']
+
+                        message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso para os '
+                                            'destinatários:{}'.format(to_recipients))
+                    else:
+                        return status_code, response_json
 
             elif esignature_app.provider == ESignatureAppProvider.CLICKSIGN.name:
                 csc = ClickSignClient(esignature_app.private_key, esignature_app.test_mode)
@@ -396,15 +432,19 @@ def send_to_esignature(doc_uuid):
                     # verifica se o signer ja foi enviado para a clicksign
                     success, recipients_sign = get_signer_key_by_email(document.recipients, document.tenant)
                     if not success:
+                        message = 'Não foi possível localizar o signatário por e-mail.'
+                        status_code = 400
                         return status_code, message
 
                     # cria os destinatarios
                     status_code, reason = csc.add_signer(recipients_sign)
                     if status_code != 201:
-                        return status_code, message
+                        return status_code, reason
 
                     # adiciona signer key no educa legal
                     if not post_signer_key(recipients_sign, esignature_app, document.tenant):
+                        message = 'Não foi possível salvar o signatário no sistema.'
+                        status_code = 400
                         return status_code, message
 
                     # adiciona os signatarios ao documento e envia por email para o primeiro signatario
@@ -420,10 +460,17 @@ def send_to_esignature(doc_uuid):
 
                         to_recipients = ''
                         for recipient in document.recipients:
-                            to_recipients += '<br/>' + recipient['email'] + ' - ' + recipient['name']
+                            to_recipients += '<br/>' + recipient['name'] + ' - ' + recipient['email']
 
-                        message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso com '
-                                            'sucesso para os destinatários:{}'.format(to_recipients))
+                        message = mark_safe('Documento enviado para a assinatura eletrônica com sucesso para os '
+                                            'destinatários:{}'.format(to_recipients))
+                    else:
+                        return status_code, response_json
+                else:
+                    return status_code, response_json
+
+        else:
+            return 404, 'Não foram encontrados destinatários no documento ID = {}.'.format(document.id)
 
     return status_code, message
 
@@ -431,6 +478,11 @@ def send_to_esignature(doc_uuid):
 def get_signer_key_by_email(recipients, tenant):
     # separa somente os destinatarios que assinam o documento
     recipients_sign = list()
+
+    if isinstance(recipients, str):
+        # converte string para dict
+        recipients = json.loads(recipients)
+
     for recipient in recipients:
         if recipient['group'] == 'signers':
             recipient['group'] = 'sign'

@@ -2,6 +2,7 @@ import os
 import moneyed
 from moneyed.localization import _FORMATTER
 from decimal import ROUND_HALF_EVEN
+from datetime import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,7 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'django.contrib.postgres',
+    "django.contrib.postgres",
     # 3rd party ==========================================
     # Nice Boostrap Forms
     "crispy_forms",
@@ -38,7 +39,8 @@ INSTALLED_APPS = [
     "rest_auth",
     # Swagger -> https://github.com/axnsan12/drf-yasg
     "drf_yasg",
-    # Not sure yet what it does...
+    # A Django App that adds Cross-Origin Resource Sharing (CORS) headers to responses.
+    # This allows in-browser requests to your Django application from other origins.
     "corsheaders",
     # Alternative storage for files in Django
     "storages",
@@ -63,9 +65,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -79,7 +81,6 @@ FILE_UPLOAD_HANDLERS = (
 )
 
 FILE_UPLOAD_TEMP_DIR = "/upload_temp_dir"
-
 
 # The Debug Toolbar is shown only if your IP address is listed in the INTERNAL_IPS setting. This means that for local
 # development, you must add '127.0.0.1' to INTERNAL_IPS; you’ll need to create this setting if it doesn’t already exist
@@ -105,7 +106,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "web.wsgi.application"
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -126,9 +126,6 @@ USE_TZ = True
 AUTH_USER_MODEL = "users.CustomUser"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # AllAuth --> https://wsvincent.com/django-login-with-email-not-username/
 
@@ -155,9 +152,11 @@ ACCOUNT_EMAIL_VERIFICATION = None
 # the logout redirect.
 LOGIN_REDIRECT_URL = "interview:interview-list"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
-ACCOUNT_FORMS = {"signup": "tenant.forms.EducaLegalSignupForm",
-                 'change_password': 'users.forms.CustomUserChangePasswordForm'}
-ACCOUNT_ADAPTER = 'users.adaptor.CustomUserAccountAdapter'
+ACCOUNT_FORMS = {
+    "signup": "tenant.forms.EducaLegalSignupForm",
+    "change_password": "users.forms.CustomUserChangePasswordForm",
+}
+ACCOUNT_ADAPTER = "users.adaptor.CustomUserAccountAdapter"
 
 # E-mail sending Settings
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -171,23 +170,29 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = "sistemas@educalegal.com.br"
 
-
 # API Settings
+LOGIN_URL = "/api/v2/login"
+
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+        # "rest_framework.permissions.AllowAny",
+    ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         # Session Authentication is kept here for the browseable API
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-        'rest_framework_datatables.renderers.DatatablesRenderer',
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+        "rest_framework_datatables.renderers.DatatablesRenderer",
     ),
-    'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_datatables.filters.DatatablesFilterBackend',
+    "DEFAULT_FILTER_BACKENDS": (
+        "rest_framework_datatables.filters.DatatablesFilterBackend",
     ),
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
     'DEFAULT_PAGINATION_CLASS': 'rest_framework_datatables.pagination.DatatablesPageNumberPagination',
     'PAGE_SIZE': 50,
 
@@ -200,12 +205,29 @@ REST_FRAMEWORK = {
     # 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' => Usado para CoreAPI (Deprecado)
 }
 
-
-CORS_ORIGIN_WHITELIST = (
+CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
-    "http://localhost:8000",
-    "https://docs.educalegal.com.br",
-)
+    "http://127.0.0.1:3000",
+    "http://educalegal:3000",
+    "http://localhost:8001",
+    "http://127.0.0.1:8001",
+    "http://api:8001",
+    "http://educalegal:8001",
+    "http://localhost:8008",
+    "http://127.0.0.1:8008",
+    "http://api:8008",
+    "http://educalegal:8008",
+    "https://apptest.educalegal.com.br",
+    "https://app.educalegal.com.br",
+    "http://educalegal",
+    "http://api",
+    "http://127.0.0.1:8800",
+    "http://localhost:8800"
+]
+
+# CORS_ALLOW_CREDENTIALS = True
+
+# CORS_ORIGIN_ALLOW_ALL = True
 
 LOGGING = {
     "version": 1,
@@ -245,6 +267,20 @@ LOGGING = {
     },
 }
 
+# Static e media files
+# https://www.digitalocean.com/docs/spaces/how-to/manage-access/
+AWS_ACCESS_KEY_ID = "AWNYACZSFSYOBCIOTFOP"
+AWS_SECRET_ACCESS_KEY = "k0GW8r3VnC9GzKD7S6RTdjCP2dVzN3bfOdthVfSCY/g"
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_OBJECT_PARAMETERS = {
+    "CacheControl": "max-age=86400",
+}
+AWS_DEFAULT_ACL = None
+STATICFILES_STORAGE = 'web.storage_backends.StaticStorage'
+DEFAULT_FILE_STORAGE = 'web.storage_backends.MediaStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+
 # Adding a new Currency
 BRL = moneyed.add_currency(
     code="BRL", numeric="986", name="Brazilian Real", countries=("BRAZIL",)
@@ -267,6 +303,29 @@ _FORMATTER.add_formatting_definition(
 
 CURRENCIES = ("BRL",)
 
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
-CELERY_BROKER_URL = 'amqp://educalegal:educalegal@educalegal_rabbitmq/educalegal'
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "django-cache"
+CELERY_BROKER_URL = "amqp://educalegal:educalegal@apirabbitmq/educalegal"
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    # 'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    # 'TOKEN_TYPE_CLAIM': 'token_type',
+    #
+    # 'JTI_CLAIM': 'jti',
+    #
+    # 'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    # 'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    # 'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}

@@ -9,13 +9,13 @@ include:
   - element-signature.yml
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
-  - element-ged.yml
   - element-document-ready.yml
   - element-school-email-reviewed.yml
   - element-default-messages.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
 ---
 sections:
   - Empregado
@@ -48,11 +48,8 @@ code: |
       tempo_garantia_emprego
     signature_local
     generated_file
-    el_document_patched_with_docassemble_data
-    if plan_use_ged:
-      el_document_patched_with_ged_data
+    el_patch_document
     document_ready_screen
-  all_done
 ---
 objects:
   - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
@@ -224,7 +221,7 @@ fields:
     datatype: integer
     required: true
     min: 1
-    max: 120
+    max: 180
 script: |
   <script type="text/javascript">
     $(document).ready(function(){
@@ -300,11 +297,3 @@ code: |
   recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
-
-  documents = [
-      {
-          'name': document_name,
-          'fileExtension': 'pdf',
-          'documentBase64': make_document_base64(generated_file.pdf.path())
-      }
-  ]

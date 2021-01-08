@@ -49,7 +49,7 @@ class ESignatureApp(models.Model):
 
 
 class Tenant(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True, verbose_name='Nome')
     subdomain_prefix = models.CharField(max_length=100, null=True, blank=True, unique=True)
     eua_agreement = models.BooleanField(default=True, verbose_name="Concordo com os termos de uso")
     plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="tenants", verbose_name="Plano", default=1)
@@ -66,6 +66,8 @@ class Tenant(models.Model):
         verbose_name='App de assinatura eletrônica')
     phone = models.CharField(max_length=50, blank=True, verbose_name="Telefone")
     esignature_folder = models.CharField(max_length=255, blank=True, verbose_name="Pasta para upload dos documentos")
+    webhook_production = models.URLField(max_length=255, blank=True, verbose_name='Webhook de produção')
+    webhook_sandbox = models.URLField(max_length=255, blank=True, verbose_name='Webhook de homologação')
 
     class Meta:
         ordering = ["name"]
@@ -80,14 +82,15 @@ class Tenant(models.Model):
         if not self.plan.use_ged:
             return False
         else:
-            if self.tenantgeddata:
+            # verifica se tem dados do ged configurados para esse tenant
+            if not hasattr(self, 'tenantgeddata'):
+                return False
+            else:
                 ged_url = self.tenantgeddata.url
                 ged_token = self.tenantgeddata.token
 
                 # verifica se o ged esta configurado
                 return ged_url != '' and ged_token != ''
-            else:
-                return False
 
     def save(self, *args, **kwargs):
         self.esignature_folder = self.esignature_folder.replace('/', '')

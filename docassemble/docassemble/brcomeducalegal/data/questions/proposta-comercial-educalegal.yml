@@ -1,0 +1,213 @@
+metadata:
+  title: Proposta Comercial Educa Legal
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+---
+sections:
+  - Prospect
+  - Escopo da Proposta
+  - Honorários
+  - Conclusão
+---
+code:  |
+  content_document = "proposta-comercial-educalegal.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    for item in prospects:
+      item.name.text
+    for item in school_prospects:
+      item.name.text
+    scope_setected
+    monthly_installment
+    signature_local
+    generated_file
+    el_patch_document
+    document_ready_screen
+---
+objects:
+  - prospects: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+  - school_prospects: DAList.using(object_type=Person, there_are_any=True)
+---
+code: |
+  prospects[i].name.text
+  prospects[i].complete = True
+---
+ga id: |
+  code: ga_id_begin
+section: Prospect
+progress: 5
+question: Número de Destinatários
+fields:
+  - Número: prospects.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+progress: 5
+section: Prospect
+question: |
+  Dados do(a) ${word(ordinal(i)) } destinatário:
+fields:
+  - "Nome completo:": prospects[i].name.text
+    required: True
+    validate: validate_person_full_name
+  - "E-mail:": prospects[i].email
+    help: ${ help_email_msg }
+    required: True
+    datatype: email
+---
+progress: 10
+section: Prospect
+question: |
+  Escola(s):
+fields:
+  - "Razão Social:": school_prospects[i].name.text
+    required: True
+list collect: True
+---
+section: Escopo da Proposta
+progress: 15
+question: |
+  Escopo da proposta
+fields:
+  - "Proposta:": scope_setected
+    datatype: checkboxes
+    choices:
+      - "Plataforma de geração de documentos": scope_1
+      - "GED - Gerenciador Eletrônico de Documentos": scope_2
+      - "Assinatura eletrônica digital": scope_3
+      - "Consultoria jurídica": scope_4
+      - "Geração em lote": scope_5
+      - "Suporte técnico": scope_6
+    none of the above: False
+  - "Número de usuários:": amount_users
+    datatype: integer
+    default: 10
+    js show if: |
+      val("scope_setected['scope_1']")
+  - "Geração de documentos será:": limit_documents
+    datatype: radio
+    choices:
+      - Ilimitada
+      - Limitada
+    default: Ilimitada
+    js show if: |
+      val("scope_setected['scope_1']")
+  - "Quantidade mensal de documentos:": amount_documents
+    datatype: integer
+    js show if: |
+      val("limit_documents") == "Limitada"
+  - "Serviço de assinatura eletrônca:": signature_service
+    datatype: radio
+    choices:
+      - Clicksign: clicksign
+      - Docusign: docusign
+    default:
+      code: |
+        dict(clicksign=True, docusign=False)
+    js show if: |
+      val("scope_setected['scope_3']")
+  - "Horas de consultoria jurídica:": consultation_hours
+    datatype: integer
+    note: horas mensais
+    default: 5
+    js show if: |
+      val("scope_setected['scope_4']")
+  - "Suporte Técnico:": technical_support
+    datatype: checkboxes
+    choices:
+      - Suporte Técnico Nível I - 6h SLA: Suporte Técnico Nível I - 6h SLA
+      - Suporte Técnico Nível II - 24h SLA: Suporte Técnico Nível II - 24h SLA
+    none of the above: False
+    default:
+      code: |
+        dict(sup1=True, sup2=False)
+    js show if: |
+      val("scope_setected['scope_6']")
+---
+code: |
+  from num2words import num2words
+  monthly_installment_words = num2words(monthly_installment, lang='pt_BR', to='currency')
+  signature_unit_price_words = num2words(signature_unit_price, lang='pt_BR', to='currency')
+  extrahour_consultation_value_words = num2words(extrahour_consultation_value, lang='pt_BR', to='currency')
+  development_hour_value_words = num2words(development_hour_value, lang='pt_BR', to='currency')
+---
+code: |
+  bulk_unit_price_one = bulk_unit_price - 0.50
+  bulk_unit_price_two = bulk_unit_price - 1.00
+---
+section: Honorários
+progress: 25
+question: |
+  Honorários e preço dos serviços
+fields:
+  - "Mensalidade:": monthly_installment
+    datatype: currency
+    hint: 0000,00
+  - "Preço horas excedentes da consultoria jurídica:": extrahour_consultation_value
+    datatype: currency
+    hint: 0000,00
+    default: 300.00
+  - "Preço unitário da assinatura eletrônica: ": signature_unit_price
+    datatype: currency
+    hint: 0000,00
+    default: 4.60
+  - "Preço unitário do documento em lote: ": bulk_unit_price
+    datatype: currency
+    hint: 0000,00
+    default: 5.00
+  - "Preço da hora de desenvolvimento: ": development_hour_value
+    datatype: currency
+    hint: 0000,00
+    default: 250.00
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#bW9udGhseV9pbnN0YWxsbWVudA').mask('000000000000000.00', {reverse: true});
+        $('#ZXh0cmFob3VyX2NvbnN1bHRhdGlvbl92YWx1ZQ').mask('000000000000000.00', {reverse: true});
+        $('#c2lnbmF0dXJlX3VuaXRfcHJpY2U').mask('000000000000000.00', {reverse: true});
+        $('#YnVsa191bml0X3ByaWNl').mask('000000000000000.00', {reverse: true});
+        $('#ZGV2ZWxvcG1lbnRfaG91cl92YWx1ZQ').mask('000000000000000.00', {reverse: true});
+    });
+  </script>
+---
+code: |
+  recipients = list()
+  for item in prospects:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'

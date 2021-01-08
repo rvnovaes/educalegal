@@ -1,0 +1,231 @@
+metadata:
+  title: Termo de Rescisão de Acordo Individual de Trabalho
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
+  - element-default-messages.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+---
+sections:
+  - Empregado
+  - Acordo
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "termo-de-rescisao-de-acordo-individual-de-trabalho.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    workers.target_number = 1
+    for item in workers:
+      item.name.text
+    if plan_use_esignature:
+      valid_workers_table
+    term_type
+    signature_local
+    generated_file
+    el_patch_document
+    document_ready_screen
+---
+objects:
+  - workers: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+  - example_termo_de_rescisao_de_acordo_individual_de_trabalho: DAStaticFile.using(filename='example-termo-de-rescisao-de-acordo-individual-de-trabalho.pdf')
+---
+code: |
+  workers[i].name.text
+  workers[i].address.street_name
+  workers[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Empregado
+progress: 10
+question: Número de Empregados
+fields:
+  - Número: workers.target_number
+    datatype: integer
+    default: 1
+---
+ga id: |
+  code: ga_id_begin
+section: Empregado
+progress: 20
+question: |
+  Dados do(a) Empregado
+fields:
+  - "Nome completo:": workers[i].name.text
+    validate: validate_person_full_name
+    required: True
+  - "CPF:": workers[i].cpf
+    validate: validate_cpf
+    required: True
+  - "Número do RG:": workers[i].rg
+    required: True
+  - "Nacionalidade:": workers[i].nationality
+    required: True
+    default: brasileiro(a)
+  - "Estado civil:": workers[i].marital_status
+    required: True
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+    datatype: radio
+  - "CTPS:": workers[i].ctps
+    required: True
+  - "Número de série:": workers[i].serie
+    required: True
+  - "E-mail:": workers[i].email
+    help: ${ help_email_msg }
+    required: False
+    datatype: email
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#d29ya2Vyc1tpXS5jcGY').mask('000.000.000-00', {reverse: true});
+    });
+  </script>
+right: |
+  <center><h5><strong>Saiba mais</strong></h5>
+  <p>Pelo presente Instrumento, fica rescindido o Acordo Individual de Trabalho a partir da data da assinatura.</p>
+  <center>[Clique para visualizar a minuta](${ example_termo_de_rescisao_de_acordo_individual_de_trabalho.url_for() })</center>
+---
+section: Empregado
+progress: 30
+question: |
+  Endereço do(a) ${ workers[i].name.text }
+fields:
+  - "CEP:": workers[i].address.zip
+    required: True
+  - "Logradouro:": workers[i].address.street_name
+    required: True
+  - "Número:": workers[i].address.street_number
+    required: True
+  - "Complemento:": workers[i].address.unit
+    required: False
+  - "Bairro:": workers[i].address.neighborhood
+    required: True
+  - "Cidade:": workers[i].address.city
+    required: True
+  - "Estado:": workers[i].address.state
+    required: True
+    code: state_initials_list
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#d29ya2Vyc1tpXS5hZGRyZXNzLnppcA').mask('00000-000');
+  });
+
+  $("#d29ya2Vyc1tpXS5hZGRyZXNzLnppcA").focusout(function(){
+    var cep = $("#d29ya2Vyc1tpXS5hZGRyZXNzLnppcA").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#d29ya2Vyc1tpXS5hZGRyZXNzLnN0cmVldF9uYW1l").val(data.logradouro);
+          $("#d29ya2Vyc1tpXS5hZGRyZXNzLm5laWdoYm9yaG9vZA").val(data.bairro);
+          $("#d29ya2Vyc1tpXS5hZGRyZXNzLmNpdHk").val(data.localidade);
+          $("#d29ya2Vyc1tpXS5hZGRyZXNzLnN0YXRl").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Empregado
+field: valid_workers_table
+progress: 40
+question: |
+  Empregado:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ workers.table }
+buttons:
+  Continuar: continue
+---
+table: workers.table
+rows: workers
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Acordo
+progress: 70
+question: |
+  Dados do acordo
+fields:
+  - As partes têm interesse na rescisão antecipada do: term_type
+    datatype: radio
+    choices:
+      - Acordo individual de Redução de Jornada e Redução Salarial
+      - Termo de Acordo Individual -Banco de Horas
+      - Termo de Mudança de Regime e Cessão do Direito Autoral
+  - O acordo foi firmado em: term_date
+    datatype: date
+---
+code: |
+  recipients = list()
+
+  for item in workers:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'

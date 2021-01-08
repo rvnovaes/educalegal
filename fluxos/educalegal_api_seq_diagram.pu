@@ -6,6 +6,12 @@ autonumber
 User -> EducaLegal: Clicks Interview
 activate EducaLegal
 
+EducaLegal -> GED: GET document_type_read(interview_document_type)
+activate GED
+
+GED -> EducaLegal: document_type_data{id, url, label}
+deactivate GED
+
 EducaLegal -> Docassemble: Interview Link (url params: tid, ut, intid, doc_uuid)
 activate Docassemble
 
@@ -26,23 +32,7 @@ EducaLegal -> Docassemble: tenant_data{id, name, auto_enrolled, eua_agreement, e
 
 Docassemble -> EducaLegal: GET tenants_ged_read(tid)
 EducaLegal -> Docassemble: tenant_ged_data(url, token)
-deactivate EducaLegal
-
-Docassemble -> GED: GET document_type_read(interview_document_type)
-activate GED
-
-note left
-element-tenant-school-interview.yml +
-module_mayan_client.py
-end note
-
-GED -> Docassemble: document_type_data{id, url, label}
-deactivate GED
-
 Docassemble -> EducaLegal: GET interviews_read(intid)
-activate EducaLegal
-
-
 EducaLegal -> Docassemble: interview_data(name, description, version, date, lang, doc type)
 deactivate EducaLegal
 
@@ -63,7 +53,7 @@ end note
 EducaLegal -> Docassemble: returns Educa Legal document data
 deactivate Docassemble
 
-EducaLegal -> GED: PATCH mc.document_create(data, absolute_path)
+EducaLegal -> GED: PATCH mc.document_create(data, file)
 activate GED
 
 note right
@@ -99,7 +89,7 @@ deactivate Recipients
 ESignature -> EducaLegal: POST webhook_listener(final status + signed document + certificate)
 deactivate ESignature
 
-EducaLegal -> GED: POST mc.document_create(data, absolute_path)
+EducaLegal -> GED: POST mc.document_create(data, file)
 GED -> EducaLegal: dados do documento salvo
 GED -> EducaLegal: created_document_data(status, id, url, uuid)
 deactivate EducaLegal

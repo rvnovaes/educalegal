@@ -1,3 +1,5 @@
+# install tkinter
+# sudo apt-get install python3-tk
 import requests
 import configparser
 import PySimpleGUI as sg
@@ -47,7 +49,7 @@ def post_to_docassemble(
         return "Success posting " + file_path
 
 destination_options = [
-    "http://localhost",
+    "http://docassemble",
     "https://doctest.educalegal.com.br",
     "https://generation.educalegal.com.br",
 ]
@@ -90,7 +92,7 @@ while True:
     if event == sg.WIN_CLOSED or event == "Sair":
         break
     if event == "destination_ok":
-        if values["destination_options"] == "http://localhost":
+        if values["destination_options"] == "http://docassemble":
             api_key = config["keys"]["LOCALHOST"]
         elif values["destination_options"] == "https://doctest.educalegal.com.br":
             api_key = config["keys"]["DOCTEST"]
@@ -139,10 +141,10 @@ layout = [
     [sg.Text("Selecione os items a serem enviados:")],
     [sg.Text("Todos: "), sg.Checkbox("Questions", key="questions_checkbox"), sg.Checkbox("Templates", key="templates_checkbox"), sg.Checkbox("Modules", key="modules_checkbox"), sg.Checkbox("Static", key="static_checkbox")],
     [
-        sg.Listbox(questions, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="questions_listbox"),
-        sg.Listbox(templates, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="templates_listbox"),
-        sg.Listbox(modules, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="modules_listbox"),
-        sg.Listbox(static, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(70, 50), key="static_listbox")
+        sg.Listbox(questions, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(50, 40), key="questions_listbox"),
+        sg.Listbox(templates, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(50, 40), key="templates_listbox"),
+        sg.Listbox(modules, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(50, 40), key="modules_listbox"),
+        sg.Listbox(static, select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(50, 40), key="static_listbox")
     ],
     [sg.Button("Ok", key="final_ok"), sg.Button("Cancel")],
 ]
@@ -191,7 +193,7 @@ layout = [
     [sg.Text("Confirmação")],
     [sg.Multiline(configuration_summary_message, size=(210, 5))],
     [sg.Multiline(selected_items_message, size=(210, 25))],
-    [sg.Multiline("", size=(210, 25), key="output")],
+    [sg.Multiline("", size=(210, 15), key="output")],
     [sg.Button("Enviar", key="final_ok", button_color=("white", "red")), sg.Button("Sair")],
 ]
 

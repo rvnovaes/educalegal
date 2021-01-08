@@ -60,25 +60,20 @@ code: |
     school_registration_url = educalegal_url + '/school/school/'
     invalid_school
 
-  if plan_data['use_ged']:
-    if 'detail' in document_type_data:
-      if document_type_data['detail'] == 'Invalid token.':
-        invalid_ged_token
-
-      if (document_type_data['detail'] == 'Not found.') or (document_type_data['detail'] == 'N\u00e3o encontrado.'):
-        invalid_document_type
-
   valid_data = True
 ---
 code: |
   el_environment = get_config('el environment')
   el_log_to_console = get_config('el log to console')
   if el_environment == 'production':
-    educalegal_url = 'https://app.educalegal.com.br'
+    educalegal_url = 'https://api.educalegal.com.br'
+    educalegal_front_url = 'https://app.educalegal.com.br'
   elif el_environment == 'test':
-    educalegal_url = 'https://test.educalegal.com.br'
+    educalegal_url = 'https://apitest.educalegal.com.br'
+    educalegal_front_url = 'https://apptest.educalegal.com.br'
   else:
-    educalegal_url = 'http://educalegal:8008'
+    educalegal_url = 'http://api:8008'
+    educalegal_front_url = 'http://educalegal:3000'
 ---
 code: |
     elc = EducaLegalClient(educalegal_url, ut)
@@ -101,6 +96,11 @@ code: |
     log("tenant_data: {tenant_data}".format(tenant_data=tenant_data))
     if el_log_to_console:
       log("tenant_data: {tenant_data}".format(tenant_data=tenant_data), "console")
+    if tenant_data['esignature_app']:
+      signature_provider = tenant_data['esignature_app']['provider']
+      if el_log_to_console:
+        log("signature_provider", "console")
+        log(signature_provider, "console")
 ---
 code: |
     elc = EducaLegalClient(educalegal_url, ut)
@@ -121,19 +121,6 @@ code: |
       log("tenant_ged_data: {tenant_ged_data}".format(tenant_ged_data=tenant_ged_data), "console")
 ---
 code: |
-    mc = MayanClient(tenant_ged_url, tenant_ged_token)
-    # o tipo do documento esta sendo verificado logo apos a criacao do mc client
-    # para que o docassemble execute a criacao do mc client desse bloco de codigo
-    # senao ele tenta executar a criacao do mc client do element-mayan-create-document.yml
-    # e bagunca a ordem da entrevista
-    # a outra opcao seria trocar o nome da variavel mc
-    log("Chamando mc.document_type_read")
-    document_type_data = mc.document_type_read(interview_document_type)
-    log("document_type_data: {document_type_data}".format(document_type_data=document_type_data))
-    if el_log_to_console:
-      log("document_type_data: {document_type_data}".format(document_type_data=document_type_data), "console")
----
-code: |
     tenant_ged_url = tenant_ged_data['url']
     tenant_ged_token = tenant_ged_data['token']
     log("tenant_ged_url: {tenant_ged_url}".format(tenant_ged_url=tenant_ged_url))
@@ -144,22 +131,10 @@ code: |
       log("tenant_ged_token: {tenant_ged_token}".format(tenant_ged_token=tenant_ged_token), "console")
 ---
 code: |
-    # Se não tiver esignature_app cadastrado, volta None e entra em invalid_esignature
-    if plan_data['use_esignature']:
-      if not tenant_data['esignature_app']:
-        buy_esignature
-
-    tenant_esignature_provider = tenant_data['esignature_app']['provider']
-    tenant_client_id = tenant_data['esignature_app']['client_id']
-    tenant_impersonated_user_guid = tenant_data['esignature_app']['impersonated_user_guid']
-    tenant_test_mode = tenant_data['esignature_app']['test_mode']
-    tenant_private_key = tenant_data['esignature_app']['private_key']
----
-code: |
     elc = EducaLegalClient(educalegal_url, ut)
-    log("Chamando elc.tenants_school_names_school_data")
-    school_names_list, school_units_dict, school_data_dict  = elc.tenants_school_names_school_data(tid)
-    log("Lista de nomes de esocolas" + str(school_names_list))
+    log("Chamando elc.tenants_school_names_school_data", "console")
+    school_names_list, school_units_dict, school_data_dict = elc.tenants_school_names_school_data(tid)
+    log("Lista de nomes de escolas" + str(school_names_list), "console")
     if el_log_to_console:
       log("Lista de nomes de esocolas" + str(school_names_list), "console")
     log("Dicionário de unidades escolares" + str(school_units_dict))
@@ -175,6 +150,33 @@ code: |
     interview_language = interview_data['language']
     interview_custom_file_name_string = interview_data['custom_file_name']
     interview_is_freemium = interview_data['is_freemium']
+---
+code: |
+    elc = EducaLegalClient(educalegal_url, ut)
+    document_types_list = elc.document_types_list()
+    if el_log_to_console:
+      log("Lista dos tipos de documentos do Tenant" + str(document_types_list), "console")
+    document_types_names_list = elc.document_types_names_list()
+    if el_log_to_console:
+      log("Lista dos nomes dos tipos de documentos do Tenant" + str(document_types_names_list), "console")
+---
+code: |
+  elc = EducaLegalClient(educalegal_url, ut)
+  signatories_list = elc.signatories(school_data_dict[selected_school]['id'])
+  if el_log_to_console:
+    log("Lista de signatários das escolas " + str(signatories_list), "console")
+---
+code: |
+  elc = EducaLegalClient(educalegal_url, ut)
+  grades = elc.grades(school_data_dict[selected_school]['id'])
+  if el_log_to_console:
+    log("Lista de séries das escolas" + str(grades), "console")
+
+  # Lista com nome das séries escolares
+  grades_list = list()
+  for grade in grades['results']:
+       grades_list.append(grade['name'])
+  grades_select = grades_list if len(grades_list) > 0 else grades_default
 ---
 progress: 1
 section: Escola
@@ -218,7 +220,6 @@ code: |
 modules:
   - .module_base_domain
   - .module_educalegal_client
-  - .module_mayan_client
 ---
 include:
   - element-tenant-school-interview-error-screens.yml

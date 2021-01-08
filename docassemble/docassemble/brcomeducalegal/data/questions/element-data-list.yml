@@ -1,4 +1,25 @@
 ---
+code: |
+   grades_default = [
+       "Infantil - Berçário (0 a 1 ano)",
+       "Infantil - G1 (1 a 2 anos)",
+       "Infantil - G2 (2 anos)",
+       "Infantil - G3 (3 anos)",
+       "Infantil - G4 (4 anos)",
+       "Infantil - G5 (5 anos)",
+       "Fundamental - 1° Ano",
+       "Fundamental - 2° Ano",
+       "Fundamental - 3° Ano",
+       "Fundamental - 4° Ano",
+       "Fundamental - 5° Ano",
+       "Fundamental - 6° Ano",
+       "Fundamental - 7° Ano",
+       "Fundamental - 8° Ano",
+       "Fundamental - 9° Ano",
+       "Médio - 1° Ano",
+       "Médio - 2° Ano",
+       "Médio - 3° Ano"]
+---
 variable name: state_initials_list
 data:
   - AC: AC
@@ -58,6 +79,37 @@ data:
   - São Paulo
   - Sergipe
   - Tocantins
+---
+code: |
+  state_list_dict = {
+    'AC': 'Acre',
+    'AL': 'Alagoas',
+    'AP': 'Amapá',
+    'AM': 'Amazonas',
+    'BA': 'Bahia',
+    'CE': 'Ceará',
+    'DF': 'Distrito Federal',
+    'ES': 'Espírito Santo',
+    'GO': 'Goiás',
+    'MA': 'Maranhão',
+    'MT': 'Mato Grosso',
+    'MS': 'Mato Grosso do Sul',
+    'MG': 'Minas Gerais',
+    'PA': 'Pará',
+    'PB': 'Paraíba',
+    'PR': 'Paraná',
+    'PE': 'Pernambuco',
+    'PI': 'Piauí',
+    'RJ': 'Rio de Janeiro',
+    'RN': 'Rio Grande do Norte',
+    'RS': 'Rio Grande do Sul',
+    'RO': 'Rondônia',
+    'RR': 'Roraima',
+    'SC': 'Santa Catarina',
+    'SP': 'São Paulo',
+    'SE': 'Sergipe',
+    'TO': 'Tocantins'
+  }
 ---
 variable name: society_list
 data:

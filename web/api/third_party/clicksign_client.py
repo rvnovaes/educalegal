@@ -1,6 +1,7 @@
 import logging
 import os
 
+from datetime import datetime, timedelta
 from requests import Session
 # https://github.com/bustawin/retry-requests
 from retry_requests import retry
@@ -50,11 +51,19 @@ class ClickSignClient:
         path = os.path.join("/", document["tenant"]["esignature_folder"], document["school"]["esignature_folder"],
                             document['name'])
 
+        # 2019-11-28T14:30:59-03:00
+        deadline_at = datetime.today() + timedelta(days=90)
+        deadline_at = deadline_at.astimezone().replace(microsecond=0).isoformat()
+
         payload = {
             "document": {
                 "path": path,
                 "content_base64": 'data:application/pdf;base64,' + document['documentBase64'],
-                "sequence_enabled": True
+                "sequence_enabled": True,
+                # 2019-11-28T14:30:59-03:00
+                "deadline_at": deadline_at,
+                # Intervalos suportados: 1, 2, 3, 7, 14
+                "remind_interval": 14
                 }
             }
 
@@ -65,7 +74,7 @@ class ClickSignClient:
         except Exception as e:
             message = 'Erro ao fazer o upload do documento. Erro: {e}'.format(e=e)
             logger.error(message)
-            return 0, message, 0
+            return 500, message, 0
         else:
             if response.status_code == 201:
                 return response.status_code, response.json(), response.json()['document']['key']
@@ -97,7 +106,7 @@ class ClickSignClient:
                             "email"
                         ],
                         "name": recipient['name'],
-                        "has_documentation": False,
+                        "has_documentation": True,
                         "delivery": "email"
                     }
                 }
@@ -109,15 +118,26 @@ class ClickSignClient:
                 except Exception as e:
                     message = 'Erro ao adicionar o signatário. Erro: {e}'.format(e=e)
                     logger.error(message)
-                    return 0, message
+                    return 500, message
                 else:
                     if response.status_code == 201:
                         recipient['key'] = response.json()['signer']['key']
                         recipient['response_json'] = response.json()
                         recipient['status_code'] = response.status_code
                     else:
-                        message = 'Erro ao adicionar o signatário. Erro: {status_code} - {response}'.format(
-                            status_code=response.status_code, response=response.json())
+                        message = 'Erro ao adicionar o signatário {name} - {email}.'.format(
+                            name=recipient['name'], email=recipient['email'])
+                        if 'errors' in response.json():
+                            message += ' Erro: {status_code} - {response}'.format(
+                                       status_code=response.status_code,
+                                       response=response.json()['errors'])
+                            return response.status_code, message
+                        else:
+                            message += ' Erro: {status_code} - {response}'.format(
+                                       status_code=response.status_code,
+                                       response=response.json())
+                            return response.status_code, message
+
                         logger.error(message)
         try:
             return response.status_code, response.json()
@@ -153,7 +173,7 @@ class ClickSignClient:
             except Exception as e:
                 message = 'Erro ao vincular o signatário ao documento. Erro: {e}'.format(e=e)
                 logger.error(message)
-                return 0, message
+                return 500, message
             else:
                 if response.status_code == 201:
                     signer['request_signature_key'] = response.json()['list']['request_signature_key']
@@ -192,7 +212,7 @@ class ClickSignClient:
                 except Exception as e:
                     message = 'Erro ao enviar o email. Erro: {e}'.format(e=e)
                     logger.error(message)
-                    return 0, message
+                    return 500, message
                 else:
                     if response.status_code != 202:
                         message = 'Erro ao enviar o email. Erro: {status_code} - {response}'.format(

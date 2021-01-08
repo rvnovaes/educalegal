@@ -1,4 +1,3 @@
-import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -6,8 +5,8 @@ from rest_framework.authtoken.models import Token
 from django_tables2 import SingleTableMixin
 from django_filters.views import FilterView
 
-from tenant.models import Tenant
-from document.models import Document, DocumentStatus
+from document.models import DocumentStatus
+from document.views import reached_document_limit
 
 from .models import Interview
 from .tables import InterviewTable
@@ -34,25 +33,10 @@ class InterviewListView(LoginRequiredMixin, SingleTableMixin, FilterView):
 
         context = super().get_context_data(**kwargs)
 
-        reached_document_limit, document_limit = self._reached_document_limit()
-        if reached_document_limit:
+        reached_limit, document_limit = reached_document_limit(self.request.user.tenant_id)
+        if reached_limit:
             context['document_limit'] = document_limit
 
-        context['reached_document_limit'] = reached_document_limit
+        context['reached_document_limit'] = reached_limit
         context['document_status'] = DocumentStatus.RASCUNHO.value
         return context
-
-    def _reached_document_limit(self):
-        today = datetime.datetime.today()
-
-        # verifica se atingiu o limite de documentos
-        tenant = Tenant.objects.get(pk=self.request.user.tenant.pk)
-        document_count = Document.objects.filter(tenant=tenant,
-                                                 created_date__month=today.month,
-                                                 created_date__year=today.year).count()
-        reached_document_limit = False
-        if tenant.plan.document_limit:
-            if document_count >= tenant.plan.document_limit:
-                reached_document_limit = True
-
-        return reached_document_limit, tenant.plan.document_limit

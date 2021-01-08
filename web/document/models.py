@@ -3,11 +3,12 @@ import uuid
 from enum import Enum
 
 from django.db import models
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 
 from tenant.models import TenantAwareModel
 from interview.models import Interview
 from school.models import School
+from web.storage_backends import MediaStorage
 
 
 class DocumentStatus(Enum):
@@ -22,6 +23,20 @@ class DocumentStatus(Enum):
 
     def __str__(self):
         return str(self.value.lower())
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
+
+
+class BulkDocumentKind(Enum):
+    PRESTACAO_SERVICOS_ESCOLARES = 2
+    NOTIFICACAO_EXTRAJUDICIAL = 8
+    ACORDOS_TRABALHISTAS_INDIVIDUAIS = 37
+
+    @classmethod
+    def id_choices(cls):
+        return [x.value for x in cls]
 
     @classmethod
     def choices(cls):
@@ -115,7 +130,7 @@ class Document(TenantAwareModel):
         help_text="UUID do documento. UUID = Universally Unique ID.",
         verbose_name="UUID",
     )
-    relative_file_path = models.FileField(max_length=255, blank=True, verbose_name="Caminho relativo do arquivo")
+    cloud_file = models.FileField(max_length=255, storage=MediaStorage(), blank=True, verbose_name='Arquivo na nuvem')
     description = models.TextField(default="", blank=True, verbose_name="Descrição")
     interview = models.ForeignKey(
         Interview, null=True, on_delete=models.CASCADE, verbose_name="Modelo"
@@ -128,7 +143,7 @@ class Document(TenantAwareModel):
         null=True,
         blank=True,
         on_delete=models.CASCADE,
-        related_name='related_document')
+        related_name='related_documents')
 
     document_data = JSONField(null=True, verbose_name="Dados do Documento")
     recipients = JSONField(blank=True, default=dict, verbose_name="Destinatários do e-mail/assinatura eletrônica")
@@ -175,11 +190,11 @@ class Document(TenantAwareModel):
             return self.name
 
     def get_docx_file(self):
-        if self.related_document.exists():
+        if self.related_documents.exists():
             return Document.objects.filter(parent=self, file_kind=DocumentFileKind.DOCX.value).last()
 
     def get_related_documents(self):
-        if self.related_document.exists():
+        if self.related_documents.exists():
             try:
                 related_documents = Document.objects.filter(parent=self)
             except Document.DoesNotExist:

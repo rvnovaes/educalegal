@@ -3,13 +3,18 @@ import json
 import pandas as pd
 import uuid
 
-from mongoengine.errors import ValidationError
 from celery import chain
+from datetime import datetime
+from mongoengine.errors import ValidationError
+from rest_framework import generics
+from urllib.request import urlretrieve, urlcleanup
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
+from django.core.files import File
+from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -17,7 +22,6 @@ from django_tables2 import SingleTableView
 from django.shortcuts import render, HttpResponse
 from django.utils.safestring import mark_safe
 from django.views import View
-from rest_framework import generics
 
 from interview.models import Interview, InterviewServerConfig
 from interview.util import build_interview_full_name
@@ -28,13 +32,13 @@ from util.mongo_util import (
     create_dynamic_document_class,
     mongo_to_hierarchical_dict,
 )
-from util.file_import import is_csv_metadata_valid, is_csv_content_valid
+from util.file_import import is_metadata_valid, is_content_valid
 
-from .util import custom_class_name, dict_to_docassemble_objects, create_secret
+from .util import custom_class_name, dict_to_docassemble_objects
 from .forms import BulkDocumentGenerationForm
 from .models import Document, BulkDocumentGeneration, DocumentTaskView, Signer, DocumentStatus, DocumentFileKind
 # https://docs.celeryproject.org/en/latest/userguide/tasks.html#task-naming-relative-imports
-from document.tasks import celery_create_document, celery_submit_to_esignature, celery_send_email
+from document.tasks import celery_create_document, celery_submit_to_esignature, celery_send_email, create_secret
 from .tables import BulkDocumentGenerationTable, DocumentTaskViewTable, DocumentTable
 
 logger = logging.getLogger(__name__)
@@ -167,7 +171,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             {
                 "form": form,
                 "interview_id": interview.pk,
-                "csv_valid": False,
+                "data_valid": False,
                 "validation_error": False,
             },
         )
@@ -177,20 +181,6 @@ class ValidateCSVFile(LoginRequiredMixin, View):
         if form.is_valid():
             # Consulta dados do aplicativo necessarios as validacoes
             interview = Interview.objects.get(pk=self.kwargs["interview_id"])
-            tenant = Tenant.objects.get(pk=self.request.user.tenant_id)
-            schools = tenant.school_set.all()
-            # Monta os conjuntos de nomes de escolas e de unidades escolares para validacao
-            school_units_names_set = set()
-            for school in schools:
-                school_units = SchoolUnit.objects.filter(school=school).values_list(
-                    "name", flat=True
-                )
-                for school_unit in school_units:
-                    school_units_names_set.add(school_unit)
-            school_names_set = set(schools.values_list("name", flat=True))
-            # Adiciona como elemento valido "---" para ausencia de unidade escolar
-            school_units_names_set.add("---")
-
             source_file = request.FILES["source_file"]
 
             logger.info("Carregado o arquivo: " + source_file.name)
@@ -206,8 +196,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                 (
                     field_types_dict,
                     required_fields_dict,
-                    csv_metadata_valid,
-                ) = is_csv_metadata_valid(bulk_data)
+                    metadata_valid,
+                ) = is_metadata_valid(bulk_data)
 
             except ValueError as e:
                 message = str(type(e).__name__) + " : " + str(e)
@@ -221,7 +211,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         "form": form,
                         "interview_id": interview.pk,
                         "validation_error": True,
-                        "csv_valid": False,
+                        "data_valid": False,
                     },
                 )
 
@@ -238,8 +228,8 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                     bulk_data_content,
                     parent_fields_dict,
                     error_messages,
-                    csv_content_valid,
-                ) = is_csv_content_valid(bulk_data)
+                    content_valid,
+                ) = is_content_valid(bulk_data)
             except ValueError as e:
                 message = str(type(e).__name__) + " : " + str(e)
                 messages.error(request, message)
@@ -252,11 +242,11 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         "form": form,
                         "interview_id": interview.pk,
                         "validation_error": True,
-                        "csv_valid": False,
+                        "data_valid": False,
                     },
                 )
 
-            if not csv_content_valid:
+            if not content_valid:
                 for message in error_messages:
                     messages.error(request, message)
 
@@ -267,7 +257,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         "form": form,
                         "interview_id": interview.pk,
                         "validation_error": True,
-                        "csv_valid": False,
+                        "data_valid": False,
                     },
                 )
 
@@ -275,123 +265,34 @@ class ValidateCSVFile(LoginRequiredMixin, View):
             # Esta variavel ira modifica a logica de exibicao das telas ao usuario:
             # Se o CSV for valido, i.e., tiver todos os registros validos, sera exibida a tela de envio
             # Se nao, exibe as mesnagens de sucesso e de erro na tela de carregar novamente o CSV
-            csv_valid = csv_metadata_valid and csv_content_valid
+            data_valid = metadata_valid and content_valid
 
-            # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
-            # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
-            # O nome gerado e semelhante ao custom file name que usamos no docassemble
-            # YYYYMMDD_HHMMSS_custom_file_name
-            dynamic_document_class_name = (custom_class_name(interview.custom_file_name))
+            bulk_generation_id = 0
 
-            # Cria a classe do tipo Document (mongoengine) dinamicamente
-            DynamicDocumentClass = create_dynamic_document_class(
-                dynamic_document_class_name,
-                field_types_dict,
-                required_fields_dict,
-                parent_fields_dict,
-                school_names_set=school_names_set,
-                school_units_names_set=school_units_names_set,
-            )
-
-            # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
-            # no Mongo
-            mongo_document_data_list = list()
-
-            for register_index, row in enumerate(
-                bulk_data_content.itertuples(index=False)
-            ):
-                # Transforma a linha em dicionario
-                row_dict = row._asdict()
-                # Cria um objeto Documento a partir da classe dinamica
-                mongo_document = DynamicDocumentClass(**row_dict)
-
-                try:
-                    mongo_document_data = mongo_document.save()
-                    mongo_document_data_list.append(mongo_document_data)
-                    # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
-                    # mensagem de sucesso
-                    row_values = list(row_dict.values())
-                    message = "Registro {register_index} validado com sucesso".format(
-                        register_index=str(register_index + 1)
-                    )
-                    for value_index, value in enumerate(row_values):
-                        message += " | " + str(row_values[value_index])
-                    logger.info(message)
-                    messages.success(request, message)
-                except ValidationError as e:
-                    # Se a operacao for mal sucedida, itera sobre a lista de valores para gerar a
-                    # mensagem de erro
-                    row_values = list(row_dict.values())
-                    message = (
-                        "Erro ao validar o registro "
-                        + str(register_index + 1)
-                        + ": "
-                        + str(e)
-                    )
-                    for value_index, value in enumerate(row_values):
-                        message += " | " + str(row_values[value_index])
-                    logger.info(message)
-                    messages.error(request, message)
-
-            storage = get_messages(request)
-            for message in storage:
-                if message.level_tag == "error":
-                    csv_valid = False
-                    break
-
-            if csv_valid:
-                bulk_generation = BulkDocumentGeneration(
-                    tenant=request.user.tenant,
-                    interview=interview,
-                    mongo_db_collection_name=dynamic_document_class_name,
-                    field_types_dict=field_types_dict,
-                    required_fields_dict=required_fields_dict,
-                    parent_fields_dict=parent_fields_dict,
-                    school_names_set=list(school_names_set),
-                    school_units_names_set=list(school_units_names_set),
-                    status="não executada"
+            try:
+                bulk_generation_id, mongo_document = validate_data_mongo(
+                    self.request, interview.pk, data_valid, bulk_data_content,
+                    field_types_dict, required_fields_dict, parent_fields_dict, True
                 )
-                bulk_generation.save()
+            except Exception as e:
+                data_valid = False
+                error_message = "Houve erro no processo de geração em lote. | {exc}".format(
+                    exc=str(type(e).__name__) + " : " + str(e))
+                logger.error(error_message)
 
-                el_document_list = list()
-                for mongo_document_data in mongo_document_data_list:
-                    school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
-                    el_document = Document(
-                        tenant=tenant,
-                        name=interview.name + "-rascunho-em-lote",
-                        status=DocumentStatus.RASCUNHO.value,
-                        description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
-                        interview=interview,
-                        school=school,
-                        bulk_generation=bulk_generation,
-                        mongo_uuid=mongo_document_data.id,
-                        submit_to_esignature=mongo_document_data.submit_to_esignature,
-                        send_email=mongo_document_data.el_send_email
-                    )
-                    el_document_list.append(el_document)
-
-                Document.objects.bulk_create(el_document_list)
-
-                logger.info(
-                    "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
-                        dynamic_document_class_name=dynamic_document_class_name
-                    )
-                )
-
+            if data_valid:
                 return render(
                     request,
                     "document/bulkdocumentgeneration_validate_generate.html",
                     {
                         "form": form,
                         "interview_id": interview.pk,
-                        "csv_valid": csv_valid,
-                        "bulk_generation_id": bulk_generation.pk,
+                        "data_valid": data_valid,
+                        "bulk_generation_id": bulk_generation_id,
                     },
                 )
 
             else:
-                # TODO Testar se realmente apaga quando há erro Apaga a colecao do banco
-                mongo_document.drop_collection()
                 return render(
                     request,
                     "document/bulkdocumentgeneration_validate_generate.html",
@@ -399,7 +300,7 @@ class ValidateCSVFile(LoginRequiredMixin, View):
                         "form": form,
                         "interview_id": interview.pk,
                         "validation_error": True,
-                        "csv_valid": csv_valid,
+                        "data_valid": data_valid,
                     },
                 )
 
@@ -412,10 +313,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
             dynamic_document_class_name=bulk_document_generation.mongo_db_collection_name
         )
     )
-    interview = Interview.objects.get(pk=bulk_document_generation.interview.pk)
-    tenant = request.user.tenant
-
-    DynamicDocumentClass = create_dynamic_document_class(
+    dynamic_document_class = create_dynamic_document_class(
         bulk_document_generation.mongo_db_collection_name,
         bulk_document_generation.field_types_dict,
         bulk_document_generation.required_fields_dict,
@@ -424,12 +322,49 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         school_units_names_set=list(bulk_document_generation.school_units_names_set),
     )
 
-    mongo_documents_collection = DynamicDocumentClass.objects
+    try:
+        success, data = generate_document_from_mongo(
+            request, dynamic_document_class, bulk_document_generation.interview.pk)
+
+        if success:
+            bulk_document_generation.status = "em andamento..."
+
+            bulk_document_generation.save()
+
+            payload = {
+                "success": True,
+                "total_task_size": data,
+                "bulk_status": bulk_document_generation.status,
+                "message": "A tarefa foi enviada para execução"
+            }
+        else:
+            payload = {
+                "success": False,
+                "message": str(data),
+            }
+
+        return HttpResponse(json.dumps(payload), content_type="application/json")
+    except Exception as e:
+        error_message = "Houve erro no processo de geração em lote. | {exc}".format(exc=str(type(e).__name__) + " : " + str(e))
+        logger.error(error_message)
+
+        payload = {
+            "success": False,
+            "message":  error_message,
+        }
+
+        return HttpResponse(json.dumps(payload), content_type="application/json")
+
+
+def generate_document_from_mongo(request, dynamic_document_class, interview_id, mongo_document_id=None):
+    if mongo_document_id:
+        mongo_documents_collection = dynamic_document_class.objects.filter(id=mongo_document_id)
+    else:
+        mongo_documents_collection = dynamic_document_class.objects
 
     logger.info(
         "Recuperados {n} documento(s) do Mongo".format(n=len(mongo_documents_collection))
     )
-
 
     # gera lista de documentos em lista de dicionarios
     hierarchical_dict_list = list()
@@ -437,10 +372,12 @@ def generate_bulk_documents(request, bulk_document_generation_id):
         hierarchical_dict = mongo_to_hierarchical_dict(mongo_document)
         hierarchical_dict_list.append(hierarchical_dict)
 
-
     logger.info(
         "Gerados {n} dicionários hierárquicos.".format(n=len(hierarchical_dict_list))
     )
+
+    interview = Interview.objects.get(pk=interview_id)
+    tenant = request.user.tenant
 
     interview_variables_list = dict_to_docassemble_objects(
         hierarchical_dict_list, interview.document_type.pk
@@ -509,7 +446,11 @@ def generate_bulk_documents(request, bulk_document_generation_id):
 
         for i, interview_variables in enumerate(interview_variables_list):
             # Recupera o registro do documento no Educa Legal e passa o doc_uuid como url_args
-            el_document = Document.objects.get(mongo_uuid=interview_variables["mongo_uuid"])
+            try:
+                el_document = Document.objects.get(mongo_uuid=interview_variables["mongo_uuid"])
+            except Document.DoesNotExist:
+                return False, 'Não foi encontrado o documento com mongo_uuid = {}'.format(
+                    interview_variables["mongo_uuid"])
             url_args["doc_uuid"] = str(el_document.doc_uuid)
             interview_variables["url_args"] = url_args
             interview_variables["interview_data"] = interview_data
@@ -527,12 +468,13 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 interview_variables["el_send_email"] = False
 
             if interview_variables["submit_to_esignature"]:
+
                 # result = celery_create_document(
                 #         base_url,
                 #         api_key,
                 #         secret,
                 #         interview_full_name,
-                #         interview_variables,
+                #         interview_variables
                 #     )
                 #
                 # celery_submit_to_esignature(str(el_document.doc_uuid))
@@ -544,7 +486,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                         api_key,
                         secret,
                         interview_full_name,
-                        interview_variables,
+                        interview_variables
                     ),
                     # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
                     # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
@@ -553,10 +495,24 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 )()
                 result_description = "Criação do documento: {parent_id} | Assinatura: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
+
+                # faz refresh pq alguns campos sao atualizados nas funcoes que o celery chama
+                el_document.refresh_from_db()
                 el_document.task_create_document = result.parent.id
                 el_document.task_submit_to_esignature = result.id
                 total_task_size += 2
             elif interview_variables["el_send_email"]:
+
+                # result = celery_create_document(
+                #         base_url,
+                #         api_key,
+                #         secret,
+                #         interview_full_name,
+                #         interview_variables
+                #     )
+                #
+                # celery_send_email(str(el_document.doc_uuid))
+
                 result = chain(
                     # nao é necessario passar o self, é passado automaticamente
                     celery_create_document.s(
@@ -564,7 +520,7 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                         api_key,
                         secret,
                         interview_full_name,
-                        interview_variables,
+                        interview_variables
                     ),
                     # o retorno da primeira função é passado automaticamente para a segunda como 2o parametro
                     # porque estão encadeados com o chain, por isso não é necessário passar o doc_uuid
@@ -573,14 +529,24 @@ def generate_bulk_documents(request, bulk_document_generation_id):
                 )()
                 result_description = "Criação do documento: {parent_id} | Envio por e-mail: {child_id}".format(
                     parent_id=result.parent.id, child_id=result.id)
+
+                # faz refresh pq alguns campos sao atualizados nas funcoes que o celery chama
+                el_document.refresh_from_db()
                 el_document.task_create_document = result.parent.id
                 el_document.task_send_email = result.id
                 total_task_size += 2
             else:
                 result = celery_create_document.delay(
-                    base_url, api_key, secret, interview_full_name, interview_variables,
+                    base_url,
+                    api_key,
+                    secret,
+                    interview_full_name,
+                    interview_variables
                 )
                 result_description = "Criação do documento: {id}".format(id=result.id)
+
+                # faz refresh pq alguns campos sao atualizados nas funcoes que o celery chama
+                el_document.refresh_from_db()
                 el_document.task_create_document = result.id
                 total_task_size += 1
 
@@ -589,29 +555,9 @@ def generate_bulk_documents(request, bulk_document_generation_id):
             el_document.save()
             logger.info(result_description)
 
-        bulk_document_generation.status = "em andamento..."
-
-        bulk_document_generation.save()
-
-        payload = {
-            "success": True,
-            "total_task_size": total_task_size,
-            "bulk_status": bulk_document_generation.status,
-            "message": "A tarefa foi enviada para execução"
-        }
-        return HttpResponse(json.dumps(payload), content_type="application/json")
-
+        return True, total_task_size
     except Exception as e:
-        error_message = "Houve erro no processo de geração em lote. | {exc}".format(
-            exc=str(type(e).__name__) + " : " + str(e))
-        logger.error(error_message)
-
-        payload = {
-            "success": False,
-            "message":  error_message,
-        }
-
-        return HttpResponse(json.dumps(payload), content_type="application/json")
+        return False, e
 
 
 @login_required
@@ -698,22 +644,42 @@ def query_documents_by_args(pk=None, **kwargs):
     return data
 
 
-def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
+def save_document_data(document, url, file_data, relative_path, has_ged, ged_data, filename, parent=None):
     if has_ged:
         document.ged_id = ged_data['id']
         document.ged_link = ged_data['latest_version']['document_url'] + 'download/'
         document.ged_uuid = ged_data['uuid']
 
-    document.relative_file_path = relative_path
+    if url:
+        try:
+            # salva como arquivo temporario
+            temp_file, _ = urlretrieve(url)
+            # salva arquivo na nuvem (campo file esta configurado pra salvar no spaces)
+            document.cloud_file.save(relative_path + filename, File(open(temp_file, 'rb')))
+        except Exception as e:
+            message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
+            logging.error(message)
+        finally:
+            # apaga arquivo temporario
+            urlcleanup()
+    else:
+        try:
+            file = ContentFile(file_data, name=filename)
+            document.cloud_file.save(relative_path + filename, file)
+        except Exception as e:
+            message = 'Erro ao fazer o upload do documento na nuvem. Erro: {e}'.format(e=e)
+            logging.error(message)
+
     document.status = DocumentStatus.INSERIDO_GED.value
 
     if parent:
-        # cria documento relacionado ao documento pdf principal
+        # cria documento relacionado ao pdf principal
         document.doc_uuid = uuid.uuid4()
         document.parent = parent
+        logging.info(document.doc_uuid)
 
         try:
-            # salva dados do ged do documento no educa legal
+            # salva dados do documento relacionado ao pdf principal
             document.save()
         except Exception as e:
             message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
@@ -724,11 +690,167 @@ def save_document_data(document, has_ged, ged_data, relative_path, parent=None):
         try:
             if has_ged:
                 # salva dados do ged do documento no educa legal
-                document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'relative_file_path', 'status',
-                                             'file_kind'])
+                document.save(update_fields=['ged_id', 'ged_link', 'ged_uuid', 'status', 'file_kind'])
             else:
                 # salva dados do ged do documento no educa legal
-                document.save(update_fields=['relative_file_path', 'status', 'file_kind'])
+                document.save(update_fields=['status', 'file_kind'])
         except Exception as e:
             message = 'Não foi possível salvar o documento no sistema. {}'.format(str(e))
             logging.exception(message)
+
+
+def validate_data_mongo(request, interview_id, data_valid, bulk_data_content,
+                        field_types_dict, required_fields_dict, parent_fields_dict, is_bulk_generation):
+    tenant = Tenant.objects.get(pk=request.user.tenant_id)
+    interview = Interview.objects.get(pk=interview_id)
+    schools = tenant.school_set.all()
+    # Monta os conjuntos de nomes de escolas e de unidades escolares para validacao
+    school_units_names_set = set()
+    for school in schools:
+        school_units = SchoolUnit.objects.filter(school=school).values_list(
+            "name", flat=True
+        )
+        for school_unit in school_units:
+            school_units_names_set.add(school_unit)
+    school_names_set = set(schools.values_list("name", flat=True))
+    # Adiciona como elemento valido "---" para ausencia de unidade escolar
+    school_units_names_set.add("---")
+
+    # O nome da collection deve ser unico no Mongo, pq cada collection representa uma acao
+    # de importação. Precisaremos do nome da collection depois para recuperá-la do Mongo
+    # O nome gerado e semelhante ao custom file name que usamos no docassemble
+    # YYYYMMDD_HHMMSS_custom_file_name
+    if is_bulk_generation:
+        dynamic_document_class_name = (custom_class_name(interview.custom_file_name))
+    else:
+        dynamic_document_class_name = 'api_' + interview.custom_file_name
+
+    # Cria a classe do tipo Document (mongoengine) dinamicamente
+    dynamic_document_class = create_dynamic_document_class(
+        dynamic_document_class_name,
+        field_types_dict,
+        required_fields_dict,
+        parent_fields_dict,
+        school_names_set=school_names_set,
+        school_units_names_set=school_units_names_set,
+    )
+
+    # Percorre o df resultante, que possui apenas o conteudo e tenta gravar cada uma das linhas
+    # no Mongo
+    mongo_document_data_list = list()
+    mongo_document = None
+
+    for register_index, row in enumerate(
+            bulk_data_content.itertuples(index=False)
+    ):
+        # Transforma a linha em dicionario
+        row_dict = row._asdict()
+        # Cria um objeto Documento a partir da classe dinamica
+        mongo_document = dynamic_document_class(**row_dict)
+
+        try:
+            mongo_document_data = mongo_document.save()
+            mongo_document_data_list.append(mongo_document_data)
+            # Se a operacao for bem sucedida, itera sobre a lista de valores para gerar a
+            # mensagem de sucesso
+            row_values = list(row_dict.values())
+            message = "Registro {register_index} validado com sucesso".format(
+                register_index=str(register_index + 1)
+            )
+            for value_index, value in enumerate(row_values):
+                message += " | " + str(row_values[value_index])
+            logger.info(message)
+            messages.success(request, message)
+        except ValidationError as e:
+            # Se a operacao for mal sucedida, itera sobre a lista de valores para gerar a
+            # mensagem de erro
+            row_values = list(row_dict.values())
+            message = (
+                    "Erro ao validar o registro "
+                    + str(register_index + 1)
+                    + ": "
+                    + str(e)
+            )
+            for value_index, value in enumerate(row_values):
+                message += " | " + str(row_values[value_index])
+            logger.info(message)
+            messages.error(request, message)
+
+    storage = get_messages(request)
+    for message in storage:
+        if message.level_tag == "error":
+            data_valid = False
+            break
+
+    if data_valid:
+        if is_bulk_generation:
+            bulk_generation = BulkDocumentGeneration(
+                tenant=request.user.tenant,
+                interview=interview,
+                mongo_db_collection_name=dynamic_document_class_name,
+                field_types_dict=field_types_dict,
+                required_fields_dict=required_fields_dict,
+                parent_fields_dict=parent_fields_dict,
+                school_names_set=list(school_names_set),
+                school_units_names_set=list(school_units_names_set),
+                status="não executada"
+            )
+            bulk_generation.save()
+
+            interview_name = interview.name + "-rascunho-em-lote"
+        else:
+            interview_name = interview.name
+            bulk_generation = None
+
+        el_document_list = list()
+        for mongo_document_data in mongo_document_data_list:
+            school = tenant.school_set.filter(name=mongo_document_data.selected_school)[0]
+            el_document = Document(
+                tenant=tenant,
+                name=interview_name,
+                status=DocumentStatus.RASCUNHO.value,
+                description=interview.description + " | " + interview.version + " | " + str(interview.date_available),
+                interview=interview,
+                school=school,
+                bulk_generation=bulk_generation,
+                mongo_uuid=str(mongo_document_data.id),
+                submit_to_esignature=mongo_document_data.submit_to_esignature,
+                send_email=mongo_document_data.el_send_email
+            )
+            el_document_list.append(el_document)
+
+        Document.objects.bulk_create(el_document_list)
+
+        logger.info(
+            "Gravada a estrutura de classe bulk_generation: {dynamic_document_class_name}".format(
+                dynamic_document_class_name=dynamic_document_class_name
+            )
+        )
+
+        if is_bulk_generation:
+            return bulk_generation.pk, mongo_document
+        else:
+            return mongo_document, dynamic_document_class_name, school_names_set, school_units_names_set
+
+
+def reached_document_limit(tenant_id):
+    today = datetime.today()
+
+    # verifica se atingiu o limite de documentos
+    tenant = Tenant.objects.get(pk=tenant_id)
+    documents = Document.objects.filter(tenant=tenant,
+                                        parent=None,
+                                        created_date__month=today.month,
+                                        created_date__year=today.year)
+
+    if tenant.has_ged():
+        document_count = documents.exclude(Q(status="rascunho") | Q(status="criado")).count()
+    else:
+        document_count = documents.exclude(status="rascunho").count()
+
+    reached_limit = False
+    if tenant.plan.document_limit:
+        if document_count >= tenant.plan.document_limit:
+            reached_limit = True
+
+    return reached_limit, tenant.plan.document_limit

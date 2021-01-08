@@ -1,0 +1,118 @@
+---
+progress: 95
+question: |
+  Enviar o documento para assinatura de 2 testemunhas?
+yesno: has_witnesses
+---
+objects:
+  - witnesses: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  witnesses[i].name.text
+  witnesses[i].complete = True
+---
+progress: 95
+question: Testemunhas
+fields:
+  - Número de Testemunhas: witnesses.target_number
+    required: true
+    datatype: integer
+    default: 2
+    max: 2
+---
+code: |
+  witnesses.target_number = 2
+  if 'results' in signatories_list:
+    signatories_esw = signatories_list['results']
+    witnesses_list = list()
+
+    if len(signatories_esw) > 0:
+      # Extraindo lista de testemunhas do json response
+      for signer in signatories_esw:
+        if signer['kind'].upper() == 'TESTEMUNHA':
+          witnesses_list.append(signer)
+
+      # Populando lista docassemble para exibir tabela e campos da testemunha
+      if len(witnesses_list) == 1:
+        witnesses[0].name.text = witnesses_list[0]['name']
+        witnesses[0].email = witnesses_list[0]['email']
+        witnesses[0].cpf = witnesses_list[0]['cpf']
+      elif len(witnesses_list) == 2:
+        witnesses[0].name.text = witnesses_list[0]['name']
+        witnesses[0].email = witnesses_list[0]['email']
+        witnesses[0].cpf = witnesses_list[0]['cpf']
+        witnesses[1].name.text = witnesses_list[1]['name']
+        witnesses[1].email = witnesses_list[1]['email']
+        witnesses[1].cpf = witnesses_list[1]['cpf']
+---
+field: valid_witnesses_table
+progress: 95
+question: |
+  Dados das Testemunhas
+subquestion: |
+  Confira os e-mails das testemunhas abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica ou e-mail.
+  ${ witnesses.table }
+buttons:
+  Continuar: continue
+---
+table: witnesses.table
+rows: witnesses
+columns:
+  - Nome: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+  - CPF: |
+      row_item.cpf
+edit:
+  - name.text
+  - email
+  - cpf
+---
+progress: 95
+question: |
+  Dados da 1ª testemunha:
+fields:
+  - "Nome:": witnesses[0].name.text
+    required: True
+    validate: validate_person_full_name
+  - "E-mail:": witnesses[0].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: True
+  - "CPF:": witnesses[0].cpf
+    required: True
+    validate: validate_cpf
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#d2l0bmVzc2VzWzBdLmNwZg').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+progress: 95
+question: |
+  % if len(witnesses_list) == 1:
+    Você já possui uma testemunha cadastrada no sistema. Devem ser inseridos os dados da 2ª testemunha:
+  % else:
+    Dados da 2ª testemunha:
+  % endif
+fields:
+  - "Nome:": witnesses[1].name.text
+    required: True
+    validate: validate_person_full_name
+  - "E-mail:": witnesses[1].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: True
+  - "CPF:": witnesses[1].cpf
+    required: True
+    validate: validate_cpf
+script: |
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $('#d2l0bmVzc2VzWzFdLmNwZg').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---

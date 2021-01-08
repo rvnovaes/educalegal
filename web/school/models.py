@@ -5,7 +5,7 @@ from django.urls import reverse
 from tenant.models import TenantAwareModel
 
 
-class LegalType(Enum):
+class LegalNature(Enum):
     FISICA = "F"
     JURIDICA = "J"
 
@@ -30,22 +30,28 @@ class LegalType(Enum):
         return label.get(value)
 
 
+class SignatoryKind(Enum):
+    Testemunha = "Testemunha"
+    Representante = "Representante"
+
+    def __str__(self):
+        return self.value
+
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
+
+
 class School(TenantAwareModel):
     legal_name = models.CharField(max_length=255, verbose_name="Razão social")
     name = models.CharField(max_length=255, blank=True, verbose_name="Nome Fantasia")
-    legal_type = models.CharField(
-        verbose_name="Tipo",
-        max_length=1,
-        choices=((x.value, x.format(x.value)) for x in LegalType),
-        default=LegalType.JURIDICA,
-    )
     # https://docs.djangoproject.com/en/3.0/ref/models/fields/
     # when a CharField has both unique=True and blank=True set null=True is required to
     # avoid unique constraint violations when saving multiple objects with blank values
-    cnpj = models.CharField(max_length=255, verbose_name="CNPJ/CPF")
-    logo = models.ImageField(verbose_name="Logo", blank=True)
+    cnpj = models.CharField(max_length=255, verbose_name="CNPJ")
+    logo = models.ImageField(verbose_name="Logo", blank=True, null=True)
     phone = models.CharField(max_length=255, verbose_name="Telefone")
-    site = models.URLField(verbose_name="Site")
+    site = models.URLField(verbose_name="Site", blank=True)
     email = models.EmailField(verbose_name="E-mail")
     street = models.CharField(max_length=255, verbose_name="Logradouro")
     street_number = models.CharField(max_length=255, verbose_name="Número")
@@ -58,6 +64,11 @@ class School(TenantAwareModel):
     letterhead = models.CharField(max_length=255, default="timbrado-padrao.docx", verbose_name="Timbrado")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Criação", blank=True)
     esignature_folder = models.CharField(max_length=255, blank=True, verbose_name="Pasta para upload dos documentos")
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Escola"
+        verbose_name_plural = "Escolas"
 
     def __str__(self):
         return self.name
@@ -83,21 +94,20 @@ class School(TenantAwareModel):
     def get_absolute_url(self):
         return reverse("school:school-detail", kwargs={"pk": self.pk})
 
-    class Meta:
-        ordering = ["name"]
-        verbose_name = "Escola"
-        verbose_name_plural = "Escolas"
-
 
 class SchoolUnit(TenantAwareModel):
-    name = models.CharField(max_length=255, blank=True, verbose_name="Nome")
+    name = models.CharField(max_length=255, verbose_name="Nome")
     school = models.ForeignKey(
         School,
-        null=True,
         on_delete=models.CASCADE,
         related_name="school_units",
-        verbose_name="Unidade Escolar",
+        verbose_name="Escola",
     )
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Unidade Escolar"
+        verbose_name_plural = "Unidades Escolares"
 
     def __str__(self):
         return self.name
@@ -105,7 +115,47 @@ class SchoolUnit(TenantAwareModel):
     def get_absolute_url(self):
         return reverse("school:school-unit-detail", kwargs={"pk": self.pk})
 
+
+class Signatory(TenantAwareModel):
+    name = models.CharField(max_length=255, verbose_name="Nome")
+    email = models.EmailField(verbose_name="E-mail")
+    cpf = models.CharField(max_length=255, verbose_name="CPF")
+    kind = models.CharField(
+        verbose_name="Tipo de Signatário da Escola",
+        max_length=255,
+        choices=SignatoryKind.choices(),
+        default=SignatoryKind.Testemunha.value,
+    )
+
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name="signatories",
+        verbose_name="Escola",
+    )
+
     class Meta:
         ordering = ["name"]
-        verbose_name = "Unidade Escolar"
-        verbose_name_plural = "Unidades Escolares"
+        verbose_name = "Signatário da Escola"
+        verbose_name_plural = "Signatários da Escola"
+
+    def __str__(self):
+        return self.name
+
+
+class Grade(TenantAwareModel):
+    name = models.CharField(max_length=255, verbose_name="Nome")
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name="grades",
+        verbose_name="Escola",
+    )
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Série"
+        verbose_name_plural = "Séries"
+
+    def __str__(self):
+        return self.name
