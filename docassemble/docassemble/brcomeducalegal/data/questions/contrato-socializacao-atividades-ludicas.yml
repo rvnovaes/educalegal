@@ -45,7 +45,6 @@ code: |
     contratantes.gather()
     if plan_use_esignature:
       valid_contratantes_table
-    contratante_inserirDadosGestor
     child_name
     services_location.zip
     valorContrato
@@ -209,32 +208,8 @@ columns:
 edit:
   - email
 ---
-section: Contratante
-progress: 65
-question: Gestor do Contrato
-fields:
-  - 'Inserir os dados de contato do gestor do contrato?': contratante_inserirDadosGestor
-    datatype: yesnoradio
-  - 'Nome:': contratante_nome_gestor
-    datatype: text
-    show if:
-      variable: contratante_inserirDadosGestor
-      is: true
-  - 'E-mail:': contratante_email_gestor
-    datatype: email
-    show if:
-      variable: contratante_inserirDadosGestor
-      is: true
-    required: False
-  - 'Telefone:': contratante_telefone_gestor
-    datatype: text
-    show if:
-      variable: contratante_inserirDadosGestor
-      is: true
-    required: False
----
 section: Cláusulas
-progress: 80
+progress: 65
 question: Nome da criança e horário da prestação dos serviços
 fields:
   - 'Nome completo:': child_name
@@ -252,7 +227,7 @@ objects:
   services_location: Address
 ---
 section: Cláusulas
-progress: 90
+progress: 80
 question: Local da prestação dos serviços
 fields:
   - 'CEP:': services_location.zip
@@ -314,7 +289,7 @@ code: |
   valorAdicionalHoraExcedidaExtenso = num2words(valorAdicionalHoraExcedida, lang='pt_BR', to='currency')
 ---
 section: Cláusulas
-progress: 100
+progress: 90
 question: Preço e forma de pagamento
 subquestion: |
   A contratada pagará à Contratante o valor mensal de [FIELD valorContrato].
