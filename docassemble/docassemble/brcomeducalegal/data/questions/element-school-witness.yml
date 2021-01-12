@@ -22,29 +22,28 @@ fields:
 ---
 code: |
   witnesses.target_number = 2
-  # Extraindo lista de testemunhas do json response
-  witnesses_list = list()
   if 'results' in signatories_list:
-    signatories_list = signatories_list['results']
+    signatories_esw = signatories_list['results']
+    witnesses_list = list()
 
-  for signer in signatories_list:
-    if signer['kind'].upper() == 'TESTEMUNHA':
-      witnesses_list.append(signer)
+    if len(signatories_esw) > 0:
+      # Extraindo lista de testemunhas do json response
+      for signer in signatories_esw:
+        if signer['kind'].upper() == 'TESTEMUNHA':
+          witnesses_list.append(signer)
 
-  # Populando lista docassemble para exibir tabela e campos da testemunha
-  if len(witnesses_list) == 0:
-    valid_witnesses_table
-  elif len(witnesses_list) == 1:
-    witnesses[0].name.text = witnesses_list[0]['name']
-    witnesses[0].email = witnesses_list[0]['email']
-    witnesses[0].cpf = witnesses_list[0]['cpf']
-  else:
-    witnesses[0].name.text = witnesses_list[0]['name']
-    witnesses[0].email = witnesses_list[0]['email']
-    witnesses[0].cpf = witnesses_list[0]['cpf']
-    witnesses[1].name.text = witnesses_list[1]['name']
-    witnesses[1].email = witnesses_list[1]['email']
-    witnesses[1].cpf = witnesses_list[1]['cpf']
+      # Populando lista docassemble para exibir tabela e campos da testemunha
+      if len(witnesses_list) == 1:
+        witnesses[0].name.text = witnesses_list[0]['name']
+        witnesses[0].email = witnesses_list[0]['email']
+        witnesses[0].cpf = witnesses_list[0]['cpf']
+      elif len(witnesses_list) == 2:
+        witnesses[0].name.text = witnesses_list[0]['name']
+        witnesses[0].email = witnesses_list[0]['email']
+        witnesses[0].cpf = witnesses_list[0]['cpf']
+        witnesses[1].name.text = witnesses_list[1]['name']
+        witnesses[1].email = witnesses_list[1]['email']
+        witnesses[1].cpf = witnesses_list[1]['cpf']
 ---
 field: valid_witnesses_table
 progress: 95

@@ -1,0 +1,367 @@
+metadata:
+  title: Contrato de Socialização e atividades ludicas
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
+  - element-school-witness.yml
+  - element-default-messages.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+---
+sections:
+  - Contratada
+  - Contratante
+  - Cláusulas
+  - Assinatura
+  - Conclusão
+---
+code:  |
+  content_document = "contrato-socializacao-atividades-ludicas.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    signatories_list
+    reviewed_school_email_answer
+    contratada_inserirDadosGestor
+    contratantes.gather()
+    if plan_use_esignature:
+      valid_contratantes_table
+    child_name
+    services_location.zip
+    valorContrato
+    state
+    signature_local
+    if has_witnesses:
+      valid_witnesses_table
+    generated_file
+    el_patch_document
+    document_ready_screen
+---
+ga id: |
+  code: ga_id_begin
+section: Contratada
+progress: 10
+question: Gestor do Contrato da Escola
+fields:
+  - 'Inserir os dados de contato do gestor do contrato?': contratada_inserirDadosGestor
+    datatype: yesnoradio
+  - 'Nome:': contratada_nome_gestor
+    datatype: text
+    show if:
+      variable: contratada_inserirDadosGestor
+      is: true
+  - 'E-mail:': contratada_email_gestor
+    datatype: email
+    show if:
+      variable: contratada_inserirDadosGestor
+      is: true
+    required: False
+  - 'Telefone:': contratada_telefone_gestor
+    datatype: text
+    show if:
+      variable: contratada_inserirDadosGestor
+      is: true
+    required: False
+---
+objects:
+  - contratantes: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  contratantes[i].name.text
+  contratantes[i].address.street_name
+  contratantes[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Contratante
+progress: 20
+question: Número de contratantes
+fields:
+  - Número: contratantes.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Contratante
+progress: 35
+question: Dados do(a) ${word(ordinal(i)) } contratante
+fields:
+  - 'Nome/Razão social:': contratantes[i].name.text
+    validate: validate_person_full_name
+    help: 'Informe o nome completo.'
+  - 'CPF:': contratantes[i].cpf
+    validate: validate_cpf
+  - 'RG:': contratantes[i].rg
+    datatype: text
+  - 'Nacionalidade:': contratantes[i].nationality
+    datatype: text
+    default: brasileiro(a)
+  - 'Estado civil:': contratantes[i].marital_status
+    input type: radio
+    choices:
+      - solteiro(a)
+      - casado(a)
+      - divorciado(a)
+      - viúvo(a)
+  - 'Profissão:': contratantes[i].occupation
+    datatype: text
+    required: False
+  - "E-mail:": contratantes[i].email
+    help: ${ help_email_msg }
+    required: false
+    datatype: email
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#Y29udHJhdGFudGVzW2ldLmNwZg').mask('000.000.000-00', {reverse: true});
+      });
+  </script>
+---
+section: Contratante
+progress: 50
+question: Endereço do(a) ${ contratantes[i].name.text }
+fields:
+  - 'CEP:': contratantes[i].address.zip
+    datatype: text
+  - 'Logradouro:': contratantes[i].address.street_name
+    datatype: text
+  - 'Número:': contratantes[i].address.street_number
+    datatype: text
+  - 'Complemento:': contratantes[i].address.unit
+    datatype: text
+    required: false
+  - 'Bairro:': contratantes[i].address.neighborhood
+    datatype: text
+  - 'Município:': contratantes[i].address.city
+    datatype: text
+  - 'Estado:': contratantes[i].address.state
+    code: state_initials_list
+    datatype: dropdown
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Contratante
+field: valid_contratantes_table
+question: |
+  Contratantes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ contratantes.table }
+buttons:
+  Continuar: continue
+---
+table: contratantes.table
+rows: contratantes
+columns:
+  - Name: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+section: Cláusulas
+progress: 65
+question: Nome da criança e horário da prestação dos serviços
+fields:
+  - 'Nome completo:': child_name
+    validate: validate_person_full_name
+  - 'Hora início:': horaInicioExecucaoServicos
+    datatype: time
+  - 'Hora fim:': horaFimExecucaoServicos
+    datatype: time
+---
+code: |
+  horaInicioExecucaoServicosFormatada = format_time(horaInicioExecucaoServicos, format='HH:mm')
+  horaFimExecucaoServicosFormatada = format_time(horaFimExecucaoServicos, format='HH:mm')
+---
+objects:
+  services_location: Address
+---
+section: Cláusulas
+progress: 80
+question: Local da prestação dos serviços
+fields:
+  - 'CEP:': services_location.zip
+    datatype: text
+  - 'Logradouro:': services_location.street_name
+    datatype: text
+  - 'Número:': services_location.street_number
+    datatype: text
+  - 'Complemento:': services_location.unit
+    datatype: text
+    required: false
+  - 'Bairro:': services_location.neighborhood
+    datatype: text
+  - 'Município:': services_location.city
+    datatype: text
+  - 'Estado:': services_location.state
+    code: state_initials_list
+    datatype: dropdown
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#c2VydmljZXNfbG9jYXRpb24uemlw').mask('00000-000');
+  });
+
+  $("#c2VydmljZXNfbG9jYXRpb24uemlw").focusout(function(){
+    var cep = $("#c2VydmljZXNfbG9jYXRpb24uemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#c2VydmljZXNfbG9jYXRpb24uc3RyZWV0X25hbWU").val(data.logradouro);
+          $("#c2VydmljZXNfbG9jYXRpb24ubmVpZ2hib3Job29k").val(data.bairro);
+          $("#c2VydmljZXNfbG9jYXRpb24uY2l0eQ").val(data.localidade);
+          $("#c2VydmljZXNfbG9jYXRpb24uc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+code: |
+  from num2words import num2words
+  valorContratoExtenso = num2words(valorContrato, lang='pt_BR', to='currency')
+---
+code: |
+  from num2words import num2words
+  valorHoraExtenso = num2words(valorHora, lang='pt_BR', to='currency')
+---
+code: |
+  from num2words import num2words
+  valorAdicionalHoraExcedidaExtenso = num2words(valorAdicionalHoraExcedida, lang='pt_BR', to='currency')
+---
+section: Cláusulas
+progress: 90
+question: Preço e forma de pagamento
+subquestion: |
+  A contratada pagará à Contratante o valor mensal de [FIELD valorContrato].
+fields:
+  - 'Valor:': valorContrato
+    datatype: currency
+    hint: 0000,00
+  - 'Nº de horas contratadas/mês:': nrHorasContratadas
+    datatype: integer
+  - 'Valor da hora:': valorHora
+    datatype: currency
+    hint: 0000,00
+  - 'Valor adicional por hora excedida:': valorAdicionalHoraExcedida
+    datatype: currency
+    hint: 0000,00
+  - 'Dia do vencimento mensal:': diaVencimento
+    datatype: integer
+    min: 1
+    max: 31
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#dmFsb3JDb250cmF0bw').mask('000000000000000.00', {reverse: true});
+        $('#dmFsb3JIb3Jh').mask('000000000000000.00', {reverse: true});
+        $('#dmFsb3JBZGljaW9uYWxIb3JhRXhjZWRpZGE').mask('000000000000000.00', {reverse: true});
+    });
+  </script>
+---
+code: |
+  recipients = list()
+  for item in contratantes:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  new_recipient = dict()
+  new_recipient['name'] = school_legal_name
+  new_recipient['email'] = school_email
+  new_recipient['group'] = 'signers'
+  new_recipient['routingOrder'] = 2
+  new_recipient['tabs'] = [
+      {
+          'type': 'signHere',
+          'anchorString': generate_anchor('signHere', school_email)
+      },
+  ]
+  recipients.append(new_recipient)
+
+  if has_witnesses:
+    for item in witnesses:
+        if item.email:
+            new_recipient = dict()
+            new_recipient['name'] = item.name.text
+            new_recipient['email'] = item.email
+            new_recipient['group'] = 'signers'
+            new_recipient['routingOrder'] = 2
+            new_recipient['tabs'] = [
+                {
+                    'type': 'signHere',
+                    'anchorString': generate_anchor('signHere', item.email)
+                },
+            ]
+            recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'

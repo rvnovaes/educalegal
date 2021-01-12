@@ -11,7 +11,6 @@ question: |
   Seu documento foi gerado com sucesso!
 subquestion: |
   Nome do documento:
-
   ${ generated_file.pdf.filename }
 action buttons:
   code: |

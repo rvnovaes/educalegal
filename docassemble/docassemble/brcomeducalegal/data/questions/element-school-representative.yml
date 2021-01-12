@@ -1,6 +1,6 @@
 ---
 objects:
-  - representatives: DAList.using(object_type=Individual, complete_attribute='complete', there_is_another=False)
+  - representatives: DAList.using(object_type=Individual, complete_attribute='complete', there_is_another=False, minimum_number=1)
 ---
 code: |
   representatives[i].name.text
@@ -29,9 +29,8 @@ subquestion: |
 
   * Os e-mails dos representantes legais devem ser diferentes.
 
-  * Para adicionar mais um representante clique no botão "Adicionar outro"
+  * Os representantes são cadastrados no menu da Escola
   ${ representatives.table }
-  ${ representatives.add_action() }
 buttons:
   Continuar: continue
 ---

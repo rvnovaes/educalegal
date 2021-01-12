@@ -496,7 +496,7 @@ script: |
 ---
 section: Outorgado
 progress: 15
-question: Data final
+question: Data final para a representação dos poderes
 fields:
   - Data: final_date
     datatype: date
@@ -506,10 +506,10 @@ code: |
   recipients = list()
   for grantor in grantors:
       if grantor.type == 'organization':
-          for item in grantors.child:
+          for item in grantor.child:
               if item.email:
                   new_recipient = dict()
-                  new_recipient['name'] = item.name.text
+                  new_recipient['name'] = item.name.first
                   new_recipient['email'] = item.email
                   new_recipient['group'] = 'signers'
                   new_recipient['routingOrder'] = 1

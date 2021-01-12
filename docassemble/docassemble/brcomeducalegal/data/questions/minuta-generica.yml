@@ -36,6 +36,7 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
+    signatories_list
     the_task = background_action('upload_task', upload=generic_document)
     if not the_task.ready():
       part_types.target_number = 1
