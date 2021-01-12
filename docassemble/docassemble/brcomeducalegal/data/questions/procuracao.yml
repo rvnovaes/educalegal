@@ -95,6 +95,7 @@ question: |
   Dados do(a) ${ word(ordinal(i)) } outorgante
 fields:
   - "Nome/Razão Social": grantors[i].name.text
+    validate: validate_person_full_name
   - "Número de representantes:": grantors[i].child.target_number
     required: False
     datatype: integer
