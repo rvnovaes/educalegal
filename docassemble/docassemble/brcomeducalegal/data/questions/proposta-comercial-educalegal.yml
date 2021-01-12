@@ -12,7 +12,6 @@ include:
   - element-document-ready.yml
   - element-school-email-reviewed.yml
   - element-default-messages.yml
-  - element-school-witness.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -36,72 +35,72 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
-    for item in prospect:
+    for item in prospects:
       item.name.text
-    for item in schools:
+    for item in school_prospects:
       item.name.text
     scope_setected
-    monthly_instalment
+    monthly_installment
     signature_local
     generated_file
     el_patch_document
     document_ready_screen
 ---
 objects:
-  - prospect: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
-  - schools: DAList.using(object_type=Person, there_are_any=True)
+  - prospects: DAList.using(object_type=Person, complete_attribute='complete', ask_number=True)
+  - school_prospects: DAList.using(object_type=Person, there_are_any=True)
 ---
 code: |
-  prospect[i].name.text
-  prospect[i].complete = True
+  prospects[i].name.text
+  prospects[i].complete = True
 ---
 ga id: |
   code: ga_id_begin
 section: Prospect
-progress: 5
+progress: 15
 question: Número de Destinatários
 fields:
-  - Número: prospect.target_number
+  - Número: prospects.target_number
     datatype: integer
     default: 1
     min: 1
 ---
-progress: 5
+progress: 30
 section: Prospect
 question: |
   Dados do(a) ${word(ordinal(i)) } destinatário:
 fields:
-  - "Nome completo:": prospect[i].name.text
+  - "Nome completo:": prospects[i].name.text
     required: True
     validate: validate_person_full_name
-  - "E-mail:": prospect[i].email
+  - "E-mail:": prospects[i].email
     help: ${ help_email_msg }
     required: True
     datatype: email
 ---
-progress: 10
+progress: 45
 section: Prospect
 question: |
   Escola(s):
 fields:
-  - "Razão Social:": schools[i].name.text
+  - "Razão Social:": school_prospects[i].name.text
     required: True
 list collect: True
 ---
 section: Escopo da Proposta
-progress: 15
+progress: 60
 question: |
   Escopo da proposta
 fields:
   - "Proposta:": scope_setected
     datatype: checkboxes
     choices:
-      - "Plataforma de geração de documentos.": scope_1
-      - "GED - Gerenciador Eletrônico de Documentos.": scope_2
-      - "Assinatura eletrônica digital.": scope_3
-      - "Consultoria jurídica.": scope_4
-      - "Geração, assinatura e armazenamento em lote.": scope_5
-      - "Suporte técnico.": scope_6
+      - "Plataforma de geração de documentos": scope_1
+      - "GED - Gerenciador Eletrônico de Documentos": scope_2
+      - "Assinatura eletrônica digital": scope_3
+      - "Consultoria jurídica": scope_4
+      - "Geração de documentos em lote": scope_5
+      - "Suporte técnico": scope_6
     none of the above: False
   - "Número de usuários:": amount_users
     datatype: integer
@@ -121,14 +120,11 @@ fields:
     js show if: |
       val("limit_documents") == "Limitada"
   - "Serviço de assinatura eletrônca:": signature_service
-    datatype: checkboxes
+    datatype: radio
     choices:
-      - Clicksign: clicksign
-      - Docusign: docusign
-    none of the above: False
-    default:
-      code: |
-        dict(clicksign=True, docusign=False)
+      - Clicksign
+      - Docusign
+    default: Clicksign
     js show if: |
       val("scope_setected['scope_3']")
   - "Horas de consultoria jurídica:": consultation_hours
@@ -140,8 +136,8 @@ fields:
   - "Suporte Técnico:": technical_support
     datatype: checkboxes
     choices:
-      - Suporte Técnico Nível I - 6h SLA: sup1
-      - Suporte Técnico Nível II - 24h SLA: sup2
+      - Suporte Técnico Nível I - 6h SLA: Suporte Técnico Nível I - 6h SLA
+      - Suporte Técnico Nível II - 24h SLA: Suporte Técnico Nível II - 24h SLA
     none of the above: False
     default:
       code: |
@@ -151,14 +147,21 @@ fields:
 ---
 code: |
   from num2words import num2words
-  mensalidade_words = num2words(mensalidade, lang='pt_BR', to='currency')
+  monthly_installment_words = num2words(monthly_installment, lang='pt_BR', to='currency')
+  signature_unit_price_words = num2words(signature_unit_price, lang='pt_BR', to='currency')
+  extrahour_consultation_value_words = num2words(extrahour_consultation_value, lang='pt_BR', to='currency')
+  development_hour_value_words = num2words(development_hour_value, lang='pt_BR', to='currency')
+---
+code: |
+  bulk_unit_price_one = bulk_unit_price - 0.50
+  bulk_unit_price_two = bulk_unit_price - 1.00
 ---
 section: Honorários
-progress: 25
+progress: 80
 question: |
   Honorários e preço dos serviços
 fields:
-  - "Mensalidade:": monthly_instalment
+  - "Mensalidade:": monthly_installment
     datatype: currency
     hint: 0000,00
   - "Preço horas excedentes da consultoria jurídica:": extrahour_consultation_value
@@ -177,10 +180,20 @@ fields:
     datatype: currency
     hint: 0000,00
     default: 250.00
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#bW9udGhseV9pbnN0YWxsbWVudA').mask('000000000000000.00', {reverse: true});
+        $('#ZXh0cmFob3VyX2NvbnN1bHRhdGlvbl92YWx1ZQ').mask('000000000000000.00', {reverse: true});
+        $('#c2lnbmF0dXJlX3VuaXRfcHJpY2U').mask('000000000000000.00', {reverse: true});
+        $('#YnVsa191bml0X3ByaWNl').mask('000000000000000.00', {reverse: true});
+        $('#ZGV2ZWxvcG1lbnRfaG91cl92YWx1ZQ').mask('000000000000000.00', {reverse: true});
+    });
+  </script>
 ---
 code: |
   recipients = list()
-  for item in prospect:
+  for item in prospects:
       if item.email:
           new_recipient = dict()
           new_recipient['name'] = item.name.text

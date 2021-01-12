@@ -1,5 +1,5 @@
 metadata:
-  title: Ata da Assembleia Geral Ordinária
+  title: Ata da Assembleia Geral Ordinária-Extraordinária
 ---
 include:
   - element-tenant-school-interview.yml
@@ -9,7 +9,10 @@ include:
   - element-signature.yml
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-email-reviewed.yml
   - element-default-messages.yml
+  - element-school-witness.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -23,7 +26,7 @@ sections:
   - Acionistas Presentes
 ---
 code:  |
-  content_document = "ata-assembleia-geral-ordinaria.docx"
+  content_document = "ata-assembleia-geral-ordinaria-extraordinaria.docx"
 ---
 id: logic
 mandatory: True
@@ -34,31 +37,48 @@ code: |
       selected_school
     else:
       selected_school = school_names_list[0]
+    school
+    ata_type
     stock_company.target_number = 1
     for item in stock_company:
       item.name.text
-    for item in directors:
-      item.name.first
+    if has_managements:
+      for item in managements:
+        item.name.first
     general_shareholder_meeting_date
     chairman_name
     accounting_year
-    for item in agenda:
-      item.name.text
-    for item in adoptions:
-      item.name.text
+    if ata_type == "Assembleia Geral Ordinária":
+      net_profit
+    if ata_type == "Assembleia Geral Extraordinária":
+      for item in agenda:
+        item.name.text
+      for item in adoptions:
+        item.name.text
     for item in shareholders:
       if item.type  == 'individual':
         item.name.text
         item.child.target_number = 0
       elif item.type == 'organization':
         item.name.text
+    witnesses.uses_parts = False
+    valid_witnesses_table
     signature_local
     generated_file
     el_patch_document
     document_ready_screen
 ---
+section: Companhia
+progress: 5
+question: Tipo da assembleia geral
+fields:
+  - "Tipo:": ata_type
+    datatype: radio
+    choices:
+      - Ordinária: Assembleia Geral Ordinária
+      - Extraordinária: Assembleia Geral Extraordinária
+---
 objects:
-  - example_ata_assembleia_geral_ordinaria: DAStaticFile.using(filename='example-ata-assembleia-geral-ordinaria.pdf')
   - stock_company: DAList.using(object_type=Organization, complete_attribute='complete', ask_number=True)
 ---
 code: |
@@ -100,10 +120,6 @@ script: |
         $('#c3RvY2tfY29tcGFueVtpXS5jbnBq').mask('00.000.000/0000-00', {reverse: true});
       });
   </script>
-right: |
-  <center><h5><strong>Saiba mais</strong></h5>
-  <p>A assembleia geral ordinária (AGO) é uma assembleia realizada no máximo em até 4 meses após o encerramento do exercício, com a finalidade de tomar as contas dos administradores, examinar, discutir e votar as demonstrações financeiras, deliberar sobre a destinação do lucro líquido do exercício e a distribuição de dividendos, e eleger os administradores e, se for o caso, os membros do conselho fiscal.</p>
-  <center>[Clique para visualizar a minuta](${ example_ata_assembleia_geral_ordinaria.url_for() })</center>
 ---
 progress: 5
 section: Companhia
@@ -155,15 +171,22 @@ script: |
   });
   </script>
 ---
+section: Companhia
+progress: 15
+question: Os integrantes da direção estão presentes?
+yesno: has_managements
+---
 objects:
-  - directors: DAList.using(object_type=Individual, there_are_any=True)
+  - managements: DAList.using(object_type=Individual, there_are_any=True)
 ---
 progress: 20
 section: Companhia
 question: |
   Integrantes da administração da companhia presentes na assembleia
 fields:
-  - "Nome completo:": directors[i].name.first
+  - "Nome completo:": managements[i].name.first
+    required: True
+  - "Cargo:": managements[i].position
     required: True
 list collect: True
 ---
@@ -199,12 +222,40 @@ section: Assembleia
 progress: 15
 question: Exercício Social
 subquestion: |
-  As demonstrações financeiras apresentadas pela Companhia são relativas ao exercício social encerrado em [FIELD accounting_year].
+  As demonstrações financeiras apresentadas pela Companhia são relativas ao exercício social encerrado em [FIELD accounting_year] (ano).
 fields:
   - Ano: accounting_year
     datatype: integer
     inline width: 10em
     required: True
+---
+code: |
+  from num2words import num2words
+  net_profit_words = num2words(net_profit, lang='pt_BR', to='currency')
+  legal_reserve_words = num2words(legal_reserve, lang='pt_BR', to='currency')
+  dividend_distribution_words = num2words(dividend_distribution, lang='pt_BR', to='currency')
+---
+section: Assembleia
+progress: 15
+question: Financeiro
+fields:
+  - Lucro Líquido: net_profit
+    datatype: currency
+    required: True
+  - Reserva Legal: legal_reserve
+    datatype: currency
+    required: True
+  - Distribuição dos Dividendos: dividend_distribution
+    datatype: currency
+    required: True
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#bmV0X3Byb2ZpdA').mask('000000000000000.00', {reverse: true});
+        $('#bGVnYWxfcmVzZXJ2ZQ').mask('000000000000000.00', {reverse: true});
+        $('#ZGl2aWRlbmRfZGlzdHJpYnV0aW9u').mask('000000000000000.00', {reverse: true});
+    });
+  </script>
 ---
 objects:
   - agenda: DAList.using(object_type=Thing, there_are_any=True)
@@ -333,76 +384,20 @@ code: |
       ]
       recipients.append(new_recipient)
 
+  for item in witnesses:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 2
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
   document_name = custom_file_name + '.pdf'
----
-include:
-  - element-esignature.yml
-  - element-send-email.yml
----
-undefine:
-  - button_send_list
-ga id: |
-  code: ga_id_end
-event: document_ready_screen
-section: Conclusão
-progress: 100
-back button: False
-question: |
-  Seu documento foi gerado com sucesso!
-subquestion: |
-  ${ generated_file.pdf.filename }
-under: |
-  Você pode baixar os documentos:
-  [PDF](${ generated_file.pdf.url_for() })
-  ou
-  [DOCX](${ generated_file.docx.url_for() })
-
-
-  % if plan_use_ged:
-    % if ged_response_status_code == 201:
-      O documento foi inserido com sucesso no GED - id: ${ ged_id }
-    % else:
-      <p>Houve erro ao inserir o documento no GED</p>
-      ${ ged_response }
-    % endif
-  % endif
-
-
-action buttons:
-  code: |
-    button_list
----
-code: |
-  esignature_button = {'action': 'submit_to_esignature',
-                       'arguments': {'target': 'signature'},
-                       'label': 'Enviar para assinatura eletrônica',
-                       'color': 'info',
-                       'icon': 'signature'}
----
-code: |
-  email_button = {'action': 'el_send_email',
-                       'arguments': {'target': 'email'},
-                       'label': 'Enviar por e-mail',
-                       'color': 'info',
-                       'icon': 'envelope'}
----
-code: |
-  el_button = {'action': educalegal_url,
-                'label': 'Fim',
-                'color': 'success',
-                'icon': 'check'}
----
-code: |
-  button_list = list()
-  button_list.append(el_button)
-  button_list.append(email_button)
-  if plan_use_esignature:
-    button_list.append(esignature_button)
----
-event: all_done
-back button: False
-question: Você já completou todas as etapas desta entrevista
-action buttons:
-  code: |
-    [el_button]
 ---
