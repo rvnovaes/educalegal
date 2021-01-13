@@ -29,8 +29,10 @@ subquestion: |
 
   * Os e-mails dos representantes legais devem ser diferentes.
 
-  * Os representantes são cadastrados no menu da Escola
+  * Para adicionar mais um representante clique no botão "Adicionar outro"
+  * Os representantes são cadastrados no menu da Escola"
   ${ representatives.table }
+  ${ representatives.add_action() }
 buttons:
   Continuar: continue
 ---

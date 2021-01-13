@@ -37,7 +37,7 @@ code: |
         witnesses[0].name.text = witnesses_list[0]['name']
         witnesses[0].email = witnesses_list[0]['email']
         witnesses[0].cpf = witnesses_list[0]['cpf']
-      elif len(witnesses_list) == 2:
+      elif len(witnesses_list) >= 2:
         witnesses[0].name.text = witnesses_list[0]['name']
         witnesses[0].email = witnesses_list[0]['email']
         witnesses[0].cpf = witnesses_list[0]['cpf']

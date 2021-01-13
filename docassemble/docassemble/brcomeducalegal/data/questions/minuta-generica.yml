@@ -5,8 +5,7 @@ metadata:
 sections:
   - Minuta
   - Parte
-  - Contraparte
-  - Parte extra
+  - Outra Parte
   - Conclusão
 ---
 include:
@@ -39,29 +38,13 @@ code: |
     signatories_list
     the_task = background_action('upload_task', upload=generic_document)
     if not the_task.ready():
-      part_types.target_number = 1
-      for item in part_types:
-        item.name.text
       representatives_list
+      for item in representatives:
+        item.name.text
       valid_representatives_table
-      school_party_type
-      if school_party_type_selected == part_types[0].name.text:
-        for item in counterparts:
-          item.name.text
-        if part_types[0].has_extraparts:
-          for item in extraparts:
-            item.name.text
-      elif school_party_type_selected == part_types[0].counterpart_name:
-        for item in parts:
-          item.name.text
-        if part_types[0].has_extraparts:
-          for item in extraparts:
-            item.name.text
-      elif school_party_type_selected == part_types[0].extrapart_name:
-        for item in parts:
-          item.name.text
-        for item in counterparts:
-          item.name.text
+      for item in other_party:
+        item.name.text
+      valid_other_party_table
       if has_witnesses:
         witnesses_list
         valid_witnesses_table
@@ -75,7 +58,7 @@ code: |
   background_response(action_argument('upload'))
 ---
 section: Minuta
-progress: 5
+progress: 20
 question: |
   Insira a minuta que deseja subir na plataforma.
 fields:
@@ -88,49 +71,6 @@ fields:
     required: true
     datatype: files
 ---
-objects:
-  - part_types: DAList.using(object_type=Person, ask_number=True)
----
-section: Parte
-progress: 5
-question: Parte
-fields:
-  - Número de Tipo de Pessoas: part_types.target_number
-    required: true
-    datatype: integer
-    default: 1
-    min: 1
----
-progress: 5
-section: Partes
-question: Tipos de Partes do Documento
-fields:
-  - "Denominação da Parte:": part_types[i].name.text
-    required: True
-    help: "Ex: Contratante, Locadora, Receptora, etc."
-  - "Denominação da Contraparte:": part_types[i].counterpart_name
-    required: True
-    help: "Ex: Contratada, Locatária, Reveladora, etc."
-  - "Haverá parte extra (Ex: Fiador):": part_types[i].has_extraparts
-    help: "Ex.: para o contrato de locação há a necessidade de uma 3ª parte que é o fiador."
-    datatype: yesnoradio
-    default: False
-  - "Denominação da Extra parte:": part_types[i].extrapart_name
-    required: True
-    default: "Fiador"
-    js show if: |
-      val("part_types[i].has_extraparts")
----
-code: |
-  school_party_type_list = list()
-  if part_types[0].has_extraparts:
-    school_party_type_list.append(part_types[0].name.text)
-    school_party_type_list.append(part_types[0].counterpart_name)
-    school_party_type_list.append(part_types[0].extrapart_name)
-  else:
-    school_party_type_list.append(part_types[0].name.text)
-    school_party_type_list.append(part_types[0].counterpart_name)
----
 section: Escola
 question: |
   A escola será a parte
@@ -141,68 +81,14 @@ fields:
     code: |
       school_party_type_list
 ---
-code: |
-  # Atribuindo os dados da escola para o tipo de parte escolhido pelo usuário
-  school_party_type_selected = school_party_type
-  if school_party_type_selected == part_types[0].name.text:
-    parts.target_number = len(representatives_list)
-    for i, signer in enumerate(representatives_list):
-        parts[i].name.text = signer['name']
-        parts[i].email = signer['email']
-        parts[i].cpf = signer['cpf']
-  elif school_party_type_selected == part_types[0].counterpart_name:
-    counterparts.target_number = len(representatives_list)
-    for i, signer in enumerate(representatives_list):
-        counterparts[i].name.text = signer['name']
-        counterparts[i].email = signer['email']
-        counterparts[i].cpf = signer['cpf']
-  elif school_party_type_selected == part_types[0].extrapart_name:
-    extraparts.target_number = len(representatives_list)
-    for i, signer in enumerate(representatives_list):
-        extraparts[i].name.text = signer['name']
-        extraparts[i].email = signer['email']
-        extraparts[i].cpf = signer['cpf']
----
 objects:
-  - parts: DAList.using(object_type=Person, ask_number=True)
+  - other_party: DAList.using(object_type=Person, ask_number=True)
 ---
-section: Parte
-progress: 10
-question: Dados da parte ${ part_types[0].name.text }
-fields:
-  - Número de Pessoas: parts.target_number
-    required: true
-    datatype: integer
-    default: 1
-    min: 1
-script: |
-  <script>
-    flash("Os dados da escola foram salvos! Agora, continue preenchendo os dados da(s) outra(s) parte(s).")
-  </script>
----
-section: Parte
-progress: 20
-question: |
-  Dados do(a) ${word(ordinal(i)) } ${ part_types[0].name.text }
-fields:
-  - 'Nome/Razão social:': parts[i].name.text
-    validate: validate_person_full_name
-    datatype: text
-    required: True
-    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
-  - "E-mail:": parts[i].email
-    datatype: email
-    help: ${ help_email_msg }
-    required: True
----
-objects:
-  - counterparts: DAList.using(object_type=Person, ask_number=True)
----
-section: Contraparte
+section: Outra Parte
 progress: 40
-question: Dados da parte ${ part_types[0].counterpart_name }
+question: Dados da(s) outra(s) parte(s)
 fields:
-  - Número de Pessoas: counterparts.target_number
+  - Número de Pessoas: other_party.target_number
     required: true
     datatype: integer
     default: 1
@@ -212,44 +98,39 @@ script: |
     flash("Os dados da escola foram salvos! Agora, continue preenchendo os dados da(s) outra(s) parte(s).")
   </script>
 ---
-section: Contraparte
-progress: 50
+section: Outra Parte
+progress: 60
 question: |
-  Dados do(a) ${word(ordinal(i)) } ${ part_types[i].counterpart_name }
+  Dados do(a) ${word(ordinal(i)) } outra parte
 fields:
-  - 'Nome/Razão social:': counterparts[i].name.text
+  - 'Nome/Razão social:': other_party[i].name.text
     validate: validate_person_full_name
     help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
-  - "E-mail:": counterparts[i].email
+  - "E-mail:": other_party[i].email
     datatype: email
     help: ${ help_email_msg }
     required: False
 ---
-objects:
-  - extraparts: DAList.using(object_type=Person, ask_number=True)
----
-section: Parte Extra
-progress: 70
-question: ${ part_types[0].extrapart_name }
-fields:
-  - Número de Pessoas: extraparts.target_number
-    required: true
-    datatype: integer
-    default: 1
-    min: 1
----
-section: Parte Extra
+field: valid_other_party_table
 progress: 80
 question: |
-  Dados do(a) ${word(ordinal(i)) } ${ part_types[i].extrapart_name }
-fields:
-  - 'Nome/Razão social:': extraparts[i].name.text
-    validate: validate_person_full_name
-    help: 'Para pessoa jurídica informe o nome conforme consta no CNPJ. Para pessoa física, o nome completo.'
-  - "E-mail:": extraparts[i].email
-    datatype: email
-    help: ${ help_email_msg }
-    required: True
+  Dados da(s) outra(s) parte(s)
+subquestion: |
+  * Confira os e-mails da(s) outra(s) parte(s) abaixo, pois estes serão usados no envio para a assinatura eletrônica ou e-mail.
+  ${ other_party.table }
+buttons:
+  Continuar: continue
+---
+table: other_party.table
+rows: other_party
+columns:
+  - Nome: |
+      row_item.name.text
+  - E-mail: |
+      row_item.email
+edit:
+  - name.text
+  - email
 ---
 code: |
   # Nome do tipo de documento selecionado pela usuario da escola
@@ -331,16 +212,13 @@ code: |
 ---
 code: |
   recipients = list()
-  for item in parts:
+  for item in representatives:
       if item.email:
           new_recipient = dict()
           new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
-          if school_party_type_selected == part_types[0].name.text:
-            new_recipient['routingOrder'] = 2
-          else:
-            new_recipient['routingOrder'] = 1
+          new_recipient['routingOrder'] = 2
           new_recipient['tabs'] = [
               {
                   'type': 'signHere',
@@ -349,16 +227,13 @@ code: |
           ]
           recipients.append(new_recipient)
 
-  for item in counterparts:
+  for item in other_party:
       if item.email:
           new_recipient = dict()
           new_recipient['name'] = item.name.text
           new_recipient['email'] = item.email
           new_recipient['group'] = 'signers'
-          if school_party_type_selected == part_types[0].counterpart_name:
-            new_recipient['routingOrder'] = 2
-          else:
-            new_recipient['routingOrder'] = 1
+          new_recipient['routingOrder'] = 1
           new_recipient['tabs'] = [
               {
                   'type': 'signHere',
@@ -366,25 +241,6 @@ code: |
               },
           ]
           recipients.append(new_recipient)
-
-  if part_types[0].has_extraparts:
-      for item in extraparts:
-          if item.email:
-              new_recipient = dict()
-              new_recipient['name'] = item.name.text
-              new_recipient['email'] = item.email
-              new_recipient['group'] = 'signers'
-              if school_party_type_selected == part_types[0].extrapart_name:
-                new_recipient['routingOrder'] = 2
-              else:
-                new_recipient['routingOrder'] = 1
-              new_recipient['tabs'] = [
-                  {
-                      'type': 'signHere',
-                      'anchorString': generate_anchor('signHere', item.email)
-                  },
-              ]
-              recipients.append(new_recipient)
 
   if has_witnesses:
       for item in witnesses:
@@ -401,4 +257,3 @@ code: |
                   },
               ]
               recipients.append(new_recipient)
----
