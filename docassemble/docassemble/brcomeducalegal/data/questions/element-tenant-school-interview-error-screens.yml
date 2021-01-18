@@ -64,7 +64,7 @@ buttons:
 event: invalid_ged_link
 question: Link do GED inválido
 subquestion: |
-  Não foi possível fazer o upload do arquivo no GED.  
+  Não foi possível fazer o upload do arquivo no GED.
   Contate nosso <a href="https://www.educalegal.com.br/contato/" target="_blank">suporte</a> para ajuda.
 buttons:
   - Sair: exit
