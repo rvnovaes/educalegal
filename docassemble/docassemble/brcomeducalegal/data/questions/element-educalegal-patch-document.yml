@@ -35,10 +35,20 @@ code: |
       "doc_uuid": doc_uuid,
   }
 
+  if el_environment == 'development':
+    log("params", "console")
+    log(params, "console")
+
   # atualiza no educa legal dados do documento gerado
   status_code, el_patch_document = elc.patch_document(data, params)
+
+  if el_environment == 'development':
+    log("status_code", "console")
+    log(status_code, "console")
+
   if status_code == 200:
     log("Atualizado o documento")
   else:
     log("Erro ao atualizar o documento")
+    invalid_ged_link
   log("{doc_uuid} - {data}".format(doc_uuid=doc_uuid, data=el_patch_document))

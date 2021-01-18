@@ -131,7 +131,7 @@ def patch_document():
        'docx_url':'http://docassemble/uploadedfile/37/20200916-124132-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx',
        'docx_filename':'20200916-124132-termo-de-acordo-individual-de-banco-de-horas-mp-927-2020.docx',
        'tenant_id':'1',
-       'doc_uuid':'cfe228dd-417e-4280-a670-63e565b7a838'
+       'doc_uuid':'69977197-4d04-45d3-a8af-9f93d04a6d76'
     }
 
     status_code, el_patch_document = elc.patch_document(data, params)
@@ -139,7 +139,7 @@ def patch_document():
 
 if __name__ == "__main__":
     # # Dados do Tenant
-    print(elc.document_types_list())
+    # print(elc.document_types_list())
     #
     # # Dados do GED do Tenant
     # print(elc.tenants_ged_read(2))
@@ -192,32 +192,6 @@ if __name__ == "__main__":
     # el_document_created_id = response["id"]
     # el_document_created_doc_uuid = response["doc_uuid"]
     # print(el_document_created_id)
-    #
-    # # Atualizacao de documento com dados do GED (Depende do valor para a ID do documento criado no método anterior
-    # ged_id = 1
-    # ged_link = "ged_link"
-    # ged_uuid = "010101010101"
-    #
-    # response = elc.patch_document(PARAMETROS DEVEM SER PASSADOS COMO DICT (data, params)
-    #     el_document_created_doc_uuid, send_email=True, status="enviado por e-mail"
-    # )
-    # print(response)
-    #
-    # response = elc.patch_document(PARAMETROS DEVEM SER PASSADOS COMO DICT (data, params)
-    #     el_document_created_doc_uuid, ged_id, ged_link, ged_uuid, status="inserido no GED",
-    # )
-    #
-    # print(response)
-    #
-    # # Atualização de documento com dos de ESignature (Depende do valor para ID do documento criado no método anterior)
-    #
-    # ged_id = 1
-    # new_status = "modificado"
-    # new_envelope_number = '3fc59949-23ab-4301-b4ce-1176f1246954'
-    # response = elc.patch_document(PARAMETROS DEVEM SER PASSADOS COMO DICT (data, params)
-    #     el_document_created_doc_uuid, new_status, new_envelope_number, submit_to_esignature=False
-    # )
-    # print(response)
     #
     # =========== envio do documento para assinatura clicksign ============= #
     # send_to_clicksign()

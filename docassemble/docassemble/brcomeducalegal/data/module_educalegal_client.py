@@ -93,6 +93,6 @@ class EducaLegalClient:
         except Exception as e:
             # log("e", "console")
             # log(e, "console")
-            return None, str(e)
+            return 400, str(e)
         else:
             return response.status_code, response.json()
