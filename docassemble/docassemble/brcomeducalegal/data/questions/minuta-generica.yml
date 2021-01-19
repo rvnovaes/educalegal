@@ -69,7 +69,7 @@ fields:
     help: Escolha o tipo do documento para que ele seja classificado corretamente no GED.
   - "Inserir minuta:": generic_document
     required: true
-    datatype: files
+    datatype: file
 ---
 section: Escola
 question: |
