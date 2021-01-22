@@ -146,7 +146,6 @@ class DocuSignClient:
         )
         self.token = json.loads(request_for_token.text)["access_token"]
 
-
     def get_user_info(self):
         self.authorization_header = {"Authorization": "Bearer " + self.token}
         request_for_user = requests.get(
@@ -347,6 +346,20 @@ class DocuSignClient:
                 return status_code, document
             else:
                 return status_code, document.reason
+
+    def get_envelope_info(self, envelope_id):
+        """Retorna as informações do envelope"""
+
+        try:
+            envelope_documents = requests.get(
+                self.extended_base_uri + "/envelopes/" + envelope_id, headers=self.authorization_header
+            )
+        except Exception as e:
+            message = str(type(e).__name__) + " : " + str(e)
+            logger.error(message)
+            return 500, message
+        else:
+            return envelope_documents.status_code, envelope_documents.json()
 
 
 def make_document_base64(document):

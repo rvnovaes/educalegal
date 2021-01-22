@@ -6,15 +6,15 @@ from pathlib import Path
 
 from api.third_party.docusign_client import DocuSignClient
 
-
+# pegar dados da docusign para acesso à api
 client_id = ""
 impersonated_user = ''
 private_key = '''-----BEGIN RSA PRIVATE KEY-----
 -----END RSA PRIVATE KEY-----'''
 
 
-def download_docusign_files():
-    filename = 'bahema_docusign.csv'
+def download_files():
+    filename = 'docusign.csv'
     # envelope_id = 'b01b1b76-8b9e-47bb-806a-7cc32be98d4d'
     envelope_list = pd.read_csv(filename).to_dict(orient='records')
 
@@ -71,4 +71,4 @@ def download_docusign_files():
 
 
 if __name__ == "__main__":
-    download_docusign_files()
+    download_files()
