@@ -430,7 +430,11 @@ class DocumentViewSet(viewsets.ModelViewSet):
             if 'trigger' in params:
                 if params['trigger'] == 'docassemble':
                     # salva o documento no sistema de arquivos e/ou ged
-                    save_document_file(instance, data, params)
+                    status_code, message = save_document_file(instance, data, params)
+
+                    if status_code != status.HTTP_200_OK:
+                        Response.status_code = status_code
+                        return Response({"status_code": status_code, "message": message})
 
             return Response(serializer.data)
 
@@ -989,21 +993,29 @@ def save_document_file(document, data, params):
     relative_path = 'docs/' + document.tenant.name + '/' + params['pdf_filename'][:15] + '/'
 
     document.file_kind = DocumentFileKind.PDF.value
-
+    status_code = 400
     if has_ged:
         try:
             status_code, ged_data, ged_id = save_in_ged(data, params['pdf_url'], None, document.tenant)
         except Exception as e:
             message = str(e)
             logging.exception(message)
+            return status_code, message
         else:
             if status_code == 201:
-                save_document_data(document, params['pdf_url'], None, relative_path, has_ged, ged_data,
-                                   params['pdf_filename'], None)
+                if 'id' in ged_data['id']:
+                    save_document_data(document, params['pdf_url'], None, relative_path, has_ged, ged_data,
+                                       params['pdf_filename'], None)
+                else:
+                    message = 'Não foi gerado o link do PDF do documento {} no GED. Entre em contato com o ' \
+                              'suporte.'.format(document.doc_uuid)
+                    logging.error(message)
+                    return status.HTTP_400_BAD_REQUEST, message
             else:
                 message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                     str(status_code), ged_data)
                 logging.error(message)
+                return status.HTTP_400_BAD_REQUEST, message
     else:
         save_document_data(document, params['pdf_url'], None, relative_path, has_ged, None, params['pdf_filename'],
                            None)
@@ -1033,17 +1045,27 @@ def save_document_file(document, data, params):
             except Exception as e:
                 message = str(e)
                 logging.exception(message)
+                return status_code, message
             else:
                 if status_code == 201:
-                    save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data,
+                    if 'id' in ged_data['id']:
+                        save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, ged_data,
                                        params['docx_filename'], document)
+                    else:
+                        message = 'Não foi gerado o link do DOCX do documento {} no GED. Entre em contato com o ' \
+                                  'suporte.'.format(document.doc_uuid)
+                        logging.error(message)
+                        return status.HTTP_400_BAD_REQUEST, message
                 else:
                     message = 'Não foi possível salvar o documento no GED. {} - {}'.format(
                         str(status_code), ged_data)
                     logging.error(message)
+                    return status.HTTP_400_BAD_REQUEST, message
         else:
             save_document_data(related_document, params['docx_url'], None, relative_path, has_ged, None,
                                params['docx_filename'], document)
+
+    return status.HTTP_200_OK, 'Feito o upload do documento'
 
 
 # Front end views views - All filtered by tenant - They all follow the convention with TenantMODELViewSet
