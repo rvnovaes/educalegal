@@ -552,7 +552,8 @@ def clean_all_variables(all_variables):
                       'signature_local_default', 'state_initials_list', 'string_types', 'table', 'target_number',
                       'tenant_data', 'tenant_esignature_data', 'tenant_ged_data', 'tenant_ged_token', 'tenant_ged_url',
                       'there_are_any', 'tid', 'url_args', 'user_local', 'uses_parts', 'ut', 'v', 'valid_data',
-                      'signingperson_data_list']
+                      'signingperson_data_list', 'grades_list', 'grades_select', 'grades_default', 'witnesses_list',
+                      'signatories_esw', 'signatories_list']
 
     # ignora valid_*_table: ex.: valid_employees_table, valid_locatarios_table
     regex_list = ['valid_(.*)_table']
