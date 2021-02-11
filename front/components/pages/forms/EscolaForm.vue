@@ -173,6 +173,7 @@ import Swal from "sweetalert2";
 import ufs from "@/components/pages/forms/ufs";
 import {isCNPJ} from 'brazilian-values';
 import {mask} from 'vue-the-mask';
+import { treat_error } from '@/util/error_handling';
 
 export default {
   props: ["school"],
@@ -295,10 +296,11 @@ export default {
             // recarrega a escola que foi criada
             await this.$router.push({path: "/escolas/" + res.data.id});
           }
-        } catch (e) {
+        } catch (error) {
+          let errorMessage = treat_error(error);
           await Swal.fire({
             title: `Erro ao criar ${this.school.name}`,
-            text: e,
+            text: errorMessage,
             icon: "error",
             customClass: {
               confirmButton: "btn btn-info btn-fill",
