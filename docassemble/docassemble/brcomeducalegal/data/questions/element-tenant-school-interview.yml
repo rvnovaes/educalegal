@@ -133,6 +133,9 @@ code: |
 code: |
     elc = EducaLegalClient(educalegal_url, ut)
     log("Chamando elc.tenants_school_names_school_data", "console")
+    school_names_list = None
+    school_units_dict = None
+    school_data_dict = None
     school_names_list, school_units_dict, school_data_dict = elc.tenants_school_names_school_data(tid)
     log("Lista de nomes de escolas" + str(school_names_list), "console")
     if el_log_to_console:
