@@ -11,7 +11,7 @@ include:
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
   - element-document-ready.yml
-  - element-school-email-reviewed.yml
+  - element-school-representative.yml
   - element-default-messages.yml
 ---
 modules:
@@ -38,7 +38,10 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
-    reviewed_school_email_answer
+    representatives_list
+    for item in representatives:
+      item.name.text
+    valid_representatives_table
     if school_party_type == "cedente":
       parte_insert_manager
       cessionarias.gather()
@@ -540,6 +543,53 @@ fields:
 ---
 code: |
   recipients = list()
+
+   for item in representatives:
+     if item.email:
+         new_recipient = dict()
+         new_recipient['name'] = item.name.text
+         new_recipient['email'] = item.email
+         new_recipient['group'] = 'signers'
+         new_recipient['routingOrder'] = 2
+         new_recipient['tabs'] = [
+             {
+                 'type': 'signHere',
+                 'anchorString': generate_anchor('signHere', item.email)
+             },
+         ]
+         recipients.append(new_recipient)
+
+   if school_party_type == "revealing":
+     for rec in receptors:
+       if rec.email:
+         new_recipient = dict()
+         new_recipient['name'] = rec.name.text
+         new_recipient['email'] = rec.email
+         new_recipient['group'] = 'signers'
+         new_recipient['routingOrder'] = 1
+         new_recipient['tabs'] = [
+           {
+             'type': 'signHere',
+             'anchorString': generate_anchor('signHere', rec.email)
+           },
+         ]
+         recipients.append(new_recipient)
+   else:
+     for rev in revealings:
+         if rev.email:
+           new_recipient = dict()
+           new_recipient['name'] = rev.name.text
+           new_recipient['email'] = rev.email
+           new_recipient['group'] = 'signers'
+           new_recipient['routingOrder'] = 1
+           new_recipient['tabs'] = [
+             {
+               'type': 'signHere',
+               'anchorString': generate_anchor('signHere', rev.email)
+             },
+           ]
+           recipients.append(new_recipient)
+
   for item in cedentes:
       if item.email:
           new_recipient = dict()

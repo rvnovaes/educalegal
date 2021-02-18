@@ -11,7 +11,7 @@ include:
   - element-generate-file.yml
   - element-educalegal-patch-document.yml
   - element-document-ready.yml
-  - element-school-email-reviewed.yml
+  - element-school-representative.yml
   - element-default-messages.yml
 ---
 modules:
@@ -37,7 +37,10 @@ code: |
     else:
       selected_school = school_names_list[0]
     school
-    reviewed_school_email_answer
+    representatives_list
+    for item in representatives:
+      item.name.text
+    valid_representatives_table
     if school_party_type == "comodante":
       parte_insert_manager
       comodatarias.gather()
@@ -152,7 +155,7 @@ fields:
   - "Nacionalidade:": comodantes[i].nationality
     required: True
     default: brasileiro(a)
-    show if: 
+    show if:
       variable: comodantes[i].person_type
       is: individual
   - "Estado Civil:": comodantes[i].marital_status
@@ -163,12 +166,12 @@ fields:
       - divorciado(a)
       - viúvo(a)
     datatype: radio
-    show if: 
+    show if:
       variable: comodantes[i].person_type
       is: individual
   - "Profissão:": comodantes[i].occupation
     required: True
-    show if: 
+    show if:
       variable: comodantes[i].person_type
       is: individual
   - "CNPJ:": comodantes[i].cnpj
@@ -337,7 +340,7 @@ fields:
   - "Nacionalidade:": comodatarias[i].nationality
     required: True
     default: brasileiro(a)
-    show if: 
+    show if:
       variable: comodatarias[i].person_type
       is: individual
   - "Estado Civil:": comodatarias[i].marital_status
@@ -348,12 +351,12 @@ fields:
       - divorciado(a)
       - viúvo(a)
     datatype: radio
-    show if: 
+    show if:
       variable: comodatarias[i].person_type
       is: individual
   - "Profissão:": comodatarias[i].occupation
     required: True
-    show if: 
+    show if:
       variable: comodatarias[i].person_type
       is: individual
   - "CNPJ:": comodatarias[i].cnpj
@@ -583,22 +586,24 @@ code:  |
 ---
 code: |
   recipients = list()
-  for item in comodantes:
-      if item.email:
-          new_recipient = dict()
-          new_recipient['name'] = item.name.text
-          new_recipient['email'] = item.email
-          new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 1
-          new_recipient['tabs'] = [
-              {
-                  'type': 'signHere',
-                  'anchorString': generate_anchor('signHere', item.email)
-              },
-          ]
-          recipients.append(new_recipient)
 
-  for item in comodatarias:
+   for item in representatives:
+     if item.email:
+         new_recipient = dict()
+         new_recipient['name'] = item.name.text
+         new_recipient['email'] = item.email
+         new_recipient['group'] = 'signers'
+         new_recipient['routingOrder'] = 2
+         new_recipient['tabs'] = [
+             {
+                 'type': 'signHere',
+                 'anchorString': generate_anchor('signHere', item.email)
+             },
+         ]
+         recipients.append(new_recipient)
+
+   if school_party_type == "comodatarias":
+    for item in comodantes:
       if item.email:
           new_recipient = dict()
           new_recipient['name'] = item.name.text
@@ -612,5 +617,20 @@ code: |
               },
           ]
           recipients.append(new_recipient)
+   else:
+     for item in comodatarias:
+         if item.email:
+             new_recipient = dict()
+             new_recipient['name'] = item.name.text
+             new_recipient['email'] = item.email
+             new_recipient['group'] = 'signers'
+             new_recipient['routingOrder'] = 1
+             new_recipient['tabs'] = [
+                 {
+                     'type': 'signHere',
+                     'anchorString': generate_anchor('signHere', item.email)
+                 },
+             ]
+             recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
