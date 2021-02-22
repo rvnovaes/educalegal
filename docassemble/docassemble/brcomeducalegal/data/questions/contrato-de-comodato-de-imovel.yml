@@ -587,50 +587,50 @@ code:  |
 code: |
   recipients = list()
 
-   for item in representatives:
-     if item.email:
-         new_recipient = dict()
-         new_recipient['name'] = item.name.text
-         new_recipient['email'] = item.email
-         new_recipient['group'] = 'signers'
-         new_recipient['routingOrder'] = 2
-         new_recipient['tabs'] = [
-             {
-                 'type': 'signHere',
-                 'anchorString': generate_anchor('signHere', item.email)
-             },
-         ]
-         recipients.append(new_recipient)
+  for item in representatives:
+   if item.email:
+     new_recipient = dict()
+     new_recipient['name'] = item.name.text
+     new_recipient['email'] = item.email
+     new_recipient['group'] = 'signers'
+     new_recipient['routingOrder'] = 2
+     new_recipient['tabs'] = [
+         {
+             'type': 'signHere',
+             'anchorString': generate_anchor('signHere', item.email)
+         },
+     ]
+     recipients.append(new_recipient)
 
-   if school_party_type == "comodatarias":
+  if school_party_type == "comodatarias":
     for item in comodantes:
       if item.email:
-          new_recipient = dict()
-          new_recipient['name'] = item.name.text
-          new_recipient['email'] = item.email
-          new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 1
-          new_recipient['tabs'] = [
-              {
-                  'type': 'signHere',
-                  'anchorString': generate_anchor('signHere', item.email)
-              },
-          ]
-          recipients.append(new_recipient)
-   else:
-     for item in comodatarias:
-         if item.email:
-             new_recipient = dict()
-             new_recipient['name'] = item.name.text
-             new_recipient['email'] = item.email
-             new_recipient['group'] = 'signers'
-             new_recipient['routingOrder'] = 1
-             new_recipient['tabs'] = [
-                 {
-                     'type': 'signHere',
-                     'anchorString': generate_anchor('signHere', item.email)
-                 },
-             ]
-             recipients.append(new_recipient)
+        new_recipient = dict()
+        new_recipient['name'] = item.name.text
+        new_recipient['email'] = item.email
+        new_recipient['group'] = 'signers'
+        new_recipient['routingOrder'] = 1
+        new_recipient['tabs'] = [
+            {
+                'type': 'signHere',
+                'anchorString': generate_anchor('signHere', item.email)
+            },
+        ]
+        recipients.append(new_recipient)
+  else:
+   for item in comodatarias:
+     if item.email:
+       new_recipient = dict()
+       new_recipient['name'] = item.name.text
+       new_recipient['email'] = item.email
+       new_recipient['group'] = 'signers'
+       new_recipient['routingOrder'] = 1
+       new_recipient['tabs'] = [
+           {
+               'type': 'signHere',
+               'anchorString': generate_anchor('signHere', item.email)
+           },
+       ]
+       recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'

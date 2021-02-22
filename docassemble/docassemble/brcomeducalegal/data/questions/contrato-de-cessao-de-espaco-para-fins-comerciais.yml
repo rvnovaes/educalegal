@@ -544,80 +544,50 @@ fields:
 code: |
   recipients = list()
 
-   for item in representatives:
-     if item.email:
-         new_recipient = dict()
-         new_recipient['name'] = item.name.text
-         new_recipient['email'] = item.email
-         new_recipient['group'] = 'signers'
-         new_recipient['routingOrder'] = 2
-         new_recipient['tabs'] = [
-             {
-                 'type': 'signHere',
-                 'anchorString': generate_anchor('signHere', item.email)
-             },
-         ]
-         recipients.append(new_recipient)
-
-   if school_party_type == "revealing":
-     for rec in receptors:
-       if rec.email:
-         new_recipient = dict()
-         new_recipient['name'] = rec.name.text
-         new_recipient['email'] = rec.email
-         new_recipient['group'] = 'signers'
-         new_recipient['routingOrder'] = 1
-         new_recipient['tabs'] = [
-           {
+  for item in representatives:
+   if item.email:
+     new_recipient = dict()
+     new_recipient['name'] = item.name.text
+     new_recipient['email'] = item.email
+     new_recipient['group'] = 'signers'
+     new_recipient['routingOrder'] = 2
+     new_recipient['tabs'] = [
+         {
              'type': 'signHere',
-             'anchorString': generate_anchor('signHere', rec.email)
-           },
-         ]
-         recipients.append(new_recipient)
-   else:
-     for rev in revealings:
-         if rev.email:
-           new_recipient = dict()
-           new_recipient['name'] = rev.name.text
-           new_recipient['email'] = rev.email
-           new_recipient['group'] = 'signers'
-           new_recipient['routingOrder'] = 1
-           new_recipient['tabs'] = [
-             {
-               'type': 'signHere',
-               'anchorString': generate_anchor('signHere', rev.email)
-             },
-           ]
-           recipients.append(new_recipient)
+             'anchorString': generate_anchor('signHere', item.email)
+         },
+     ]
+     recipients.append(new_recipient)
 
-  for item in cedentes:
-      if item.email:
-          new_recipient = dict()
-          new_recipient['name'] = item.name.text
-          new_recipient['email'] = item.email
-          new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 1
-          new_recipient['tabs'] = [
-              {
-                  'type': 'signHere',
-                  'anchorString': generate_anchor('signHere', item.email)
-              },
-          ]
-          recipients.append(new_recipient)
-
-  for item in cessionarias:
-      if item.email:
-          new_recipient = dict()
-          new_recipient['name'] = item.name.text
-          new_recipient['email'] = item.email
-          new_recipient['group'] = 'signers'
-          new_recipient['routingOrder'] = 1
-          new_recipient['tabs'] = [
-              {
-                  'type': 'signHere',
-                  'anchorString': generate_anchor('signHere', item.email)
-              },
-          ]
-          recipients.append(new_recipient)
+  if school_party_type == "cedentes":
+   for item in cessionarias:
+     if item.email:
+       new_recipient = dict()
+       new_recipient['name'] = item.name.text
+       new_recipient['email'] = item.email
+       new_recipient['group'] = 'signers'
+       new_recipient['routingOrder'] = 1
+       new_recipient['tabs'] = [
+         {
+           'type': 'signHere',
+           'anchorString': generate_anchor('signHere', item.email)
+         },
+       ]
+       recipients.append(new_recipient)
+  else:
+   for item in cedentes:
+     if item.email:
+       new_recipient = dict()
+       new_recipient['name'] = item.name.text
+       new_recipient['email'] = item.email
+       new_recipient['group'] = 'signers'
+       new_recipient['routingOrder'] = 1
+       new_recipient['tabs'] = [
+         {
+           'type': 'signHere',
+           'anchorString': generate_anchor('signHere', item.email)
+         },
+       ]
+       recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
