@@ -13,6 +13,7 @@ include:
   - element-document-ready.yml
   - element-school-representative.yml
   - element-default-messages.yml
+  - element-school-witness.yml
 ---
 modules:
   - docassemble_wrappers.validator_collection_br
@@ -57,6 +58,10 @@ code: |
     atividade
     duracao_contrato
     city
+    if has_witnesses:
+      witnesses.uses_parts = False
+      witnesses_list
+      valid_witnesses_table
     signature_local
     generated_file
     el_patch_document
@@ -634,3 +639,19 @@ code: |
        recipients.append(new_recipient)
 
   document_name = custom_file_name + '.pdf'
+
+  if has_witnesses:
+    for item in witnesses:
+      if item.email:
+        new_recipient = dict()
+        new_recipient['name'] = item.name.text
+        new_recipient['email'] = item.email
+        new_recipient['group'] = 'signers'
+        new_recipient['routingOrder'] = 1
+        new_recipient['tabs'] = [
+          {
+            'type': 'signHere',
+            'anchorString': generate_anchor('signHere', item.email)
+          },
+        ]
+        recipients.append(new_recipient)
