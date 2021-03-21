@@ -17,8 +17,8 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "educa-legal-test",
         "USER": "doadmin",
-        "PASSWORD": "lvr0emmvuc8241ez",
-        "HOST": "educa-legal-development-db-postgresql-do-user-106912-0.a.db.ondigitalocean.com",
+        "PASSWORD": "wxk5gsxfqj8jnru2",
+        "HOST": "educa-legal-development-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com",
         "PORT": 25060
     }
 }
