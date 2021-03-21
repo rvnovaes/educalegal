@@ -34,7 +34,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Static e media files
 # https://www.digitalocean.com/community/questions/getting-signaturedoesnotmatch-with-digitalocean-spaces
 AWS_STORAGE_BUCKET_NAME = "educalegal-test"
-AWS_S3_ENDPOINT_URL = "https://educalegal-test.sfo2.digitaloceanspaces.com/"
+AWS_S3_ENDPOINT_URL = " https://educa-legal-files-test.nyc3.digitaloceanspaces.com/"
 AWS_STATIC_LOCATION = "static"
 STATIC_URL = "{}/{}/".format(AWS_S3_ENDPOINT_URL, AWS_STATIC_LOCATION)
 AWS_MEDIA_LOCATION = "media"
