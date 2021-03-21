@@ -74,8 +74,8 @@
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
-    storage_access_key: QR3GRQYL26DWRS5NKPC4
-    storage_secret_key: I/GOZ5ZY1cB6r8+T9YiMWSNJhRhPir5Kke3uzhqYLFI
+    storage_access_key: ZUI36K4ACK63IB4NFKPP
+    storage_secret_key: +Bns+Y7R3or/Hi+u9qTQaPz9qjJcp6UbKnzMBpH//8g
     storage_bucket_name: educalegal-storage-educalegal
     storage_default_acl: private
     storage_endpoint_url: https://nyc3.digitaloceanspaces.com
@@ -92,8 +92,8 @@
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
-    storage_access_key: QR3GRQYL26DWRS5NKPC4
-    storage_secret_key: I/GOZ5ZY1cB6r8+T9YiMWSNJhRhPir5Kke3uzhqYLFI
+    storage_access_key: ZUI36K4ACK63IB4NFKPP
+    storage_secret_key: +Bns+Y7R3or/Hi+u9qTQaPz9qjJcp6UbKnzMBpH//8g
     storage_bucket_name: educalegal-storage-educalegal
     storage_default_acl: private
     storage_endpoint_url: https://nyc3.digitaloceanspaces.com
@@ -110,8 +110,8 @@
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
-    storage_access_key: QR3GRQYL26DWRS5NKPC4
-    storage_secret_key: I/GOZ5ZY1cB6r8+T9YiMWSNJhRhPir5Kke3uzhqYLFI
+    storage_access_key: ZUI36K4ACK63IB4NFKPP
+    storage_secret_key: +Bns+Y7R3or/Hi+u9qTQaPz9qjJcp6UbKnzMBpH//8g
     storage_bucket_name: educalegal-storage-bahema
     storage_default_acl: private
     storage_endpoint_url: https://nyc3.digitaloceanspaces.com
@@ -128,8 +128,8 @@
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
-    storage_access_key: QR3GRQYL26DWRS5NKPC4
-    storage_secret_key: I/GOZ5ZY1cB6r8+T9YiMWSNJhRhPir5Kke3uzhqYLFI
+    storage_access_key: ZUI36K4ACK63IB4NFKPP
+    storage_secret_key: +Bns+Y7R3or/Hi+u9qTQaPz9qjJcp6UbKnzMBpH//8g
     storage_bucket_name: educalegal-storage-escolamais
     storage_default_acl: private
     storage_endpoint_url: https://nyc3.digitaloceanspaces.com
@@ -146,8 +146,8 @@
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
-    storage_access_key: QR3GRQYL26DWRS5NKPC4
-    storage_secret_key: I/GOZ5ZY1cB6r8+T9YiMWSNJhRhPir5Kke3uzhqYLFI
+    storage_access_key: ZUI36K4ACK63IB4NFKPP
+    storage_secret_key: +Bns+Y7R3or/Hi+u9qTQaPz9qjJcp6UbKnzMBpH//8g
     storage_bucket_name: educalegal-storage-educalegal
     storage_default_acl: private
     storage_endpoint_url: https://nyc3.digitaloceanspaces.com
@@ -164,8 +164,8 @@
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
-    storage_access_key: QR3GRQYL26DWRS5NKPC4
-    storage_secret_key: I/GOZ5ZY1cB6r8+T9YiMWSNJhRhPir5Kke3uzhqYLFI
+    storage_access_key: ZUI36K4ACK63IB4NFKPP
+    storage_secret_key: +Bns+Y7R3or/Hi+u9qTQaPz9qjJcp6UbKnzMBpH//8g
     storage_bucket_name: educalegal-storage-educalegal
     storage_default_acl: private
     storage_endpoint_url: https://nyc3.digitaloceanspaces.com
@@ -182,8 +182,8 @@
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
-    storage_access_key: QR3GRQYL26DWRS5NKPC4
-    storage_secret_key: I/GOZ5ZY1cB6r8+T9YiMWSNJhRhPir5Kke3uzhqYLFI
+    storage_access_key: ZUI36K4ACK63IB4NFKPP
+    storage_secret_key: +Bns+Y7R3or/Hi+u9qTQaPz9qjJcp6UbKnzMBpH//8g
     storage_bucket_name: educalegal-storage-educalegal
     storage_default_acl: private
     storage_endpoint_url: https://nyc3.digitaloceanspaces.com
@@ -200,8 +200,8 @@
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
-    storage_access_key: QR3GRQYL26DWRS5NKPC4
-    storage_secret_key: I/GOZ5ZY1cB6r8+T9YiMWSNJhRhPir5Kke3uzhqYLFI
+    storage_access_key: ZUI36K4ACK63IB4NFKPP
+    storage_secret_key: +Bns+Y7R3or/Hi+u9qTQaPz9qjJcp6UbKnzMBpH//8g
     storage_bucket_name: educalegal-storage-educalegal
     storage_default_acl: private
     storage_endpoint_url: https://nyc3.digitaloceanspaces.com

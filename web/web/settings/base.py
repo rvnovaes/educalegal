@@ -269,8 +269,8 @@ LOGGING = {
 
 # Static e media files
 # https://www.digitalocean.com/docs/spaces/how-to/manage-access/
-AWS_ACCESS_KEY_ID = "AWNYACZSFSYOBCIOTFOP"
-AWS_SECRET_ACCESS_KEY = "k0GW8r3VnC9GzKD7S6RTdjCP2dVzN3bfOdthVfSCY/g"
+AWS_ACCESS_KEY_ID = "HAXMVLODCJJNK26SDGCJ"
+AWS_SECRET_ACCESS_KEY = "b3HiAIO9a5JmsHS/b7dgtLS5Fg0nfTSWojd/BG5nX68"
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_S3_OBJECT_PARAMETERS = {
     "CacheControl": "max-age=86400",
