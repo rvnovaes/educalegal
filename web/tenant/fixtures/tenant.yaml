@@ -69,7 +69,7 @@
     token: aaa4d93a7611637578984d43958eedc6316e42f3
     database: educa-legal-app
     database_user: educa-legal-app
-    database_user_password: e60k17byidfg20ye
+    database_user_password: utgbtttqy7hcaytm
     database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
@@ -87,7 +87,7 @@
     token: aaa4d93a7611637578984d43958eedc6316e42f3
     database: educa-legal-app
     database_user: educa-legal-app
-    database_user_password: e60k17byidfg20ye
+    database_user_password: utgbtttqy7hcaytm
     database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
@@ -141,7 +141,7 @@
     token: aaa4d93a7611637578984d43958eedc6316e42f3
     database: educa-legal-app
     database_user: educa-legal-app
-    database_user_password: e60k17byidfg20ye
+    database_user_password: utgbtttqy7hcaytm
     database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
@@ -159,7 +159,7 @@
     token: aaa4d93a7611637578984d43958eedc6316e42f3
     database: educa-legal-app
     database_user: educa-legal-app
-    database_user_password: e60k17byidfg20ye
+    database_user_password: utgbtttqy7hcaytm
     database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
@@ -177,7 +177,7 @@
     token: aaa4d93a7611637578984d43958eedc6316e42f3
     database: educa-legal-app
     database_user: educa-legal-app
-    database_user_password: e60k17byidfg20ye
+    database_user_password: utgbtttqy7hcaytm
     database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
@@ -195,7 +195,7 @@
     token: aaa4d93a7611637578984d43958eedc6316e42f3
     database: educa-legal-app
     database_user: educa-legal-app
-    database_user_password: e60k17byidfg20ye
+    database_user_password: utgbtttqy7hcaytm
     database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
