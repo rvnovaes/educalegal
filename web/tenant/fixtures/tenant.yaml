@@ -105,7 +105,7 @@
     token: e04b028e76570b913b40c0924c68ce98b533acb8
     database: mayan-bahema
     database_user: mayan-bahema
-    database_user_password: cvm9ahrop69aztre
+    database_user_password: oekq5sv4w3ehxite
     database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
