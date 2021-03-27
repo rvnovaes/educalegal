@@ -70,7 +70,7 @@
     database: educa-legal-app
     database_user: educa-legal-app
     database_user_password: e60k17byidfg20ye
-    database_host: educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
+    database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
@@ -88,7 +88,7 @@
     database: educa-legal-app
     database_user: educa-legal-app
     database_user_password: e60k17byidfg20ye
-    database_host: educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
+    database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
@@ -106,7 +106,7 @@
     database: mayan-bahema
     database_user: mayan-bahema
     database_user_password: cvm9ahrop69aztre
-    database_host: educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
+    database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
@@ -124,7 +124,7 @@
     database: mayan-escolamais
     database_user: mayan-escolamais
     database_user_password: y0l1u2jtcqdwyvfs
-    database_host: educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
+    database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
@@ -142,7 +142,7 @@
     database: educa-legal-app
     database_user: educa-legal-app
     database_user_password: e60k17byidfg20ye
-    database_host: educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
+    database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
@@ -160,7 +160,7 @@
     database: educa-legal-app
     database_user: educa-legal-app
     database_user_password: e60k17byidfg20ye
-    database_host: educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
+    database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
@@ -178,7 +178,7 @@
     database: educa-legal-app
     database_user: educa-legal-app
     database_user_password: e60k17byidfg20ye
-    database_host: educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
+    database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean
@@ -196,7 +196,7 @@
     database: educa-legal-app
     database_user: educa-legal-app
     database_user_password: e60k17byidfg20ye
-    database_host: educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com
+    database_host: educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com
     database_port: '25060'
     database_database_engine: django.db.backends.postgresql
     storage_provider: Digital Ocean

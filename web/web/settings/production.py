@@ -2,7 +2,7 @@ from .base import *
 
 from django.contrib.messages import constants as message_constants
 
-ALLOWED_HOSTS = ["app.educalegal.com.br", "api.educalegal.com.br", "167.71.161.48"]
+ALLOWED_HOSTS = ["app.educalegal.com.br", "api.educalegal.com.br", "134.122.5.207"]
 
 DEBUG = False
 MESSAGE_LEVEL = message_constants.INFO
@@ -14,7 +14,7 @@ DATABASES = {
         "NAME": "educa-legal-app",
         "USER": "educa-legal-app",
         "PASSWORD": "e60k17byidfg20ye",
-        "HOST": "educa-legal-producao-db-postgresql-do-user-106912-0.db.ondigitalocean.com",
+        "HOST": "educa-legal-producao-db-postgresql-do-user-8910843-0.b.db.ondigitalocean.com",
         "PORT": 25060
     }
 }
