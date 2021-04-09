@@ -1,0 +1,249 @@
+metadata:
+  title: Contrato de Prestação de Serviços de Consultoria Jurídica
+---
+include:
+  - element-tenant-school-interview.yml
+  - element-features.yml
+  - element-roadmap.yml
+  - element-foro.yml
+  - element-data-list.yml
+  - element-signature.yml
+  - element-generate-file.yml
+  - element-educalegal-patch-document.yml
+  - element-document-ready.yml
+  - element-school-representative.yml
+  - element-default-messages.yml
+  - element-school-witness.yml
+---
+modules:
+  - docassemble_wrappers.validator_collection_br
+  - .module_docusign_client
+---
+sections:
+  - Contratante
+  - Contratada
+  - Cláusulas
+  - Conclusão
+---
+code:  |
+  content_document = "contrato-prestacao-servicos-consultoria-juridica.docx"
+---
+id: logic
+mandatory: True
+code: |
+  if valid_data:
+    menu_items
+    if len(school_names_list) > 1:
+      selected_school
+    else:
+      selected_school = school_names_list[0]
+    school
+    representatives_list
+    for item in representatives:
+      item.name.text
+    valid_representatives_table
+    contratantes.gather()
+    if plan_use_esignature:
+      valid_contratantes_table
+    valorContrato
+    state
+    if has_witnesses:
+      witnesses.uses_parts = False
+      witnesses_list
+      valid_witnesses_table
+    signature_local
+    generated_file
+    el_patch_document
+    document_ready_screen
+---
+objects:
+  - contratantes: DAList.using(object_type=Individual, complete_attribute='complete', ask_number=True)
+---
+code: |
+  contratantes[i].name.first
+  contratantes[i].address.street
+  contratantes[i].complete = True
+comment: |
+  1. A ordem informada nesse bloco é a ordem que aparece na entrevista
+  2. O complete = True deve ser a última instrução sempre
+---
+section: Contratante
+progress: 30
+question: Número de Contratantes
+fields:
+  - Número: contratantes.target_number
+    datatype: integer
+    default: 1
+    min: 1
+---
+section: Contratante
+progress: 35
+question: Dados do(a) ${word(ordinal(i)) } Contratante
+fields:
+  - 'Razão social:': contratantes[i].name.first
+    validate: validate_person_full_name
+    datatype: text
+    help: 'Nome da pessoa jurídica, conforme consta no CNPJ.'
+  - 'CNPJ:': contratantes[i].cnpj
+    datatype: text
+    validate: validate_cnpj
+  - "E-mail:": contratantes[i].email
+    help: ${ help_email_msg }
+    datatype: email
+    required: False
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#Y29udHJhdGFudGVzW2ldLmNucGo').mask('00.000.000/0000-00', {reverse: true});
+      });
+  </script>
+---
+section: Contratante
+progress: 40
+question: Endereço do(a) ${ contratantes[i].name.first }
+fields:
+  - 'CEP:': contratantes[i].address.zip
+    datatype: text
+  - 'Logradouro:': contratantes[i].address.street
+    datatype: text
+  - 'Número:': contratantes[i].address.street_number
+    datatype: text
+  - 'Complemento:': contratantes[i].address.unit
+    datatype: text
+    required: false
+  - 'Bairro:': contratantes[i].address.neighborhood
+    datatype: text
+  - 'Município:': contratantes[i].address.city
+    datatype: text
+  - 'Estado:': contratantes[i].address.state
+    code: state_initials_list
+    datatype: dropdown
+script: |
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muemlw').mask('00000-000');
+  });
+
+  $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muemlw").focusout(function(){
+    var cep = $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muemlw").val();
+    cep = cep.replace ("-","");
+    if (cep != ""){
+      var urlStr = "https://viacep.com.br/ws/"+ cep +"/json/";
+      $.ajax({
+        url: urlStr,
+        crossDomain: true,
+        type: "get",
+        dataType: "json",
+        success: function(data){
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muc3RyZWV0").val(data.logradouro);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3MubmVpZ2hib3Job29k").val(data.bairro);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3MuY2l0eQ").val(data.localidade);
+          $("#Y29udHJhdGFudGVzW2ldLmFkZHJlc3Muc3RhdGU").val(data.uf);
+        },
+        error: function(erro){
+          console.log(erro);
+        }
+      });
+    }
+  });
+  </script>
+---
+section: Contratante
+field: valid_contratantes_table
+question: |
+  Contratantes:
+subquestion: |
+  Confira os e-mails dos destinatários abaixo, pois estes serão usados
+  no envio para a assinatura eletrônica.
+  ${ contratantes.table }
+buttons:
+  Continuar: continue
+---
+table: contratantes.table
+rows: contratantes
+columns:
+  - Name: |
+      row_item.name.first
+  - E-mail: |
+      row_item.email
+edit:
+  - email
+---
+code: |
+  from num2words import num2words
+  valorContratoExtenso = num2words(valorContrato, lang='pt_BR', to='currency')
+
+  if tipoParcela != 'mensal' and formaPagamento == 'parcelado':
+    nrParcelasExtenso = num2words(nrParcelas, lang='pt_BR')
+---
+section: Cláusulas
+progress: 60
+question: Preço e forma de pagamento
+subquestion: |
+  A Contratante pagará à Contratada o valor [FIELD tipoParcela] de [FIELD valorContrato].
+fields:
+  - 'A Contratante pagará à Contratada o valor:': tipoParcela
+    datatype: dropdown
+    choices:
+    - mensal: mensal
+    - anual: anual
+    - total: total
+  - 'Valor:': valorContrato
+    datatype: currency
+    hint: 0000,00
+script: |
+  <script type='text/javascript'>
+    $(document).ready(function(){
+        $('#dmFsb3JDb250cmF0bw').mask('000000000000000.00', {reverse: true});
+      });
+  </script>
+---
+code: |
+  recipients = list()
+  for item in contratantes:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.first
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 1
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  for item in representatives:
+      if item.email:
+          new_recipient = dict()
+          new_recipient['name'] = item.name.text
+          new_recipient['email'] = item.email
+          new_recipient['group'] = 'signers'
+          new_recipient['routingOrder'] = 2
+          new_recipient['tabs'] = [
+              {
+                  'type': 'signHere',
+                  'anchorString': generate_anchor('signHere', item.email)
+              },
+          ]
+          recipients.append(new_recipient)
+
+  document_name = custom_file_name + '.pdf'
+
+  if has_witnesses:
+      for item in witnesses:
+          if item.email:
+              new_recipient = dict()
+              new_recipient['name'] = item.name.text
+              new_recipient['email'] = item.email
+              new_recipient['group'] = 'signers'
+              new_recipient['routingOrder'] = 1
+              new_recipient['tabs'] = [
+                  {
+                      'type': 'signHere',
+                      'anchorString': generate_anchor('signHere', item.email)
+                  },
+              ]
+              recipients.append(new_recipient)
