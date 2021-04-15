@@ -172,9 +172,6 @@ edit:
 code: |
   from num2words import num2words
   valorContratoExtenso = num2words(valorContrato, lang='pt_BR', to='currency')
-
-  if tipoParcela != 'mensal' and formaPagamento == 'parcelado':
-    nrParcelasExtenso = num2words(nrParcelas, lang='pt_BR')
 ---
 section: Cláusulas
 progress: 60
