@@ -51,7 +51,6 @@
           <li class="nav-item">
             <a class="nav-link" href="https://atendimento.atlassian.net/servicedesk/customer/portal/2"
                target="_blank" rel="noopener">
-              <!--              <i class="ni ni-bulb-61"></i>-->
               <i class="fa fa-user-tie text-red"></i>
               <span class="nav-link-text">Atendimento Jurídico</span>
             </a>
@@ -62,6 +61,14 @@
                target="_blank" rel="noopener">
               <i class="ni ni-chat-round text-warning"></i>
               <span class="nav-link-text">Site Educa Legal</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link"
+               href="manual_usuario.pdf"
+               target="_blank" rel="noopener">
+              <i class="ni ni-single-copy-04 text-warning"></i>
+              <span class="nav-link-text">Manual do Usuário</span>
             </a>
           </li>
         </ul>

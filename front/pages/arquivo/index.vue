@@ -68,6 +68,10 @@
                     </el-select>
                   </base-input>
                 </div>
+                <div class="col-6">
+                  <base-input label="Parte do Documento" v-model="documentPart"data-mode="">
+                  </base-input>
+                </div>
                 <div class="col-4">
                   <base-input label="Escola">
                     <el-select multiple
@@ -287,6 +291,7 @@ export default {
       selectedRows: [],
       orderByCreatedDate: "descending",
       documentName: null,
+      documentPart: null,
       createdDateRange: null,
       selectedStatuses: [],
       selectedInterviews: [],
@@ -323,6 +328,7 @@ export default {
       this.$store.dispatch("documents/fetchPaginatedDocuments", {
         offset: 0,
         documentName: null,
+        documentPart: null,
         statusFilter: [],
         schoolFilter: [],
         interviewFilter: [],
@@ -425,6 +431,7 @@ export default {
         this.$store.dispatch("documents/fetchPaginatedDocuments", {
           offset: onStore,
           documentNameFilter: this.documentName,
+          documentPartFilter: this.documentPart,
           statusFilter: this.selectedStatuses,
           schoolFilter: this.selectedSchools,
           interviewFilter: this.selectedInterviews,
@@ -438,6 +445,7 @@ export default {
       await this.$store.dispatch("documents/fetchPaginatedDocuments", {
         offset: 0,
         documentNameFilter: this.documentName,
+        documentPartFilter: this.documentPart,
         statusFilter: this.selectedStatuses,
         schoolFilter: this.selectedSchools,
         interviewFilter: this.selectedInterviews,
@@ -447,6 +455,7 @@ export default {
     },
     cleanFilters() {
       this.documentName = null;
+      this.documentPart = null;
       this.createdDateRange = null;
       this.selectedInterviews = [];
       this.selectedStatuses = [];

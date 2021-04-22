@@ -233,7 +233,6 @@ class GradeSerializer(serializers.ModelSerializer):
 
 # https://www.django-rest-framework.org/api-guide/serializers/#dealing-with-nested-objects
 class SchoolSerializer(serializers.ModelSerializer):
-    unit = serializers.CharField(allow_blank=True)
     school_units = SchoolUnitSerializer(many=True, read_only=True)
     signatories = SignatorySerializer(many=True, read_only=True)
     grades = GradeSerializer(many=True, read_only=True)

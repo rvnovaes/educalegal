@@ -33,7 +33,8 @@ from validator_collection import checkers
 from django.core.files.storage import default_storage
 from django.core.exceptions import MultipleObjectsReturned
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, TextField
+from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from django.conf import settings
@@ -227,11 +228,12 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        document = Document.objects.annotate(document_data_as_text=Cast('document_data', TextField()))
         if not user.is_superuser:
             tenant = self.request.user.tenant
-            return Document.objects.filter(tenant=tenant)
+            return document.filter(tenant=tenant)
         else:
-            return Document.objects.all()
+            return document.all()
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -292,6 +294,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         paginator = LimitOffsetPagination()
         paginator.page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
         document_name_filter_param = request.query_params.get("documentName")
+        document_part_filter_param = request.query_params.get("documentPart")
         status_filter_param = request.query_params.getlist("status[]")
         school_filter_param = request.query_params.getlist("school[]")
         interview_filter_param = request.query_params.getlist("interview[]")
@@ -300,6 +303,9 @@ class DocumentViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset().filter(parent=None).exclude(status="rascunho")
         if document_name_filter_param:
             queryset = queryset.filter(name__unaccent__icontains=document_name_filter_param)
+        if document_part_filter_param:
+            queryset = queryset.filter(document_data_as_text__unaccent__icontains=document_part_filter_param)
+            # queryset = Document.objects.annotate(document_data_as_text=Cast('document_data', TextField())).filter(document_data_as_text__unaccent__icontains=document_part_filter_param)
         if status_filter_param:
             conditions = Q(status=status_filter_param[0])
             if len(status_filter_param) > 1:
@@ -546,7 +552,8 @@ def clean_all_variables(all_variables):
                       'signature_local_default', 'state_initials_list', 'string_types', 'table', 'target_number',
                       'tenant_data', 'tenant_esignature_data', 'tenant_ged_data', 'tenant_ged_token', 'tenant_ged_url',
                       'there_are_any', 'tid', 'url_args', 'user_local', 'uses_parts', 'ut', 'v', 'valid_data',
-                      'signingperson_data_list']
+                      'signingperson_data_list', 'grades_list', 'grades_select', 'grades_default', 'witnesses_list',
+                      'signatories_esw', 'signatories_list']
 
     # ignora valid_*_table: ex.: valid_employees_table, valid_locatarios_table
     regex_list = ['valid_(.*)_table']
